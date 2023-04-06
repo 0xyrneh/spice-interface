@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "./fonts.scss";
+
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -89,16 +91,6 @@ body {
   overflow-x: hidden;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
 a {
   color: inherit;
   text-decoration: none;
@@ -108,4 +100,50 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+.main {
+  background-image: url("/assets/images/bg.png");
+  @apply bg-black;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.vault-row > td {
+  transform-style: preserve-3d;
+  white-space: nowrap;
+}
+
+.vault-row:hover > td::before {
+  content: "";
+  transform: translateZ(-1px) translateX(-50%) translateY(-50%);
+  @apply absolute bg-light left-1/2 pointer-events-none;
+  width: 100%;
+  height: calc(100% - 14px);
+  top: calc(50% + 8px);
+}
+
+.vault-row:hover > td:first-child:before {
+  @apply rounded-l;
+}
+
+.vault-row:hover > td:last-child:before {
+  @apply rounded-r;
+}
+
+.text-shadow-yellow-light {
+  text-shadow: 0px 0px 8px rgba(255, 227, 202, 0.4);
+}
+
+.text-shadow-yellow {
+  text-shadow: 0px 0px 8px rgba(253, 167, 57, 0.4);
 }
