@@ -22,8 +22,8 @@ const Header = () => {
   };
 
   return (
-    <div className="hidden md:flex fixed left-0 top-0 right-0 h-[62px] bg-secondary bg-opacity-45 items-center justify-between px-20 font-SuisseIntl font-semibold">
-      <div className="flex-1 flex items-center gap-10">
+    <div className="z-50 hidden md:flex fixed left-0 top-0 right-0 h-[62px] bg-secondary bg-opacity-45 items-center justify-between px-7.5 xl:px-20 font-SuisseIntl font-semibold">
+      <div className="flex-1 flex items-center gap-7 xl:gap-10">
         <Image
           src="/assets/icons/logo.svg"
           alt="spice"
@@ -40,7 +40,7 @@ const Header = () => {
           </Link>
         ))}
       </div>
-      <div className="rounded border-1 border-gray px-3 py-1 flex items-center gap-3">
+      <div className="hidden lg:flex rounded border-1 border-gray px-3 py-1 items-center gap-3">
         <Image src="/assets/icons/search.svg" alt="" width={14} height={14} />
         <input
           className="bg-transparent text-gray font-SuisseIntl text-xs xl:text-sm outline-0 placeholder:text-gray placeholder:text-opacity-50"
