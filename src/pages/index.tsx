@@ -20,11 +20,16 @@ export default function VaultInfo() {
           backgroundImage: `url(${getVaultBackground()})`,
         }}
       >
-        <div className="flex justify-center px-2.5 xl:px-5 gap-2.5 lg:gap-4.5 xl:gap-[22px] pt-6 xl:pt-9 overflow-x-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-1 scrollbar-track-gray-100 pb-2">
+        {/* <div className="flex justify-center px-2.5 xl:px-5 gap-2.5 lg:gap-4.5 xl:gap-[22px] pt-6 xl:pt-9 overflow-x-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-1 scrollbar-track-gray-100 pb-2"> */}
+        <div
+          className={`flex px-2.5 xl:px-5 gap-2.5 lg:gap-4.5 xl:gap-[22px] pt-6 xl:pt-9 overflow-x-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-1 scrollbar-track-gray-100 pb-2 ${
+            vaults.length < 5 ? "justify-center" : ""
+          }`}
+        >
           {vaults.map((vault, index) => (
             <button
               key={`vault-${index}`}
-              className="flex flex-col-reverse aspect-[328/219] bg-cover min-w-[calc(20%-25px)] px-4 py-[26px] text-xs lg:text-sm xl:text-lg rounded shadow-sm hover:border-1 hover:border-light hover:-translate-y-2 text-left"
+              className="flex flex-col-reverse aspect-[328/219] bg-cover w-[calc(20%-25px)] min-w-[calc(20%-25px)] px-4 py-[26px] text-xs lg:text-sm xl:text-lg rounded shadow-sm hover:drop-shadow-sm hover:border-1 hover:border-light hover:-translate-y-2 text-left"
               style={{
                 backgroundImage: `url(${getVaultBackground(vault)})`,
               }}

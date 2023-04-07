@@ -39,6 +39,9 @@ module.exports = {
       boxShadow: {
         sm: "inset 0px 4px 70px 30px rgba(0, 0, 0, 0.7)",
       },
+      dropShadow: {
+        sm: "0px 0px 5px rgba(255, 255, 255, 0.6)",
+      },
       borderWidth: {
         1: "1px",
       },
