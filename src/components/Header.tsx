@@ -12,6 +12,7 @@ const NAV_OPTIONS: NavOption[] = [
 
 const Header = () => {
   const router = useRouter();
+
   const linkClass = (option: NavOption) => {
     if (
       router.pathname === option.href ||
