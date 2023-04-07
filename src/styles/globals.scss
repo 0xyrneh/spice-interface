@@ -126,10 +126,12 @@ a {
 .vault-row:hover > td::before {
   content: "";
   transform: translateZ(-1px) translateX(-50%) translateY(-50%);
-  @apply absolute bg-light left-1/2 pointer-events-none;
+  @apply absolute bg-light top-[calc(50%+5px)] xl:top-[calc(50%+8px)] h-[calc(100%-8px)] xl:h-[calc(100%-14px)] left-1/2 pointer-events-none;
   width: 100%;
-  height: calc(100% - 14px);
-  top: calc(50% + 8px);
+}
+
+.vault-row:last-child:hover > td::before {
+  @apply top-1/2 h-[calc(100%-18px)] xl:h-[calc(100%-30px)];
 }
 
 .vault-row:hover > td:first-child:before {

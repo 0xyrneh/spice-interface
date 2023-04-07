@@ -44,7 +44,7 @@ const Header = () => {
         <Image src="/assets/icons/search.svg" alt="" width={14} height={14} />
         <input
           className="bg-transparent text-gray font-SuisseIntl text-xs xl:text-sm outline-0 placeholder:text-gray placeholder:text-opacity-50"
-          placeholder="Search Vaults"
+          placeholder="Search Vaults and NFTs"
         />
       </div>
       <div className="flex-1 flex justify-end">
