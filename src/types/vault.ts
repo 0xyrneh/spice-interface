@@ -15,3 +15,9 @@ export type Vault = {
   icon: string;
   bg?: string;
 };
+
+export type Nft = {
+  name: string;
+  tvl: number;
+  icon: string;
+};

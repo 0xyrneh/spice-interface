@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { NavOption } from "@/types/common";
+import { VaultSearch } from "@/components/common";
 
 const NAV_OPTIONS: NavOption[] = [
   { href: "/", name: "Vaults" },
@@ -40,13 +41,8 @@ const Header = () => {
           </Link>
         ))}
       </div>
-      <div className="hidden lg:flex rounded border-1 border-gray px-3 py-1 items-center gap-3">
-        <Image src="/assets/icons/search.svg" alt="" width={14} height={14} />
-        <input
-          className="bg-transparent text-gray font-SuisseIntl text-xs xl:text-sm outline-0 placeholder:text-gray placeholder:text-opacity-50"
-          placeholder="Search Vaults and NFTs"
-        />
-      </div>
+
+      <VaultSearch />
       <div className="flex-1 flex justify-end">
         <button className="text-yellow border-2 border-yellow rounded px-2.5 py-1 bg-yellow bg-opacity-10">
           <span className="text-xs xl:text-sm text-shadow-yellow">

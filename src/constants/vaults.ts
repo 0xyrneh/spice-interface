@@ -3,7 +3,7 @@ import { Vault, ReceiptToken } from "@/types/vault";
 const vaults: Vault[] = [
   {
     name: "Prologue Vault",
-    tvl: 400,
+    tvl: 500,
     apy: 16,
     oneDayChange: -0.02,
     sevenDayChange: 4,
@@ -15,7 +15,7 @@ const vaults: Vault[] = [
   },
   {
     name: "Prologue Leverage Vault",
-    tvl: 400,
+    tvl: 700,
     apy: 25,
     oneDayChange: -0.05,
     sevenDayChange: 7,
@@ -27,7 +27,7 @@ const vaults: Vault[] = [
   },
   {
     name: "Flagship Vault",
-    tvl: 400,
+    tvl: 430,
     apy: 18,
     oneDayChange: 0.05,
     sevenDayChange: -4,
@@ -39,7 +39,7 @@ const vaults: Vault[] = [
   },
   {
     name: "HoneyJar Vault",
-    tvl: 400,
+    tvl: 200,
     apy: 30,
     oneDayChange: -0.05,
     sevenDayChange: 5,
