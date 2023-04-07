@@ -20,34 +20,49 @@ export default function VaultInfo() {
           backgroundImage: `url(${getVaultBackground()})`,
         }}
       >
-        <div className="flex justify-center px-2.5 xl:px-5 gap-[22px] pt-6 xl:pt-9 overflow-x-auto">
+        <div className="flex justify-center px-2.5 xl:px-5 gap-2.5 lg:gap-4.5 xl:gap-[22px] pt-6 xl:pt-9 overflow-x-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-1 scrollbar-track-gray-100 pb-2">
           {vaults.map((vault, index) => (
             <button
               key={`vault-${index}`}
-              className="flex flex-col-reverse aspect-[328/219] bg-cover min-w-[328px] px-4 py-[26px] text-sm xl:text-lg rounded shadow-sm border-1 border-light hover:-translate-y-2"
+              className="flex flex-col-reverse aspect-[328/219] bg-cover min-w-[calc(20%-25px)] px-4 py-[26px] text-xs lg:text-sm xl:text-lg rounded shadow-sm hover:border-1 hover:border-light hover:-translate-y-2 text-left"
               style={{
                 backgroundImage: `url(${getVaultBackground(vault)})`,
               }}
               onClick={() => setActiveVaultIndex(index)}
             >
-              {vault.name}
+              <span className="hidden xl:block">
+                {vault.name.length > 27
+                  ? `${vault.name.substring(0, 27)}...`
+                  : vault.name}
+              </span>
+              <span className="hidden lg:block xl:hidden">
+                {vault.name.length > 22
+                  ? `${vault.name.substring(0, 22)}...`
+                  : vault.name}
+              </span>
+
+              <span className="lg:hidden">
+                {vault.name.length > 19
+                  ? `${vault.name.substring(0, 19)}...`
+                  : vault.name}
+              </span>
             </button>
           ))}
         </div>
         <div className="flex items-center mt-3 xl:mt-5 font-SuisseIntl gap-10 xl:gap-15">
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2">
             <span className="text-gray text-sm xl:text-xl">TVL</span>
             <span className="text-sm xl:text-1.5xl">
               Ξ{getActiveVault().tvl}
             </span>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2">
             <span className="text-gray text-sm xl:text-xl">APY</span>
             <span className="text-sm xl:text-1.5xl">
               {getActiveVault().apy}%
             </span>
           </div>
-          <button className="flex justify-between items-center rounded bg-secondary bg-opacity-45 px-4.5 py-3 gap-16 hover:border-1 hover:border-light">
+          <button className="flex justify-between items-center rounded bg-secondary bg-opacity-45 px-4.5 py-3 gap-16 box-border hover:border-1 hover:border-light">
             <span className="font-Sanomat text-sm xl:text-xl">View Vault</span>
             <Image
               src="/assets/icons/arrowRight.svg"
@@ -64,7 +79,7 @@ export default function VaultInfo() {
       </div>
       <News />
       <VaultList
-        onClickVault={(vault, index) => {
+        onClickVault={(_, index) => {
           setActiveVaultIndex(index);
         }}
       />

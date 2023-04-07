@@ -15,6 +15,7 @@ module.exports = {
         light: "#FAFAF9",
         red: "#FF255A",
         green: "#34D399",
+        "gray-1": "#BBBFC6",
       },
       fontSize: {
         "1.5xl": "22px",
@@ -43,5 +44,8 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar")],
+  variants: {
+    scrollbar: ["rounded"],
+  },
 };

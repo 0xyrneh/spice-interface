@@ -149,3 +149,12 @@ a {
 .text-shadow-yellow {
   text-shadow: 0px 0px 8px rgba(253, 167, 57, 0.4);
 }
+
+.styled-scrollbars::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.styled-scrollbars::-webkit-scrollbar-thumb {
+  background: #bbbfc6;
+  @apply rounded-lg;
+}
