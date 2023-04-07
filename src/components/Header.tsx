@@ -24,13 +24,16 @@ const Header = () => {
 
   return (
     <div className="z-50 hidden md:flex fixed left-0 top-0 right-0 h-[62px] bg-secondary bg-opacity-45 items-center justify-between px-7.5 xl:px-20 font-SuisseIntl font-semibold">
-      <div className="flex-1 flex items-center gap-7 xl:gap-10">
-        <Image
-          src="/assets/icons/logo.svg"
-          alt="spice"
-          width={108}
-          height={32}
-        />
+      <div className="flex-1 flex items-center gap-7 xl:gap-10 min-w-[420px] xl:min-w-[500px]">
+        <Link href="/">
+          <Image
+            src="/assets/icons/logo.svg"
+            alt="spice"
+            width={108}
+            height={32}
+          />
+        </Link>
+
         {NAV_OPTIONS.map((item) => (
           <Link
             key={item.name}
