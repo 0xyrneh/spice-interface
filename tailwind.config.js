@@ -45,6 +45,9 @@ module.exports = {
       borderWidth: {
         1: "1px",
       },
+      letterSpacing: {
+        wide: ".07em",
+      },
     },
   },
   plugins: [require("tailwind-scrollbar")],

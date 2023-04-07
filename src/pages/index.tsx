@@ -13,14 +13,13 @@ export default function VaultInfo() {
     (vault ?? getActiveVault()).bg ?? "/assets/images/bgEmptyVault.png";
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col tracking-wide">
       <div
         className="aspect-[1930/1080] bg-cover hidden md:flex flex-col-reverse px-7.5 xl:px-20 py-7.5 xl:py-16 gap-2.5 xl:gap-3.5 text-light font-Sanomat font-semibold"
         style={{
           backgroundImage: `url(${getVaultBackground()})`,
         }}
       >
-        {/* <div className="flex justify-center px-2.5 xl:px-5 gap-2.5 lg:gap-4.5 xl:gap-[22px] pt-6 xl:pt-9 overflow-x-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-1 scrollbar-track-gray-100 pb-2"> */}
         <div
           className={`flex px-2.5 xl:px-5 gap-2.5 lg:gap-4.5 xl:gap-[22px] pt-6 xl:pt-9 overflow-x-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-1 scrollbar-track-gray-100 pb-2 ${
             vaults.length < 5 ? "justify-center" : ""
