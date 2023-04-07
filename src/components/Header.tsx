@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { NavOption } from "@/types/common";
-import { VaultSearch } from "@/components/common";
+import { VaultSearch, ConnectWallet } from "@/components/common";
 
 const NAV_OPTIONS: NavOption[] = [
   { href: "/", name: "Vaults" },
@@ -44,11 +44,7 @@ const Header = () => {
 
       <VaultSearch />
       <div className="flex-1 flex justify-end">
-        <button className="text-yellow border-2 border-yellow rounded px-2.5 py-1 bg-yellow bg-opacity-10">
-          <span className="text-xs xl:text-sm text-shadow-yellow">
-            CONNECT WALLET
-          </span>
-        </button>
+        <ConnectWallet />
       </div>
     </div>
   );
