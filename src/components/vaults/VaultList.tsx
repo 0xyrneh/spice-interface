@@ -10,7 +10,9 @@ type Props = {
 const VaultList = ({ onClickVault }: Props) => {
   return (
     <div className="hidden md:flex flex-col font-semibold px-7.5 xl:px-20 pt-[68px] pb-15 xl:py-25">
-      <h1 className="text-2.5xl text-yellow font-Sanomat">Vault List</h1>
+      <h1 className="text-2.5xl text-yellow text-shadow-yellow font-Sanomat">
+        Vault List
+      </h1>
 
       <table className="text-gray font-SuisseIntl text-xs lg:text-sm xl:text-base mx-3.5 xl:mx-5 border-b-1 border-b-gray">
         <thead>
@@ -90,7 +92,7 @@ const VaultList = ({ onClickVault }: Props) => {
         </tbody>
       </table>
 
-      <div className="flex items-center justify-center mt-8 xl:mt-10">
+      <div className="flex items-center justify-center mt-8 xl:mt-10 text-shadow-yellow">
         <Link
           target="__blank"
           href="https://docs.spicefi.xyz/"
