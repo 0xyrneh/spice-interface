@@ -17,13 +17,14 @@ const VaultList = ({ onClickVault }: Props) => {
       <table className="text-gray font-SuisseIntl text-xs lg:text-sm xl:text-base mx-3.5 xl:mx-5 border-b-1 border-b-gray">
         <thead>
           <tr className="table table-fixed w-full text-right border-b-1 border-b-gray">
-            <th className="text-left py-2 w-2/5 lg:w-[35%]">Vault</th>
+            <th className="text-left pl-5 py-2 w-2/5 lg:w-[35%]">Vault</th>
             <th>TVL</th>
             <th>APY</th>
             <th className="hidden lg:table-cell">1d Change</th>
             <th className="hidden lg:table-cell">7d Change</th>
             <th>Creator</th>
-            <th className="">Receipt Token</th>
+
+            <th className="pr-7.5 xl:pr-12.5 w-[15%]">Receipt Token</th>
           </tr>
         </thead>
         <tbody className="block max-h-[876px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-1 scrollbar-track-gray-100 [&>tr>td]:pt-2.5 [&>:last-child>td]:py-2.5 xl:[&>tr>td]:pt-4 xl:[&>:last-child>td]:py-4">
@@ -82,7 +83,7 @@ const VaultList = ({ onClickVault }: Props) => {
                   {vault.creator}
                 </div>
               </td>
-              <td>
+              <td className="w-[15%]">
                 <div className="flex items-center justify-end mr-px h-[50px] xl:h-[70px] bg-secondary rounded-r pr-7.5 xl:pr-12.5 -ml-px">
                   {vault.receiptToken}
                 </div>
