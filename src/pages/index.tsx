@@ -28,7 +28,7 @@ export default function VaultInfo() {
           {vaults.map((vault, index) => (
             <button
               key={`vault-${index}`}
-              className="flex flex-col-reverse aspect-[328/219] bg-cover w-[calc(20%-25px)] min-w-[calc(20%-25px)] px-4 py-[26px] text-xs lg:text-sm xl:text-lg rounded shadow-sm hover:drop-shadow-sm hover:border-1 hover:border-light hover:-translate-y-2 text-left"
+              className="flex flex-col-reverse aspect-[328/219] bg-cover md:w-[calc(25%-7px)] md:min-w-[calc(25%-7px)] lg:w-[calc(20%-15px)] lg:min-w-[calc(20%-15px)] px-4 py-[26px] text-xs lg:text-sm xl:text-lg rounded shadow-sm hover:drop-shadow-sm hover:border-1 hover:border-light hover:-translate-y-2 text-left"
               style={{
                 backgroundImage: `url(${getVaultBackground(vault)})`,
               }}
