@@ -1,31 +1,38 @@
-/* SuisseIntl */
+/* Space Grotesk */
 @font-face {
-  font-family: Suisse Intl;
-  src: url(/assets/fonts/SuisseIntl/SuisseIntl-Regular.ttf) format("truetype");
-  font-weight: 400;
+  font-family: Space Grotesk;
+  src: url(/assets/fonts/SpaceGrotesk/SpaceGrotesk-Light.ttf) format("truetype");
+  font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: Suisse Intl;
-  src: url(/assets/fonts/SuisseIntl/SuisseIntl-SemiBold.ttf) format("truetype");
-  font-weight: 500 600;
-  font-style: normal;
-}
-
-/* Sanomat */
-@font-face {
-  font-family: Sanomat;
-  src: url("/assets/fonts/Sanomat/Sanomat Web Regular Regular.ttf")
+  font-family: Space Grotesk;
+  src: url(/assets/fonts/SpaceGrotesk/SpaceGrotesk-Regular.ttf)
     format("truetype");
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: Sanomat;
-  src: url("/assets/fonts/Sanomat/Sanomat Web Semibold Regular.ttf")
+  font-family: Space Grotesk;
+  src: url(/assets/fonts/SpaceGrotesk/SpaceGrotesk-Medium.ttf)
     format("truetype");
-  font-weight: 500 600;
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Space Grotesk;
+  src: url(/assets/fonts/SpaceGrotesk/SpaceGrotesk-SemiBold.ttf)
+    format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Space Grotesk;
+  src: url(/assets/fonts/SpaceGrotesk/SpaceGrotesk-Bold.ttf) format("truetype");
+  font-weight: 700;
   font-style: normal;
 }

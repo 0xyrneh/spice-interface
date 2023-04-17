@@ -1,7 +1,7 @@
 const News = () => {
   return (
-    <div className="bg-secondary bg-opacity-[.95] h-20 hidden md:flex items-center justify-center">
-      <span className="text-light text-xs lg:text-sm xl:text-xl text-center font-Sanomat font-semibold">
+    <div className="bg-gray-700 bg-opacity-[.95] h-[60px] hidden sm:flex items-center justify-center">
+      <span className="text-orange-50 font-medium text-base text-center">
         The Prologue Leverage Vault is now LIVE! Deposit now to support Prologue
         Holders 🐪🏜️
       </span>

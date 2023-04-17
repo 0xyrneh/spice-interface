@@ -18,13 +18,13 @@ const Header = () => {
       router.pathname === option.href ||
       router.pathname.startsWith(option.href + "/", 0)
     ) {
-      return "text-yellow-light text-shadow-yellow-light";
+      return "text-orange-200 text-shadow-orange-200";
     }
     return "";
   };
 
   return (
-    <div className="z-50 hidden md:flex fixed left-0 top-0 right-0 h-[62px] bg-secondary bg-opacity-45 items-center justify-between px-7.5 xl:px-20 font-SuisseIntl font-semibold">
+    <div className="z-50 hidden sm:flex fixed left-0 top-0 right-0 h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-7.5 xl:px-20 font-bold">
       <div className="flex-1 flex items-center gap-7 xl:gap-10 min-w-[420px] xl:min-w-[500px]">
         <Link href="/">
           <Image
@@ -39,7 +39,9 @@ const Header = () => {
           <Link
             key={item.name}
             href={item.href}
-            className={`text-gray text-xs xl:text-sm ${linkClass(item)}`}
+            className={`hidden md:flex text-gray-200 text-xs xl:text-sm ${linkClass(
+              item
+            )}`}
           >
             {item.name.toUpperCase()}
           </Link>

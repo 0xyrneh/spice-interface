@@ -53,10 +53,10 @@ const VaultSearch = () => {
   }, [searchQuery]);
 
   return (
-    <div className="relative hidden lg:w-[268px] xl:w-[350px] h-9 lg:flex text-gray text-xs xl:text-sm rounded border-1 border-gray px-3 py-1 items-center gap-3">
-      <FaSearch />
+    <div className="relative hidden w-[224px] h-8 lg:flex text-gray-200 text-xs rounded border-1 border-gray-200 px-3 py-1 items-center gap-3">
+      <FaSearch size={16} />
       <input
-        className="flex-1 bg-transparent font-SuisseIntl outline-0 placeholder:text-gray placeholder:text-opacity-50"
+        className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
         placeholder="Search Vaults and NFTs"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
@@ -65,14 +65,14 @@ const VaultSearch = () => {
       />
 
       {visibleResults && (
-        <div className="absolute flex flex-col top-[calc(100%+16px)] left-0 right-0 bg-secondary bg-opacity-45 border-1 border-light px-2 pt-2.5 pb-3 gap-2 rounded">
+        <div className="absolute flex flex-col top-[calc(100%+16px)] left-0 right-0 bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 pt-2.5 pb-3 gap-2 rounded">
           <div className="flex flex-col gap-1">
             <span className="text-xs xl:text-sm">VAULTS</span>
             <div className="flex flex-col gap-px">
               {filteredVaults.map((vault, index) => (
                 <button
                   key={`vault-${index}`}
-                  className="flex justify-between items-center text-xs border-1 border-transparent hover:border-light rounded p-[5px]"
+                  className="flex justify-between items-center text-xs border-1 border-transparent hover:border-orange-50 rounded p-[5px]"
                 >
                   <div className="flex items-center gap-3 text-left">
                     <Image src={vault.icon} width={20} height={20} alt="" />
@@ -93,7 +93,7 @@ const VaultSearch = () => {
               {filteredNfts.map((vault, index) => (
                 <button
                   key={`vault-${index}`}
-                  className="flex justify-between items-center text-xs border-1 border-transparent hover:border-light rounded p-[5px]"
+                  className="flex justify-between items-center text-xs border-1 border-transparent hover:border-orange-50 rounded p-[5px]"
                 >
                   <div className="flex items-center gap-3 text-left">
                     <Image src={vault.icon} width={20} height={20} alt="" />
