@@ -37,25 +37,25 @@ const ConnectWallet = () => {
   return (
     <div>
       {account ? (
-        <div className="flex items-center gap-3.5">
+        <div className="flex items-center gap-3">
           <Image
             src="/assets/images/vaultIcon.svg"
-            width={32}
-            height={32}
+            width={28}
+            height={28}
             alt=""
           />
-          <span className="text-xs xl:text-sm text-light">
+          <span className="text-xs text-bold text-orange-200 text-shadow-orange-200">
             {shortAddress(account)}
           </span>
         </div>
       ) : (
         <button
-          className="text-yellow border-2 border-yellow rounded px-2.5 py-1 bg-yellow bg-opacity-10"
+          className="text-orange-900 border-2 border-orange-900 rounded px-2.5 py-1 bg-orange-900 bg-opacity-10"
           onClick={handleConnect}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <span className="text-xs xl:text-sm text-shadow-yellow">
+          <span className="text-xs xl:text-sm text-shadow-orange-900">
             CONNECT WALLET
           </span>
         </button>

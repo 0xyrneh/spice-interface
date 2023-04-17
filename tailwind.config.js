@@ -4,18 +4,16 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        SuisseIntl: ["Suisse Intl", "sans-serif"],
-        Sanomat: ["Sanomat", "sans-serif"],
+        SpaceGrotesk: ["Space Grotesk", "sans-serif"],
       },
       colors: {
-        "yellow-light": "#FFE3CA",
-        yellow: "#FDA739",
-        secondary: "#1E1E1E",
-        gray: "#C7C7C7",
-        light: "#FAFAF9",
+        "orange-200": "#FFE3CA",
+        "orange-900": "#FDA739",
+        "gray-700": "#1E1E1E",
+        "gray-200": "#C7C7C7",
+        "orange-50": "#FAFAF9",
         red: "#FF255A",
         green: "#34D399",
-        "gray-1": "#BBBFC6",
       },
       fontSize: {
         "1.5xl": "22px",
@@ -37,10 +35,7 @@ module.exports = {
         45: ".45",
       },
       boxShadow: {
-        sm: "inset 0px 4px 70px 30px rgba(0, 0, 0, 0.7)",
-      },
-      dropShadow: {
-        sm: "0px 0px 5px rgba(255, 255, 255, 0.6)",
+        "orange-900": "0px 0px 4px rgba(253, 167, 57, 0.4)",
       },
       borderWidth: {
         1: "1px",

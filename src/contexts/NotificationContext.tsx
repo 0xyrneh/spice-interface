@@ -37,7 +37,7 @@ const NotificationProvider = ({ children }: Props) => {
     >
       {children}
       {visible && (
-        <div className="fixed bg-secondary bg-opacity-90 top-16 right-20 w-[300px] flex flex-col rounded-l rounded-b border-1 border-light text-xs text-white font-SuisseIntl p-2">
+        <div className="fixed bg-gray-700 bg-opacity-90 top-16 right-20 w-[300px] flex flex-col rounded-l rounded-b border-1 border-orange-50 text-xs text-white p-2">
           <span>{title}</span>
           <br />
           <span>{message}</span>

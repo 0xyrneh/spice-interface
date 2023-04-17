@@ -1,8 +1,8 @@
 import { useState } from "react";
 import vaults from "@/constants/vaults";
-import Image from "next/image";
+import { FaChevronRight } from "react-icons/fa";
 import { Vault } from "@/types/vault";
-import { News, VaultList, VaultFooter } from "@/components/vaults";
+import { News, VaultList } from "@/components/vaults";
 import { NotSupported } from "@/components";
 
 export default function VaultInfo() {
@@ -13,73 +13,49 @@ export default function VaultInfo() {
     (vault ?? getActiveVault()).bg ?? "/assets/images/bgEmptyVault.png";
 
   return (
-    <div className="flex flex-col tracking-wide">
+    <div className="flex flex-col tracking-wide max-w-[1512px] w-full">
       <div
-        className="aspect-[1930/1080] bg-cover hidden md:flex flex-col-reverse px-7.5 xl:px-20 py-7.5 xl:py-16 gap-2.5 xl:gap-3.5 text-light font-Sanomat font-semibold"
+        className="min-w-[960px] aspect-[1930/1080] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-orange-50 font-semibold"
         style={{
           backgroundImage: `url(${getVaultBackground()})`,
         }}
       >
         <div
-          className={`flex px-2.5 xl:px-5 gap-2.5 lg:gap-4.5 xl:gap-[22px] pt-6 xl:pt-9 overflow-x-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-1 scrollbar-track-gray-100 pb-2 ${
+          className={`flex gap-3 pt-3 overflow-x-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100 pb-2 ${
             vaults.length < 5 ? "justify-center" : ""
           }`}
         >
           {vaults.map((vault, index) => (
             <button
               key={`vault-${index}`}
-              className="flex flex-col-reverse aspect-[328/219] bg-cover md:w-[calc(25%-7px)] md:min-w-[calc(25%-7px)] lg:w-[calc(20%-15px)] lg:min-w-[calc(20%-15px)] px-4 py-[26px] text-xs lg:text-sm xl:text-lg rounded shadow-sm hover:drop-shadow-sm hover:border-1 hover:border-light hover:-translate-y-2 text-left"
+              className="flex flex-col-reverse h-[144px] xl:h-[176px] bg-cover w-[calc(20%-9.6px)] min-w-[calc(20%-9.6px)] p-3 rounded hover:drop-shadow-sm border-1 border-gray-200 border-opacity-50 hover:border-orange-50 hover:-translate-y-2 text-left"
               style={{
                 backgroundImage: `url(${getVaultBackground(vault)})`,
               }}
               onClick={() => setActiveVaultIndex(index)}
             >
-              <span className="hidden xl:block">
-                {vault.name.length > 27
-                  ? `${vault.name.substring(0, 27)}...`
-                  : vault.name}
-              </span>
-              <span className="hidden lg:block xl:hidden">
-                {vault.name.length > 22
-                  ? `${vault.name.substring(0, 22)}...`
-                  : vault.name}
-              </span>
-
-              <span className="lg:hidden">
-                {vault.name.length > 19
-                  ? `${vault.name.substring(0, 19)}...`
-                  : vault.name}
+              <span className="text-sm font-bold whitespace-nowrap overflow-hidden w-full text-ellipsis">
+                {vault.name}
               </span>
             </button>
           ))}
         </div>
-        <div className="flex items-center mt-3 xl:mt-5 font-SuisseIntl gap-10 xl:gap-15">
-          <div className="flex flex-col gap-2">
-            <span className="text-gray text-sm xl:text-xl">TVL</span>
-            <span className="text-sm xl:text-1.5xl">
-              Ξ{getActiveVault().tvl}
-            </span>
+        <div className="flex items-center mt-3 gap-7">
+          <div className="flex flex-col gap-1">
+            <span className="text-gray-200 text-sm font-medium">TVL</span>
+            <span className="text-xl font-bold">Ξ{getActiveVault().tvl}</span>
           </div>
-          <div className="flex flex-col gap-2">
-            <span className="text-gray text-sm xl:text-xl">APY</span>
-            <span className="text-sm xl:text-1.5xl">
-              {getActiveVault().apy}%
-            </span>
+          <div className="flex flex-col gap-1">
+            <span className="text-gray-200 text-sm font-medium">APY</span>
+            <span className="text-xl font-bold">{getActiveVault().apy}%</span>
           </div>
-          <button className="flex justify-between items-center rounded bg-secondary bg-opacity-45 px-4.5 py-3 gap-16 box-border hover:border-1 hover:border-light">
-            <span className="font-Sanomat text-sm xl:text-xl">View Vault</span>
-            <Image
-              src="/assets/icons/arrowRight.svg"
-              width={18}
-              height={14}
-              alt=""
-            />
+          <button className="flex justify-between h-10 items-center rounded bg-gray-700 bg-opacity-45 px-4 gap-3 box-border hover:border-1 hover:border-orange-50">
+            <span className="text-sm">View Vault</span>
+            <FaChevronRight size={16} />
           </button>
         </div>
-        <h3 className="text-base xl:text-2xl font-SuisseIntl">
-          BY {getActiveVault().creator.toUpperCase()}
-        </h3>
-        <h2 className="text-xl xl:text-2.5xl">{getActiveVault().name}</h2>
+        <h3 className="text-xl font-bold">By {getActiveVault().creator}</h3>
+        <h2 className="text-xl font-bold">{getActiveVault().name}</h2>
       </div>
       <News />
       <VaultList
@@ -87,7 +63,6 @@ export default function VaultInfo() {
           setActiveVaultIndex(index);
         }}
       />
-      <VaultFooter />
 
       <NotSupported />
     </div>
