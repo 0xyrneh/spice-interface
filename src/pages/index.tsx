@@ -13,9 +13,9 @@ export default function VaultInfo() {
     (vault ?? getActiveVault()).bg ?? "/assets/images/bgEmptyVault.png";
 
   return (
-    <div className="flex flex-col tracking-wide max-w-[1512px] w-full">
+    <div className="flex flex-col tracking-wide max-w-[1536px] w-full">
       <div
-        className="min-w-[960px] aspect-[1930/1080] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-orange-50 font-semibold"
+        className="min-w-[1024px] aspect-[1930/1080] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-orange-50 font-semibold"
         style={{
           backgroundImage: `url(${getVaultBackground()})`,
         }}
