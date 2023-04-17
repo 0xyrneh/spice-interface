@@ -1,7 +1,6 @@
+import Image from "next/image";
 import vaults from "@/constants/vaults";
 import { Vault } from "@/types/vault";
-import Image from "next/image";
-import Link from "next/link";
 
 type Props = {
   onClickVault: (vault: Vault, index: number) => void;
