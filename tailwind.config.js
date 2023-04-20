@@ -3,6 +3,9 @@ module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      screens: {
+        "3xl": "1740px",
+      },
       fontFamily: {
         SpaceGrotesk: ["Space Grotesk", "sans-serif"],
       },
@@ -36,6 +39,7 @@ module.exports = {
       },
       boxShadow: {
         "orange-900": "0px 0px 4px rgba(253, 167, 57, 0.4)",
+        white: "0px 0px 4px rgba(255, 255, 255, 0.4)",
       },
       borderWidth: {
         1: "1px",
