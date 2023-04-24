@@ -3,6 +3,7 @@ import Image from "next/image";
 import vaults from "@/constants/vaults";
 import nfts from "@/constants/nfts";
 import { Vault, Nft } from "@/types/vault";
+import SearchSVG from "@/assets/icons/search.svg";
 
 const VaultSearch = () => {
   const inputDiv = useRef<HTMLInputElement>();
@@ -10,14 +11,17 @@ const VaultSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredVaults, setFilteredVaults] = useState<Vault[]>([]);
   const [filteredNfts, setFilteredNfts] = useState<Nft[]>([]);
+  const [focused, setFocused] = useState(false);
 
   const handleBlur = () => {
     setSearchQuery("");
+    setFocused(false);
   };
 
   const handleMouseEnter = () => {
     if (inputDiv.current) {
       inputDiv.current.focus();
+      setFocused(true);
     }
   };
 
@@ -54,8 +58,15 @@ const VaultSearch = () => {
   }, [searchQuery]);
 
   return (
-    <div className="relative hidden w-[224px] h-8 lg:flex text-gray-200 text-xs rounded border-1 border-gray-200 px-3 py-1 items-center gap-3">
-      <Image src="/assets/icons/search.svg" width={16} height={16} alt="" />
+    <div
+      className={`relative hidden w-[224px] h-8 lg:flex text-gray-200 text-xs rounded border-1 px-3 py-1 items-center gap-3
+      ${
+        focused
+          ? "text-gray-300 border-gray-300"
+          : "text-gray-200 border-gray-200"
+      }`}
+    >
+      <SearchSVG />
       <input
         ref={inputDiv as any}
         className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50 text-white"

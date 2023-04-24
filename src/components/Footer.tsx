@@ -1,10 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
+import DocsSVG from "@/assets/icons/docs.svg";
+import GithubSVG from "@/assets/icons/github.svg";
+import DiscordSVG from "@/assets/icons/discord.svg";
+import TwitterSVG from "@/assets/icons/twitter.svg";
 import { useRouter } from "next/router";
-import { FaDiscord } from "react-icons/fa";
-import { FaTwitter } from "react-icons/fa";
-import { FaGithub } from "react-icons/fa";
-import { FaFile } from "react-icons/fa";
 import { NAV_OPTIONS } from "@/constants";
 
 const VaultFooter = () => {
@@ -41,17 +41,33 @@ const VaultFooter = () => {
             SPICE MARKET IS OPEN
           </span>
         </div>
-        <Link target="__blank" href="https://docs.spicefi.xyz/">
-          <FaFile size={16} />
+        <Link
+          target="__blank"
+          href="https://docs.spicefi.xyz/"
+          className="text-gray-200 hover:text-gray-300"
+        >
+          <DocsSVG />
         </Link>
-        <Link target="__blank" href="https://github.com">
-          <FaGithub size={16} />
+        <Link
+          target="__blank"
+          href="https://github.com"
+          className="text-gray-200 hover:text-gray-300"
+        >
+          <GithubSVG />
         </Link>
-        <Link target="__blank" href="https://discord.com/invite/spicefinance">
-          <FaDiscord size={16} />
+        <Link
+          target="__blank"
+          href="https://discord.com/invite/spicefinance"
+          className="text-gray-200 hover:text-gray-300"
+        >
+          <DiscordSVG />
         </Link>
-        <Link target="__blank" href="https://twitter.com/spice_finance">
-          <FaTwitter size={16} />
+        <Link
+          target="__blank"
+          href="https://twitter.com/spice_finance"
+          className="text-gray-200 hover:text-gray-300"
+        >
+          <TwitterSVG />
         </Link>
       </div>
       <span className="hidden md:flex text-gray-200 font-bold text-xs">

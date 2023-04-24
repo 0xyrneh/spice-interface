@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import LogoSVG from "@/assets/icons/logo.svg";
 import { NavOption } from "@/types/common";
 import { VaultSearch, ConnectWallet } from "@/components/common";
 import { NAV_OPTIONS } from "@/constants";
@@ -13,7 +14,7 @@ const Header = () => {
       router.pathname === option.href ||
       router.pathname.startsWith(option.href + "/", 0)
     ) {
-      return "text-orange-200 text-shadow-orange-200";
+      return "text-orange-200 text-shadow-orange-900";
     }
     return "";
   };
@@ -33,17 +34,12 @@ const Header = () => {
 
   return (
     <div
-      className={`z-50 hidden sm:flex fixed w-full top-0 h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-7.5 xl:px-20 font-bold
+      className={`z-50 hidden sm:flex fixed w-full top-0 h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-8 font-bold
       max-w-[${activeTab().maxWidth}]`}
     >
       <div className="flex-1 flex items-center gap-7 xl:gap-10 min-w-[420px] xl:min-w-[500px]">
         <Link href="/">
-          <Image
-            src="/assets/icons/logo.svg"
-            alt="spice"
-            width={108}
-            height={32}
-          />
+          <LogoSVG />
         </Link>
 
         {NAV_OPTIONS.map((item) => (

@@ -16,7 +16,7 @@ export default function VaultInfo() {
   return (
     <div className="flex flex-col tracking-wide max-w-[1536px] w-full">
       <div
-        className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[922px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-orange-50 font-semibold"
+        className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[922px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-orange-50 font-semibold shadow-black"
         style={{
           backgroundImage: `url(${getVaultBackground()})`,
         }}
@@ -29,7 +29,12 @@ export default function VaultInfo() {
           {vaults.slice(0, 5).map((vault, index) => (
             <Button
               key={`vault-${index}`}
-              className="flex flex-col-reverse h-[144px] xl:h-[176px] bg-cover w-[calc(20%-9.6px)] min-w-[calc(20%-9.6px)] p-3 rounded border-1 border-gray-200 border-opacity-50 text-left"
+              className={`flex flex-col-reverse h-[144px] xl:h-[176px] bg-cover w-[calc(20%-9.6px)] min-w-[calc(20%-9.6px)] p-3 rounded border-1 border-opacity-50 text-left
+              ${
+                activeVaultIndex === index
+                  ? "drop-shadow-orange-200 border-orange-200"
+                  : "border-gray-200"
+              }`}
               hoverClassName="hover:drop-shadow-sm hover:border-white hover:-translate-y-2"
               clickClassName="hover:drop-shadow-orange-200 hover:border-orange-200 hover:-translate-y-2"
               style={{

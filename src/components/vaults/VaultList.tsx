@@ -34,11 +34,11 @@ const VaultList = ({ onClickVault }: Props) => {
         <div className="hidden md:flex gap-6">
           <div className="relative">
             <Listbox value={vaultFilter} onChange={setVaultFilter}>
-              <Listbox.Button className="w-[124px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-gray-200">
+              <Listbox.Button className="w-[124px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-white">
                 {vaultFilter}
                 <FaChevronDown />
               </Listbox.Button>
-              <Listbox.Options className="absolute w-[124px] top-10 px-3 text-xs text-gray-200 bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
+              <Listbox.Options className="absolute w-[124px] top-10 px-3 text-xs text-white bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
                 {VAULT_FILTERS.map((filter) => (
                   <Listbox.Option
                     className="h-8 flex items-center cursor-pointer"
@@ -53,12 +53,12 @@ const VaultList = ({ onClickVault }: Props) => {
           </div>
           <div className="relative">
             <Listbox value={marketplaceFilter} onChange={setMarketplaceFilter}>
-              <Listbox.Button className="w-[140px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-gray-200">
+              <Listbox.Button className="w-[140px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-white">
                 {marketplaceFilter ?? "Marketplaces"}
                 <FaChevronDown />
               </Listbox.Button>
 
-              <Listbox.Options className="absolute w-[140px] top-10 px-3 text-xs text-gray-200 bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
+              <Listbox.Options className="absolute w-[140px] top-10 px-3 text-xs text-white bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
                 {MARKETPLACE_FILTERS.map((filter) => (
                   <Listbox.Option
                     className="h-8 flex items-center cursor-pointer"
@@ -74,12 +74,12 @@ const VaultList = ({ onClickVault }: Props) => {
 
           <div className="relative">
             <Listbox value={collectionFilter} onChange={setCollectionFilter}>
-              <Listbox.Button className="w-[140px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-gray-200">
+              <Listbox.Button className="w-[140px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-white">
                 {collectionFilter ?? "Collections"}
                 <FaChevronDown />
               </Listbox.Button>
 
-              <Listbox.Options className="absolute w-[140px] max-h-[320px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100 top-10 px-3 text-xs text-gray-200 bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
+              <Listbox.Options className="absolute w-[140px] max-h-[320px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100 top-10 px-3 text-xs text-white bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
                 {COLLECTION_FILTERS.map((filter) => (
                   <Listbox.Option
                     className="h-8 flex items-center cursor-pointer"
@@ -95,7 +95,7 @@ const VaultList = ({ onClickVault }: Props) => {
         </div>
       </div>
 
-      <table className="text-gray-200 text-xs border-y-1 border-y-gray-200">
+      <table className="text-white text-xs border-y-1 border-y-gray-200">
         <thead>
           <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200">
             <th className="text-left pl-1 lg:w-[35%] h-14">Vault</th>

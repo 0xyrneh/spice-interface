@@ -45,7 +45,7 @@ const ConnectWallet = () => {
             height={28}
             alt=""
           />
-          <span className="text-xs text-bold text-orange-200 text-shadow-orange-200">
+          <span className="text-xs text-bold text-orange-200 text-shadow-orange-900">
             {shortAddress(account)}
           </span>
         </div>
