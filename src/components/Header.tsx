@@ -3,12 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { NavOption } from "@/types/common";
 import { VaultSearch, ConnectWallet } from "@/components/common";
-
-const NAV_OPTIONS: NavOption[] = [
-  { href: "/", name: "Vaults" },
-  { href: "/portfolio", name: "Portfolio" },
-  { href: "/prologue-nfts", name: "Prologue NFTs" },
-];
+import { NAV_OPTIONS } from "@/constants";
 
 const Header = () => {
   const router = useRouter();
@@ -23,8 +18,24 @@ const Header = () => {
     return "";
   };
 
+  const activeTab = () => {
+    for (let i = 0; i < NAV_OPTIONS.length; i += 1) {
+      const option = NAV_OPTIONS[i];
+      if (
+        router.pathname === option.href ||
+        router.pathname.startsWith(option.href + "/", 0)
+      ) {
+        return option;
+      }
+    }
+    return NAV_OPTIONS[0];
+  };
+
   return (
-    <div className="z-50 hidden sm:flex fixed left-0 top-0 right-0 h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-7.5 xl:px-20 font-bold">
+    <div
+      className={`z-50 hidden sm:flex fixed w-full top-0 h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-7.5 xl:px-20 font-bold
+      max-w-[${activeTab().maxWidth}]`}
+    >
       <div className="flex-1 flex items-center gap-7 xl:gap-10 min-w-[420px] xl:min-w-[500px]">
         <Link href="/">
           <Image

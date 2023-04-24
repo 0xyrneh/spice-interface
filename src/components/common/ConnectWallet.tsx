@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useWallet, useNotification } from "@/hooks";
 import { shortAddress, checkIfBlocked } from "@/utils";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/common";
 
 const ConnectWallet = () => {
   const { connect, account } = useWallet();
@@ -49,16 +50,16 @@ const ConnectWallet = () => {
           </span>
         </div>
       ) : (
-        <button
-          className="text-orange-900 border-2 border-orange-900 rounded px-2.5 py-1 bg-orange-900 bg-opacity-10"
+        <Button
+          className="px-2 h-8"
+          type="primary"
+          hideHoverStyle={!!blockedRegion}
           onClick={handleConnect}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <span className="text-xs xl:text-sm text-shadow-orange-900">
-            CONNECT WALLET
-          </span>
-        </button>
+          <span className="text-xs font-medium">CONNECT WALLET</span>
+        </Button>
       )}
     </div>
   );

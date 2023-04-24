@@ -1,17 +1,99 @@
 import Image from "next/image";
+import { Listbox } from "@headlessui/react";
 import vaults from "@/constants/vaults";
 import { Vault } from "@/types/vault";
+import { useState } from "react";
+import { MarketplaceFilter, VaultFilter } from "@/types/common";
+import { Button } from "@/components/common";
+import { FaChevronDown } from "react-icons/fa";
+import {
+  MARKETPLACE_FILTERS,
+  VAULT_FILTERS,
+  COLLECTION_FILTERS,
+} from "@/constants";
 
 type Props = {
   onClickVault: (vault: Vault, index: number) => void;
 };
 
 const VaultList = ({ onClickVault }: Props) => {
+  const [vaultFilter, setVaultFilter] = useState(VaultFilter.All);
+  const [marketplaceFilter, setMarketplaceFilter] = useState<
+    MarketplaceFilter | undefined
+  >();
+  const [collectionFilter, setCollectionFilter] = useState<
+    string | undefined
+  >();
+
   return (
     <div className="hidden sm:flex flex-col text-white font-medium px-8 pt-[72px] pb-6 gap-4">
-      <h1 className="text-xl text-orange-200 font-bold text-shadow-orange-200">
-        VAULT LIST
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl text-orange-200 font-bold text-shadow-orange-200">
+          VAULT LIST
+        </h1>
+        <div className="hidden md:flex gap-6">
+          <div className="relative">
+            <Listbox value={vaultFilter} onChange={setVaultFilter}>
+              <Listbox.Button className="w-[124px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-gray-200">
+                {vaultFilter}
+                <FaChevronDown />
+              </Listbox.Button>
+              <Listbox.Options className="absolute w-[124px] top-10 px-3 text-xs text-gray-200 bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
+                {VAULT_FILTERS.map((filter) => (
+                  <Listbox.Option
+                    className="h-8 flex items-center cursor-pointer"
+                    key={filter}
+                    value={filter}
+                  >
+                    {filter}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </Listbox>
+          </div>
+          <div className="relative">
+            <Listbox value={marketplaceFilter} onChange={setMarketplaceFilter}>
+              <Listbox.Button className="w-[140px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-gray-200">
+                {marketplaceFilter ?? "Marketplaces"}
+                <FaChevronDown />
+              </Listbox.Button>
+
+              <Listbox.Options className="absolute w-[140px] top-10 px-3 text-xs text-gray-200 bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
+                {MARKETPLACE_FILTERS.map((filter) => (
+                  <Listbox.Option
+                    className="h-8 flex items-center cursor-pointer"
+                    key={filter}
+                    value={filter}
+                  >
+                    {filter}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </Listbox>
+          </div>
+
+          <div className="relative">
+            <Listbox value={collectionFilter} onChange={setCollectionFilter}>
+              <Listbox.Button className="w-[140px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-gray-200">
+                {collectionFilter ?? "Collections"}
+                <FaChevronDown />
+              </Listbox.Button>
+
+              <Listbox.Options className="absolute w-[140px] max-h-[320px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100 top-10 px-3 text-xs text-gray-200 bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
+                {COLLECTION_FILTERS.map((filter) => (
+                  <Listbox.Option
+                    className="h-8 flex items-center cursor-pointer"
+                    key={filter}
+                    value={filter}
+                  >
+                    {filter}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </Listbox>
+          </div>
+        </div>
+      </div>
 
       <table className="text-gray-200 text-xs border-y-1 border-y-gray-200">
         <thead>
@@ -23,7 +105,7 @@ const VaultList = ({ onClickVault }: Props) => {
             <th className="hidden md:table-cell h-14">7d Change</th>
             <th className="h-14 hidden md:table-cell">Creator</th>
             <th className="h-14">Receipt</th>
-            <th className="h-14">Deposit</th>
+            <th className="h-14 pr-1">Deposit</th>
           </tr>
         </thead>
         <tbody className="block max-h-[728px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
@@ -35,7 +117,7 @@ const VaultList = ({ onClickVault }: Props) => {
             >
               <td className="text-left lg:w-[35%] h-14">
                 <div className="flex items-center gap-2 pl-1">
-                  <Image src={vault.icon} width={16} height={16} alt="" />
+                  <Image src={vault.icon} width={20} height={20} alt="" />
                   {vault.name}
                 </div>
               </td>
@@ -64,9 +146,11 @@ const VaultList = ({ onClickVault }: Props) => {
               <td className="h-14 hidden md:table-cell">{vault.creator}</td>
               <td className="h-14">{vault.receiptToken}</td>
               <td className="h-14">
-                <button className="border-1 border-orange-900 rounded p-1 bg-orange-900 bg-opacity-10 shadow-orange-900">
-                  <span className="text-xs text-orange-900">DEPOSIT</span>
-                </button>
+                <div className="flex justify-end items-center pr-1">
+                  <Button type="primary" className="p-1">
+                    <span className="text-xs">DEPOSIT</span>
+                  </Button>
+                </div>
               </td>
             </tr>
           ))}

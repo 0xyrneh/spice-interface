@@ -11,8 +11,10 @@ module.exports = {
       },
       colors: {
         "orange-200": "#FFE3CA",
+        "orange-300": "#FFCC8A",
         "orange-900": "#FDA739",
         "gray-700": "#1E1E1E",
+        "gray-300": "#C9C9C9",
         "gray-200": "#A1A1A1",
         "orange-50": "#FAFAF9",
         red: "#FF255A",
@@ -40,6 +42,10 @@ module.exports = {
       boxShadow: {
         "orange-900": "0px 0px 4px rgba(253, 167, 57, 0.4)",
         white: "0px 0px 4px rgba(255, 255, 255, 0.4)",
+        "orange-200": "0px 0px 4px rgba(255, 227, 202, 0.4)",
+      },
+      dropShadow: {
+        sm: "0px 0px 4px rgba(255, 255, 255, 0.4)",
         "orange-200": "0px 0px 4px rgba(255, 227, 202, 0.4)",
       },
       borderWidth: {

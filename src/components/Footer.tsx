@@ -1,13 +1,34 @@
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { FaDiscord } from "react-icons/fa";
 import { FaTwitter } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import { FaFile } from "react-icons/fa";
+import { NAV_OPTIONS } from "@/constants";
 
 const VaultFooter = () => {
+  const router = useRouter();
+
+  const activeTab = () => {
+    for (let i = 0; i < NAV_OPTIONS.length; i += 1) {
+      const option = NAV_OPTIONS[i];
+      if (
+        router.pathname === option.href ||
+        router.pathname.startsWith(option.href + "/", 0)
+      ) {
+        return option;
+      }
+    }
+    return NAV_OPTIONS[0];
+  };
+
   return (
-    <div className="w-full h-[60px] bg-gray-700 bg-opacity-90 hidden sm:flex items-center justify-between px-8 text-gray-200 text-[10px] lg:text-xs xl:text-base">
+    <div
+      className={`w-full h-[60px] bg-gray-700 bg-opacity-90 hidden sm:flex items-center justify-between px-8 text-gray-200 text-[10px] lg:text-xs xl:text-base max-w-[${
+        activeTab().maxWidth
+      }]`}
+    >
       <div className="flex gap-4 items-center">
         <div className="flex items-center">
           <Image
