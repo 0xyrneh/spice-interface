@@ -25,12 +25,25 @@ const options = {
   responsive: true,
   plugins: {
     legend: {
-      position: "right" as const,
+      display: false,
     },
     title: {
       display: true,
     },
   },
+  scales: {
+    x: {
+      grid: {
+        color: "rgba(161, 161, 161, 0.3)",
+      },
+    },
+    y: {
+      grid: {
+        color: "rgba(161, 161, 161, 0.3)",
+      },
+    },
+  },
+  maintainAspectRatio: false,
 };
 
 const labels = [
@@ -49,6 +62,7 @@ const data = {
       data: [10, 50, 20, 50, 20],
       borderColor: "#FFE3CA",
       backgroundColor: "#FFE3CA",
+      tension: 0.4,
     },
   ],
 };

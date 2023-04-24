@@ -5,3 +5,9 @@ export type PrologueNft = {
   tvl: number;
   icon: string;
 };
+
+export type Exposure = {
+  color: string;
+  name: string;
+  percent: number;
+};

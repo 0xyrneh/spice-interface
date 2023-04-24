@@ -3,12 +3,18 @@ import Image from "next/image";
 import { FaSearch } from "react-icons/fa";
 import { NotSupported } from "@/components";
 import { Card } from "@/components/common";
-import { PositionChart } from "@/components/portfolio";
+import { PieChart, PositionChart } from "@/components/portfolio";
 import prologueNfts from "@/constants/prologueNfts";
+import marketplaceExposure from "@/constants/marketplaceExposure";
+import collectionExposure from "@/constants/collectionExposure";
+import { useState } from "react";
+import { PeriodFilter } from "@/types/common";
 
 export default function Portfolio() {
+  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
+
   return (
-    <div className="flex tracking-wide w-full mt-[84px] px-8 pb-5 gap-5">
+    <div className="flex tracking-wide w-full h-min-[982px] mt-[84px] px-8 pb-5 gap-5">
       <div className="flex flex-col w-2/5 gap-5">
         <div className="flex flex-col gap-5">
           <Card className="py-3 !flex-row items-center justify-between gap-5">
@@ -180,8 +186,8 @@ export default function Portfolio() {
         </Card>
       </div>
 
-      <div className="flex flex-col flex-1">
-        <Card className="gap-3">
+      <div className="flex flex-col flex-1 gap-5">
+        <Card className="gap-3 flex-1">
           <div className="flex items-center gap-2.5">
             <Image
               src="/assets/icons/position.svg"
@@ -209,8 +215,141 @@ export default function Portfolio() {
               </div>
             </div>
           </div>
-          <PositionChart />
+          <div className="flex flex-1 flex-col-reverse lg:flex-row">
+            <div className="flex-1">
+              <PositionChart />
+            </div>
+            <div className="flex lg:flex-col gap-5.5 justify-center">
+              {[
+                PeriodFilter.Day,
+                PeriodFilter.Week,
+                PeriodFilter.Month,
+                PeriodFilter.Year,
+                PeriodFilter.All,
+              ].map((period) => (
+                <button
+                  key={period}
+                  className={`border-1 px-2.5 rounded text-xs bg-opacity-10 ${
+                    period === selectedPeriod
+                      ? "text-orange-200 border-orange-200 shadow-orange-200 bg-orange-200"
+                      : "text-gray-200 border-gray-200 bg-gray-200"
+                  }`}
+                  onClick={() => setPeriod(period)}
+                >
+                  {period}
+                </button>
+              ))}
+            </div>
+          </div>
         </Card>
+        <div className="flex gap-5">
+          <Card className="flex-1 gap-3">
+            <div className="flex items-center gap-2.5">
+              <Image
+                src="/assets/icons/market-exposure.svg"
+                width={15}
+                height={15}
+                alt=""
+              />
+              <h2 className="font-bold text-white font-sm">
+                MARKETPLACE EXPOSURE
+              </h2>
+            </div>
+            <div className="flex gap-2.5">
+              <table className="flex-1 text-gray-200 text-xs border-y-1 border-y-gray-200 text-xs font-medium">
+                <thead>
+                  <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200">
+                    <th className="text-left pl-1 h-10">Marketplace</th>
+                    <th className="h-10">%</th>
+                  </tr>
+                </thead>
+                <tbody className="block max-h-[240px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+                  {marketplaceExposure.map((exposure, index) => (
+                    <tr
+                      key={`vault-${index}`}
+                      className="vault-row table table-fixed w-full text-right cursor-pointer"
+                    >
+                      <td className="text-left h-10">
+                        <div className="flex items-center gap-2 pl-1">
+                          <div
+                            className="rounded w-3 h-3"
+                            style={{
+                              backgroundColor: exposure.color,
+                            }}
+                          />
+                          {exposure.name}
+                        </div>
+                      </td>
+                      <td className="h-10">{exposure.percent}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="hidden xl:flex flex-1 w-[160px] items-center justify-center">
+                <PieChart
+                  data={marketplaceExposure.map((item) => ({
+                    name: item.name,
+                    value: item.percent,
+                    color: item.color,
+                  }))}
+                />
+              </div>
+            </div>
+          </Card>
+          <Card className="flex-1 gap-3">
+            <div className="flex items-center gap-2.5">
+              <Image
+                src="/assets/icons/user.svg"
+                width={15}
+                height={15}
+                alt=""
+              />
+              <h2 className="font-bold text-white font-sm">
+                COLLECTION EXPOSURE
+              </h2>
+            </div>
+            <div className="flex gap-2.5">
+              <table className="flex-1 text-gray-200 text-xs border-y-1 border-y-gray-200 text-xs font-medium">
+                <thead>
+                  <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200">
+                    <th className="text-left pl-1 h-10">Collection</th>
+                    <th className="h-10">%</th>
+                  </tr>
+                </thead>
+                <tbody className="block max-h-[240px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+                  {collectionExposure.map((exposure, index) => (
+                    <tr
+                      key={`vault-${index}`}
+                      className="vault-row table table-fixed w-full text-right cursor-pointer"
+                    >
+                      <td className="text-left h-10">
+                        <div className="flex items-center gap-2 pl-1">
+                          <div
+                            className="rounded w-3 h-3"
+                            style={{
+                              backgroundColor: exposure.color,
+                            }}
+                          />
+                          {exposure.name}
+                        </div>
+                      </td>
+                      <td className="h-10">{exposure.percent}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="hidden xl:flex flex-1 w-[160px] items-center justify-center">
+                <PieChart
+                  data={collectionExposure.map((item) => ({
+                    name: item.name,
+                    value: item.percent,
+                    color: item.color,
+                  }))}
+                />
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
 
       <NotSupported />
