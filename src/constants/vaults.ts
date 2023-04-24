@@ -11,7 +11,7 @@ const vaults: Vault[] = [
     receiptToken: ReceiptToken.NFT,
     favorite: true,
     icon: "/assets/images/vaultIcon.svg",
-    bg: "/assets/images/bgVaults.png",
+    bg: "/assets/images/bgVaults.jpg",
   },
   {
     name: "Prologue Leverage Vault",
@@ -35,7 +35,7 @@ const vaults: Vault[] = [
     receiptToken: ReceiptToken.ERC20,
     favorite: true,
     icon: "/assets/images/vaultIcon.svg",
-    bg: "/assets/images/bgVaults.png",
+    bg: "/assets/images/bgVaults.jpg",
   },
   {
     name: "HoneyJar Vault",
@@ -47,7 +47,7 @@ const vaults: Vault[] = [
     receiptToken: ReceiptToken.NFT,
     favorite: false,
     icon: "/assets/images/vaultIcon.svg",
-    bg: "/assets/images/bgVaults2.png",
+    bg: "/assets/images/bgVaults2.jpg",
   },
   {
     name: "Prologue Vault",
@@ -59,6 +59,7 @@ const vaults: Vault[] = [
     receiptToken: ReceiptToken.NFT,
     favorite: true,
     icon: "/assets/images/vaultIcon.svg",
+    bg: "/assets/images/bgVaults1.png",
   },
   {
     name: "Prologue Leverage Vault",
@@ -82,7 +83,7 @@ const vaults: Vault[] = [
     receiptToken: ReceiptToken.ERC20,
     favorite: true,
     icon: "/assets/images/vaultIcon.svg",
-    bg: "/assets/images/bgVaults.png",
+    bg: "/assets/images/bgVaults.jpg",
   },
   {
     name: "HoneyJar Vault",
@@ -94,7 +95,7 @@ const vaults: Vault[] = [
     receiptToken: ReceiptToken.NFT,
     favorite: false,
     icon: "/assets/images/vaultIcon.svg",
-    bg: "/assets/images/bgVaults2.png",
+    bg: "/assets/images/bgVaults2.jpg",
   },
   {
     name: "Prologue Vault",
@@ -129,7 +130,7 @@ const vaults: Vault[] = [
     receiptToken: ReceiptToken.ERC20,
     favorite: true,
     icon: "/assets/images/vaultIcon.svg",
-    bg: "/assets/images/bgVaults.png",
+    bg: "/assets/images/bgVaults.jpg",
   },
   {
     name: "HoneyJar Vault",
@@ -141,7 +142,7 @@ const vaults: Vault[] = [
     receiptToken: ReceiptToken.NFT,
     favorite: false,
     icon: "/assets/images/vaultIcon.svg",
-    bg: "/assets/images/bgVaults2.png",
+    bg: "/assets/images/bgVaults2.jpg",
   },
   {
     name: "Prologue Vault",
@@ -176,7 +177,7 @@ const vaults: Vault[] = [
   //   receiptToken: ReceiptToken.ERC20,
   //   favorite: true,
   //   icon: "/assets/images/vaultIcon.svg",
-  //   bg: "/assets/images/bgVaults.png",
+  //   bg: "/assets/images/bgVaults.jpg",
   // },
   // {
   //   name: "HoneyJar Vault",
@@ -188,7 +189,7 @@ const vaults: Vault[] = [
   //   receiptToken: ReceiptToken.NFT,
   //   favorite: false,
   //   icon: "/assets/images/vaultIcon.svg",
-  //   bg: "/assets/images/bgVaults2.png",
+  //   bg: "/assets/images/bgVaults2.jpg",
   // },
   // {
   //   name: "Prologue Vault",
@@ -223,7 +224,7 @@ const vaults: Vault[] = [
   //   receiptToken: ReceiptToken.ERC20,
   //   favorite: true,
   //   icon: "/assets/images/vaultIcon.svg",
-  //   bg: "/assets/images/bgVaults.png",
+  //   bg: "/assets/images/bgVaults.jpg",
   // },
   // {
   //   name: "HoneyJar Vault",
@@ -235,7 +236,7 @@ const vaults: Vault[] = [
   //   receiptToken: ReceiptToken.NFT,
   //   favorite: false,
   //   icon: "/assets/images/vaultIcon.svg",
-  //   bg: "/assets/images/bgVaults2.png",
+  //   bg: "/assets/images/bgVaults2.jpg",
   // },
   // {
   //   name: "Prologue Vault",
@@ -270,7 +271,7 @@ const vaults: Vault[] = [
   //   receiptToken: ReceiptToken.ERC20,
   //   favorite: true,
   //   icon: "/assets/images/vaultIcon.svg",
-  //   bg: "/assets/images/bgVaults.png",
+  //   bg: "/assets/images/bgVaults.jpg",
   // },
   // {
   //   name: "HoneyJar Vault",
@@ -282,7 +283,7 @@ const vaults: Vault[] = [
   //   receiptToken: ReceiptToken.NFT,
   //   favorite: false,
   //   icon: "/assets/images/vaultIcon.svg",
-  //   bg: "/assets/images/bgVaults2.png",
+  //   bg: "/assets/images/bgVaults2.jpg",
   // },
 ];
 
