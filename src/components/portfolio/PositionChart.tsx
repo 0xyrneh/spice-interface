@@ -27,6 +27,7 @@ ChartJS.register(
 
 const options = {
   responsive: true,
+  maintainAspectRatio: false,
   plugins: {
     legend: {
       display: false,
@@ -61,7 +62,6 @@ const options = {
       },
     },
   },
-  maintainAspectRatio: false,
 };
 
 const labels = [
@@ -78,28 +78,6 @@ const data = {
     {
       label: "1W",
       data: [10, 50, 20, 50, 20],
-      // [
-      //   {
-      //     x: 10,
-      //     y: "2023-3-15",
-      //   },
-      //   {
-      //     x: 50,
-      //     y: "2023-4-15",
-      //   },
-      //   {
-      //     x: 20,
-      //     y: "2023-5-15",
-      //   },
-      //   {
-      //     x: 50,
-      //     y: "2023-6-15",
-      //   },
-      //   {
-      //     x: 20,
-      //     y: "2023-7-15",
-      //   },
-      // ],
       borderColor: "#FFE3CA",
       backgroundColor: "#FFE3CA",
       tension: 0.4,
@@ -108,5 +86,5 @@ const data = {
 };
 
 export default function PositionChart() {
-  return <Line options={options} data={data} />;
+  return <Line options={options as any} data={data} />;
 }
