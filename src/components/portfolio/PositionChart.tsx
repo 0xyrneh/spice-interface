@@ -35,11 +35,13 @@ const options = {
     x: {
       grid: {
         color: "rgba(161, 161, 161, 0.3)",
+        drawTicks: false,
       },
     },
     y: {
       grid: {
         color: "rgba(161, 161, 161, 0.3)",
+        drawTicks: false,
       },
     },
   },
