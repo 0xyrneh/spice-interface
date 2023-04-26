@@ -31,6 +31,7 @@ const VaultList = ({ onClickVault }: Props) => {
         <div className="hidden md:flex gap-6">
           <Dropdown
             className="w-[124px]"
+            type="primary"
             title={vaultFilter}
             values={[vaultFilter]}
             items={VAULT_FILTERS.filter((item) => item !== vaultFilter)}

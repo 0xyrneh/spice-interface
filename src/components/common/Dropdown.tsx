@@ -6,6 +6,7 @@ import UncheckedSVG from "@/assets/icons/unchecked.svg";
 
 type Props = {
   className?: string;
+  type?: "primary";
   title: string;
   items: string[];
   values: string[];
@@ -13,8 +14,19 @@ type Props = {
   onChange: (items: string[] | string) => void;
 };
 
+const defaultClass = {
+  primary: "border-orange-200 text-orange-200 drop-shadow-orange-200",
+  default: "border-gray-200 text-gray-200",
+};
+
+const defaultOptionsClass = {
+  primary: "border-orange-200 text-orange-200",
+  default: "border-gray-200 text-gray-200",
+};
+
 const Dropdown = ({
   className,
+  type,
   title,
   items,
   values,
@@ -62,44 +74,42 @@ const Dropdown = ({
 
   return (
     <div ref={options as any} className={`relative ${className}`}>
-      <Listbox value={title} onChange={handleOnChange} multiple={multiple}>
-        <Listbox.Button
-          className={`w-full h-8 px-3 border-1 text-left border-gray-200 flex items-center justify-between text-xs text-white ${
-            opened ? "rounded-t" : "rounded"
-          }`}
-          onClick={() => setOpened(!opened)}
-        >
-          {title}
-          <FaChevronDown />
-        </Listbox.Button>
-        <div
-          className={`absolute w-full top-[31px] px-3 text-xs text-white bg-black border-1 border-gray-200 px-2 rounded-b max-h-[320px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100 ${
-            opened ? "flex flex-col" : "hidden"
-          }`}
-        >
-          {items.map((item) => (
-            <button
-              className="h-8 min-h-[32px] flex items-center cursor-pointer gap-2"
-              key={item}
-              onClick={() => handleSelect(item)}
-            >
-              {multiple &&
-                (values.includes(item) ? (
-                  <div className="w-min-[16px]">
-                    <CheckedSVG class="w-4 h-[17px]" />
-                  </div>
-                ) : (
-                  <div className="w-min-[16px]">
-                    <UncheckedSVG class="w-4 h-[17px]" />
-                  </div>
-                ))}
-              <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-                {item}
-              </span>
-            </button>
-          ))}
-        </div>
-      </Listbox>
+      <button
+        className={`w-full h-8 px-3 border-1 text-left flex items-center justify-between text-xs ${
+          opened ? "rounded-t" : "rounded"
+        } ${defaultClass[type ?? "default"]}`}
+        onClick={() => setOpened(!opened)}
+      >
+        <span className="drop-shadow-none">{title}</span>
+        <FaChevronDown />
+      </button>
+      <div
+        className={`absolute w-full top-[31px] px-3 text-xs bg-black border-1 px-2 rounded-b max-h-[320px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100 ${
+          opened ? "flex flex-col" : "hidden"
+        } ${defaultOptionsClass[type ?? "default"]}`}
+      >
+        {items.map((item) => (
+          <button
+            className="h-8 min-h-[32px] flex items-center cursor-pointer gap-2"
+            key={item}
+            onClick={() => handleSelect(item)}
+          >
+            {multiple &&
+              (values.includes(item) ? (
+                <div className="w-min-[16px]">
+                  <CheckedSVG class="w-4 h-[17px]" />
+                </div>
+              ) : (
+                <div className="w-min-[16px]">
+                  <UncheckedSVG class="w-4 h-[17px]" />
+                </div>
+              ))}
+            <span className="text-ellipsis overflow-hidden whitespace-nowrap">
+              {item}
+            </span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
