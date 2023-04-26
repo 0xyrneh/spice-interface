@@ -22,8 +22,8 @@ export const MARKETPLACE_FILTERS = [
 ];
 
 export const COLLECTION_FILTERS = [
-  "Bored Ape Yacht Club",
-  "Mutant Ape Yacht Club",
+  "BAYC",
+  "MAYC",
   "Crypto Punks",
   "CloneX",
   "Azuki",

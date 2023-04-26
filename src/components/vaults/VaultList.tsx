@@ -1,11 +1,10 @@
 import Image from "next/image";
-import { Listbox } from "@headlessui/react";
 import vaults from "@/constants/vaults";
 import { Vault } from "@/types/vault";
 import { useState } from "react";
 import { MarketplaceFilter, VaultFilter } from "@/types/common";
-import { Button } from "@/components/common";
-import { FaChevronDown } from "react-icons/fa";
+import { Button, Dropdown } from "@/components/common";
+import CircleXSVG from "@/assets/icons/circleX.svg";
 import {
   MARKETPLACE_FILTERS,
   VAULT_FILTERS,
@@ -18,12 +17,10 @@ type Props = {
 
 const VaultList = ({ onClickVault }: Props) => {
   const [vaultFilter, setVaultFilter] = useState(VaultFilter.All);
-  const [marketplaceFilter, setMarketplaceFilter] = useState<
-    MarketplaceFilter | undefined
-  >();
-  const [collectionFilter, setCollectionFilter] = useState<
-    string | undefined
-  >();
+  const [marketplaceFilters, setMarketplaceFilters] = useState<
+    MarketplaceFilter[]
+  >([]);
+  const [collectionFilters, setCollectionFilters] = useState<string[]>([]);
 
   return (
     <div className="hidden sm:flex flex-col text-white font-medium px-8 pt-[72px] pb-6 gap-4">
@@ -32,68 +29,83 @@ const VaultList = ({ onClickVault }: Props) => {
           VAULT LIST
         </h1>
         <div className="hidden md:flex gap-6">
-          <div className="relative">
-            <Listbox value={vaultFilter} onChange={setVaultFilter}>
-              <Listbox.Button className="w-[124px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-white">
-                {vaultFilter}
-                <FaChevronDown />
-              </Listbox.Button>
-              <Listbox.Options className="absolute w-[124px] top-10 px-3 text-xs text-white bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
-                {VAULT_FILTERS.map((filter) => (
-                  <Listbox.Option
-                    className="h-8 flex items-center cursor-pointer"
-                    key={filter}
-                    value={filter}
-                  >
-                    {filter}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Listbox>
-          </div>
-          <div className="relative">
-            <Listbox value={marketplaceFilter} onChange={setMarketplaceFilter}>
-              <Listbox.Button className="w-[140px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-white">
-                {marketplaceFilter ?? "Marketplaces"}
-                <FaChevronDown />
-              </Listbox.Button>
-
-              <Listbox.Options className="absolute w-[140px] top-10 px-3 text-xs text-white bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
-                {MARKETPLACE_FILTERS.map((filter) => (
-                  <Listbox.Option
-                    className="h-8 flex items-center cursor-pointer"
-                    key={filter}
-                    value={filter}
-                  >
-                    {filter}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Listbox>
-          </div>
-
-          <div className="relative">
-            <Listbox value={collectionFilter} onChange={setCollectionFilter}>
-              <Listbox.Button className="w-[140px] h-8 px-3 border-1 text-left rounded border-gray-200 flex items-center justify-between text-xs text-white">
-                {collectionFilter ?? "Collections"}
-                <FaChevronDown />
-              </Listbox.Button>
-
-              <Listbox.Options className="absolute w-[140px] max-h-[320px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100 top-10 px-3 text-xs text-white bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 rounded">
-                {COLLECTION_FILTERS.map((filter) => (
-                  <Listbox.Option
-                    className="h-8 flex items-center cursor-pointer"
-                    key={filter}
-                    value={filter}
-                  >
-                    {filter}
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Listbox>
-          </div>
+          <Dropdown
+            className="w-[124px]"
+            title={vaultFilter}
+            values={[vaultFilter]}
+            items={VAULT_FILTERS.filter((item) => item !== vaultFilter)}
+            onChange={(item) => setVaultFilter(item as VaultFilter)}
+          />
+          <Dropdown
+            className="w-[140px]"
+            title={"Marketplaces"}
+            values={marketplaceFilters}
+            items={MARKETPLACE_FILTERS}
+            multiple
+            onChange={(items) =>
+              setMarketplaceFilters(items as MarketplaceFilter[])
+            }
+          />
+          <Dropdown
+            className="w-[140px]"
+            title={"Collections"}
+            values={collectionFilters}
+            items={COLLECTION_FILTERS}
+            multiple
+            onChange={(items) => setCollectionFilters(items as string[])}
+          />
         </div>
       </div>
+
+      {(marketplaceFilters.length !== 0 || collectionFilters.length !== 0) && (
+        <div className="flex gap-4 flex-wrap items-center">
+          <span className="text-base font-medium">23 results</span>
+          {marketplaceFilters.map((item) => (
+            <div
+              key={item}
+              className="bg-gray-500 rounded h-8 flex items-center text-xs font-medium pl-8 pr-2 gap-2"
+            >
+              {item}
+              <button
+                onClick={() => {
+                  const idx = marketplaceFilters.findIndex(
+                    (_item) => _item === item
+                  );
+                  if (idx !== -1) {
+                    const newValues = [...marketplaceFilters];
+                    newValues.splice(idx, 1);
+                    setMarketplaceFilters(newValues);
+                  }
+                }}
+              >
+                <CircleXSVG />
+              </button>
+            </div>
+          ))}
+          {collectionFilters.map((item) => (
+            <div
+              key={item}
+              className="bg-gray-500 rounded h-8 flex items-center text-xs font-medium pl-8 pr-2 gap-2"
+            >
+              {item}
+              <button
+                onClick={() => {
+                  const idx = collectionFilters.findIndex(
+                    (_item) => _item === item
+                  );
+                  if (idx !== -1) {
+                    const newValues = [...collectionFilters];
+                    newValues.splice(idx, 1);
+                    setCollectionFilters(newValues);
+                  }
+                }}
+              >
+                <CircleXSVG />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <table className="text-white text-xs border-y-1 border-y-gray-200">
         <thead>
@@ -116,37 +128,57 @@ const VaultList = ({ onClickVault }: Props) => {
               className="vault-row table table-fixed w-full text-right cursor-pointer"
             >
               <td className="text-left lg:w-[35%] h-14">
-                <div className="flex items-center gap-2 pl-1">
+                <div className="flex items-center gap-2 pl-1 h-10 rounded-l">
                   <Image src={vault.icon} width={20} height={20} alt="" />
                   {vault.name}
                 </div>
               </td>
-              <td className="h-14">Ξ{vault.tvl}</td>
-              <td className="h-14">{vault.apy}%</td>
+              <td className="h-14">
+                <div className="h-10 flex items-center justify-end">
+                  Ξ{vault.tvl}
+                </div>
+              </td>
+              <td className="h-14">
+                <div className="h-10 flex items-center justify-end">
+                  {vault.apy}%
+                </div>
+              </td>
               <td
                 className={`h-14 hidden md:table-cell ${
                   vault.oneDayChange >= 0 ? "text-green" : "text-red"
                 }`}
               >
-                {vault.oneDayChange >= 0
-                  ? "+" + vault.oneDayChange
-                  : vault.oneDayChange}
-                %
+                <div className="h-10 flex items-center justify-end">
+                  {vault.oneDayChange >= 0
+                    ? "+" + vault.oneDayChange
+                    : vault.oneDayChange}
+                  %
+                </div>
               </td>
               <td
                 className={`h-14 hidden md:table-cell ${
                   vault.sevenDayChange >= 0 ? "text-green" : "text-red"
                 }`}
               >
-                {vault.sevenDayChange >= 0
-                  ? "+" + vault.sevenDayChange
-                  : vault.sevenDayChange}
-                %
+                <div className="h-10 flex items-center justify-end">
+                  {vault.sevenDayChange >= 0
+                    ? "+" + vault.sevenDayChange
+                    : vault.sevenDayChange}
+                  %
+                </div>
               </td>
-              <td className="h-14 hidden md:table-cell">{vault.creator}</td>
-              <td className="h-14">{vault.receiptToken}</td>
+              <td className="h-14 hidden md:table-cell">
+                <div className="h-10 flex items-center justify-end">
+                  {vault.creator}
+                </div>
+              </td>
               <td className="h-14">
-                <div className="flex justify-end items-center pr-1">
+                <div className="h-10 flex items-center justify-end">
+                  {vault.receiptToken}
+                </div>
+              </td>
+              <td className="h-14">
+                <div className="h-10 flex justify-end items-center pr-1 rounded-r">
                   <Button type="primary" className="p-1">
                     <span className="text-xs">DEPOSIT</span>
                   </Button>

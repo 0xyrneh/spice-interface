@@ -118,29 +118,9 @@ a {
   scrollbar-width: none; /* Firefox */
 }
 
-// .vault-row > td {
-//   transform-style: preserve-3d;
-//   white-space: nowrap;
-// }
-
-// .vault-row:hover > td::before {
-//   content: "";
-//   transform: translateZ(-1px) translateX(-50%) translateY(-50%);
-//   @apply absolute bg-orange-50 top-[calc(50%+5px)] xl:top-[calc(50%+8px)] h-[calc(100%-8px)] xl:h-[calc(100%-14px)] left-1/2 pointer-events-none;
-//   width: 100%;
-// }
-
-// .vault-row:last-child:hover > td::before {
-//   @apply top-1/2 h-[calc(100%-18px)] xl:h-[calc(100%-30px)];
-// }
-
-// .vault-row:hover > td:first-child:before {
-//   @apply rounded-l;
-// }
-
-// .vault-row:hover > td:last-child:before {
-//   @apply rounded-r;
-// }
+.vault-row:hover > td > div {
+  @apply bg-gray-300 bg-opacity-10;
+}
 
 .text-shadow-orange-200 {
   text-shadow: 0px 0px 4px #ffe3ca;
