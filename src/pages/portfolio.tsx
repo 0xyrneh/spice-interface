@@ -1,5 +1,6 @@
-import vaults from "@/constants/vaults";
+import { useState } from "react";
 import Image from "next/image";
+import vaults from "@/constants/vaults";
 import { FaSearch } from "react-icons/fa";
 import { NotSupported } from "@/components";
 import { Card } from "@/components/common";
@@ -7,8 +8,13 @@ import { PieChart, PositionChart } from "@/components/portfolio";
 import prologueNfts from "@/constants/prologueNfts";
 import marketplaceExposure from "@/constants/marketplaceExposure";
 import collectionExposure from "@/constants/collectionExposure";
-import { useState } from "react";
 import { PeriodFilter } from "@/types/common";
+import PositionSVG from "@/assets/icons/position.svg";
+import CopySVG from "@/assets/icons/copy.svg";
+import ExposureSVG from "@/assets/icons/exposure.svg";
+import KeySVG from "@/assets/icons/key.svg";
+import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
+import UserSVG from "@/assets/icons/user.svg";
 
 export default function Portfolio() {
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
@@ -30,22 +36,12 @@ export default function Portfolio() {
               </span>
             </div>
             <button className="min-w-[24px] min-w-[24px]">
-              <Image
-                src="/assets/icons/copy.svg"
-                width={24}
-                height={24}
-                alt=""
-              />
+              <CopySVG />
             </button>
           </Card>
           <Card className="gap-3">
             <div className="flex items-center gap-2.5">
-              <Image
-                src="/assets/icons/exposure.svg"
-                width={15}
-                height={15}
-                alt=""
-              />
+              <ExposureSVG />
               <h2 className="font-bold text-white font-sm">VAULT EXPOSURE</h2>
             </div>
             <div className="flex items-center justify-between">
@@ -81,10 +77,10 @@ export default function Portfolio() {
                   <th className="h-10 hidden xl:table-cell">TVL</th>
                   <th className="h-10">APY</th>
                   <th className="h-10 hidden xl:table-cell">Receipt</th>
-                  <th className="h-10">Deposit</th>
+                  <th className="h-10 pr-1">Deposit</th>
                 </tr>
               </thead>
-              <tbody className="block max-h-[240px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+              <tbody className="block max-h-[240px] overflow-y-hidden hover:overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
                 {vaults.map((vault, index) => (
                   <tr
                     key={`vault-${index}`}
@@ -102,7 +98,7 @@ export default function Portfolio() {
                     <td className="h-10 hidden xl:table-cell">
                       {vault.receiptToken}
                     </td>
-                    <td className="h-10">
+                    <td className="h-10 pr-1">
                       <button className="border-1 border-orange-900 rounded p-1 bg-orange-900 bg-opacity-10 shadow-orange-900">
                         <span className="text-xs text-orange-900">DEPOSIT</span>
                       </button>
@@ -115,7 +111,7 @@ export default function Portfolio() {
         </div>
         <Card className="gap-5">
           <div className="flex items-center gap-2.5">
-            <Image src="/assets/icons/key.svg" width={15} height={15} alt="" />
+            <KeySVG />
             <h2 className="font-bold text-white font-sm">VAULT NFTS</h2>
           </div>
           <div className="flex items-center justify-between">
@@ -153,7 +149,7 @@ export default function Portfolio() {
                   }`}
                 >
                   <div
-                    className="flex flex-col h-20 bg-cover aspect-square relative justify-center"
+                    className="flex flex-col w-full bg-cover aspect-square relative justify-center"
                     style={{
                       backgroundImage: `url(${nft.icon})`,
                     }}
@@ -189,12 +185,7 @@ export default function Portfolio() {
       <div className="flex flex-col flex-1 gap-5">
         <Card className="gap-3 flex-1">
           <div className="flex items-center gap-2.5">
-            <Image
-              src="/assets/icons/position.svg"
-              width={15}
-              height={15}
-              alt=""
-            />
+            <PositionSVG />
             <h2 className="font-bold text-white font-sm">
               TOTAL SPICE POSITION
             </h2>
@@ -204,7 +195,11 @@ export default function Portfolio() {
               <span className="text-sm font-medium">Your Spice TVL</span>
               <span className="font-bold text-xl text-orange-200">Ξ30.00</span>
             </div>
-            <div className="flex items-center text-xs gap-4">
+            <div className="flex items-center text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
+              <div className="hidden 2xl:flex items-center gap-1">
+                <span>1W Est. Yield:</span>
+                <span className="text-white">Ξ25.60</span>
+              </div>
               <div className="flex items-center gap-1">
                 <span>1M Est. Yield:</span>
                 <span className="text-white">Ξ25.60</span>
@@ -245,12 +240,7 @@ export default function Portfolio() {
         <div className="flex gap-5">
           <Card className="flex-1 gap-3">
             <div className="flex items-center gap-2.5">
-              <Image
-                src="/assets/icons/market-exposure.svg"
-                width={15}
-                height={15}
-                alt=""
-              />
+              <MarketExposureSVG />
               <h2 className="font-bold text-white font-sm">
                 MARKETPLACE EXPOSURE
               </h2>
@@ -298,12 +288,7 @@ export default function Portfolio() {
           </Card>
           <Card className="flex-1 gap-3">
             <div className="flex items-center gap-2.5">
-              <Image
-                src="/assets/icons/user.svg"
-                width={15}
-                height={15}
-                alt=""
-              />
+              <UserSVG />
               <h2 className="font-bold text-white font-sm">
                 COLLECTION EXPOSURE
               </h2>

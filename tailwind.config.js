@@ -42,7 +42,7 @@ module.exports = {
       },
       boxShadow: {
         "orange-900": "0px 0px 4px rgba(253, 167, 57, 0.4)",
-        white: "0px 0px 4px rgba(255, 255, 255, 0.4)",
+        card: "0px 0px 4px rgba(255, 255, 255, 0.4)",
         "orange-200": "0px 0px 4px rgba(255, 227, 202, 0.4)",
         black: "inset 0px 4px 50px 15px rgba(0, 0, 0, 0.5)",
       },

@@ -97,11 +97,11 @@ const Dropdown = ({
             {multiple &&
               (values.includes(item) ? (
                 <div className="w-min-[16px]">
-                  <CheckedSVG class="w-4 h-[17px]" />
+                  <CheckedSVG className="w-4 h-[17px]" />
                 </div>
               ) : (
                 <div className="w-min-[16px]">
-                  <UncheckedSVG class="w-4 h-[17px]" />
+                  <UncheckedSVG className="w-4 h-[17px]" />
                 </div>
               ))}
             <span className="text-ellipsis overflow-hidden whitespace-nowrap">

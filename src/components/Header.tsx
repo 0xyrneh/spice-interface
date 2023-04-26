@@ -15,14 +15,11 @@ const Header = () => {
   const controlNavbar = () => {
     if (typeof window !== "undefined") {
       if (window.scrollY > lastScrollY) {
-        // if scroll down hide the navbar
         setShow(false);
       } else {
-        // if scroll up show the navbar
         setShow(true);
       }
 
-      // remember current page location to use in the next move
       setLastScrollY(window.scrollY);
     }
   };
@@ -63,7 +60,7 @@ const Header = () => {
 
   return (
     <div
-      className={`z-50 hidden sm:flex fixed w-full top-0 h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-8 font-bold
+      className={`z-50 hidden sm:flex fixed w-full h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-8 font-bold
       max-w-[${activeTab().maxWidth}] ${show ? "top-0" : "-top-[64px]"}`}
       style={{ transition: "top 0.4s ease-in-out" }}
     >
