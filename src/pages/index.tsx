@@ -3,7 +3,6 @@ import vaults from "@/constants/vaults";
 import { FaChevronRight } from "react-icons/fa";
 import { Vault } from "@/types/vault";
 import { News, VaultList } from "@/components/vaults";
-import { NotSupported } from "@/components";
 import { Button } from "@/components/common";
 
 export default function VaultInfo() {
@@ -77,8 +76,6 @@ export default function VaultInfo() {
           setActiveVaultIndex(index);
         }}
       />
-
-      <NotSupported />
     </div>
   );
 }

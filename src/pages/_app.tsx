@@ -1,6 +1,6 @@
 import "@/styles/globals.scss";
 import type { AppProps } from "next/app";
-import { Header, Footer } from "@/components";
+import { Header, Footer, NotSupported } from "@/components";
 import WalletProvider from "@/contexts/WalletContext";
 import NotificationProvider from "@/contexts/NotificationContext";
 
@@ -12,6 +12,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Header />
           <Component {...pageProps} />
           <Footer />
+          <NotSupported />
         </div>
       </WalletProvider>
     </NotificationProvider>

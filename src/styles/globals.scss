@@ -138,3 +138,7 @@ a {
   background: #bbbfc6;
   @apply rounded-lg;
 }
+
+.custom-scroll {
+  @apply styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200;
+}
