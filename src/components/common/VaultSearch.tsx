@@ -64,7 +64,7 @@ const VaultSearch = () => {
         focused
           ? "text-gray-300 border-gray-300"
           : "text-gray-200 border-gray-200"
-      } ${searchQuery !== "" ? "rounded-t" : "rounded"}`}
+      } ${focused ? "rounded-t" : "rounded"}`}
     >
       <SearchSVG />
       <input
@@ -77,7 +77,7 @@ const VaultSearch = () => {
         onMouseEnter={handleMouseEnter}
       />
 
-      {searchQuery !== "" && (
+      {focused && (
         <div className="font-medium absolute flex flex-col top-[100%] -left-px -right-px bg-gray-700 bg-opacity-45 border-b-1 border-x-1 border-gray-300 px-2 pt-2.5 pb-3 gap-2 rounded-b">
           <div className="flex flex-col gap-1">
             <span className="text-xs text-gray-300">VAULTS</span>
