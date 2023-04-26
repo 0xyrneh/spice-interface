@@ -253,7 +253,7 @@ export default function Portfolio() {
             </div>
           </div>
           <div className="flex flex-1 flex-col-reverse lg:flex-row">
-            <div className="flex-1 relative">
+            <div className="flex-1 relative w-[50vw]">
               <PositionChart />
             </div>
             <div className="flex lg:flex-col gap-5.5 justify-center">
