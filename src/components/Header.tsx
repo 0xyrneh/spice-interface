@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import LogoSVG from "@/assets/icons/logo.svg";
@@ -8,6 +8,35 @@ import { NAV_OPTIONS } from "@/constants";
 
 const Header = () => {
   const router = useRouter();
+
+  const [show, setShow] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  const controlNavbar = () => {
+    if (typeof window !== "undefined") {
+      if (window.scrollY > lastScrollY) {
+        // if scroll down hide the navbar
+        setShow(false);
+      } else {
+        // if scroll up show the navbar
+        setShow(true);
+      }
+
+      // remember current page location to use in the next move
+      setLastScrollY(window.scrollY);
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.addEventListener("scroll", controlNavbar);
+
+      // cleanup function
+      return () => {
+        window.removeEventListener("scroll", controlNavbar);
+      };
+    }
+  }, [lastScrollY]);
 
   const linkClass = (option: NavOption) => {
     if (
@@ -35,7 +64,8 @@ const Header = () => {
   return (
     <div
       className={`z-50 hidden sm:flex fixed w-full top-0 h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-8 font-bold
-      max-w-[${activeTab().maxWidth}]`}
+      max-w-[${activeTab().maxWidth}] ${show ? "top-0" : "-top-[64px]"}`}
+      style={{ transition: "top 0.4s ease-in-out" }}
     >
       <div className="flex-1 flex items-center gap-7 xl:gap-10 min-w-[420px] xl:min-w-[500px]">
         <Link href="/">

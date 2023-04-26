@@ -29,11 +29,11 @@ export default function VaultInfo() {
           {vaults.slice(0, 5).map((vault, index) => (
             <Button
               key={`vault-${index}`}
-              className={`flex flex-col-reverse h-[144px] xl:h-[176px] bg-cover w-[calc(20%-9.6px)] min-w-[calc(20%-9.6px)] p-3 rounded border-1 border-opacity-50 text-left
+              className={`flex flex-col-reverse h-[144px] xl:h-[176px] bg-cover w-[calc(20%-9.6px)] min-w-[calc(20%-9.6px)] p-3 rounded border-1 text-left shadow-black
               ${
                 activeVaultIndex === index
-                  ? "drop-shadow-orange-200 border-orange-200"
-                  : "border-gray-200"
+                  ? "drop-shadow-orange-200 border-orange-200 border-opacity-50"
+                  : "border-gray-500 border-opacity-90"
               }`}
               hoverClassName="hover:drop-shadow-sm hover:border-white hover:-translate-y-2"
               clickClassName="hover:drop-shadow-orange-200 hover:border-orange-200 hover:-translate-y-2"

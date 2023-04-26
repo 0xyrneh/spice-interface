@@ -28,7 +28,7 @@ const VaultList = ({ onClickVault }: Props) => {
   return (
     <div className="hidden sm:flex flex-col text-white font-medium px-8 pt-[72px] pb-6 gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl text-orange-200 font-bold text-shadow-orange-200">
+        <h1 className="text-xl text-orange-200 font-bold text-shadow-orange-900">
           VAULT LIST
         </h1>
         <div className="hidden md:flex gap-6">

@@ -14,6 +14,7 @@ module.exports = {
         "orange-300": "#FFCC8A",
         "orange-900": "#FDA739",
         "gray-700": "#1E1E1E",
+        "gray-500": "#44403C",
         "gray-300": "#C9C9C9",
         "gray-200": "#A1A1A1",
         "orange-50": "#FAFAF9",

@@ -59,12 +59,12 @@ const VaultSearch = () => {
 
   return (
     <div
-      className={`relative hidden w-[224px] h-8 lg:flex text-gray-200 text-xs rounded border-1 px-3 py-1 items-center gap-3
+      className={`relative hidden w-[224px] h-8 lg:flex text-gray-200 text-xs border-1 px-3 py-1 items-center gap-3
       ${
         focused
           ? "text-gray-300 border-gray-300"
           : "text-gray-200 border-gray-200"
-      }`}
+      } ${searchQuery !== "" ? "rounded-t" : "rounded"}`}
     >
       <SearchSVG />
       <input
@@ -78,7 +78,7 @@ const VaultSearch = () => {
       />
 
       {searchQuery !== "" && (
-        <div className="font-medium absolute flex flex-col top-[calc(100%+16px)] left-0 right-0 bg-gray-700 bg-opacity-45 border-1 border-orange-50 px-2 pt-2.5 pb-3 gap-2 rounded">
+        <div className="font-medium absolute flex flex-col top-[100%] -left-px -right-px bg-gray-700 bg-opacity-45 border-b-1 border-x-1 border-gray-300 px-2 pt-2.5 pb-3 gap-2 rounded-b">
           <div className="flex flex-col gap-1">
             <span className="text-xs text-gray-300">VAULTS</span>
             <div className="flex flex-col gap-px">
