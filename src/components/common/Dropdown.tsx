@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Listbox } from "@headlessui/react";
 import { FaChevronDown } from "react-icons/fa";
 import CheckedSVG from "@/assets/icons/checked.svg";
 import UncheckedSVG from "@/assets/icons/unchecked.svg";
 
 type Props = {
   className?: string;
+  dropdownClassName?: string;
   type?: "primary";
   title: string;
   items: string[];
@@ -26,6 +26,7 @@ const defaultOptionsClass = {
 
 const Dropdown = ({
   className,
+  dropdownClassName,
   type,
   title,
   items,
@@ -86,7 +87,7 @@ const Dropdown = ({
       <div
         className={`absolute z-10 w-full top-[31px] px-3 text-xs bg-black border-1 px-2 rounded-b max-h-[320px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100 ${
           opened ? "flex flex-col" : "hidden"
-        } ${defaultOptionsClass[type ?? "default"]}`}
+        } ${defaultOptionsClass[type ?? "default"]} ${dropdownClassName}`}
       >
         {items.map((item) => (
           <button

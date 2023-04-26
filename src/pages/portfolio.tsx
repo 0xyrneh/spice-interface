@@ -7,7 +7,11 @@ import { PieChart, PositionChart } from "@/components/portfolio";
 import prologueNfts from "@/constants/prologueNfts";
 import marketplaceExposure from "@/constants/marketplaceExposure";
 import collectionExposure from "@/constants/collectionExposure";
-import { PeriodFilter } from "@/types/common";
+import {
+  PeriodFilter,
+  VaultExposureSortFilter,
+  VaultNftsSortFilter,
+} from "@/types/common";
 import PositionSVG from "@/assets/icons/position.svg";
 import CopySVG from "@/assets/icons/copy.svg";
 import ExposureSVG from "@/assets/icons/exposure.svg";
@@ -16,10 +20,21 @@ import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
 import UserSVG from "@/assets/icons/user.svg";
 import SearchSVG from "@/assets/icons/search.svg";
 import { shortAddress } from "@/utils";
+import {
+  VAULT_EXPOSURE_SORT_FILTERS,
+  VAULT_NFTS_SORT_FILTERS,
+} from "@/constants";
 
 export default function Portfolio() {
   const address = "0x8snD12tFeAcc7s23ase5339D8snD12tFeAcc7s9D";
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
+
+  const [vaultExposureSortFilter, setVaultExposureSortFilter] = useState(
+    VaultExposureSortFilter.ApyHighToLow
+  );
+  const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
+    VaultNftsSortFilter.ValueHighToLow
+  );
 
   return (
     <div className="hidden sm:flex tracking-wide w-full h-min-[982px] mt-[84px] px-8 pb-5 gap-5">
@@ -67,10 +82,15 @@ export default function Portfolio() {
               <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
                 <Dropdown
                   className="w-[170px]"
-                  title={"Low to high Position"}
-                  values={["Low to high Position"]}
-                  items={["Low to high Position", "High to low Position"]}
-                  onChange={(item) => {}}
+                  dropdownClassName="bg-gray-700 bg-opacity-95"
+                  title={vaultExposureSortFilter}
+                  values={[vaultExposureSortFilter]}
+                  items={VAULT_EXPOSURE_SORT_FILTERS.filter(
+                    (item) => item !== vaultExposureSortFilter
+                  )}
+                  onChange={(item) =>
+                    setVaultExposureSortFilter(item as VaultExposureSortFilter)
+                  }
                 />
               </div>
             </div>
@@ -145,10 +165,15 @@ export default function Portfolio() {
               <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
                 <Dropdown
                   className="w-[170px]"
-                  title={"Low to high Value"}
-                  values={["Low to high Value"]}
-                  items={["Low to high Value", "High to low Value"]}
-                  onChange={(item) => {}}
+                  dropdownClassName="bg-gray-700 bg-opacity-95"
+                  title={vaultNftsSortFilter}
+                  values={[vaultNftsSortFilter]}
+                  items={VAULT_NFTS_SORT_FILTERS.filter(
+                    (item) => item !== vaultNftsSortFilter
+                  )}
+                  onChange={(item) =>
+                    setVaultNftsSortFilter(item as VaultNftsSortFilter)
+                  }
                 />
               </div>
             </div>
