@@ -1,7 +1,7 @@
 import Image from "next/image";
 import vaults from "@/constants/vaults";
 import { Vault } from "@/types/vault";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MarketplaceFilter, VaultFilter } from "@/types/common";
 import { Button, Dropdown } from "@/components/common";
 import CircleXSVG from "@/assets/icons/circleX.svg";
@@ -21,6 +21,16 @@ const VaultList = ({ onClickVault }: Props) => {
     MarketplaceFilter[]
   >([]);
   const [collectionFilters, setCollectionFilters] = useState<string[]>([]);
+  const [filteredVaults, setFilteredVaults] = useState<Vault[]>(vaults);
+
+  useEffect(() => {
+    const _vaults =
+      vaultFilter === VaultFilter.All
+        ? vaults
+        : vaults.filter((vault) => vault.type === vaultFilter);
+
+    setFilteredVaults(_vaults);
+  }, [vaultFilter]);
 
   return (
     <div className="hidden sm:flex flex-col text-white font-medium px-8 pt-[72px] pb-6 gap-4">
@@ -31,6 +41,7 @@ const VaultList = ({ onClickVault }: Props) => {
         <div className="hidden md:flex gap-6">
           <Dropdown
             className="w-[124px]"
+            itemClassName="text-white hover:text-orange-300"
             type="primary"
             title={vaultFilter}
             values={[vaultFilter]}
@@ -122,7 +133,7 @@ const VaultList = ({ onClickVault }: Props) => {
           </tr>
         </thead>
         <tbody className="block max-h-[728px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
-          {vaults.map((vault, index) => (
+          {filteredVaults.map((vault, index) => (
             <tr
               key={`vault-${index}`}
               onClick={() => onClickVault(vault, index)}

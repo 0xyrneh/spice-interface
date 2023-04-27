@@ -7,6 +7,7 @@ import { Button } from "@/components/common";
 
 export default function VaultInfo() {
   const [activeVaultIndex, setActiveVaultIndex] = useState(0);
+  const [focusedVaultIndex, setFocusedVaultIndex] = useState(-1);
 
   const getActiveVault = () => vaults[activeVaultIndex];
   const getVaultBackground = (vault?: Vault) =>
@@ -33,14 +34,20 @@ export default function VaultInfo() {
                 activeVaultIndex === index
                   ? "drop-shadow-orange-200 border-orange-200 border-opacity-50"
                   : "border-gray-500 border-opacity-90"
+              } ${
+                activeVaultIndex === index && focusedVaultIndex === -1
+                  ? "-translate-y-2"
+                  : ""
               }`}
               hoverClassName="hover:drop-shadow-sm hover:border-white hover:-translate-y-2"
-              clickClassName="hover:drop-shadow-orange-200 hover:border-orange-200 hover:-translate-y-2"
+              clickClassName="hover:drop-shadow-orange-200 hover:border-orange-200"
               style={{
                 backgroundImage: `url(${getVaultBackground(vault)})`,
                 transition: "transform 450ms",
               }}
               onClick={() => setActiveVaultIndex(index)}
+              onMouseEnter={() => setFocusedVaultIndex(index)}
+              onMouseLeave={() => setFocusedVaultIndex(-1)}
             >
               <span className="text-sm font-bold whitespace-nowrap overflow-hidden w-full text-ellipsis">
                 {vault.name}

@@ -1,3 +1,5 @@
+import { VaultFilter } from "./common";
+
 export enum ReceiptToken {
   NFT = "NFT",
   ERC20 = "ERC-20",
@@ -5,6 +7,7 @@ export enum ReceiptToken {
 
 export type Vault = {
   name: string;
+  type: VaultFilter.Public | VaultFilter.VIP;
   tvl: number;
   apy: number;
   oneDayChange: number;

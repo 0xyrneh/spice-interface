@@ -1,18 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ReactNode } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import CheckedSVG from "@/assets/icons/checked.svg";
 import UncheckedSVG from "@/assets/icons/unchecked.svg";
 
-type Props = {
+interface Props<T> {
   className?: string;
   dropdownClassName?: string;
+  itemClassName?: string;
   type?: "primary";
   title: string;
-  items: string[];
+  items: T[];
   values: string[];
   multiple?: boolean;
+  itemComponent?: (item: string) => ReactNode;
   onChange: (items: string[] | string) => void;
-};
+}
 
 const defaultClass = {
   primary: "border-orange-200 text-orange-200 drop-shadow-orange-200",
@@ -24,16 +26,18 @@ const defaultOptionsClass = {
   default: "border-gray-200 text-gray-200",
 };
 
-const Dropdown = ({
+function Dropdown<T>({
   className,
   dropdownClassName,
+  itemClassName,
   type,
   title,
   items,
   values,
   multiple,
+  itemComponent,
   onChange,
-}: Props) => {
+}: Props<string>) {
   const [opened, setOpened] = useState(false);
   const options = useRef();
 
@@ -91,7 +95,7 @@ const Dropdown = ({
       >
         {items.map((item) => (
           <button
-            className="h-8 min-h-[32px] flex items-center cursor-pointer gap-2"
+            className={`h-8 min-h-[32px] flex items-center cursor-pointer gap-2 ${itemClassName}`}
             key={item}
             onClick={() => handleSelect(item)}
           >
@@ -105,14 +109,18 @@ const Dropdown = ({
                   <UncheckedSVG className="w-4 h-[17px]" />
                 </div>
               ))}
-            <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-              {item}
-            </span>
+            {itemComponent ? (
+              itemComponent(item)
+            ) : (
+              <span className="text-ellipsis overflow-hidden whitespace-nowrap">
+                {item}
+              </span>
+            )}
           </button>
         ))}
       </div>
     </div>
   );
-};
+}
 
 export default Dropdown;
