@@ -282,7 +282,7 @@ export default function Portfolio() {
         <div className="flex gap-5">
           <Card className="flex-1 gap-3">
             <div className="flex items-center gap-2.5">
-              <MarketExposureSVG />
+              <MarketExposureSVG className="text-white" />
               <h2 className="font-bold text-white font-sm">
                 MARKETPLACE EXPOSURE
               </h2>
@@ -330,7 +330,7 @@ export default function Portfolio() {
           </Card>
           <Card className="flex-1 gap-3">
             <div className="flex items-center gap-2.5">
-              <UserSVG />
+              <UserSVG className="text-white" />
               <h2 className="font-bold text-white font-sm">
                 COLLECTION EXPOSURE
               </h2>

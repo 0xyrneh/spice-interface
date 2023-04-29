@@ -19,12 +19,12 @@ export const VAULT_FILTERS = [
 ];
 
 export const MARKETPLACE_FILTERS = [
-  MarketplaceFilter.Arcade,
-  MarketplaceFilter.Bend,
-  MarketplaceFilter.Drops,
-  MarketplaceFilter.NFTfi,
-  MarketplaceFilter.ParaSpace,
-  MarketplaceFilter.X2Y2,
+  "Arcade",
+  "Bend",
+  "Drops",
+  "NFTfi",
+  "ParaSpace",
+  "X2Y2",
 ];
 
 export const COLLECTION_FILTERS = [

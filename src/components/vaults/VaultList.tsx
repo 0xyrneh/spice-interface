@@ -3,8 +3,14 @@ import vaults from "@/constants/vaults";
 import { Vault } from "@/types/vault";
 import { useEffect, useState } from "react";
 import { MarketplaceFilter, VaultFilter } from "@/types/common";
-import { Button, Dropdown } from "@/components/common";
+import { Button, Dropdown, Select } from "@/components/common";
 import CircleXSVG from "@/assets/icons/circleX.svg";
+import SearchSVG from "@/assets/icons/search.svg";
+import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
+import UserSVG from "@/assets/icons/user.svg";
+import CheckedSVG from "@/assets/icons/checked.svg";
+import UncheckedSVG from "@/assets/icons/unchecked.svg";
+import SortDownSVG from "@/assets/icons/sort-down.svg";
 import {
   MARKETPLACE_FILTERS,
   VAULT_FILTERS,
@@ -17,11 +23,11 @@ type Props = {
 
 const VaultList = ({ onClickVault }: Props) => {
   const [vaultFilter, setVaultFilter] = useState(VaultFilter.All);
-  const [marketplaceFilters, setMarketplaceFilters] = useState<
-    MarketplaceFilter[]
-  >([]);
+  const [marketplaceFilters, setMarketplaceFilters] = useState<string[]>([]);
   const [collectionFilters, setCollectionFilters] = useState<string[]>([]);
   const [filteredVaults, setFilteredVaults] = useState<Vault[]>(vaults);
+  const [filterOpened, setFilterOpened] = useState(false);
+  const [filterQuery, setFilterQuery] = useState("");
 
   useEffect(() => {
     const _vaults =
@@ -32,6 +38,28 @@ const VaultList = ({ onClickVault }: Props) => {
     setFilteredVaults(_vaults);
   }, [vaultFilter]);
 
+  const toggleMarketplaceFilter = (filter: string) => {
+    const idx = marketplaceFilters.findIndex((_item) => _item === filter);
+    if (idx === -1) {
+      setMarketplaceFilters([...marketplaceFilters, filter]);
+    } else {
+      const newValues = [...marketplaceFilters];
+      newValues.splice(idx, 1);
+      setMarketplaceFilters(newValues);
+    }
+  };
+
+  const toggleCollectionFilter = (filter: string) => {
+    const idx = collectionFilters.findIndex((_item) => _item === filter);
+    if (idx === -1) {
+      setCollectionFilters([...collectionFilters, filter]);
+    } else {
+      const newValues = [...collectionFilters];
+      newValues.splice(idx, 1);
+      setCollectionFilters(newValues);
+    }
+  };
+
   return (
     <div className="hidden sm:flex flex-col text-white font-medium px-8 pt-[72px] pb-6 gap-4">
       <div className="flex items-center justify-between">
@@ -39,7 +67,7 @@ const VaultList = ({ onClickVault }: Props) => {
           VAULT LIST
         </h1>
         <div className="hidden md:flex gap-6">
-          <Dropdown
+          <Select
             className="w-[124px]"
             itemClassName="text-white hover:text-orange-300"
             type="primary"
@@ -49,23 +77,75 @@ const VaultList = ({ onClickVault }: Props) => {
             onChange={(item) => setVaultFilter(item as VaultFilter)}
           />
           <Dropdown
-            className="w-[140px]"
-            title={"Marketplaces"}
-            values={marketplaceFilters}
-            items={MARKETPLACE_FILTERS}
-            multiple
-            onChange={(items) =>
-              setMarketplaceFilters(items as MarketplaceFilter[])
-            }
-          />
-          <Dropdown
-            className="w-[140px]"
-            title={"Collections"}
-            values={collectionFilters}
-            items={COLLECTION_FILTERS}
-            multiple
-            onChange={(items) => setCollectionFilters(items as string[])}
-          />
+            opened={filterOpened}
+            onClose={() => setFilterOpened(false)}
+          >
+            <div
+              className={`flex items-center gap-3 border-1 border-gray-200 h-8 px-3 ${
+                filterOpened ? "rounded-t" : "rounded"
+              }`}
+            >
+              <SearchSVG />
+              <input
+                className="text-xs font-medium bg-transparent outline-0 placeholder:text-gray-200 text-white"
+                placeholder="Filter Vaults"
+                onFocus={() => setFilterOpened(true)}
+                onChange={(e) => setFilterQuery(e.target.value)}
+              />
+            </div>
+            <div className="bg-black border-x-1 border-b-1 border-gray-300 rounded-b px-3 py-[7px] text-xs max-h-[356px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+              {MARKETPLACE_FILTERS.filter((item) =>
+                item.toLowerCase().includes(filterQuery.toLowerCase())
+              ).map((filter) => (
+                <button
+                  key={`marketplace-filter-${filter}`}
+                  className={`h-8 flex items-center gap-2 hover:text-gray-300 ${
+                    marketplaceFilters.includes(filter)
+                      ? "text-gray-300"
+                      : "text-gray-400"
+                  }`}
+                  onClick={() => toggleMarketplaceFilter(filter)}
+                >
+                  {marketplaceFilters.includes(filter) ? (
+                    <div className="w-min-[16px]">
+                      <CheckedSVG className="w-4 h-[17px]" />
+                    </div>
+                  ) : (
+                    <div className="w-min-[16px]">
+                      <UncheckedSVG className="w-4 h-[17px]" />
+                    </div>
+                  )}
+                  <MarketExposureSVG />
+                  <span>{filter}</span>
+                </button>
+              ))}
+              {COLLECTION_FILTERS.filter((item) =>
+                item.toLowerCase().includes(filterQuery.toLowerCase())
+              ).map((filter) => (
+                <button
+                  key={`collection-filter-${filter}`}
+                  className={`h-8 flex items-center gap-2 hover:text-gray-300 ${
+                    marketplaceFilters.includes(filter)
+                      ? "text-gray-300"
+                      : "text-gray-400"
+                  }`}
+                  onClick={() => toggleCollectionFilter(filter)}
+                >
+                  {collectionFilters.includes(filter) ? (
+                    <div className="w-min-[16px]">
+                      <CheckedSVG className="w-4 h-[17px]" />
+                    </div>
+                  ) : (
+                    <div className="w-min-[16px]">
+                      <UncheckedSVG className="w-4 h-[17px]" />
+                    </div>
+                  )}
+                  <UserSVG />
+                  <span>{filter}</span>
+                </button>
+              ))}
+            </div>
+          </Dropdown>
         </div>
       </div>
 
@@ -75,8 +155,9 @@ const VaultList = ({ onClickVault }: Props) => {
           {marketplaceFilters.map((item) => (
             <div
               key={item}
-              className="bg-gray-500 rounded h-8 flex items-center text-xs font-medium pl-8 pr-2 gap-2"
+              className="bg-gray-500 rounded h-8 flex items-center text-warm-gray-50 text-xs font-medium px-2 gap-2"
             >
+              <MarketExposureSVG className="text-white" />
               {item}
               <button
                 onClick={() => {
@@ -97,8 +178,9 @@ const VaultList = ({ onClickVault }: Props) => {
           {collectionFilters.map((item) => (
             <div
               key={item}
-              className="bg-gray-500 rounded h-8 flex items-center text-xs font-medium pl-8 pr-2 gap-2"
+              className="bg-gray-450 bg-opacity-90 rounded h-8 flex items-center text-warm-gray-50 text-xs font-medium px-2 gap-2"
             >
+              <UserSVG className="text-white" />
               {item}
               <button
                 onClick={() => {
@@ -121,15 +203,20 @@ const VaultList = ({ onClickVault }: Props) => {
 
       <table className="text-white text-xs border-y-1 border-y-gray-200">
         <thead>
-          <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200">
-            <th className="text-left pl-1 lg:w-[35%] h-14">Vault</th>
+          <tr className="table table-fixed w-full text-gray-250 text-right border-b-1 border-b-gray-200">
+            <th className="text-left pl-1 lg:w-[35%] h-14">VAULT</th>
+            <th className="h-14">
+              <div className="flex items-center justify-end text-orange-200">
+                APY
+                <SortDownSVG />
+              </div>
+            </th>
+            <th className="hidden md:table-cell h-14">1D CHANGE</th>
+            <th className="hidden md:table-cell h-14">7D CHANGE</th>
             <th className="h-14">TVL</th>
-            <th className="h-14">APY</th>
-            <th className="hidden md:table-cell h-14">1d Change</th>
-            <th className="hidden md:table-cell h-14">7d Change</th>
-            <th className="h-14 hidden md:table-cell">Creator</th>
-            <th className="h-14">Receipt</th>
-            <th className="h-14 pr-1">Deposit</th>
+            <th className="h-14 hidden md:table-cell">CREATOR</th>
+            <th className="h-14">RECEIPT</th>
+            <th className="h-14 pr-1">DEPOSIT</th>
           </tr>
         </thead>
         <tbody className="block max-h-[728px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
@@ -142,12 +229,9 @@ const VaultList = ({ onClickVault }: Props) => {
               <td className="text-left lg:w-[35%] h-14">
                 <div className="flex items-center gap-2 pl-1 h-10 rounded-l">
                   <Image src={vault.icon} width={20} height={20} alt="" />
-                  {vault.name}
-                </div>
-              </td>
-              <td className="h-14">
-                <div className="h-10 flex items-center justify-end">
-                  Ξ{vault.tvl}
+                  <span className="whitespace-nowrap overflow-hidden w-full text-ellipsis">
+                    {vault.name}
+                  </span>
                 </div>
               </td>
               <td className="h-14">
@@ -177,6 +261,11 @@ const VaultList = ({ onClickVault }: Props) => {
                     ? "+" + vault.sevenDayChange
                     : vault.sevenDayChange}
                   %
+                </div>
+              </td>
+              <td className="h-14">
+                <div className="h-10 flex items-center justify-end">
+                  Ξ{vault.tvl}
                 </div>
               </td>
               <td className="h-14 hidden md:table-cell">

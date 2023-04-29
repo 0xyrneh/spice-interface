@@ -16,7 +16,7 @@ export default function VaultInfo() {
   return (
     <div className="flex flex-col tracking-wide max-w-[1536px] w-full">
       <div
-        className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[922px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-orange-50 font-semibold shadow-black"
+        className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[922px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-warm-gray-50 font-semibold shadow-black"
         style={{
           backgroundImage: `url(${getVaultBackground()})`,
         }}
