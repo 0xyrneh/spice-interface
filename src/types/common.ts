@@ -1,6 +1,7 @@
 export type NavOption = {
   href: string;
   name: string;
+  breakpoint: string;
   maxWidth?: string;
 };
 
@@ -22,16 +23,6 @@ export enum VaultFilter {
   All = "All Vaults",
   Public = "Public Vaults",
   VIP = "VIP Vaults",
-}
-
-export enum MarketplaceFilter {
-  All = "Marketplaces",
-  Arcade = "Arcade",
-  Bend = "Bend",
-  Drops = "Drops",
-  NFTfi = "NFTfi",
-  ParaSpace = "ParaSpace",
-  X2Y2 = "X2Y2",
 }
 
 export enum VaultExposureSortFilter {

@@ -60,7 +60,9 @@ const Header = () => {
 
   return (
     <div
-      className={`z-50 hidden sm:flex fixed w-full h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-8 font-bold
+      className={`z-50 hidden ${
+        activeTab().breakpoint
+      }:flex fixed w-full h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-8 font-bold
       max-w-[${activeTab().maxWidth}] ${show ? "top-0" : "-top-[64px]"}`}
       style={{ transition: "top 0.4s ease-in-out" }}
     >

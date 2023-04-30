@@ -1,15 +1,14 @@
 import {
   NavOption,
   VaultFilter,
-  MarketplaceFilter,
   VaultExposureSortFilter,
   VaultNftsSortFilter,
 } from "@/types/common";
 
 export const NAV_OPTIONS: NavOption[] = [
-  { href: "/", name: "Vaults", maxWidth: "1536px" },
-  { href: "/portfolio", name: "Portfolio" },
-  { href: "/prologue-nfts", name: "Prologue NFTs" },
+  { href: "/", name: "Vaults", maxWidth: "1536px", breakpoint: "sm" },
+  { href: "/portfolio", name: "Portfolio", breakpoint: "md" },
+  { href: "/prologue-nfts", name: "Prologue NFTs", breakpoint: "md" },
 ];
 
 export const VAULT_FILTERS = [

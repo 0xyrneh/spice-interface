@@ -2,7 +2,7 @@ import { useState } from "react";
 import Image from "next/image";
 import vaults from "@/constants/vaults";
 import { NotSupported } from "@/components";
-import { Card, Dropdown } from "@/components/common";
+import { Card, Select } from "@/components/common";
 import { PieChart, PositionChart } from "@/components/portfolio";
 import prologueNfts from "@/constants/prologueNfts";
 import marketplaceExposure from "@/constants/marketplaceExposure";
@@ -19,6 +19,7 @@ import KeySVG from "@/assets/icons/key.svg";
 import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
 import UserSVG from "@/assets/icons/user.svg";
 import SearchSVG from "@/assets/icons/search.svg";
+import CircleDotSVG from "@/assets/icons/circle-dot.svg";
 import { shortAddress } from "@/utils";
 import {
   VAULT_EXPOSURE_SORT_FILTERS,
@@ -37,7 +38,7 @@ export default function Portfolio() {
   );
 
   return (
-    <div className="hidden sm:flex tracking-wide w-full h-min-[982px] mt-[84px] px-8 pb-5 gap-5">
+    <div className="hidden md:flex tracking-wide w-full h-min-[982px] mt-[84px] px-8 pb-5 gap-5">
       <div className="flex flex-col w-2/5 gap-5">
         <Card className="py-3 !flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-5 flex-1">
@@ -80,7 +81,7 @@ export default function Portfolio() {
                 />
               </div>
               <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
-                <Dropdown
+                <Select
                   className="w-[170px]"
                   dropdownClassName="bg-gray-700 bg-opacity-95"
                   title={vaultExposureSortFilter}
@@ -114,30 +115,46 @@ export default function Portfolio() {
                       className="vault-row table table-fixed w-full text-right cursor-pointer"
                     >
                       <td className="text-left lg:w-[35%] h-10">
-                        <div className="flex items-center gap-2 pl-1">
+                        <div className="h-8 flex items-center gap-2 pl-1 rounded-l">
                           <Image
                             src={vault.icon}
                             width={16}
                             height={16}
                             alt=""
                           />
-                          {vault.name}
+                          <span className="whitespace-nowrap overflow-hidden w-full text-ellipsis">
+                            {vault.name}
+                          </span>
                         </div>
                       </td>
-                      <td className="h-10">Ξ2</td>
-                      <td className="h-10 hidden xl:table-cell">
-                        Ξ{vault.tvl}
+                      <td className="h-10">
+                        <div className="h-8 flex items-center justify-end">
+                          Ξ2
+                        </div>
                       </td>
-                      <td className="h-10">{vault.apy}%</td>
                       <td className="h-10 hidden xl:table-cell">
-                        {vault.receiptToken}
+                        <div className="h-8 flex items-center justify-end">
+                          Ξ{vault.tvl}
+                        </div>
                       </td>
-                      <td className="h-10 pr-1">
-                        <button className="border-1 border-orange-900 rounded p-1 bg-orange-900 bg-opacity-10 shadow-orange-900">
-                          <span className="text-xs text-orange-900">
-                            DEPOSIT
-                          </span>
-                        </button>
+                      <td className="h-10">
+                        <div className="h-8 flex items-center justify-end">
+                          {vault.apy}%
+                        </div>
+                      </td>
+                      <td className="h-10 hidden xl:table-cell">
+                        <div className="h-8 flex items-center justify-end">
+                          {vault.receiptToken}
+                        </div>
+                      </td>
+                      <td className="h-10">
+                        <div className="h-8 flex items-center justify-end rounded-r pr-1">
+                          <button className="border-1 border-orange-900 rounded p-1 bg-orange-900 bg-opacity-10 shadow-orange-900">
+                            <span className="text-xs text-orange-900">
+                              DEPOSIT
+                            </span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -163,7 +180,7 @@ export default function Portfolio() {
                 />
               </div>
               <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
-                <Dropdown
+                <Select
                   className="w-[170px]"
                   dropdownClassName="bg-gray-700 bg-opacity-95"
                   title={vaultNftsSortFilter}
@@ -197,10 +214,10 @@ export default function Portfolio() {
                     >
                       {nft.featured && (
                         <Image
-                          className="absolute top-0"
+                          className="absolute -top-1.5 -left-1.5"
                           src="/assets/icons/circle-dot.svg"
-                          width={15}
-                          height={15}
+                          width={28}
+                          height={28}
                           alt=""
                         />
                       )}
@@ -232,7 +249,7 @@ export default function Portfolio() {
               TOTAL SPICE POSITION
             </h2>
           </div>
-          <div className="flex items-end justify-between text-gray-200 pl-11 pr-12">
+          <div className="flex items-end justify-between text-gray-200 px-12">
             <div className="flex flex-col">
               <span className="text-sm font-medium">Your Spice TVL</span>
               <span className="font-bold text-xl text-orange-200">Ξ30.00</span>
@@ -256,7 +273,7 @@ export default function Portfolio() {
             <div className="flex-1 relative w-[50vw]">
               <PositionChart />
             </div>
-            <div className="flex lg:flex-col gap-5.5 justify-center">
+            <div className="flex lg:flex-col gap-5.5 justify-center px-12 justify-between lg:justify-center">
               {[
                 PeriodFilter.Day,
                 PeriodFilter.Week,
@@ -266,7 +283,7 @@ export default function Portfolio() {
               ].map((period) => (
                 <button
                   key={period}
-                  className={`border-1 px-2.5 rounded text-xs bg-opacity-10 ${
+                  className={`w-[34px] lg:w-full border-1 lg:px-2.5 rounded text-xs bg-opacity-10 ${
                     period === selectedPeriod
                       ? "text-orange-200 border-orange-200 shadow-orange-200 bg-orange-200"
                       : "text-gray-200 border-gray-200 bg-gray-200"
@@ -283,7 +300,10 @@ export default function Portfolio() {
           <Card className="flex-1 gap-3">
             <div className="flex items-center gap-2.5">
               <MarketExposureSVG className="text-white" />
-              <h2 className="font-bold text-white font-sm">
+              <h2 className="block lg:hidden font-bold text-white font-sm whitespace-nowrap">
+                MARKETPLACE EXP.
+              </h2>
+              <h2 className="hidden lg:block font-bold text-white font-sm whitespace-nowrap">
                 MARKETPLACE EXPOSURE
               </h2>
             </div>
@@ -299,7 +319,7 @@ export default function Portfolio() {
                   {marketplaceExposure.map((exposure, index) => (
                     <tr
                       key={`vault-${index}`}
-                      className="vault-row table table-fixed w-full text-right"
+                      className="table table-fixed w-full text-right"
                     >
                       <td className="text-left h-10 w-[80%]">
                         <div className="flex items-center gap-2 pl-1">
@@ -331,7 +351,10 @@ export default function Portfolio() {
           <Card className="flex-1 gap-3">
             <div className="flex items-center gap-2.5">
               <UserSVG className="text-white" />
-              <h2 className="font-bold text-white font-sm">
+              <h2 className="block lg:hidden font-bold text-white font-sm whitespace-nowrap">
+                COLLECTION EXP.
+              </h2>
+              <h2 className="hidden lg:block font-bold text-white font-sm whitespace-nowrap">
                 COLLECTION EXPOSURE
               </h2>
             </div>
@@ -347,7 +370,7 @@ export default function Portfolio() {
                   {collectionExposure.map((exposure, index) => (
                     <tr
                       key={`vault-${index}`}
-                      className="vault-row table table-fixed w-full text-right"
+                      className="table table-fixed w-full text-right"
                     >
                       <td className="text-left h-10 w-[80%]">
                         <div className="flex items-center gap-2 pl-1">

@@ -2,7 +2,7 @@ import Image from "next/image";
 import vaults from "@/constants/vaults";
 import { Vault } from "@/types/vault";
 import { useEffect, useState } from "react";
-import { MarketplaceFilter, VaultFilter } from "@/types/common";
+import { VaultFilter } from "@/types/common";
 import { Button, Dropdown, Select } from "@/components/common";
 import CircleXSVG from "@/assets/icons/circleX.svg";
 import SearchSVG from "@/assets/icons/search.svg";
