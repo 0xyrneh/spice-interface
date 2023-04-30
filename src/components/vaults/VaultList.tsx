@@ -34,12 +34,14 @@ const rowInfos: TableRowInfo[] = [
   {
     title: "1D CHANGE",
     key: "oneDayChange",
+    rowClass: () => "hidden md:table-cell",
     itemSuffix: () => "%",
     itemClass: (item) => (item.oneDayChange >= 0 ? "text-green" : "text-red"),
   },
   {
     title: "7D CHANGE",
     key: "sevenDayChange",
+    rowClass: () => "hidden md:table-cell",
     itemSuffix: () => "%",
     itemClass: (item) => (item.sevenDayChange >= 0 ? "text-green" : "text-red"),
   },
@@ -51,6 +53,7 @@ const rowInfos: TableRowInfo[] = [
   {
     title: "CREATOR",
     key: "creator",
+    rowClass: () => "hidden md:table-cell",
   },
   {
     title: "RECEIPT",
@@ -257,6 +260,7 @@ const VaultList = ({ onClickVault }: Props) => {
         trStyle="h-14"
         rowStyle="h-10"
         defaultSortKey="apy"
+        bodyClass="max-h-[528px]"
       />
     </div>
   );

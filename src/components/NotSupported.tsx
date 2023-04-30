@@ -20,8 +20,8 @@ const NotSupported = () => {
   return (
     <div
       className={`flex flex-col justify-center ${
-        activeTab().breakpoint
-      }:hidden h-screen text-orange-200 px-[26px] gap-3 font-semibold`}
+        activeTab().breakpoint === "sm" ? "sm:hidden" : "md:hidden"
+      } h-screen text-orange-200 px-[26px] gap-3 font-semibold`}
     >
       <h1 className="text-[26px] text-shadow-orange-200">
         Mobile is not supported.

@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import SortDownSVG from "@/assets/icons/sort-down.svg";
 
 export type TableRowInfo = {
@@ -18,6 +18,7 @@ type Props = {
   trStyle?: string;
   rowStyle?: string;
   defaultSortKey?: string;
+  bodyClass?: string;
 };
 
 const Table = ({
@@ -26,9 +27,11 @@ const Table = ({
   trStyle,
   rowStyle,
   defaultSortKey,
+  bodyClass,
 }: Props) => {
   const [sortKey, setSortKey] = useState<string | undefined>(defaultSortKey);
   const [sortAsc, setSortAsc] = useState(false);
+  const [sortedItems, setSortedItems] = useState(items);
 
   const getSortedItems = () => {
     if (sortKey) {
@@ -86,13 +89,13 @@ const Table = ({
           ))}
         </tr>
       </thead>
-      <tbody className="max-h-[728px]">
+      <tbody className={bodyClass}>
         {getSortedItems().map((item, index) => (
           <tr key={`item-${index}`} className={trStyle}>
             {rowInfos.map((row) => (
               <td
                 key={`item-${index}-${row.title}`}
-                className={row.rowClass ? row.rowClass() : ""}
+                className={`${row.rowClass ? row.rowClass() : ""}`}
               >
                 <div
                   className={`${rowStyle} ${
