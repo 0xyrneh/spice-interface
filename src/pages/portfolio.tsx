@@ -401,8 +401,6 @@ export default function Portfolio() {
           </Card>
         </div>
       </div>
-
-      <NotSupported />
     </div>
   );
 }

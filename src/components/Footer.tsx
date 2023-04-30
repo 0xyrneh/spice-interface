@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import CircleDotSvg from "@/assets/icons/circle-dot.svg";
 import DocsSVG from "@/assets/icons/docs.svg";
 import GithubSVG from "@/assets/icons/github.svg";
 import DiscordSVG from "@/assets/icons/discord.svg";
@@ -33,12 +33,7 @@ const VaultFooter = () => {
     >
       <div className="flex gap-4 items-center">
         <div className="flex items-center">
-          <Image
-            src="/assets/icons/circle-dot.svg"
-            width={28}
-            height={28}
-            alt=""
-          />
+          <CircleDotSvg />
           <span className="text-green font-bold text-xs">
             SPICE MARKET IS OPEN
           </span>

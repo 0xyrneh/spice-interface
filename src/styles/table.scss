@@ -1,0 +1,29 @@
+.vault-row:hover > td > div {
+  @apply bg-gray-300 bg-opacity-10;
+}
+
+.custom-table {
+  @apply text-white text-xs border-y-1 border-y-gray-200;
+
+  thead {
+    tr {
+      @apply table table-fixed w-full text-gray-250 text-right border-b-1 border-b-gray-200 [&>th:first-child>div]:justify-start [&>th:first-child>div]:pl-1 [&>th:last-child>div]:pr-1;
+
+      th div {
+        @apply flex items-center justify-end;
+      }
+    }
+  }
+
+  tbody {
+    @apply block overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100;
+
+    tr {
+      @apply vault-row table table-fixed w-full text-right cursor-pointer [&>td:first-child>div]:justify-start [&>td:first-child>div]:pl-1 [&>td:first-child>div]:rounded-l [&>td:last-child>div]:pr-1 [&>td:last-child>div]:rounded-r;
+
+      td div {
+        @apply flex items-center justify-end text-left;
+      }
+    }
+  }
+}

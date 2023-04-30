@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @import "./fonts.scss";
+@import "./table.scss";
 
 :root {
   --max-width: 1100px;
@@ -116,10 +117,6 @@ a {
 .no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
-}
-
-.vault-row:hover > td > div {
-  @apply bg-gray-300 bg-opacity-10;
 }
 
 .text-shadow-orange-200 {

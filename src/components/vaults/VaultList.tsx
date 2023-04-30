@@ -3,19 +3,69 @@ import vaults from "@/constants/vaults";
 import { Vault } from "@/types/vault";
 import { useEffect, useState } from "react";
 import { VaultFilter } from "@/types/common";
-import { Button, Dropdown, Select } from "@/components/common";
+import { Button, Dropdown, Select, Table } from "@/components/common";
 import CircleXSVG from "@/assets/icons/circleX.svg";
 import SearchSVG from "@/assets/icons/search.svg";
 import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
 import UserSVG from "@/assets/icons/user.svg";
 import CheckedSVG from "@/assets/icons/checked.svg";
 import UncheckedSVG from "@/assets/icons/unchecked.svg";
-import SortDownSVG from "@/assets/icons/sort-down.svg";
 import {
   MARKETPLACE_FILTERS,
   VAULT_FILTERS,
   COLLECTION_FILTERS,
 } from "@/constants";
+import { TableRowInfo } from "../common/Table";
+
+const rowInfos: TableRowInfo[] = [
+  {
+    title: "VAULT",
+    key: "name",
+    itemPrefix: (item) => (
+      <Image className="mr-2" src={item.icon} width={20} height={20} alt="" />
+    ),
+    rowClass: () => "lg:w-[35%]",
+  },
+  {
+    title: "APY",
+    key: "apy",
+    itemSuffix: () => "%",
+  },
+  {
+    title: "1D CHANGE",
+    key: "oneDayChange",
+    itemSuffix: () => "%",
+    itemClass: (item) => (item.oneDayChange >= 0 ? "text-green" : "text-red"),
+  },
+  {
+    title: "7D CHANGE",
+    key: "sevenDayChange",
+    itemSuffix: () => "%",
+    itemClass: (item) => (item.sevenDayChange >= 0 ? "text-green" : "text-red"),
+  },
+  {
+    title: "TVL",
+    key: "tvl",
+    itemPrefix: () => "Ξ",
+  },
+  {
+    title: "CREATOR",
+    key: "creator",
+  },
+  {
+    title: "RECEIPT",
+    key: "receiptToken",
+  },
+  {
+    title: "DEPOSIT",
+    noSort: true,
+    component: () => (
+      <Button type="primary" className="p-1">
+        <span className="text-xs">DEPOSIT</span>
+      </Button>
+    ),
+  },
+];
 
 type Props = {
   onClickVault: (vault: Vault, index: number) => void;
@@ -201,94 +251,13 @@ const VaultList = ({ onClickVault }: Props) => {
         </div>
       )}
 
-      <table className="text-white text-xs border-y-1 border-y-gray-200">
-        <thead>
-          <tr className="table table-fixed w-full text-gray-250 text-right border-b-1 border-b-gray-200">
-            <th className="text-left pl-1 lg:w-[35%] h-14">VAULT</th>
-            <th className="h-14">
-              <div className="flex items-center justify-end text-orange-200">
-                APY
-                <SortDownSVG />
-              </div>
-            </th>
-            <th className="hidden md:table-cell h-14">1D CHANGE</th>
-            <th className="hidden md:table-cell h-14">7D CHANGE</th>
-            <th className="h-14">TVL</th>
-            <th className="h-14 hidden md:table-cell">CREATOR</th>
-            <th className="h-14">RECEIPT</th>
-            <th className="h-14 pr-1">DEPOSIT</th>
-          </tr>
-        </thead>
-        <tbody className="block max-h-[728px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
-          {filteredVaults.map((vault, index) => (
-            <tr
-              key={`vault-${index}`}
-              onClick={() => onClickVault(vault, index)}
-              className="vault-row table table-fixed w-full text-right cursor-pointer"
-            >
-              <td className="text-left lg:w-[35%] h-14">
-                <div className="flex items-center gap-2 pl-1 h-10 rounded-l">
-                  <Image src={vault.icon} width={20} height={20} alt="" />
-                  <span className="whitespace-nowrap overflow-hidden w-full text-ellipsis">
-                    {vault.name}
-                  </span>
-                </div>
-              </td>
-              <td className="h-14">
-                <div className="h-10 flex items-center justify-end">
-                  {vault.apy}%
-                </div>
-              </td>
-              <td
-                className={`h-14 hidden md:table-cell ${
-                  vault.oneDayChange >= 0 ? "text-green" : "text-red"
-                }`}
-              >
-                <div className="h-10 flex items-center justify-end">
-                  {vault.oneDayChange >= 0
-                    ? "+" + vault.oneDayChange
-                    : vault.oneDayChange}
-                  %
-                </div>
-              </td>
-              <td
-                className={`h-14 hidden md:table-cell ${
-                  vault.sevenDayChange >= 0 ? "text-green" : "text-red"
-                }`}
-              >
-                <div className="h-10 flex items-center justify-end">
-                  {vault.sevenDayChange >= 0
-                    ? "+" + vault.sevenDayChange
-                    : vault.sevenDayChange}
-                  %
-                </div>
-              </td>
-              <td className="h-14">
-                <div className="h-10 flex items-center justify-end">
-                  Ξ{vault.tvl}
-                </div>
-              </td>
-              <td className="h-14 hidden md:table-cell">
-                <div className="h-10 flex items-center justify-end">
-                  {vault.creator}
-                </div>
-              </td>
-              <td className="h-14">
-                <div className="h-10 flex items-center justify-end">
-                  {vault.receiptToken}
-                </div>
-              </td>
-              <td className="h-14">
-                <div className="h-10 flex justify-end items-center pr-1 rounded-r">
-                  <Button type="primary" className="p-1">
-                    <span className="text-xs">DEPOSIT</span>
-                  </Button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Table
+        rowInfos={rowInfos}
+        items={filteredVaults}
+        trStyle="h-14"
+        rowStyle="h-10"
+        defaultSortKey="apy"
+      />
     </div>
   );
 };
