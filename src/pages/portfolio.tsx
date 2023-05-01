@@ -36,14 +36,14 @@ const rowInfos: TableRowInfo[] = [
     rowClass: () => "lg:w-[35%]",
   },
   {
-    title: "Position",
+    title: "POSITION",
     key: "position",
     noSort: true,
     rowClass: () => "hidden lg:table-cell",
     itemPrefix: () => "Ξ",
   },
   {
-    title: "Pos.",
+    title: "POS.",
     key: "position",
     noSort: true,
     rowClass: () => "lg:hidden",
@@ -92,7 +92,7 @@ export default function Portfolio() {
 
   return (
     <div className="hidden md:flex tracking-wide w-full h-min-[982px] mt-[84px] px-8 pb-5 gap-5">
-      <div className="flex flex-col w-2/5 gap-5">
+      <div className="flex flex-col min-w-[41%] w-[41%] gap-5">
         <Card className="py-3 !flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-5 flex-1">
             <Image
@@ -198,11 +198,11 @@ export default function Portfolio() {
               <span className="font-medium text-white text-xs">
                 Prologue NFT
               </span>
-              <div className="flex flex-wrap gap-y-3 gap-x-[1%] overflow-y-auto custom-scroll">
+              <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto custom-scroll">
                 {prologueNfts.map((nft, idx) => (
                   <div
                     key={`prologue-nft-${idx}`}
-                    className={`rounded flex flex-col text-orange-200 text-shadow-orange-200 font-bold w-[calc(98%/3)] lg:w-[calc(97%/4)] xl:w-[calc(96%/5)] 3xl:w-[calc(95%/6)] border-1 ${
+                    className={`rounded flex flex-col text-orange-200 text-shadow-orange-200 font-bold w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)] border-1 ${
                       nft.featured ? "border-orange-200" : "border-transparent"
                     }`}
                   >
@@ -222,10 +222,12 @@ export default function Portfolio() {
                         />
                       )}
                       {nft.featured && (
-                        <span className="text-center font-bold text-xs md:text-sm xl:text-base">
+                        <span className="text-center font-bold text-xs md:text-sm xl:text-base whitespace-nowrap">
                           [LEVERED]
                           <br />
-                          Net APY: {nft.apy}%
+                          Net APY:
+                          <br />
+                          {nft.apy}%
                         </span>
                       )}
                     </div>
@@ -269,11 +271,11 @@ export default function Portfolio() {
               </div>
             </div>
           </div>
-          <div className="flex flex-1 flex-col-reverse lg:flex-row">
-            <div className="flex-1 relative w-[50vw]">
+          <div className="flex flex-1 flex-col-reverse lg:flex-row gap-3">
+            <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)]">
               <PositionChart />
             </div>
-            <div className="flex lg:flex-col gap-5.5 justify-center px-12 justify-between lg:justify-center">
+            <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
               {[
                 PeriodFilter.Day,
                 PeriodFilter.Week,
@@ -283,7 +285,7 @@ export default function Portfolio() {
               ].map((period) => (
                 <button
                   key={period}
-                  className={`w-[34px] lg:w-full border-1 lg:px-2.5 rounded text-xs bg-opacity-10 ${
+                  className={`w-[34px] lg:w-full border-1 rounded text-xs bg-opacity-10 ${
                     period === selectedPeriod
                       ? "text-orange-200 border-orange-200 shadow-orange-200 bg-orange-200"
                       : "text-gray-200 border-gray-200 bg-gray-200"
