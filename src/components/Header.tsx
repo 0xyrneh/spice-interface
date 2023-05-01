@@ -42,7 +42,7 @@ const Header = () => {
     ) {
       return "text-orange-200 text-shadow-orange-900";
     }
-    return "";
+    return "hover:text-gray-300";
   };
 
   const activeTab = () => {
@@ -63,7 +63,9 @@ const Header = () => {
       className={`z-50 hidden ${
         activeTab().breakpoint
       }:flex fixed w-full h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-8 font-bold
-      max-w-[${activeTab().maxWidth}] ${show ? "top-0" : "-top-[64px]"}`}
+      max-w-[${activeTab().maxWidth}] ${
+        activeTab().name !== "Vaults" || show ? "top-0" : "-top-[64px]"
+      }`}
       style={{ transition: "top 0.4s ease-in-out" }}
     >
       <div className="flex-1 flex items-center gap-7 xl:gap-10 min-w-[420px] xl:min-w-[500px]">

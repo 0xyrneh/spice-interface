@@ -1,8 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import vaults from "@/constants/vaults";
-import { NotSupported } from "@/components";
-import { Card, Select } from "@/components/common";
+import { Button, Card, Select, Table } from "@/components/common";
 import { PieChart, PositionChart } from "@/components/portfolio";
 import prologueNfts from "@/constants/prologueNfts";
 import marketplaceExposure from "@/constants/marketplaceExposure";
@@ -19,12 +18,66 @@ import KeySVG from "@/assets/icons/key.svg";
 import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
 import UserSVG from "@/assets/icons/user.svg";
 import SearchSVG from "@/assets/icons/search.svg";
-import CircleDotSVG from "@/assets/icons/circle-dot.svg";
 import { shortAddress } from "@/utils";
 import {
   VAULT_EXPOSURE_SORT_FILTERS,
   VAULT_NFTS_SORT_FILTERS,
 } from "@/constants";
+import { TableRowInfo } from "@/components/common/Table";
+
+const rowInfos: TableRowInfo[] = [
+  {
+    title: "VAULT",
+    key: "name",
+    noSort: true,
+    itemPrefix: (item) => (
+      <Image className="mr-2" src={item.icon} width={20} height={20} alt="" />
+    ),
+    rowClass: () => "lg:w-[35%]",
+  },
+  {
+    title: "Position",
+    key: "position",
+    noSort: true,
+    rowClass: () => "hidden lg:table-cell",
+    itemPrefix: () => "Ξ",
+  },
+  {
+    title: "Pos.",
+    key: "position",
+    noSort: true,
+    rowClass: () => "lg:hidden",
+    itemPrefix: () => "Ξ",
+  },
+  {
+    title: "TVL",
+    key: "tvl",
+    noSort: true,
+    rowClass: () => "hidden xl:table-cell",
+    itemPrefix: () => "Ξ",
+  },
+  {
+    title: "APY",
+    key: "apy",
+    noSort: true,
+    itemSuffix: () => "%",
+  },
+  {
+    title: "RECEIPT",
+    key: "receiptToken",
+    noSort: true,
+    rowClass: () => "hidden xl:table-cell",
+  },
+  {
+    title: "DEPOSIT",
+    noSort: true,
+    component: () => (
+      <Button type="primary" className="p-1">
+        <span className="text-xs">DEPOSIT</span>
+      </Button>
+    ),
+  },
+];
 
 export default function Portfolio() {
   const address = "0x8snD12tFeAcc7s23ase5339D8snD12tFeAcc7s9D";
@@ -96,70 +149,17 @@ export default function Portfolio() {
               </div>
             </div>
             <div className="flex-1">
-              <table className="text-gray-200 text-xs border-y-1 border-y-gray-200 text-xs font-medium text-white">
-                <thead>
-                  <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200">
-                    <th className="text-left pl-1 lg:w-[35%] h-10">Vault</th>
-                    <th className="h-10 hidden lg:table-cell">Position</th>
-                    <th className="h-10 lg:hidden">Pos.</th>
-                    <th className="h-10 hidden xl:table-cell">TVL</th>
-                    <th className="h-10">APY</th>
-                    <th className="h-10 hidden xl:table-cell">Receipt</th>
-                    <th className="h-10 pr-1">Deposit</th>
-                  </tr>
-                </thead>
-                <tbody className="block max-h-[calc((max(982px,100vh)-294px)/2-160px)] overflow-y-hidden hover:overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
-                  {vaults.map((vault, index) => (
-                    <tr
-                      key={`vault-${index}`}
-                      className="vault-row table table-fixed w-full text-right cursor-pointer"
-                    >
-                      <td className="text-left lg:w-[35%] h-10">
-                        <div className="h-8 flex items-center gap-2 pl-1 rounded-l">
-                          <Image
-                            src={vault.icon}
-                            width={16}
-                            height={16}
-                            alt=""
-                          />
-                          <span className="whitespace-nowrap overflow-hidden w-full text-ellipsis">
-                            {vault.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="h-10">
-                        <div className="h-8 flex items-center justify-end">
-                          Ξ2
-                        </div>
-                      </td>
-                      <td className="h-10 hidden xl:table-cell">
-                        <div className="h-8 flex items-center justify-end">
-                          Ξ{vault.tvl}
-                        </div>
-                      </td>
-                      <td className="h-10">
-                        <div className="h-8 flex items-center justify-end">
-                          {vault.apy}%
-                        </div>
-                      </td>
-                      <td className="h-10 hidden xl:table-cell">
-                        <div className="h-8 flex items-center justify-end">
-                          {vault.receiptToken}
-                        </div>
-                      </td>
-                      <td className="h-10">
-                        <div className="h-8 flex items-center justify-end rounded-r pr-1">
-                          <button className="border-1 border-orange-900 rounded p-1 bg-orange-900 bg-opacity-10 shadow-orange-900">
-                            <span className="text-xs text-orange-900">
-                              DEPOSIT
-                            </span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <Table
+                rowInfos={rowInfos}
+                items={vaults.map((vault) => ({
+                  ...vault,
+                  position: 2,
+                }))}
+                trStyle="h-10"
+                rowStyle="h-8"
+                defaultSortKey="apy"
+                bodyClass="max-h-[calc((max(982px,100vh)-294px)/2-160px)]"
+              />
             </div>
           </Card>
           <Card className="gap-5 h-[calc(50%-10px)]">

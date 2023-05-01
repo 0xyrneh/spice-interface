@@ -147,8 +147,10 @@ const VaultList = ({ onClickVault }: Props) => {
               />
             </div>
             <div className="bg-black border-x-1 border-b-1 border-gray-300 rounded-b px-3 py-[7px] text-xs max-h-[356px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
-              {MARKETPLACE_FILTERS.filter((item) =>
-                item.toLowerCase().includes(filterQuery.toLowerCase())
+              {MARKETPLACE_FILTERS.filter(
+                (item) =>
+                  item.toLowerCase().includes(filterQuery.toLowerCase()) &&
+                  !marketplaceFilters.includes(item)
               ).map((filter) => (
                 <button
                   key={`marketplace-filter-${filter}`}
@@ -172,8 +174,10 @@ const VaultList = ({ onClickVault }: Props) => {
                   <span>{filter}</span>
                 </button>
               ))}
-              {COLLECTION_FILTERS.filter((item) =>
-                item.toLowerCase().includes(filterQuery.toLowerCase())
+              {COLLECTION_FILTERS.filter(
+                (item) =>
+                  item.toLowerCase().includes(filterQuery.toLowerCase()) &&
+                  !collectionFilters.includes(item)
               ).map((filter) => (
                 <button
                   key={`collection-filter-${filter}`}
