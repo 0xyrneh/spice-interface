@@ -245,7 +245,7 @@ export default function Portfolio() {
         </div>
       </div>
 
-      <div className="flex flex-col flex-1 gap-5 max-h-[calc(max(982px,100vh)-164px)] h-[calc(max(982px,100vh)-164px)]">
+      <div className="flex flex-col flex-1 gap-5">
         <Card className="gap-3 flex-1">
           <div className="flex items-center gap-2.5">
             <PositionSVG />
