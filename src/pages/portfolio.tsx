@@ -136,6 +136,7 @@ export default function Portfolio() {
               <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
                 <Select
                   className="w-[170px]"
+                  itemClassName="text-gray-200 hover:text-gray-300"
                   dropdownClassName="bg-gray-700 bg-opacity-95"
                   title={vaultExposureSortFilter}
                   values={[vaultExposureSortFilter]}
@@ -182,6 +183,7 @@ export default function Portfolio() {
               <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
                 <Select
                   className="w-[170px]"
+                  itemClassName="text-gray-200 hover:text-gray-300"
                   dropdownClassName="bg-gray-700 bg-opacity-95"
                   title={vaultNftsSortFilter}
                   values={[vaultNftsSortFilter]}
@@ -271,8 +273,8 @@ export default function Portfolio() {
               </div>
             </div>
           </div>
-          <div className="flex flex-1 flex-col-reverse lg:flex-row gap-3">
-            <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)]">
+          <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3">
+            <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)] max-h-[calc(max(982px,100vh)-658px)] lg:max-h-[calc(max(982px,100vh)-639px)]">
               <PositionChart />
             </div>
             <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">

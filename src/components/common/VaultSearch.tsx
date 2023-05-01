@@ -91,7 +91,7 @@ const VaultSearch = () => {
       />
 
       {focused && (
-        <div className="font-medium absolute flex flex-col top-[100%] -left-px -right-px bg-gray-700 bg-opacity-45 border-b-1 border-x-1 border-gray-300 px-2 pt-2.5 pb-3 gap-2 rounded-b">
+        <div className="font-medium absolute flex flex-col top-[100%] -left-px -right-px bg-gray-700 bg-opacity-95 border-b-1 border-x-1 border-gray-300 px-2 pt-2.5 pb-3 gap-2 rounded-b">
           <div className="flex flex-col gap-1">
             <span className="text-xs text-gray-300">VIP VAULTS</span>
             <div className="flex flex-col gap-px">
