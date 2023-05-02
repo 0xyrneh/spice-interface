@@ -9,7 +9,7 @@
 
   thead {
     tr {
-      @apply table table-fixed w-full text-gray-250 text-right border-b-1 border-b-gray-200 [&>th:first-child>div]:justify-start [&>th:first-child>div]:pl-1 [&>th:last-child>div]:pr-1;
+      @apply table table-fixed w-full text-gray-100 text-right border-b-1 border-b-gray-200 [&>th:first-child>div]:justify-start [&>th:first-child>div]:pl-1 [&>th:last-child>div]:pr-1;
 
       th div {
         @apply flex items-center justify-end;

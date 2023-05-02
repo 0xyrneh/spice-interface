@@ -6,6 +6,7 @@ export enum ReceiptToken {
 }
 
 export type Vault = {
+  id: number;
   name: string;
   type: VaultFilter.Public | VaultFilter.VIP;
   tvl: number;

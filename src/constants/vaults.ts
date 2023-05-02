@@ -3,6 +3,7 @@ import { Vault, ReceiptToken } from "@/types/vault";
 
 const vaults: Vault[] = [
   {
+    id: 0,
     name: "Prologue Vault",
     type: VaultFilter.Public,
     tvl: 500,
@@ -16,6 +17,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults.jpg",
   },
   {
+    id: 1,
     name: "Prologue Leverage Vault",
     type: VaultFilter.VIP,
     tvl: 700,
@@ -29,6 +31,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults1.png",
   },
   {
+    id: 2,
     name: "Flagship Vault",
     type: VaultFilter.Public,
     tvl: 430,
@@ -42,6 +45,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults.jpg",
   },
   {
+    id: 3,
     name: "HoneyJar Vault",
     type: VaultFilter.VIP,
     tvl: 200,
@@ -55,6 +59,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults2.jpg",
   },
   {
+    id: 4,
     name: "Prologue Vault",
     type: VaultFilter.Public,
     tvl: 400,
@@ -68,6 +73,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults1.png",
   },
   {
+    id: 5,
     name: "Prologue Leverage Vault",
     type: VaultFilter.VIP,
     tvl: 400,
@@ -81,6 +87,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults1.png",
   },
   {
+    id: 6,
     name: "Flagship Vault",
     type: VaultFilter.Public,
     tvl: 400,
@@ -94,6 +101,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults.jpg",
   },
   {
+    id: 7,
     name: "HoneyJar Vault",
     type: VaultFilter.VIP,
     tvl: 400,
@@ -107,6 +115,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults2.jpg",
   },
   {
+    id: 8,
     name: "Prologue Vault",
     type: VaultFilter.Public,
     tvl: 400,
@@ -119,6 +128,7 @@ const vaults: Vault[] = [
     icon: "/assets/images/vaultIcon.svg",
   },
   {
+    id: 9,
     name: "Prologue Leverage Vault",
     type: VaultFilter.VIP,
     tvl: 400,
@@ -132,6 +142,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults1.png",
   },
   {
+    id: 10,
     name: "Flagship Vault",
     type: VaultFilter.Public,
     tvl: 400,
@@ -145,6 +156,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults.jpg",
   },
   {
+    id: 11,
     name: "HoneyJar Vault",
     type: VaultFilter.VIP,
     tvl: 400,
@@ -158,6 +170,7 @@ const vaults: Vault[] = [
     bg: "/assets/images/bgVaults2.jpg",
   },
   {
+    id: 12,
     name: "Prologue Vault",
     type: VaultFilter.Public,
     tvl: 400,

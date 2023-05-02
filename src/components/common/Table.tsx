@@ -13,12 +13,14 @@ export type TableRowInfo = {
 };
 
 type Props = {
+  className?: string;
   rowInfos: TableRowInfo[];
   items: any[];
   trStyle?: string;
   rowStyle?: string;
   defaultSortKey?: string;
   bodyClass?: string;
+  onClickItem?: (item: any) => void;
 };
 
 const Table = ({
@@ -28,6 +30,8 @@ const Table = ({
   rowStyle,
   defaultSortKey,
   bodyClass,
+  className,
+  onClickItem,
 }: Props) => {
   const [sortKey, setSortKey] = useState<string | undefined>(defaultSortKey);
   const [sortAsc, setSortAsc] = useState(false);
@@ -56,7 +60,7 @@ const Table = ({
   };
 
   return (
-    <table className="custom-table">
+    <table className={`custom-table ${className}`}>
       <thead>
         <tr className={trStyle}>
           {rowInfos.map((row) => (
@@ -91,7 +95,13 @@ const Table = ({
       </thead>
       <tbody className={bodyClass}>
         {getSortedItems().map((item, index) => (
-          <tr key={`item-${index}`} className={trStyle}>
+          <tr
+            key={`item-${index}`}
+            className={trStyle}
+            onClick={() => {
+              if (onClickItem) onClickItem(item);
+            }}
+          >
             {rowInfos.map((row) => (
               <td
                 key={`item-${index}-${row.title}`}

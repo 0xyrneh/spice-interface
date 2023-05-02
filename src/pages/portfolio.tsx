@@ -1,7 +1,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import vaults from "@/constants/vaults";
-import { Button, Card, Select, Table } from "@/components/common";
+import {
+  Button,
+  Card,
+  PrologueNftCard,
+  Select,
+  Stats,
+  Table,
+} from "@/components/common";
 import { PieChart, PositionChart } from "@/components/portfolio";
 import prologueNfts from "@/constants/prologueNfts";
 import marketplaceExposure from "@/constants/marketplaceExposure";
@@ -91,7 +98,7 @@ export default function Portfolio() {
   );
 
   return (
-    <div className="hidden md:flex tracking-wide w-full h-min-[982px] mt-[84px] px-8 pb-5 gap-5">
+    <div className="hidden md:flex tracking-wide w-full mt-[84px] px-8 pb-5 gap-5">
       <div className="flex flex-col min-w-[41%] w-[41%] gap-5">
         <Card className="py-3 !flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-5 flex-1">
@@ -202,42 +209,11 @@ export default function Portfolio() {
               </span>
               <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto custom-scroll">
                 {prologueNfts.map((nft, idx) => (
-                  <div
+                  <PrologueNftCard
                     key={`prologue-nft-${idx}`}
-                    className={`rounded flex flex-col text-orange-200 text-shadow-orange-200 font-bold w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)] border-1 ${
-                      nft.featured ? "border-orange-200" : "border-transparent"
-                    }`}
-                  >
-                    <div
-                      className="flex flex-col w-full bg-cover aspect-square relative justify-center"
-                      style={{
-                        backgroundImage: `url(${nft.icon})`,
-                      }}
-                    >
-                      {nft.featured && (
-                        <Image
-                          className="absolute -top-1.5 -left-1.5"
-                          src="/assets/icons/circle-dot.svg"
-                          width={28}
-                          height={28}
-                          alt=""
-                        />
-                      )}
-                      {nft.featured && (
-                        <span className="text-center font-bold text-xs md:text-sm xl:text-base whitespace-nowrap">
-                          [LEVERED]
-                          <br />
-                          Net APY:
-                          <br />
-                          {nft.apy}%
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between h-6 bg-gray-700 text-xs p-2">
-                      <span>#{nft.rank}</span>
-                      <span>Ξ{nft.tvl}</span>
-                    </div>
-                  </div>
+                    nft={nft}
+                    className="w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
+                  />
                 ))}
               </div>
             </div>
@@ -254,10 +230,7 @@ export default function Portfolio() {
             </h2>
           </div>
           <div className="flex items-end justify-between text-gray-200 px-12">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">Your Spice TVL</span>
-              <span className="font-bold text-xl text-orange-200">Ξ30.00</span>
-            </div>
+            <Stats title="Your Spice TVL" value="Ξ30.00" />
             <div className="flex items-center text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
               <div className="hidden 2xl:flex items-center gap-1">
                 <span>1W Est. Yield:</span>
@@ -314,8 +287,8 @@ export default function Portfolio() {
             <div className="flex gap-2.5">
               <table className="flex-1 text-gray-200 text-xs border-y-1 border-y-gray-200 text-xs font-medium text-white">
                 <thead>
-                  <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200">
-                    <th className="text-left pl-1 h-10 w-[80%]">Marketplace</th>
+                  <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200 text-gray-100">
+                    <th className="text-left pl-1 h-10 w-[80%]">MARKETPLACE</th>
                     <th className="h-10 pr-1">%</th>
                   </tr>
                 </thead>
@@ -365,8 +338,8 @@ export default function Portfolio() {
             <div className="flex gap-2.5">
               <table className="flex-1 text-gray-200 text-xs border-y-1 border-y-gray-200 text-xs font-medium text-white">
                 <thead>
-                  <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200">
-                    <th className="text-left pl-1 h-10 w-[80%]">Collection</th>
+                  <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200 text-gray-100">
+                    <th className="text-left pl-1 h-10 w-[80%]">COLLECTION</th>
                     <th className="h-10 pr-1">%</th>
                   </tr>
                 </thead>

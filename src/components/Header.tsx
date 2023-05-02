@@ -38,7 +38,9 @@ const Header = () => {
   const linkClass = (option: NavOption) => {
     if (
       router.pathname === option.href ||
-      router.pathname.startsWith(option.href + "/", 0)
+      router.pathname.startsWith(option.href + "/", 0) ||
+      (option.name === "Vaults" &&
+        router.pathname.startsWith("/vault" + "/", 0))
     ) {
       return "text-orange-200 text-shadow-orange-900";
     }

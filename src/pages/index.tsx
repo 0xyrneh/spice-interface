@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import vaults from "@/constants/vaults";
 import { FaChevronRight } from "react-icons/fa";
 import { Vault } from "@/types/vault";
@@ -6,6 +7,8 @@ import { News, VaultList } from "@/components/vaults";
 import { Button } from "@/components/common";
 
 export default function VaultInfo() {
+  const router = useRouter();
+
   const [activeVaultIndex, setActiveVaultIndex] = useState(0);
   const [focusedVaultIndex, setFocusedVaultIndex] = useState(-1);
 
@@ -16,7 +19,7 @@ export default function VaultInfo() {
   return (
     <div className="flex flex-col tracking-wide max-w-[1536px] w-full">
       <div
-        className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[922px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-warm-gray-50 font-semibold shadow-black"
+        className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[982px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-warm-gray-50 font-semibold shadow-black"
         style={{
           backgroundImage: `url(${getVaultBackground()})`,
         }}
@@ -79,8 +82,8 @@ export default function VaultInfo() {
       </div>
       <News />
       <VaultList
-        onClickVault={(_, index) => {
-          setActiveVaultIndex(index);
+        onClickVault={(vault) => {
+          router.push(`/vault/${vault.id}`);
         }}
       />
     </div>

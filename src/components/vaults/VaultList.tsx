@@ -71,7 +71,7 @@ const rowInfos: TableRowInfo[] = [
 ];
 
 type Props = {
-  onClickVault: (vault: Vault, index: number) => void;
+  onClickVault: (vault: Vault) => void;
 };
 
 const VaultList = ({ onClickVault }: Props) => {
@@ -265,6 +265,7 @@ const VaultList = ({ onClickVault }: Props) => {
         rowStyle="h-10"
         defaultSortKey="apy"
         bodyClass="max-h-[528px]"
+        onClickItem={onClickVault}
       />
     </div>
   );
