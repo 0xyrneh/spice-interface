@@ -14,7 +14,7 @@ const NotSupported = () => {
         return option;
       }
     }
-    return NAV_OPTIONS[0];
+    return NAV_OPTIONS[1];
   };
 
   return (

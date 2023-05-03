@@ -167,6 +167,7 @@ export default function Portfolio() {
                 rowStyle="h-8"
                 defaultSortKey="apy"
                 bodyClass="max-h-[calc((max(982px,100vh)-294px)/2-160px)]"
+                onClickItem={() => {}}
               />
             </div>
           </Card>

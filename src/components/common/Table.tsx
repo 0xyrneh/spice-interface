@@ -97,7 +97,9 @@ const Table = ({
         {getSortedItems().map((item, index) => (
           <tr
             key={`item-${index}`}
-            className={trStyle}
+            className={`trStyle ${
+              onClickItem ? "vault-row cursor-pointer" : ""
+            }`}
             onClick={() => {
               if (onClickItem) onClickItem(item);
             }}

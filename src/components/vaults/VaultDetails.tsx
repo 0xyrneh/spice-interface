@@ -28,7 +28,6 @@ const rowInfos: TableRowInfo[] = [
   {
     title: "LOAN",
     key: "name",
-    noSort: true,
     itemPrefix: (item) => (
       <>
         <Image
@@ -46,32 +45,27 @@ const rowInfos: TableRowInfo[] = [
   {
     title: "PRINCIPAL",
     key: "principal",
-    noSort: true,
     itemPrefix: () => "Ξ",
   },
   {
     title: "REPAY",
     key: "repay",
-    noSort: true,
+    rowClass: () => "hidden lg:table-cell",
     itemPrefix: () => "Ξ",
   },
   {
     title: "LTV",
     key: "ltv",
-    noSort: true,
     itemSuffix: () => "%",
   },
   {
     title: "APY",
     key: "apy",
-    noSort: true,
-    rowClass: () => "hidden lg:table-cell",
     itemSuffix: () => "%",
   },
   {
     title: "DUE",
     key: "due",
-    noSort: true,
     rowClass: () => "hidden lg:table-cell",
     itemSuffix: () => "d",
   },
@@ -82,9 +76,6 @@ type Props = {
 };
 
 export default function VaultDetails({ vault }: Props) {
-  const [vaultExposureSortFilter, setVaultExposureSortFilter] = useState(
-    VaultExposureSortFilter.ApyHighToLow
-  );
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
     VaultNftsSortFilter.ValueHighToLow
   );
@@ -101,7 +92,7 @@ export default function VaultDetails({ vault }: Props) {
                 height={40}
                 alt=""
               />
-              <h2 className="font-bold text-white font-base">PROLOGUE VAULT</h2>
+              <h2 className="font-bold text-white font-base">{vault.name}</h2>
             </div>
             <div className="hidden xl:flex items-center justify-end gap-5 flex-1">
               <Button type="primary" className="h-9 flex-1 max-w-[148px]">
@@ -210,8 +201,8 @@ export default function VaultDetails({ vault }: Props) {
             </div>
             <ExternalLinkSVG />
           </div>
-          <div className="flex items-center justify-between gap-5">
-            <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
+          <div className="flex">
+            <div className="flex flex-1 text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
               <SearchSVG />
               <input
                 className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
@@ -220,21 +211,6 @@ export default function VaultDetails({ vault }: Props) {
                 // onChange={(e) => setSearchQuery(e.target.value)}
                 // onFocus={handleFocus}
                 // onBlur={handleBlur}
-              />
-            </div>
-            <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
-              <Select
-                className="w-[170px]"
-                itemClassName="text-gray-200 hover:text-gray-300"
-                dropdownClassName="bg-gray-700 bg-opacity-95"
-                title={vaultExposureSortFilter}
-                values={[vaultExposureSortFilter]}
-                items={VAULT_EXPOSURE_SORT_FILTERS.filter(
-                  (item) => item !== vaultExposureSortFilter
-                )}
-                onChange={(item) =>
-                  setVaultExposureSortFilter(item as VaultExposureSortFilter)
-                }
               />
             </div>
           </div>

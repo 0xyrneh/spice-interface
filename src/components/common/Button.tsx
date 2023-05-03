@@ -24,7 +24,7 @@ const hoverDefaultClass = {
   primary:
     "hover:bg-orange-300 hover:border-orange-300 hover:text-orange-300 hover:bg-opacity-10",
   secondary:
-    "hover:bg-orange-300 hover:border-orange-300 hover:text-orange-300 hover:bg-opacity-10",
+    "hover:bg-gray-300 hover:border-gray-300 hover:text-gray-300 hover:bg-opacity-10",
 };
 
 const Button = ({
