@@ -57,7 +57,7 @@ export default function VaultDetails({ vault }: Props) {
             />
           </>
         ),
-        rowClass: () => "lg:w-[35%]",
+        rowClass: () => "w-[45%]",
       },
       {
         title: "PRINCIPAL",

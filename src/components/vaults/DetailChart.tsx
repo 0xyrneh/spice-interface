@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Card, Stats } from "@/components/common";
-import { PieChart, PositionChart } from "@/components/portfolio";
+import {
+  PieChart,
+  PositionChart,
+  PerformanceChart,
+} from "@/components/portfolio";
 import marketplaceExposure from "@/constants/marketplaceExposure";
 import collectionExposure from "@/constants/collectionExposure";
 import { PeriodFilter } from "@/types/common";
@@ -11,6 +15,7 @@ import SortUpSVG from "@/assets/icons/sort-up2.svg";
 
 export default function DetailChart() {
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
+  const [showPerformance, setShowPerformance] = useState(false);
 
   return (
     <div className="flex flex-col flex-1 gap-5">
@@ -18,7 +23,13 @@ export default function DetailChart() {
         <div className="flex items-center gap-2.5">
           <TvlSVG />
           <h2 className="font-bold text-white font-sm">TOTAL VALUE LOCKED</h2>
-          <SortUpSVG />
+          <button onClick={() => setShowPerformance(!showPerformance)}>
+            <SortUpSVG
+              className={`text-gray-100 hover:text-white ${
+                showPerformance ? "rotate-180" : ""
+              }`}
+            />
+          </button>
         </div>
         <div className="flex items-end justify-between text-gray-200 px-12">
           <div className="flex gap-4 items-center">
@@ -42,7 +53,7 @@ export default function DetailChart() {
         </div>
         <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)]">
           <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)] max-h-[calc(100%-18px)] lg:max-h-[100%]">
-            <PositionChart />
+            {showPerformance ? <PerformanceChart /> : <PositionChart />}
           </div>
           <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
             {[
