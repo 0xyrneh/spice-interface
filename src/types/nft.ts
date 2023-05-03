@@ -20,5 +20,5 @@ export type Loan = {
   apy: number;
   due: number;
   icon: string;
-  loanIcon: string;
+  market: string;
 };

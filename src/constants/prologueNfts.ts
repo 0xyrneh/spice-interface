@@ -96,7 +96,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan1.svg",
+    market: "/assets/icons/loan1.svg",
   },
   {
     name: "Squiggles #3664",
@@ -106,7 +106,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan2.svg",
+    market: "/assets/icons/loan2.svg",
   },
   {
     name: "Squiggles #3664",
@@ -116,7 +116,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan3.svg",
+    market: "/assets/icons/loan3.svg",
   },
   {
     name: "Squiggles #3664",
@@ -126,7 +126,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan1.svg",
+    market: "/assets/icons/loan1.svg",
   },
   {
     name: "Squiggles #3664",
@@ -136,7 +136,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan2.svg",
+    market: "/assets/icons/loan2.svg",
   },
   {
     name: "Squiggles #3664",
@@ -146,7 +146,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan3.svg",
+    market: "/assets/icons/loan3.svg",
   },
   {
     name: "Squiggles #3664",
@@ -156,7 +156,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan1.svg",
+    market: "/assets/icons/loan1.svg",
   },
   {
     name: "Squiggles #3664",
@@ -166,7 +166,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan2.svg",
+    market: "/assets/icons/loan2.svg",
   },
   {
     name: "Squiggles #3664",
@@ -176,7 +176,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan3.svg",
+    market: "/assets/icons/loan3.svg",
   },
   {
     name: "Squiggles #3664",
@@ -186,7 +186,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan1.svg",
+    market: "/assets/icons/loan1.svg",
   },
   {
     name: "Squiggles #3664",
@@ -196,7 +196,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan2.svg",
+    market: "/assets/icons/loan2.svg",
   },
   {
     name: "Squiggles #3664",
@@ -206,7 +206,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan3.svg",
+    market: "/assets/icons/loan3.svg",
   },
   {
     name: "Squiggles #3664",
@@ -216,7 +216,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan1.svg",
+    market: "/assets/icons/loan1.svg",
   },
   {
     name: "Squiggles #3664",
@@ -226,7 +226,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan2.svg",
+    market: "/assets/icons/loan2.svg",
   },
   {
     name: "Squiggles #3664",
@@ -236,7 +236,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan3.svg",
+    market: "/assets/icons/loan3.svg",
   },
   {
     name: "Squiggles #3664",
@@ -246,7 +246,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan1.svg",
+    market: "/assets/icons/loan1.svg",
   },
   {
     name: "Squiggles #3664",
@@ -256,7 +256,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan2.svg",
+    market: "/assets/icons/loan2.svg",
   },
   {
     name: "Squiggles #3664",
@@ -266,7 +266,7 @@ export const loans: Loan[] = [
     apy: 15,
     due: 5,
     icon: "/assets/images/vaultIcon.svg",
-    loanIcon: "/assets/icons/loan3.svg",
+    market: "/assets/icons/loan3.svg",
   },
 ];
 

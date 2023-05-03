@@ -10,66 +10,16 @@ import {
 } from "@/components/common";
 import { DetailChart } from "@/components/vaults";
 import prologueNfts, { loans } from "@/constants/prologueNfts";
-import { VaultExposureSortFilter, VaultNftsSortFilter } from "@/types/common";
+import { VaultNftsSortFilter } from "@/types/common";
 import CircleDotSvg from "@/assets/icons/circle-dot.svg";
 import ExposureSVG from "@/assets/icons/exposure.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import SearchSVG from "@/assets/icons/search.svg";
 import ChartSVG from "@/assets/icons/chart.svg";
 import UserSVG from "@/assets/icons/user.svg";
-import {
-  VAULT_EXPOSURE_SORT_FILTERS,
-  VAULT_NFTS_SORT_FILTERS,
-} from "@/constants";
+import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
 import { TableRowInfo } from "@/components/common/Table";
 import { ReceiptToken, Vault } from "@/types/vault";
-
-const rowInfos: TableRowInfo[] = [
-  {
-    title: "LOAN",
-    key: "name",
-    itemPrefix: (item) => (
-      <>
-        <Image
-          className="mr-1"
-          src={item.loanIcon}
-          width={16}
-          height={16}
-          alt=""
-        />
-        <Image className="mr-1" src={item.icon} width={16} height={16} alt="" />
-      </>
-    ),
-    rowClass: () => "lg:w-[35%]",
-  },
-  {
-    title: "PRINCIPAL",
-    key: "principal",
-    itemPrefix: () => "Ξ",
-  },
-  {
-    title: "REPAY",
-    key: "repay",
-    rowClass: () => "hidden lg:table-cell",
-    itemPrefix: () => "Ξ",
-  },
-  {
-    title: "LTV",
-    key: "ltv",
-    itemSuffix: () => "%",
-  },
-  {
-    title: "APY",
-    key: "apy",
-    itemSuffix: () => "%",
-  },
-  {
-    title: "DUE",
-    key: "due",
-    rowClass: () => "hidden lg:table-cell",
-    itemSuffix: () => "d",
-  },
-];
 
 type Props = {
   vault: Vault;
@@ -79,9 +29,81 @@ export default function VaultDetails({ vault }: Props) {
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
     VaultNftsSortFilter.ValueHighToLow
   );
+  const [loanExpanded, setLoanExpanded] = useState(false);
+  const [prologueNftExpanded, setPrologueNftExpanded] = useState(false);
+
+  const getRowInfos = (): TableRowInfo[] => {
+    return [
+      {
+        title: "LOAN",
+        key: "name",
+        itemPrefix: (item) => (
+          <>
+            {!loanExpanded && (
+              <Image
+                className="mr-1"
+                src={item.market}
+                width={16}
+                height={16}
+                alt=""
+              />
+            )}
+            <Image
+              className="mr-1"
+              src={item.icon}
+              width={16}
+              height={16}
+              alt=""
+            />
+          </>
+        ),
+        rowClass: () => "lg:w-[35%]",
+      },
+      {
+        title: "PRINCIPAL",
+        key: "principal",
+        itemPrefix: () => "Ξ",
+      },
+      {
+        title: "REPAY",
+        key: "repay",
+        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell"),
+        itemPrefix: () => "Ξ",
+      },
+      {
+        title: "LTV",
+        key: "ltv",
+        itemSuffix: () => "%",
+      },
+      {
+        title: "APY",
+        key: "apy",
+        itemSuffix: () => "%",
+      },
+      {
+        title: "DUE",
+        key: "due",
+        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell"),
+        itemSuffix: () => "d",
+      },
+      {
+        title: "MARKET",
+        component: (item) => (
+          <Image
+            className="mr-1"
+            src={item.market}
+            width={16}
+            height={16}
+            alt=""
+          />
+        ),
+        rowClass: () => (loanExpanded ? "" : "hidden"),
+      },
+    ];
+  };
 
   return (
-    <div className="hidden md:flex tracking-wide w-full min-h-[922px] max-h-[calc(max(922px,100vh))] mt-[84px] px-8 pb-5 gap-5 overflow-y-hidden">
+    <div className="relative hidden md:flex tracking-wide w-full min-h-[922px] max-h-[calc(max(922px,100vh))] mt-[84px] px-8 pb-5 gap-5 overflow-y-hidden">
       <div className="flex flex-col min-w-[41%] w-[41%] gap-5">
         <Card className="gap-3">
           <div className="flex items-center justify-between gap-5">
@@ -144,13 +166,21 @@ export default function VaultDetails({ vault }: Props) {
           </div>
         </Card>
         {vault.receiptToken === ReceiptToken.NFT && (
-          <Card className="gap-5">
+          <Card className="gap-5" expanded={prologueNftExpanded}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5 text-white">
                 <UserSVG />
                 <h2 className="font-bold text-white font-sm">PROLOGUE NFTS</h2>
               </div>
-              <ExternalLinkSVG />
+              <button
+                onClick={() => setPrologueNftExpanded(!prologueNftExpanded)}
+              >
+                <ExternalLinkSVG
+                  className={`text-gray-100 hover:text-white ${
+                    prologueNftExpanded ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
             </div>
             <div className="flex items-center justify-between gap-5">
               <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
@@ -193,20 +223,26 @@ export default function VaultDetails({ vault }: Props) {
             </div>
           </Card>
         )}
-        <Card className="gap-3 overflow-hidden">
+        <Card className="gap-3 overflow-hidden" expanded={loanExpanded}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5 text-white">
               <ExposureSVG />
               <h2 className="font-bold text-white font-sm">LOAN BREAKDOWN</h2>
             </div>
-            <ExternalLinkSVG />
+            <button onClick={() => setLoanExpanded(!loanExpanded)}>
+              <ExternalLinkSVG
+                className={`text-gray-100 hover:text-white ${
+                  loanExpanded ? "rotate-180" : ""
+                }`}
+              />
+            </button>
           </div>
           <div className="flex">
             <div className="flex flex-1 text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
               <SearchSVG />
               <input
                 className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
-                placeholder="Search your Vaults"
+                placeholder="Search loans"
                 // value={searchQuery}
                 // onChange={(e) => setSearchQuery(e.target.value)}
                 // onFocus={handleFocus}
@@ -217,7 +253,7 @@ export default function VaultDetails({ vault }: Props) {
           <div className="flex-1 overflow-hidden">
             <Table
               className="block h-full"
-              rowInfos={rowInfos}
+              rowInfos={getRowInfos()}
               items={loans}
               trStyle="h-10"
               rowStyle="h-8"
