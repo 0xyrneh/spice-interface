@@ -103,7 +103,7 @@ export default function VaultDetails({ vault }: Props) {
   };
 
   return (
-    <div className="relative hidden md:flex tracking-wide w-full min-h-[922px] max-h-[calc(max(922px,100vh))] mt-[84px] px-8 pb-5 gap-5 overflow-y-hidden">
+    <div className="relative hidden md:flex tracking-wide w-full min-h-[838px] max-h-[calc(max(982px,100vh)-144px)] mt-[84px] px-8 pb-5 gap-5 overflow-y-hidden">
       <div className="flex flex-col min-w-[41%] w-[41%] gap-5">
         <Card className="gap-3">
           <div className="flex items-center justify-between gap-5">
