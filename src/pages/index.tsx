@@ -70,6 +70,9 @@ export default function VaultInfo() {
           <Button
             className="flex justify-between h-10 items-center rounded bg-gray-700 bg-opacity-45 px-4 gap-3 box-border"
             hoverClassName="hover:bg-white hover:bg-opacity-20"
+            onClick={() => {
+              router.push(`/vault/${getActiveVault().id}`);
+            }}
           >
             <span className="text-sm">View Vault</span>
             <FaChevronRight size={16} />

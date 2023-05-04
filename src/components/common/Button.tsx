@@ -16,8 +16,7 @@ type Props = {
 const defaultClass = {
   primary:
     "text-orange-900 border-1 border-orange-900 rounded bg-orange-900 bg-opacity-10 shadow-orange-900",
-  secondary:
-    "text-gray-200 border-1 border-gray-200 rounded bg-gray-200 bg-opacity-10 shadow-card",
+  secondary: "text-gray-200 rounded bg-gray-200 bg-opacity-10 shadow-card",
   third:
     "text-orange-200 border-1 border-orange-200 rounded bg-orange-200 bg-opacity-10 shadow-card",
 };
@@ -25,8 +24,7 @@ const defaultClass = {
 const hoverDefaultClass = {
   primary:
     "hover:bg-orange-300 hover:border-orange-300 hover:text-orange-300 hover:bg-opacity-10",
-  secondary:
-    "hover:bg-gray-300 hover:border-gray-300 hover:text-gray-300 hover:bg-opacity-10",
+  secondary: "hover:bg-gray-300 hover:text-gray-300 hover:bg-opacity-10",
   third:
     "hover:bg-gray-300 hover:border-gray-300 hover:text-gray-300 hover:bg-opacity-10",
 };

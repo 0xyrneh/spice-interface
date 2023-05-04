@@ -22,7 +22,9 @@ export default function DetailChart() {
       <Card className="gap-3 flex-1 overflow-hidden">
         <div className="flex items-center gap-2.5">
           <TvlSVG />
-          <h2 className="font-bold text-white font-sm">TOTAL VALUE LOCKED</h2>
+          <h2 className="font-bold text-white font-sm">
+            {showPerformance ? "ASSETS PER VAULT SHARE" : "TOTAL VALUE LOCKED"}
+          </h2>
           <button onClick={() => setShowPerformance(!showPerformance)}>
             <SortUpSVG
               className={`text-gray-100 hover:text-white ${

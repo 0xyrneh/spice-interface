@@ -107,7 +107,7 @@ export default function LoanBreakdown({ vault, showIcon, className }: Props) {
         </button>
       </div>
       <div className="flex">
-        <div className="flex flex-1 text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
+        <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
           <SearchSVG />
           <input
             className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"

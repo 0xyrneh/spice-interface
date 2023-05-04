@@ -8,7 +8,6 @@ import {
 export const NAV_OPTIONS: NavOption[] = [
   { href: "/", name: "Vaults", maxWidth: "1536px", breakpoint: "sm" },
   { href: "/portfolio", name: "Portfolio", breakpoint: "md" },
-  { href: "/prologue-nfts", name: "Prologue NFTs", breakpoint: "md" },
 ];
 
 export const VAULT_FILTERS = [
