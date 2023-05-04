@@ -9,96 +9,96 @@ import {
   Stats,
   Table,
 } from "@/components/common";
-import { PieChart, PositionChart } from "@/components/portfolio";
+import { PositionChart } from "@/components/portfolio";
 import prologueNfts from "@/constants/prologueNfts";
-import marketplaceExposure from "@/constants/marketplaceExposure";
-import collectionExposure from "@/constants/collectionExposure";
-import {
-  PeriodFilter,
-  VaultExposureSortFilter,
-  VaultNftsSortFilter,
-} from "@/types/common";
+import { PeriodFilter, VaultNftsSortFilter } from "@/types/common";
 import PositionSVG from "@/assets/icons/position.svg";
 import CopySVG from "@/assets/icons/copy.svg";
 import ExposureSVG from "@/assets/icons/exposure.svg";
 import KeySVG from "@/assets/icons/key.svg";
-import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
-import UserSVG from "@/assets/icons/user.svg";
 import SearchSVG from "@/assets/icons/search.svg";
 import { shortAddress } from "@/utils";
-import {
-  VAULT_EXPOSURE_SORT_FILTERS,
-  VAULT_NFTS_SORT_FILTERS,
-} from "@/constants";
+import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
 import { TableRowInfo } from "@/components/common/Table";
-
-const rowInfos: TableRowInfo[] = [
-  {
-    title: "VAULT",
-    key: "name",
-    noSort: true,
-    itemPrefix: (item) => (
-      <Image className="mr-2" src={item.icon} width={20} height={20} alt="" />
-    ),
-    rowClass: () => "lg:w-[35%]",
-  },
-  {
-    title: "POSITION",
-    key: "position",
-    noSort: true,
-    rowClass: () => "hidden lg:table-cell",
-    itemPrefix: () => "Ξ",
-  },
-  {
-    title: "POS.",
-    key: "position",
-    noSort: true,
-    rowClass: () => "lg:hidden",
-    itemPrefix: () => "Ξ",
-  },
-  {
-    title: "TVL",
-    key: "tvl",
-    noSort: true,
-    rowClass: () => "hidden xl:table-cell",
-    itemPrefix: () => "Ξ",
-  },
-  {
-    title: "APY",
-    key: "apy",
-    noSort: true,
-    itemSuffix: () => "%",
-  },
-  {
-    title: "RECEIPT",
-    key: "receiptToken",
-    noSort: true,
-    rowClass: () => "hidden xl:table-cell",
-  },
-  {
-    title: "DEPOSIT",
-    noSort: true,
-    component: () => (
-      <Button type="primary" className="p-1">
-        <span className="text-xs">DEPOSIT</span>
-      </Button>
-    ),
-  },
-];
+import { Vault } from "@/types/vault";
+import { Exposure, LoanBreakdown } from "@/components/vaults";
 
 export default function Portfolio() {
   const address = "0x8snD12tFeAcc7s23ase5339D8snD12tFeAcc7s9D";
+  const [vault, setVault] = useState<Vault>();
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
 
-  const [vaultExposureSortFilter, setVaultExposureSortFilter] = useState(
-    VaultExposureSortFilter.ApyHighToLow
-  );
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
     VaultNftsSortFilter.ValueHighToLow
   );
 
+  const getRowInfos = (): TableRowInfo[] => {
+    return [
+      {
+        title: `VAULTS [${vaults.length}]`,
+        key: "name",
+        itemPrefix: (item) => (
+          <Image
+            className="mr-2"
+            src={item.icon}
+            width={20}
+            height={20}
+            alt=""
+          />
+        ),
+        rowClass: () => "lg:w-[35%]",
+      },
+      {
+        title: "POSITION",
+        key: "position",
+        rowClass: () => "hidden lg:table-cell",
+        itemPrefix: () => "Ξ",
+      },
+      {
+        title: "POS.",
+        key: "position",
+        rowClass: () => "lg:hidden",
+        itemPrefix: () => "Ξ",
+      },
+      {
+        title: "TVL",
+        key: "tvl",
+        rowClass: () => "hidden 2xl:table-cell",
+        itemPrefix: () => "Ξ",
+      },
+      {
+        title: "APY",
+        key: "apy",
+        itemSuffix: () => "%",
+      },
+      {
+        title: "RECEIPT",
+        key: "receiptToken",
+        rowClass: () => "hidden xl:table-cell",
+      },
+      {
+        title: "DETAILS",
+        noSort: true,
+        component: () => (
+          <Button type="secondary" className="p-1">
+            <span className="text-xs">DETAILS</span>
+          </Button>
+        ),
+      },
+      {
+        title: "DEPOSIT",
+        noSort: true,
+        component: () => (
+          <Button type="primary" className="p-1">
+            <span className="text-xs">DEPOSIT</span>
+          </Button>
+        ),
+      },
+    ];
+  };
+
   return (
-    <div className="hidden md:flex tracking-wide w-full mt-[84px] px-8 pb-5 gap-5">
+    <div className="relative hidden md:flex tracking-wide w-full min-h-[838px] max-h-[calc(max(982px,100vh)-144px)] mt-[84px] px-8 pb-5 gap-5 overflow-y-hidden">
       <div className="flex flex-col min-w-[41%] w-[41%] gap-5">
         <Card className="py-3 !flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-5 flex-1">
@@ -122,117 +122,121 @@ export default function Portfolio() {
             <CopySVG />
           </button>
         </Card>
-        <div className="flex flex-col gap-5 flex-1 max-h-[calc(max(982px,100vh)-264px)] h-[calc(max(982px,100vh)-264px)]">
-          <Card className="gap-3 h-[calc(50%-10px)]">
-            <div className="flex items-center gap-2.5">
-              <ExposureSVG />
-              <h2 className="font-bold text-white font-sm">VAULT EXPOSURE</h2>
-            </div>
-            <div className="flex items-center justify-between gap-5">
-              <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
-                <SearchSVG />
-                <input
-                  className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
-                  placeholder="Search your Vaults"
-                  // value={searchQuery}
-                  // onChange={(e) => setSearchQuery(e.target.value)}
-                  // onFocus={handleFocus}
-                  // onBlur={handleBlur}
-                />
-              </div>
-              <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
-                <Select
-                  className="w-[170px]"
-                  itemClassName="text-gray-200 hover:text-gray-300"
-                  dropdownClassName="bg-gray-700 bg-opacity-95"
-                  title={vaultExposureSortFilter}
-                  values={[vaultExposureSortFilter]}
-                  items={VAULT_EXPOSURE_SORT_FILTERS.filter(
-                    (item) => item !== vaultExposureSortFilter
-                  )}
-                  onChange={(item) =>
-                    setVaultExposureSortFilter(item as VaultExposureSortFilter)
-                  }
-                />
-              </div>
-            </div>
-            <div className="flex-1">
-              <Table
-                rowInfos={rowInfos}
-                items={vaults.map((vault) => ({
-                  ...vault,
-                  position: 2,
-                }))}
-                trStyle="h-10"
-                rowStyle="h-8"
-                defaultSortKey="apy"
-                bodyClass="max-h-[calc((max(982px,100vh)-294px)/2-160px)]"
-                onClickItem={() => {}}
+        <Card className="gap-3 overflow-hidden">
+          <div className="flex items-center gap-2.5">
+            <ExposureSVG />
+            <h2 className="font-bold text-white font-sm">VAULT EXPOSURE</h2>
+          </div>
+          <div className="flex items-center justify-between gap-5">
+            <div className="hidden xl:flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
+              <SearchSVG />
+              <input
+                className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
+                placeholder="Search your Vaults"
+                // value={searchQuery}
+                // onChange={(e) => setSearchQuery(e.target.value)}
+                // onFocus={handleFocus}
+                // onBlur={handleBlur}
               />
             </div>
-          </Card>
-          <Card className="gap-5 h-[calc(50%-10px)]">
-            <div className="flex items-center gap-2.5">
-              <KeySVG />
-              <h2 className="font-bold text-white font-sm">VAULT NFTS</h2>
+            <Button
+              type="third"
+              className="flex-1 xl:flex-none xl:w-[170px] h-8 text-xs"
+              onClick={() => setVault(undefined)}
+            >
+              TOTAL SPICE POSITION
+            </Button>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <Table
+              className="block h-full"
+              rowInfos={getRowInfos()}
+              items={vaults.map((vault) => ({
+                ...vault,
+                position: 2,
+              }))}
+              trStyle="h-10"
+              rowStyle="h-8"
+              defaultSortKey="apy"
+              bodyClass="h-[calc(100%-40px)]"
+              onClickItem={(item) => {
+                setVault(item);
+              }}
+              isActive={(item) => {
+                return !!vault && item.id === vault.id;
+              }}
+            />
+          </div>
+        </Card>
+        <Card className="gap-5 overflow-hidden max-h-[370px]">
+          <div className="flex items-center gap-2.5">
+            {vault && <Image src={vault.icon} width={16} height={16} alt="" />}
+            <KeySVG />
+            <h2 className="font-bold text-white font-sm">
+              {vault ? "YOUR PROLOGUE NFTS" : "VAULT NFTS"}{" "}
+            </h2>
+          </div>
+          <div className="flex items-center justify-between gap-5">
+            <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
+              <SearchSVG />
+              <input
+                className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
+                placeholder="Search your NFTs"
+                // value={searchQuery}
+                // onChange={(e) => setSearchQuery(e.target.value)}
+                // onFocus={handleFocus}
+                // onBlur={handleBlur}
+              />
             </div>
-            <div className="flex items-center justify-between gap-5">
-              <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
-                <SearchSVG />
-                <input
-                  className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
-                  placeholder="Search your NFTs"
-                  // value={searchQuery}
-                  // onChange={(e) => setSearchQuery(e.target.value)}
-                  // onFocus={handleFocus}
-                  // onBlur={handleBlur}
+            <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
+              <Select
+                className="w-[170px]"
+                itemClassName="text-gray-200 hover:text-gray-300"
+                dropdownClassName="bg-gray-700 bg-opacity-95"
+                title={vaultNftsSortFilter}
+                values={[vaultNftsSortFilter]}
+                items={VAULT_NFTS_SORT_FILTERS.filter(
+                  (item) => item !== vaultNftsSortFilter
+                )}
+                onChange={(item) =>
+                  setVaultNftsSortFilter(item as VaultNftsSortFilter)
+                }
+              />
+            </div>
+          </div>
+          <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 overflow-y-hidden">
+            <span className="font-medium text-white text-xs">Prologue NFT</span>
+            <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto custom-scroll">
+              {prologueNfts.map((nft, idx) => (
+                <PrologueNftCard
+                  key={`prologue-nft-${idx}`}
+                  nft={nft}
+                  className="w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
                 />
-              </div>
-              <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
-                <Select
-                  className="w-[170px]"
-                  itemClassName="text-gray-200 hover:text-gray-300"
-                  dropdownClassName="bg-gray-700 bg-opacity-95"
-                  title={vaultNftsSortFilter}
-                  values={[vaultNftsSortFilter]}
-                  items={VAULT_NFTS_SORT_FILTERS.filter(
-                    (item) => item !== vaultNftsSortFilter
-                  )}
-                  onChange={(item) =>
-                    setVaultNftsSortFilter(item as VaultNftsSortFilter)
-                  }
-                />
-              </div>
+              ))}
             </div>
-            <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 overflow-y-hidden">
-              <span className="font-medium text-white text-xs">
-                Prologue NFT
-              </span>
-              <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto custom-scroll">
-                {prologueNfts.map((nft, idx) => (
-                  <PrologueNftCard
-                    key={`prologue-nft-${idx}`}
-                    nft={nft}
-                    className="w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
-                  />
-                ))}
-              </div>
-            </div>
-          </Card>
-        </div>
+          </div>
+        </Card>
       </div>
 
       <div className="flex flex-col flex-1 gap-5">
-        <Card className="gap-3 flex-1">
+        <Card className="gap-3 flex-1 overflow-hidden">
           <div className="flex items-center gap-2.5">
+            {vault && <Image src={vault.icon} width={16} height={16} alt="" />}
             <PositionSVG />
             <h2 className="font-bold text-white font-sm">
-              TOTAL SPICE POSITION
+              {vault
+                ? `YOUR ${vault.name.toUpperCase()} POSITION`
+                : "TOTAL SPICE POSITION"}
             </h2>
           </div>
           <div className="flex items-end justify-between text-gray-200 px-12">
-            <Stats title="Your Spice TVL" value="Ξ30.00" />
-            <div className="flex items-center text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
+            <div className="flex gap-4 items-center">
+              {!vault && <Stats title="Your Spice TVL" value="Ξ30.00" />}
+              {vault && <Stats title="Position" value="Ξ30.00" />}
+              {vault && <Stats title="Net APY" value={`${vault.apy}%`} />}
+            </div>
+            <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
               <div className="hidden 2xl:flex items-center gap-1">
                 <span>1W Est. Yield:</span>
                 <span className="text-white">Ξ25.60</span>
@@ -247,8 +251,8 @@ export default function Portfolio() {
               </div>
             </div>
           </div>
-          <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3">
-            <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)] max-h-[calc(max(982px,100vh)-658px)] lg:max-h-[calc(max(982px,100vh)-639px)]">
+          <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)]">
+            <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)]  max-h-[calc(100%-18px)] lg:max-h-[100%]">
               <PositionChart />
             </div>
             <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
@@ -274,109 +278,18 @@ export default function Portfolio() {
             </div>
           </div>
         </Card>
-        <div className="flex gap-5">
-          <Card className="flex-1 gap-3">
-            <div className="flex items-center gap-2.5">
-              <MarketExposureSVG className="text-white" />
-              <h2 className="block lg:hidden font-bold text-white font-sm whitespace-nowrap">
-                MARKETPLACE EXP.
-              </h2>
-              <h2 className="hidden lg:block font-bold text-white font-sm whitespace-nowrap">
-                MARKETPLACE EXPOSURE
-              </h2>
-            </div>
-            <div className="flex gap-2.5">
-              <table className="flex-1 text-gray-200 text-xs border-y-1 border-y-gray-200 text-xs font-medium text-white">
-                <thead>
-                  <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200 text-gray-100">
-                    <th className="text-left pl-1 h-10 w-[80%]">MARKETPLACE</th>
-                    <th className="h-10 pr-1">%</th>
-                  </tr>
-                </thead>
-                <tbody className="block max-h-[240px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
-                  {marketplaceExposure.map((exposure, index) => (
-                    <tr
-                      key={`vault-${index}`}
-                      className="table table-fixed w-full text-right"
-                    >
-                      <td className="text-left h-10 w-[80%]">
-                        <div className="flex items-center gap-2 pl-1">
-                          <div
-                            className="rounded w-3 h-3"
-                            style={{
-                              backgroundColor: exposure.color,
-                            }}
-                          />
-                          <span>{exposure.name}</span>
-                        </div>
-                      </td>
-                      <td className="h-10  pr-1">{exposure.percent}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="hidden xl:flex flex-1 max-w-[160px] 3xl:max-w-[220px] items-center justify-center">
-                <PieChart
-                  data={marketplaceExposure.map((item) => ({
-                    name: item.name,
-                    value: item.percent,
-                    color: item.color,
-                  }))}
-                />
-              </div>
-            </div>
-          </Card>
-          <Card className="flex-1 gap-3">
-            <div className="flex items-center gap-2.5">
-              <UserSVG className="text-white" />
-              <h2 className="block lg:hidden font-bold text-white font-sm whitespace-nowrap">
-                COLLECTION EXP.
-              </h2>
-              <h2 className="hidden lg:block font-bold text-white font-sm whitespace-nowrap">
-                COLLECTION EXPOSURE
-              </h2>
-            </div>
-            <div className="flex gap-2.5">
-              <table className="flex-1 text-gray-200 text-xs border-y-1 border-y-gray-200 text-xs font-medium text-white">
-                <thead>
-                  <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200 text-gray-100">
-                    <th className="text-left pl-1 h-10 w-[80%]">COLLECTION</th>
-                    <th className="h-10 pr-1">%</th>
-                  </tr>
-                </thead>
-                <tbody className="block max-h-[240px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
-                  {collectionExposure.map((exposure, index) => (
-                    <tr
-                      key={`vault-${index}`}
-                      className="table table-fixed w-full text-right"
-                    >
-                      <td className="text-left h-10 w-[80%]">
-                        <div className="flex items-center gap-2 pl-1">
-                          <div
-                            className="rounded w-3 h-3"
-                            style={{
-                              backgroundColor: exposure.color,
-                            }}
-                          />
-                          {exposure.name}
-                        </div>
-                      </td>
-                      <td className="h-10 pr-1">{exposure.percent}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="hidden xl:flex flex-1 max-w-[160px] 3xl:max-w-[220px] items-center justify-center">
-                <PieChart
-                  data={collectionExposure.map((item) => ({
-                    name: item.name,
-                    value: item.percent,
-                    color: item.color,
-                  }))}
-                />
-              </div>
-            </div>
-          </Card>
+        <div className="flex gap-5 max-h-[319px]">
+          {vault ? (
+            <LoanBreakdown className="flex-1" showIcon vault={vault} />
+          ) : (
+            <Exposure className="flex-1" showMarketplace />
+          )}
+          <Exposure
+            className="flex-1"
+            showCollection
+            showMarketplace={!!vault}
+            vault={vault}
+          />
         </div>
       </div>
     </div>

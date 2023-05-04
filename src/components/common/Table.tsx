@@ -21,6 +21,7 @@ type Props = {
   defaultSortKey?: string;
   bodyClass?: string;
   onClickItem?: (item: any) => void;
+  isActive?: (item: any) => boolean;
 };
 
 const Table = ({
@@ -32,6 +33,7 @@ const Table = ({
   bodyClass,
   className,
   onClickItem,
+  isActive,
 }: Props) => {
   const [sortKey, setSortKey] = useState<string | undefined>(defaultSortKey);
   const [sortAsc, setSortAsc] = useState(false);
@@ -99,7 +101,7 @@ const Table = ({
             key={`item-${index}`}
             className={`trStyle ${
               onClickItem ? "vault-row cursor-pointer" : ""
-            }`}
+            } ${isActive && isActive(item) ? "active" : ""}`}
             onClick={() => {
               if (onClickItem) onClickItem(item);
             }}

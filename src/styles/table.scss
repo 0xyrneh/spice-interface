@@ -1,6 +1,13 @@
 .vault-row:hover > td > div {
   @apply bg-gray-300 bg-opacity-10;
 }
+.vault-row.active {
+  @apply [&>:first-child>div]:border-l-1 [&>:last-child>div]:border-r-1 border-orange-200;
+
+  div {
+    @apply bg-orange-200 bg-opacity-10 border-y-1 border-orange-200;
+  }
+}
 
 .custom-table {
   @apply text-white text-xs border-y-1 border-y-gray-200;
