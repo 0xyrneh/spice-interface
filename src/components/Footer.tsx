@@ -6,9 +6,11 @@ import DiscordSVG from "@/assets/icons/discord.svg";
 import TwitterSVG from "@/assets/icons/twitter.svg";
 import { useRouter } from "next/router";
 import { NAV_OPTIONS } from "@/constants";
+import { useUI } from "@/hooks";
 
 const VaultFooter = () => {
   const router = useRouter();
+  const { blur } = useUI();
 
   const activeTab = () => {
     for (let i = 0; i < NAV_OPTIONS.length; i += 1) {
@@ -29,7 +31,7 @@ const VaultFooter = () => {
         activeTab().breakpoint
       }:flex items-center justify-between px-8 text-gray-200 text-[10px] lg:text-xs xl:text-base max-w-[${
         activeTab().maxWidth
-      }]`}
+      }] ${blur ? "blur-[2px]" : ""}`}
     >
       <div className="flex gap-4 items-center">
         <div className="flex items-center">

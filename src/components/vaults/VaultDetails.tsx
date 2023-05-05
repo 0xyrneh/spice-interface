@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Button,
@@ -17,16 +17,22 @@ import ChartSVG from "@/assets/icons/chart.svg";
 import UserSVG from "@/assets/icons/user.svg";
 import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
 import { ReceiptToken, Vault } from "@/types/vault";
+import { useUI } from "@/hooks";
 
 type Props = {
   vault: Vault;
 };
 
 export default function VaultDetails({ vault }: Props) {
+  const { setBlur } = useUI();
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
     VaultNftsSortFilter.ValueHighToLow
   );
   const [prologueNftExpanded, setPrologueNftExpanded] = useState(false);
+
+  useEffect(() => {
+    setBlur(prologueNftExpanded);
+  }, [prologueNftExpanded, setBlur]);
 
   return (
     <div className="relative hidden md:flex tracking-wide w-full min-h-[838px] max-h-[calc(max(982px,100vh)-144px)] mt-[84px] px-8 pb-5 gap-5 overflow-y-hidden">
@@ -92,7 +98,11 @@ export default function VaultDetails({ vault }: Props) {
           </div>
         </Card>
         {vault.receiptToken === ReceiptToken.NFT && (
-          <Card className="gap-5" expanded={prologueNftExpanded}>
+          <Card
+            className="gap-5"
+            expanded={prologueNftExpanded}
+            onCollapse={() => setPrologueNftExpanded(false)}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5 text-white">
                 <UserSVG />
@@ -112,7 +122,7 @@ export default function VaultDetails({ vault }: Props) {
               <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
                 <SearchSVG />
                 <input
-                  className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
+                  className="flex-1 text-white font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
                   placeholder="Search NFTID"
                   // value={searchQuery}
                   // onChange={(e) => setSearchQuery(e.target.value)}
@@ -122,7 +132,7 @@ export default function VaultDetails({ vault }: Props) {
               </div>
               <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
                 <Select
-                  className="w-[170px]"
+                  className="w-[170px] text-gray-200 border-gray-200 hover:text-gray-300 hover:border-gray-300"
                   itemClassName="text-gray-200 hover:text-gray-300"
                   dropdownClassName="bg-gray-700 bg-opacity-95"
                   title={vaultNftsSortFilter}

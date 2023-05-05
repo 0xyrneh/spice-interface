@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { NotificationContext } from "@/contexts/NotificationContext";
 
-const useWallet = () => useContext(NotificationContext);
+const useNotification = () => useContext(NotificationContext);
 
-export default useWallet;
+export default useNotification;

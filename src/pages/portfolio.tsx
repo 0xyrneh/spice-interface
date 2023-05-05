@@ -131,7 +131,7 @@ export default function Portfolio() {
             <div className="hidden xl:flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
               <SearchSVG />
               <input
-                className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
+                className="flex-1 text-white font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
                 placeholder="Search your Vaults"
                 // value={searchQuery}
                 // onChange={(e) => setSearchQuery(e.target.value)}
@@ -180,7 +180,7 @@ export default function Portfolio() {
             <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
               <SearchSVG />
               <input
-                className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
+                className="flex-1 text-white font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
                 placeholder="Search your NFTs"
                 // value={searchQuery}
                 // onChange={(e) => setSearchQuery(e.target.value)}

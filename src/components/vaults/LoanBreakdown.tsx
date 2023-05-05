@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { loans } from "@/constants/prologueNfts";
 import { Card, Table } from "@/components/common";
@@ -7,6 +7,7 @@ import ExposureSVG from "@/assets/icons/exposure.svg";
 import SearchSVG from "@/assets/icons/search.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import { Vault } from "@/types/vault";
+import { useUI } from "@/hooks";
 
 type Props = {
   vault: Vault;
@@ -15,7 +16,13 @@ type Props = {
 };
 
 export default function LoanBreakdown({ vault, showIcon, className }: Props) {
+  const { setBlur } = useUI();
+
   const [loanExpanded, setLoanExpanded] = useState(false);
+
+  useEffect(() => {
+    setBlur(loanExpanded);
+  }, [loanExpanded, setBlur]);
 
   const getRowInfos = (): TableRowInfo[] => {
     return [
@@ -48,27 +55,30 @@ export default function LoanBreakdown({ vault, showIcon, className }: Props) {
         title: "PRINCIPAL",
         key: "principal",
         itemPrefix: () => "Ξ",
+        rowClass: () => "min-w-[90px]",
       },
       {
         title: "REPAY",
         key: "repay",
-        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell"),
+        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell w-[60px]"),
         itemPrefix: () => "Ξ",
       },
       {
         title: "LTV",
         key: "ltv",
         itemSuffix: () => "%",
+        rowClass: () => "w-[50px]",
       },
       {
         title: "APY",
         key: "apy",
         itemSuffix: () => "%",
+        rowClass: () => "w-[50px]",
       },
       {
         title: "DUE",
         key: "due",
-        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell"),
+        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell w-[50px]"),
         itemSuffix: () => "d",
       },
       {
@@ -91,6 +101,7 @@ export default function LoanBreakdown({ vault, showIcon, className }: Props) {
     <Card
       className={`gap-3 overflow-hidden ${className}`}
       expanded={loanExpanded}
+      onCollapse={() => setLoanExpanded(false)}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5 text-white">
@@ -110,7 +121,7 @@ export default function LoanBreakdown({ vault, showIcon, className }: Props) {
         <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
           <SearchSVG />
           <input
-            className="flex-1 font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
+            className="flex-1 text-white font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
             placeholder="Search loans"
             // value={searchQuery}
             // onChange={(e) => setSearchQuery(e.target.value)}

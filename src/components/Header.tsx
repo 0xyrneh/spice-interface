@@ -5,9 +5,11 @@ import LogoSVG from "@/assets/icons/logo.svg";
 import { NavOption } from "@/types/common";
 import { VaultSearch, ConnectWallet } from "@/components/common";
 import { NAV_OPTIONS } from "@/constants";
+import { useUI } from "@/hooks";
 
 const Header = () => {
   const router = useRouter();
+  const { blur } = useUI();
 
   const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -62,12 +64,12 @@ const Header = () => {
 
   return (
     <div
-      className={`z-50 hidden ${
+      className={`z-10 hidden ${
         activeTab().breakpoint
       }:flex fixed w-full h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-8 font-bold
       max-w-[${activeTab().maxWidth}] ${
         activeTab().name !== "Vaults" || show ? "top-0" : "-top-[64px]"
-      }`}
+      } ${blur ? "blur-[2px]" : ""}`}
       style={{ transition: "top 0.4s ease-in-out" }}
     >
       <div className="flex-1 flex items-center gap-7 xl:gap-10 min-w-[420px] xl:min-w-[500px]">
