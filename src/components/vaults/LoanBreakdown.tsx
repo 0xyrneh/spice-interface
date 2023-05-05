@@ -55,19 +55,19 @@ export default function LoanBreakdown({ vault, showIcon, className }: Props) {
         title: "PRINCIPAL",
         key: "principal",
         itemPrefix: () => "Ξ",
-        rowClass: () => "min-w-[90px]",
+        rowClass: () => "w-[90px]",
       },
       {
         title: "REPAY",
         key: "repay",
-        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell w-[60px]"),
+        rowClass: () => (loanExpanded ? "" : "hidden xl:table-cell w-[60px]"),
         itemPrefix: () => "Ξ",
       },
       {
         title: "LTV",
         key: "ltv",
         itemSuffix: () => "%",
-        rowClass: () => "w-[50px]",
+        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell w-[50px]"),
       },
       {
         title: "APY",
