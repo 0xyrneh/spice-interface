@@ -124,9 +124,15 @@ export default function VaultDetails({ vault }: Props) {
             <div className="flex items-center justify-between gap-5">
               <Search
                 placeholder={`Search NFTID [${prologueNfts.length}]`}
-                className="flex-1 xl:flex-none"
+                className={`${
+                  prologueNftExpanded ? "flex-none" : "flex-1 xl:flex-none"
+                }`}
               />
-              <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
+              <div
+                className={`${
+                  prologueNftExpanded ? "flex" : "hidden xl:flex"
+                } flex-1 justify-end text-gray-200 font-medium text-xs`}
+              >
                 <Select
                   className="w-[170px] text-gray-200 border-gray-200 hover:text-gray-300 hover:border-gray-300"
                   itemClassName="text-gray-200 hover:text-gray-300"
