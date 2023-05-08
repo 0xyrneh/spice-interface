@@ -16,65 +16,6 @@ import {
 } from "@/constants";
 import { TableRowInfo } from "../common/Table";
 
-const rowInfos: TableRowInfo[] = [
-  {
-    title: "VAULT",
-    key: "name",
-    itemPrefix: (item) => (
-      <Image
-        className="mr-2 border-1 border-gray-200 rounded-full"
-        src={item.icon}
-        width={20}
-        height={20}
-        alt=""
-      />
-    ),
-    rowClass: () => "lg:w-[35%]",
-  },
-  {
-    title: "APY",
-    key: "apy",
-    itemSuffix: () => "%",
-  },
-  {
-    title: "1D CHANGE",
-    key: "oneDayChange",
-    rowClass: () => "hidden md:table-cell",
-    itemSuffix: () => "%",
-    itemClass: (item) => (item.oneDayChange >= 0 ? "text-green" : "text-red"),
-  },
-  {
-    title: "7D CHANGE",
-    key: "sevenDayChange",
-    rowClass: () => "hidden md:table-cell",
-    itemSuffix: () => "%",
-    itemClass: (item) => (item.sevenDayChange >= 0 ? "text-green" : "text-red"),
-  },
-  {
-    title: "TVL",
-    key: "tvl",
-    itemPrefix: () => "Ξ",
-  },
-  {
-    title: "CREATOR",
-    key: "creator",
-    rowClass: () => "hidden md:table-cell",
-  },
-  {
-    title: "RECEIPT",
-    key: "receiptToken",
-  },
-  {
-    title: "DEPOSIT",
-    noSort: true,
-    component: () => (
-      <Button type="primary" className="p-1">
-        <span className="text-xs">DEPOSIT</span>
-      </Button>
-    ),
-  },
-];
-
 type Props = {
   onClickVault: (vault: Vault) => void;
 };
@@ -86,6 +27,69 @@ const VaultList = ({ onClickVault }: Props) => {
   const [filteredVaults, setFilteredVaults] = useState<Vault[]>(vaults);
   const [filterOpened, setFilterOpened] = useState(false);
   const [filterQuery, setFilterQuery] = useState("");
+
+  const getRowInfos = (): TableRowInfo[] => {
+    return [
+      {
+        title: `VAULT [${filteredVaults.length}]`,
+        key: "name",
+        itemPrefix: (item) => (
+          <Image
+            className="mr-2 border-1 border-gray-200 rounded-full"
+            src={item.icon}
+            width={20}
+            height={20}
+            alt=""
+          />
+        ),
+        rowClass: () => "lg:w-[35%]",
+      },
+      {
+        title: "APY",
+        key: "apy",
+        itemSuffix: () => "%",
+      },
+      {
+        title: "1D CHANGE",
+        key: "oneDayChange",
+        rowClass: () => "hidden md:table-cell",
+        itemSuffix: () => "%",
+        itemClass: (item) =>
+          item.oneDayChange >= 0 ? "text-green" : "text-red",
+      },
+      {
+        title: "7D CHANGE",
+        key: "sevenDayChange",
+        rowClass: () => "hidden md:table-cell",
+        itemSuffix: () => "%",
+        itemClass: (item) =>
+          item.sevenDayChange >= 0 ? "text-green" : "text-red",
+      },
+      {
+        title: "TVL",
+        key: "tvl",
+        itemPrefix: () => "Ξ",
+      },
+      {
+        title: "CREATOR",
+        key: "creator",
+        rowClass: () => "hidden md:table-cell",
+      },
+      {
+        title: "RECEIPT",
+        key: "receiptToken",
+      },
+      {
+        title: "DEPOSIT",
+        noSort: true,
+        component: () => (
+          <Button type="primary" className="p-1">
+            <span className="text-xs">DEPOSIT</span>
+          </Button>
+        ),
+      },
+    ];
+  };
 
   useEffect(() => {
     const _vaults =
@@ -257,7 +261,7 @@ const VaultList = ({ onClickVault }: Props) => {
       )}
 
       <Table
-        rowInfos={rowInfos}
+        rowInfos={getRowInfos()}
         items={filteredVaults}
         trStyle="h-14"
         rowStyle="h-10"

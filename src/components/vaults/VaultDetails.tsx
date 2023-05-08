@@ -121,7 +121,7 @@ export default function VaultDetails({ vault }: Props) {
             </div>
             <div className="flex items-center justify-between gap-5">
               <Search
-                placeholder="Search NFTID"
+                placeholder={`Search NFTID [${prologueNfts.length}]`}
                 className="flex-1 xl:flex-none"
               />
               <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">

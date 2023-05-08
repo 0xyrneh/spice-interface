@@ -8,7 +8,6 @@ import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { Card } from "@/components/common";
 import { PieChart } from "@/components/portfolio";
 import { Vault } from "@/types/vault";
-import { COLLECTION_FILTERS, MARKETPLACE_FILTERS } from "@/constants";
 
 type Props = {
   showMarketplace?: boolean;
@@ -72,8 +71,8 @@ export default function Exposure({
               <th className="text-left pl-1 h-10 w-[80%]">
                 {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"} [
                 {marketplaceSelected
-                  ? MARKETPLACE_FILTERS.length
-                  : COLLECTION_FILTERS.length}
+                  ? marketplaceExposure.length
+                  : collectionExposure.length}
                 ]
               </th>
               <th className="h-10 pr-1">%</th>
