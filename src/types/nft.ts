@@ -17,8 +17,11 @@ export type Loan = {
   principal: number;
   repay: number;
   ltv: number;
+  ltvFloor: number;
   apy: number;
   due: number;
   icon: string;
   market: string;
+  // TODO: changed to date
+  initiated: string;
 };

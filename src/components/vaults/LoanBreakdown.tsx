@@ -56,13 +56,13 @@ export default function LoanBreakdown({
             />
           </>
         ),
-        rowClass: () => "w-[45%]",
+        rowClass: () => (loanExpanded ? "" : "w-[45%]"),
       },
       {
         title: "PRINCIPAL",
         key: "principal",
         itemPrefix: () => "Ξ",
-        rowClass: () => "w-[90px]",
+        rowClass: () => (loanExpanded ? "w-[10%]" : "w-[90px]"),
       },
       {
         title: "REPAY",
@@ -71,26 +71,43 @@ export default function LoanBreakdown({
           hideRepay
             ? "hidden"
             : loanExpanded
-            ? ""
+            ? "w-[10%]"
             : "hidden xl:table-cell w-[60px]",
         itemPrefix: () => "Ξ",
       },
       {
         title: "LTV",
+        subTitle: loanExpanded ? "/SPICE/" : undefined,
         key: "ltv",
         itemSuffix: () => "%",
-        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell w-[50px]"),
+        rowClass: () =>
+          loanExpanded ? "w-[10%]" : "hidden lg:table-cell w-[50px]",
+      },
+      {
+        title: "LTV",
+        subTitle: loanExpanded ? "/FLOOR/" : undefined,
+        key: "ltvFloor",
+        itemSuffix: () => "%",
+        rowClass: () =>
+          loanExpanded ? "hidden lg:table-cell w-[10%]" : "hidden",
       },
       {
         title: "APY",
         key: "apy",
         itemSuffix: () => "%",
-        rowClass: () => "w-[50px]",
+        rowClass: () => (loanExpanded ? "w-[10%]" : "w-[50px]"),
+      },
+      {
+        title: "INITIATED",
+        key: "initiated",
+        rowClass: () =>
+          loanExpanded ? "hidden lg:table-cell w-[10%]" : "hidden",
       },
       {
         title: "DUE",
         key: "due",
-        rowClass: () => (loanExpanded ? "" : "hidden lg:table-cell w-[50px]"),
+        rowClass: () =>
+          loanExpanded ? "w-[10%]" : "hidden lg:table-cell w-[50px]",
         itemSuffix: () => "d",
       },
       {
@@ -104,7 +121,7 @@ export default function LoanBreakdown({
             alt=""
           />
         ),
-        rowClass: () => (loanExpanded ? "" : "hidden"),
+        rowClass: () => (loanExpanded ? "w-[10%]" : "hidden"),
       },
     ];
   };

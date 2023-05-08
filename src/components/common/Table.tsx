@@ -3,6 +3,7 @@ import SortDownSVG from "@/assets/icons/sort-down.svg";
 
 export type TableRowInfo = {
   title: string;
+  subTitle?: string;
   key?: string;
   noSort?: boolean;
   component?: (item: any) => ReactNode;
@@ -86,7 +87,10 @@ const Table = ({
                   !row.noSort && sortKey === row.key ? "text-orange-200" : ""
                 } ${row.noSort ? "" : "hover:text-white"}`}
               >
-                <span>{row.title}</span>
+                <div className="flex flex-col !items-end">
+                  <span>{row.title}</span>
+                  {row.subTitle && <span>{row.subTitle}</span>}
+                </div>
                 {!row.noSort && sortKey === row.key && (
                   <SortDownSVG className={sortAsc ? "rotate-180" : ""} />
                 )}
