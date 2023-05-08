@@ -35,9 +35,9 @@ export default function VaultDetails({ vault }: Props) {
   }, [prologueNftExpanded, setBlur]);
 
   return (
-    <div className="relative hidden md:flex tracking-wide w-full min-h-[838px] max-h-[calc(max(982px,100vh)-144px)] mt-[84px] px-8 pb-5 gap-5 overflow-y-hidden">
+    <div className="relative hidden md:flex tracking-wide w-full min-h-[838px] max-h-[calc(max(982px,100vh)-144px)] mt-[84px] px-8 pb-5 gap-5 overflow-hidden">
       <div className="flex flex-col min-w-[41%] w-[41%] gap-5">
-        <Card className="gap-3">
+        <Card className="gap-3 !py-3">
           <div className="flex items-center justify-between gap-5">
             <div className="flex items-center gap-5">
               <Image
@@ -64,7 +64,7 @@ export default function VaultDetails({ vault }: Props) {
               </span>
             </div>
           </div>
-          <div className="hidden xl:flex items-center text-green">
+          <div className="hidden xl:flex items-center text-green h-4">
             <CircleDotSvg />
             <span className="font-semibold text-xs">LOW RISK</span>
           </div>
@@ -85,7 +85,9 @@ export default function VaultDetails({ vault }: Props) {
         <Card className="gap-3">
           <div className="flex items-center gap-2.5">
             <ChartSVG />
-            <h2 className="font-bold text-white font-sm">VAULT STATS</h2>
+            <h2 className="font-bold text-white font-sm leading-[18px]">
+              VAULT STATS
+            </h2>
           </div>
           <div className="flex gap-4 items-center">
             <Stats
@@ -100,7 +102,7 @@ export default function VaultDetails({ vault }: Props) {
         </Card>
         {vault.receiptToken === ReceiptToken.NFT && (
           <Card
-            className="gap-5"
+            className="gap-3"
             expanded={prologueNftExpanded}
             onCollapse={() => setPrologueNftExpanded(false)}
           >
@@ -140,13 +142,23 @@ export default function VaultDetails({ vault }: Props) {
                 />
               </div>
             </div>
-            <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 overflow-y-hidden">
-              <div className="flex gap-y-3 gap-px overflow-x-hidden custom-scroll">
+            <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 h-full overflow-y-auto">
+              <div
+                className={`flex gap-y-3 gap-px custom-scroll ${
+                  prologueNftExpanded
+                    ? "overflow-y-auto flex-wrap"
+                    : "overflow-x-hidden"
+                }`}
+              >
                 {prologueNfts.map((nft, idx) => (
                   <PrologueNftCard
                     key={`prologue-nft-${idx}`}
                     nft={nft}
-                    className="min-w-[calc((100%-2px)/3)] lg:min-w-[calc((100%-3px)/4)] xl:min-w-[calc((100%-4px)/5)] 3xl:min-w-[calc((100%-5px)/6)]"
+                    className={`${
+                      prologueNftExpanded
+                        ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)] 2xl:min-w-[calc((100%-8px)/9)] 3xl:min-w-[calc((100%-9px)/10)]"
+                        : "min-w-[calc((100%-2px)/3)] lg:min-w-[calc((100%-3px)/4)] xl:min-w-[calc((100%-4px)/5)] 3xl:min-w-[calc((100%-5px)/6)]"
+                    }`}
                   />
                 ))}
               </div>
