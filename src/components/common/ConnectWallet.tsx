@@ -40,6 +40,7 @@ const ConnectWallet = () => {
       {account ? (
         <div className="flex items-center gap-3">
           <Image
+            className="border-1 border-gray-200 rounded-full"
             src="/assets/images/vaultIcon.svg"
             width={28}
             height={28}

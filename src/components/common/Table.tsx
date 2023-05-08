@@ -84,7 +84,7 @@ const Table = ({
               <div
                 className={`${rowStyle} ${
                   !row.noSort && sortKey === row.key ? "text-orange-200" : ""
-                }`}
+                } ${row.noSort ? "" : "hover:text-white"}`}
               >
                 <span>{row.title}</span>
                 {!row.noSort && sortKey === row.key && (
@@ -99,7 +99,7 @@ const Table = ({
         {getSortedItems().map((item, index) => (
           <tr
             key={`item-${index}`}
-            className={`trStyle ${
+            className={`${trStyle} ${
               onClickItem ? "vault-row cursor-pointer" : ""
             } ${isActive && isActive(item) ? "active" : ""}`}
             onClick={() => {

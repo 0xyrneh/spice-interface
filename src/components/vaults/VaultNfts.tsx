@@ -1,8 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import prologueNfts from "@/constants/prologueNfts";
-import { Card, PrologueNftCard, Select } from "@/components/common";
-import SearchSVG from "@/assets/icons/search.svg";
+import { Card, PrologueNftCard, Search, Select } from "@/components/common";
 import KeySVG from "@/assets/icons/key.svg";
 import { Vault } from "@/types/vault";
 import { VaultNftsSortFilter } from "@/types/common";
@@ -20,26 +19,27 @@ export default function VaultNfts({ vault, showIcon, className }: Props) {
   );
 
   return (
-    <Card className="gap-5 overflow-hidden max-h-[370px]">
+    <Card className="gap-5 overflow-hidden min-h-[360px] max-h-[360px]">
       <div className="flex items-center gap-2.5">
-        {vault && <Image src={vault.icon} width={16} height={16} alt="" />}
+        {vault && (
+          <Image
+            className="border-1 border-gray-200 rounded-full"
+            src={vault.icon}
+            width={16}
+            height={16}
+            alt=""
+          />
+        )}
         <KeySVG />
         <h2 className="font-bold text-white font-sm">
-          {vault ? "YOUR PROLOGUE NFTS" : "VAULT NFTS"}{" "}
+          {vault ? "YOUR VAULT NFTS" : "VAULT NFTS"}{" "}
         </h2>
       </div>
       <div className="flex items-center justify-between gap-5">
-        <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
-          <SearchSVG />
-          <input
-            className="flex-1 text-white font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
-            placeholder="Search your NFTs"
-            // value={searchQuery}
-            // onChange={(e) => setSearchQuery(e.target.value)}
-            // onFocus={handleFocus}
-            // onBlur={handleBlur}
-          />
-        </div>
+        <Search
+          placeholder="Search your NFTs"
+          className="flex-1 xl:flex-none"
+        />
         <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
           <Select
             className="w-[170px]"

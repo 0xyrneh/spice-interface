@@ -36,10 +36,13 @@ const VaultFooter = () => {
       <div className="flex gap-4 items-center">
         <div className="flex items-center">
           <CircleDotSvg />
-          <span className="text-green font-bold text-xs">
+          <span className="text-green font-bold text-xs text-shadow-green">
             SPICE MARKET IS OPEN
           </span>
         </div>
+        <span className="text-xs text-orange-200 text-shadow-orange-900">
+          Ξ600 TVL
+        </span>
         <Link
           target="__blank"
           href="https://docs.spicefi.xyz/"

@@ -6,13 +6,13 @@ import {
   Select,
   Stats,
   PrologueNftCard,
+  Search,
 } from "@/components/common";
 import { DetailChart, LoanBreakdown } from "@/components/vaults";
 import prologueNfts from "@/constants/prologueNfts";
 import { VaultNftsSortFilter } from "@/types/common";
 import CircleDotSvg from "@/assets/icons/circle-dot.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
-import SearchSVG from "@/assets/icons/search.svg";
 import ChartSVG from "@/assets/icons/chart.svg";
 import UserSVG from "@/assets/icons/user.svg";
 import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
@@ -41,6 +41,7 @@ export default function VaultDetails({ vault }: Props) {
           <div className="flex items-center justify-between gap-5">
             <div className="flex items-center gap-5">
               <Image
+                className="border-1 border-gray-200 rounded-full"
                 src="/assets/images/vaultIcon.svg"
                 width={40}
                 height={40}
@@ -58,7 +59,7 @@ export default function VaultDetails({ vault }: Props) {
             </div>
             <div className="flex xl:hidden items-center text-green">
               <CircleDotSvg />
-              <span className="hidden lg:block font-semibold text-xs">
+              <span className="hidden lg:block font-semibold text-xs text-shadow-green">
                 LOW RISK
               </span>
             </div>
@@ -119,17 +120,10 @@ export default function VaultDetails({ vault }: Props) {
               </button>
             </div>
             <div className="flex items-center justify-between gap-5">
-              <div className="flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
-                <SearchSVG />
-                <input
-                  className="flex-1 text-white font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
-                  placeholder="Search NFTID"
-                  // value={searchQuery}
-                  // onChange={(e) => setSearchQuery(e.target.value)}
-                  // onFocus={handleFocus}
-                  // onBlur={handleBlur}
-                />
-              </div>
+              <Search
+                placeholder="Search NFTID"
+                className="flex-1 xl:flex-none"
+              />
               <div className="hidden xl:flex flex-1 justify-end text-gray-200 font-medium text-xs">
                 <Select
                   className="w-[170px] text-gray-200 border-gray-200 hover:text-gray-300 hover:border-gray-300"

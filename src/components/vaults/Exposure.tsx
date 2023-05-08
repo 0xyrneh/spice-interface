@@ -8,6 +8,7 @@ import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { Card } from "@/components/common";
 import { PieChart } from "@/components/portfolio";
 import { Vault } from "@/types/vault";
+import { COLLECTION_FILTERS, MARKETPLACE_FILTERS } from "@/constants";
 
 type Props = {
   showMarketplace?: boolean;
@@ -34,7 +35,15 @@ export default function Exposure({
   return (
     <Card className={`gap-3 ${className}`}>
       <div className="flex items-center gap-2.5">
-        {vault && <Image src={vault.icon} width={16} height={16} alt="" />}
+        {vault && (
+          <Image
+            className="border-1 border-gray-200 rounded-full"
+            src={vault.icon}
+            width={16}
+            height={16}
+            alt=""
+          />
+        )}
         {marketplaceSelected ? (
           <MarketExposureSVG className="text-white" />
         ) : (
@@ -61,7 +70,11 @@ export default function Exposure({
           <thead>
             <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200 text-gray-100">
               <th className="text-left pl-1 h-10 w-[80%]">
-                {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"}
+                {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"} [
+                {marketplaceSelected
+                  ? MARKETPLACE_FILTERS.length
+                  : COLLECTION_FILTERS.length}
+                ]
               </th>
               <th className="h-10 pr-1">%</th>
             </tr>

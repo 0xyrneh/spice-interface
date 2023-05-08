@@ -85,7 +85,7 @@ const VaultSearch = () => {
         <SearchSVG />
         <input
           className="text-xs font-medium bg-transparent outline-0 placeholder:text-gray-200 text-white"
-          placeholder="Filter Vaults"
+          placeholder="Search Vaults and NFTs"
           onFocus={() => setOpened(true)}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
@@ -105,7 +105,13 @@ const VaultSearch = () => {
                 }}
               >
                 <div className="flex items-center gap-3 text-left w-[calc(100%-60px)]">
-                  <Image src={vault.icon} width={16} height={16} alt="" />
+                  <Image
+                    className="border-1 border-gray-200 rounded-full"
+                    src={vault.icon}
+                    width={16}
+                    height={16}
+                    alt=""
+                  />
                   <span className="whitespace-nowrap overflow-hidden w-full text-ellipsis">
                     {vault.name}
                   </span>
@@ -131,7 +137,13 @@ const VaultSearch = () => {
                 }}
               >
                 <div className="flex items-center gap-3 text-left w-[calc(100%-60px)]">
-                  <Image src={vault.icon} width={16} height={16} alt="" />
+                  <Image
+                    className="border-1 border-gray-200 rounded-full"
+                    src={vault.icon}
+                    width={16}
+                    height={16}
+                    alt=""
+                  />
                   <span className="whitespace-nowrap overflow-hidden w-full text-ellipsis">
                     {vault.name}
                   </span>
@@ -154,7 +166,13 @@ const VaultSearch = () => {
                 className="flex justify-between items-center text-xs rounded p-[5px] hover:bg-gray-300 hover:bg-opacity-10"
               >
                 <div className="flex items-center gap-3 text-left">
-                  <Image src={vault.icon} width={16} height={16} alt="" />
+                  <Image
+                    className="border-1 border-gray-200 rounded-full"
+                    src={vault.icon}
+                    width={16}
+                    height={16}
+                    alt=""
+                  />
                   {vault.name}
                 </div>
                 {/* <span>{vault.tvl}</span> */}

@@ -1,24 +1,13 @@
 import { useState } from "react";
 import Image from "next/image";
 import vaults from "@/constants/vaults";
-import {
-  Button,
-  Card,
-  PrologueNftCard,
-  Select,
-  Stats,
-  Table,
-} from "@/components/common";
+import { Button, Card, Search, Stats, Table } from "@/components/common";
 import { PositionChart } from "@/components/portfolio";
-import prologueNfts from "@/constants/prologueNfts";
-import { PeriodFilter, VaultNftsSortFilter } from "@/types/common";
+import { PeriodFilter } from "@/types/common";
 import PositionSVG from "@/assets/icons/position.svg";
 import CopySVG from "@/assets/icons/copy.svg";
 import ExposureSVG from "@/assets/icons/exposure.svg";
-import KeySVG from "@/assets/icons/key.svg";
-import SearchSVG from "@/assets/icons/search.svg";
 import { shortAddress } from "@/utils";
-import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
 import { TableRowInfo } from "@/components/common/Table";
 import { ReceiptToken, Vault } from "@/types/vault";
 import { Exposure, LoanBreakdown } from "@/components/vaults";
@@ -29,10 +18,6 @@ export default function Portfolio() {
   const [vault, setVault] = useState<Vault>();
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
 
-  const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
-    VaultNftsSortFilter.ValueHighToLow
-  );
-
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
@@ -40,19 +25,19 @@ export default function Portfolio() {
         key: "name",
         itemPrefix: (item) => (
           <Image
-            className="mr-2"
+            className="mr-2 border-1 border-gray-200 rounded-full"
             src={item.icon}
             width={20}
             height={20}
             alt=""
           />
         ),
-        rowClass: () => "lg:w-[35%]",
+        rowClass: () => "lg:w-[30%]",
       },
       {
         title: "POSITION",
         key: "position",
-        rowClass: () => "hidden lg:table-cell",
+        rowClass: () => "hidden lg:table-cell w-[85px]",
         itemPrefix: () => "Ξ",
       },
       {
@@ -81,7 +66,7 @@ export default function Portfolio() {
         title: "DETAILS",
         noSort: true,
         component: () => (
-          <Button type="secondary" className="p-1">
+          <Button type="secondary" className="px-1 h-[22px]">
             <span className="text-xs">DETAILS</span>
           </Button>
         ),
@@ -90,7 +75,7 @@ export default function Portfolio() {
         title: "DEPOSIT",
         noSort: true,
         component: () => (
-          <Button type="primary" className="p-1">
+          <Button type="primary" className="px-1 h-[22px]">
             <span className="text-xs">DEPOSIT</span>
           </Button>
         ),
@@ -104,6 +89,7 @@ export default function Portfolio() {
         <Card className="py-3 !flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-5 flex-1">
             <Image
+              className="border-1 border-gray-200 rounded-full"
               src="/assets/images/vaultIcon.svg"
               width={40}
               height={40}
@@ -126,24 +112,18 @@ export default function Portfolio() {
         <Card className="gap-3 overflow-hidden">
           <div className="flex items-center gap-2.5">
             <ExposureSVG />
-            <h2 className="font-bold text-white font-sm">VAULT EXPOSURE</h2>
+            <h2 className="font-bold text-white font-sm">SELECT YOUR VAULT</h2>
           </div>
           <div className="flex items-center justify-between gap-5">
-            <div className="hidden xl:flex flex-1 xl:flex-none text-gray-200 font-medium text-xs rounded border-1 border-gray-200 items-center gap-3 px-3 h-8">
-              <SearchSVG />
-              <input
-                className="flex-1 text-white font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
-                placeholder="Search your Vaults"
-                // value={searchQuery}
-                // onChange={(e) => setSearchQuery(e.target.value)}
-                // onFocus={handleFocus}
-                // onBlur={handleBlur}
-              />
-            </div>
+            <Search
+              placeholder="Search your Vaults"
+              className="hidden xl:flex flex-1 xl:flex-none"
+            />
             <Button
-              type="third"
+              type={!vault ? "third" : "secondary"}
               className="flex-1 xl:flex-none xl:w-[170px] h-8 text-xs"
               onClick={() => setVault(undefined)}
+              disabled={!vault}
             >
               TOTAL SPICE POSITION
             </Button>
@@ -170,7 +150,7 @@ export default function Portfolio() {
           </div>
         </Card>
         {vault && vault.receiptToken === ReceiptToken.ERC20 ? (
-          <LoanBreakdown vault={vault} showIcon />
+          <LoanBreakdown vault={vault} showIcon className="max-h-[360px]" />
         ) : (
           <VaultNfts vault={vault} />
         )}
@@ -179,7 +159,15 @@ export default function Portfolio() {
       <div className="flex flex-col flex-1 gap-5">
         <Card className="gap-3 flex-1 overflow-hidden">
           <div className="flex items-center gap-2.5">
-            {vault && <Image src={vault.icon} width={16} height={16} alt="" />}
+            {vault && (
+              <Image
+                className="border-1 border-gray-200 rounded-full"
+                src={vault.icon}
+                width={16}
+                height={16}
+                alt=""
+              />
+            )}
             <PositionSVG />
             <h2 className="font-bold text-white font-sm">
               {vault
@@ -237,9 +225,14 @@ export default function Portfolio() {
         </Card>
         <div className="flex gap-5 max-h-[319px]">
           {vault && vault.receiptToken !== ReceiptToken.ERC20 ? (
-            <LoanBreakdown className="flex-1" showIcon vault={vault} />
+            <LoanBreakdown
+              className="flex-1"
+              showIcon
+              vault={vault}
+              hideRepay
+            />
           ) : (
-            <Exposure className="flex-1" showMarketplace />
+            <Exposure className="flex-1" showMarketplace vault={vault} />
           )}
           <Exposure
             className="flex-1"

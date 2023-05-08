@@ -7,3 +7,4 @@ export { default as Select } from "./Select";
 export { default as Table } from "./Table";
 export { default as Stats } from "./Stats";
 export { default as PrologueNftCard } from "./PrologueNftCard";
+export { default as Search } from "./Search";

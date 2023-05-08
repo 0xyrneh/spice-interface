@@ -3,9 +3,8 @@ import vaults from "@/constants/vaults";
 import { Vault } from "@/types/vault";
 import { useEffect, useState } from "react";
 import { VaultFilter } from "@/types/common";
-import { Button, Dropdown, Select, Table } from "@/components/common";
+import { Button, Dropdown, Search, Select, Table } from "@/components/common";
 import CircleXSVG from "@/assets/icons/circleX.svg";
-import SearchSVG from "@/assets/icons/search.svg";
 import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
 import UserSVG from "@/assets/icons/user.svg";
 import CheckedSVG from "@/assets/icons/checked.svg";
@@ -22,7 +21,13 @@ const rowInfos: TableRowInfo[] = [
     title: "VAULT",
     key: "name",
     itemPrefix: (item) => (
-      <Image className="mr-2" src={item.icon} width={20} height={20} alt="" />
+      <Image
+        className="mr-2 border-1 border-gray-200 rounded-full"
+        src={item.icon}
+        width={20}
+        height={20}
+        alt=""
+      />
     ),
     rowClass: () => "lg:w-[35%]",
   },
@@ -133,19 +138,12 @@ const VaultList = ({ onClickVault }: Props) => {
             opened={filterOpened}
             onClose={() => setFilterOpened(false)}
           >
-            <div
-              className={`flex items-center gap-3 border-1 border-gray-200 h-8 px-3 ${
-                filterOpened ? "rounded-t" : "rounded"
-              }`}
-            >
-              <SearchSVG />
-              <input
-                className="text-xs font-medium bg-transparent outline-0 placeholder:text-gray-200 text-white"
-                placeholder="Filter Vaults"
-                onFocus={() => setFilterOpened(true)}
-                onChange={(e) => setFilterQuery(e.target.value)}
-              />
-            </div>
+            <Search
+              placeholder="Filter Vaults"
+              className={filterOpened ? "rounded-b-none" : ""}
+              onFocus={() => setFilterOpened(true)}
+              onChange={setFilterQuery}
+            />
             <div className="bg-black border-x-1 border-b-1 border-gray-300 rounded-b px-3 py-[7px] text-xs max-h-[356px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
               {MARKETPLACE_FILTERS.filter(
                 (item) =>

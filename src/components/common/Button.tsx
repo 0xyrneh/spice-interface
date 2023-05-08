@@ -8,6 +8,7 @@ type Props = {
   type?: "primary" | "secondary" | "third";
   children: ReactNode | ReactNode[];
   style?: object;
+  disabled?: boolean;
   onClick?: () => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
@@ -38,6 +39,7 @@ const Button = ({
   style,
   children,
   onClick,
+  disabled,
   onMouseEnter,
   onMouseLeave,
 }: Props) => {
@@ -54,10 +56,13 @@ const Button = ({
         clicked
           ? clickClassName
           : !hideHoverStyle
-          ? (type ? hoverDefaultClass[type] : "") + " " + hoverClassName
+          ? (type && !disabled ? hoverDefaultClass[type] : "") +
+            " " +
+            hoverClassName
           : ""
       }`}
       style={style}
+      disabled={disabled}
       onMouseDown={() => setClicked(true)}
       onMouseUp={() => setClicked(false)}
       onMouseLeave={handleMouseLeave}
