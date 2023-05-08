@@ -66,9 +66,9 @@ const Table = ({
     <table className={`custom-table ${className}`}>
       <thead>
         <tr className={trStyle}>
-          {rowInfos.map((row) => (
+          {rowInfos.map((row, idx) => (
             <th
-              key={row.title}
+              key={`${row.title}-${idx}`}
               className={`${row.rowClass ? row.rowClass() : ""} ${
                 row.noSort ? "" : "cursor-pointer"
               }`}
@@ -110,9 +110,9 @@ const Table = ({
               if (onClickItem) onClickItem(item);
             }}
           >
-            {rowInfos.map((row) => (
+            {rowInfos.map((row, idx) => (
               <td
-                key={`item-${index}-${row.title}`}
+                key={`item-${index}-${row.title}-${idx}`}
                 className={`${row.rowClass ? row.rowClass() : ""}`}
               >
                 <div
