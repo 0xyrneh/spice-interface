@@ -150,7 +150,11 @@ export default function Portfolio() {
           </div>
         </Card>
         {vault && vault.receiptToken === ReceiptToken.ERC20 ? (
-          <LoanBreakdown vault={vault} showIcon className="max-h-[360px]" />
+          <LoanBreakdown
+            vault={vault}
+            showIcon
+            nonExpandedClassName="max-h-[360px]"
+          />
         ) : (
           <VaultNfts vault={vault} />
         )}

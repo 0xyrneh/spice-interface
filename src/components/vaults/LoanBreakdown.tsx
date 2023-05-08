@@ -11,6 +11,7 @@ import { useUI } from "@/hooks";
 type Props = {
   vault: Vault;
   showIcon?: boolean;
+  nonExpandedClassName?: string;
   className?: string;
   hideRepay?: boolean;
 };
@@ -20,6 +21,7 @@ export default function LoanBreakdown({
   showIcon,
   className,
   hideRepay,
+  nonExpandedClassName,
 }: Props) {
   const { setBlur } = useUI();
 
@@ -109,7 +111,9 @@ export default function LoanBreakdown({
 
   return (
     <Card
-      className={`gap-3 overflow-hidden ${className}`}
+      className={`gap-3 overflow-hidden ${className} ${
+        nonExpandedClassName && loanExpanded ? "nonExpandedClassName" : ""
+      }`}
       expanded={loanExpanded}
       onCollapse={() => setLoanExpanded(false)}
     >
