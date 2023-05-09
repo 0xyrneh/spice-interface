@@ -147,7 +147,7 @@ export default function LoanBreakdown({
   return (
     <Card
       className={`gap-3 overflow-hidden ${className} ${
-        nonExpandedClassName && loanExpanded ? "nonExpandedClassName" : ""
+        nonExpandedClassName && !loanExpanded ? nonExpandedClassName : ""
       }`}
       expanded={loanExpanded}
       onCollapse={() => setLoanExpanded(false)}
