@@ -31,7 +31,7 @@ const VaultFooter = () => {
         activeTab().breakpoint
       }:flex items-center justify-between px-8 text-gray-200 text-[10px] lg:text-xs xl:text-base max-w-[${
         activeTab().maxWidth
-      }] ${blur ? "blur-[2px]" : ""}`}
+      }] ${blur ? "blur-[5px]" : ""}`}
     >
       <div className="flex gap-4 items-center">
         <div className="flex items-center">
@@ -40,7 +40,7 @@ const VaultFooter = () => {
             SPICE MARKET IS OPEN
           </span>
         </div>
-        <span className="text-xs text-orange-200 text-shadow-orange-900">
+        <span className="text-xs text-orange-200 text-shadow-orange-900 font-bold">
           Ξ600 TVL
         </span>
         <Link

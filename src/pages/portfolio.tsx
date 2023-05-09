@@ -32,7 +32,6 @@ export default function Portfolio() {
             alt=""
           />
         ),
-        rowClass: () => "lg:w-[30%]",
       },
       {
         title: "POSITION",
@@ -41,30 +40,26 @@ export default function Portfolio() {
         itemPrefix: () => "Ξ",
       },
       {
-        title: "POS.",
-        key: "position",
-        rowClass: () => "lg:hidden",
-        itemPrefix: () => "Ξ",
-      },
-      {
         title: "TVL",
         key: "tvl",
-        rowClass: () => "hidden 2xl:table-cell",
+        rowClass: () => "hidden 3xl:table-cell  w-[75px]",
         itemPrefix: () => "Ξ",
       },
       {
         title: "APY",
         key: "apy",
+        rowClass: () => "hidden xl:table-cell w-[75px]",
         itemSuffix: () => "%",
       },
       {
         title: "RECEIPT",
         key: "receiptToken",
-        rowClass: () => "hidden xl:table-cell",
+        rowClass: () => "hidden 2xl:table-cell  w-[75px]",
       },
       {
         title: "DETAILS",
         noSort: true,
+        rowClass: () => "w-[70px]",
         component: () => (
           <Button type="secondary" className="px-1 h-[22px]">
             <span className="text-xs">DETAILS</span>
@@ -74,6 +69,7 @@ export default function Portfolio() {
       {
         title: "DEPOSIT",
         noSort: true,
+        rowClass: () => "w-[70px]",
         component: () => (
           <Button type="primary" className="px-1 h-[22px]">
             <span className="text-xs">DEPOSIT</span>
@@ -84,7 +80,7 @@ export default function Portfolio() {
   };
 
   return (
-    <div className="relative hidden md:flex tracking-wide w-full min-h-[838px] max-h-[calc(max(982px,100vh)-144px)] mt-[84px] px-8 pb-5 gap-5 overflow-y-hidden">
+    <div className="relative hidden md:flex tracking-wide w-full min-h-[838px] max-h-[calc(max(982px,100vh)-144px)] mt-[84px] px-8 pb-5 gap-5 overflow-hidden">
       <div className="flex flex-col min-w-[41%] w-[41%] gap-5">
         <Card className="py-3 !flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-5 flex-1">
@@ -229,12 +225,7 @@ export default function Portfolio() {
         </Card>
         <div className="flex gap-5 max-h-[319px]">
           {vault && vault.receiptToken !== ReceiptToken.ERC20 ? (
-            <LoanBreakdown
-              className="flex-1"
-              showIcon
-              vault={vault}
-              hideRepay
-            />
+            <LoanBreakdown className="flex-1" small showIcon vault={vault} />
           ) : (
             <Exposure className="flex-1" showMarketplace vault={vault} />
           )}

@@ -69,7 +69,7 @@ const Header = () => {
       }:flex fixed w-full h-16 bg-gray-700 bg-opacity-90 items-center justify-between px-8 font-bold
       max-w-[${activeTab().maxWidth}] ${
         activeTab().name !== "Vaults" || show ? "top-0" : "-top-[64px]"
-      } ${blur ? "blur-[2px]" : ""}`}
+      } ${blur ? "blur-[5px]" : ""}`}
       style={{ transition: "top 0.4s ease-in-out" }}
     >
       <div className="flex-1 flex items-center gap-7 xl:gap-10 min-w-[420px] xl:min-w-[500px]">

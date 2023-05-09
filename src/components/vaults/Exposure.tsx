@@ -15,6 +15,7 @@ type Props = {
   vault?: Vault;
   className?: string;
 };
+
 export default function Exposure({
   showMarketplace,
   showCollection,
@@ -49,9 +50,12 @@ export default function Exposure({
           <UserSVG className="text-white" />
         )}
         <h2 className="block lg:hidden font-bold text-white font-sm whitespace-nowrap">
+          {marketplaceSelected ? "MARKET" : "NFT"} EXP.
+        </h2>
+        <h2 className="hidden lg:block xl:hidden font-bold text-white font-sm whitespace-nowrap">
           {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"} EXP.
         </h2>
-        <h2 className="hidden lg:block font-bold text-white font-sm whitespace-nowrap">
+        <h2 className="hidden xl:block font-bold text-white font-sm whitespace-nowrap">
           {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"} EXPOSURE
         </h2>
         {showMarketplace && showCollection && (
@@ -68,8 +72,8 @@ export default function Exposure({
         <table className="flex-1 text-gray-200 text-xs border-y-1 border-y-gray-200 text-xs font-medium text-white">
           <thead>
             <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200 text-gray-100">
-              <th className="text-left pl-1 h-10 w-[80%]">
-                {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"} [
+              <th className="text-left pl-1 h-10 w-[80%] whitespace-nowrap">
+                {marketplaceSelected ? "MARKETPLACES" : "COLLECTIONS"} [
                 {marketplaceSelected
                   ? marketplaceExposure.length
                   : collectionExposure.length}

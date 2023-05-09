@@ -58,7 +58,7 @@ export default function VaultNfts({ vault, showIcon, className }: Props) {
       </div>
       <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 overflow-y-hidden">
         <span className="font-medium text-white text-xs">Prologue NFT</span>
-        <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto custom-scroll">
+        <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto no-scroll">
           {prologueNfts.map((nft, idx) => (
             <PrologueNftCard
               key={`prologue-nft-${idx}`}

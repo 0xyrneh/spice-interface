@@ -84,11 +84,13 @@ const Table = ({
             >
               <div
                 className={`${rowStyle} ${
-                  !row.noSort && sortKey === row.key ? "text-orange-200" : ""
+                  !row.noSort && sortKey === row.key
+                    ? "text-orange-200 text-shadow-orange-900"
+                    : ""
                 } ${row.noSort ? "" : "hover:text-white"}`}
               >
                 <div className="flex flex-col !items-end">
-                  <span>{row.title}</span>
+                  <span className="whitespace-nowrap">{row.title}</span>
                   {row.subTitle && <span>{row.subTitle}</span>}
                 </div>
                 {!row.noSort && sortKey === row.key && (

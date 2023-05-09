@@ -10,17 +10,17 @@ import { useUI } from "@/hooks";
 
 type Props = {
   vault: Vault;
+  small?: boolean;
   showIcon?: boolean;
   nonExpandedClassName?: string;
   className?: string;
-  hideRepay?: boolean;
 };
 
 export default function LoanBreakdown({
   vault,
+  small,
   showIcon,
   className,
-  hideRepay,
   nonExpandedClassName,
 }: Props) {
   const { setBlur } = useUI();
@@ -34,7 +34,7 @@ export default function LoanBreakdown({
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
-        title: `LOAN [${loans.length}]`,
+        title: `LOANS [${loans.length}]`,
         key: "name",
         itemPrefix: (item) => (
           <>
@@ -56,23 +56,28 @@ export default function LoanBreakdown({
             />
           </>
         ),
-        rowClass: () => (loanExpanded ? "" : "w-[45%]"),
+        // rowClass: () => (loanExpanded ? "" : "w-[45%]"),
       },
       {
         title: "PRINCIPAL",
         key: "principal",
         itemPrefix: () => "Ξ",
-        rowClass: () => (loanExpanded ? "w-[10%]" : "w-[90px]"),
+        rowClass: () =>
+          loanExpanded
+            ? "w-[10%]"
+            : small
+            ? "hidden lg:table-cell w-[90px]"
+            : "w-[90px]",
       },
       {
         title: "REPAY",
         key: "repay",
         rowClass: () =>
-          hideRepay
-            ? "hidden"
-            : loanExpanded
+          loanExpanded
             ? "w-[10%]"
-            : "hidden xl:table-cell w-[60px]",
+            : small
+            ? "hidden 2xl:table-cell w-[65px]"
+            : "hidden xl:table-cell w-[65px]",
         itemPrefix: () => "Ξ",
       },
       {
@@ -81,7 +86,11 @@ export default function LoanBreakdown({
         key: "ltv",
         itemSuffix: () => "%",
         rowClass: () =>
-          loanExpanded ? "w-[10%]" : "hidden lg:table-cell w-[50px]",
+          loanExpanded
+            ? "w-[10%]"
+            : small
+            ? "hidden 3xl:table-cell w-[50px]"
+            : "hidden lg:table-cell w-[50px]",
       },
       {
         title: "LTV",
@@ -95,7 +104,12 @@ export default function LoanBreakdown({
         title: "APY",
         key: "apy",
         itemSuffix: () => "%",
-        rowClass: () => (loanExpanded ? "w-[10%]" : "w-[50px]"),
+        rowClass: () =>
+          loanExpanded
+            ? "w-[10%]"
+            : small
+            ? "hidden lg:table-cell w-[50px]"
+            : "w-[50px]",
       },
       {
         title: "INITIATED",
@@ -107,7 +121,11 @@ export default function LoanBreakdown({
         title: "DUE",
         key: "due",
         rowClass: () =>
-          loanExpanded ? "w-[10%]" : "hidden lg:table-cell w-[50px]",
+          loanExpanded
+            ? "w-[10%]"
+            : small
+            ? "hidden xl:table-cell w-[50px]"
+            : "hidden lg:table-cell w-[50px]",
         itemSuffix: () => "d",
       },
       {
@@ -146,7 +164,18 @@ export default function LoanBreakdown({
             />
           )}
           <ExposureSVG />
-          <h2 className="font-bold text-white font-sm">LOAN EXPOSURE</h2>
+          <h2
+            className={`font-bold text-white font-sm ${
+              small ? "hidden lg:block" : ""
+            }`}
+          >
+            LOAN EXPOSURE
+          </h2>
+          {small && (
+            <h2 className="lg:hidden font-bold text-white font-sm">
+              LOAN EXP.
+            </h2>
+          )}
         </div>
         <button onClick={() => setLoanExpanded(!loanExpanded)}>
           <ExternalLinkSVG
@@ -158,7 +187,7 @@ export default function LoanBreakdown({
       </div>
 
       <div className="flex">
-        <Search placeholder="Search loans" className="flex-1 xl:flex-none" />
+        <Search placeholder="Search loans" className="xl:flex-none w-full" />
       </div>
       <div className="flex-1 overflow-hidden">
         <Table
