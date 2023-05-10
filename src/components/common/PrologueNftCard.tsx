@@ -4,9 +4,10 @@ import { PrologueNft } from "@/types/nft";
 type Props = {
   className?: string;
   nft: PrologueNft;
+  expanded?: boolean;
 };
 
-export default function PrologueNftCard({ nft, className }: Props) {
+export default function PrologueNftCard({ nft, className, expanded }: Props) {
   return (
     <div
       key={`prologue-nft`}
@@ -30,16 +31,23 @@ export default function PrologueNftCard({ nft, className }: Props) {
           />
         )}
         {nft.featured && (
-          <span className="text-center font-bold text-xs md:text-sm xl:text-base whitespace-nowrap">
+          <span
+            className={`text-center font-bold whitespace-nowrap tracking-normal ${
+              expanded ? "text-base" : "text-xs md:text-sm xl:text-base"
+            }`}
+          >
             [LEVERED]
             <br />
             Net APY:
-            <br />
-            {nft.apy}%
+            <br className={expanded ? "lg:hidden" : "2xl:hidden"} /> {nft.apy}%
           </span>
         )}
       </div>
-      <div className="flex items-center justify-between h-6 bg-gray-700 text-xs p-2">
+      <div
+        className={`flex items-center justify-between bg-gray-700 text-xs p-2 ${
+          expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
+        }`}
+      >
         <span>#{nft.rank}</span>
         <span>Ξ{nft.tvl}</span>
       </div>

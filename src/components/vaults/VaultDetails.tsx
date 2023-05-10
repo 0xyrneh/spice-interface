@@ -160,9 +160,10 @@ export default function VaultDetails({ vault }: Props) {
                   <PrologueNftCard
                     key={`prologue-nft-${idx}`}
                     nft={nft}
+                    expanded={prologueNftExpanded}
                     className={`${
                       prologueNftExpanded
-                        ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)] 2xl:min-w-[calc((100%-8px)/9)] 3xl:min-w-[calc((100%-9px)/10)]"
+                        ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)]"
                         : "min-w-[calc((100%-2px)/3)] lg:min-w-[calc((100%-3px)/4)] xl:min-w-[calc((100%-4px)/5)] 3xl:min-w-[calc((100%-5px)/6)]"
                     }`}
                   />
