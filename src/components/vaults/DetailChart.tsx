@@ -1,16 +1,8 @@
 import { useState } from "react";
 import { Card, Stats } from "@/components/common";
-import {
-  PieChart,
-  PositionChart,
-  PerformanceChart,
-} from "@/components/portfolio";
-import marketplaceExposure from "@/constants/marketplaceExposure";
-import collectionExposure from "@/constants/collectionExposure";
+import { PositionChart, PerformanceChart } from "@/components/portfolio";
 import { PeriodFilter } from "@/types/common";
 import TvlSVG from "@/assets/icons/tvl.svg";
-import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
-import UserSVG from "@/assets/icons/user.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import Exposure from "./Exposure";
 
@@ -19,8 +11,8 @@ export default function DetailChart() {
   const [showPerformance, setShowPerformance] = useState(false);
 
   return (
-    <div className="flex flex-col flex-1 gap-5">
-      <Card className="gap-3 flex-1 overflow-hidden">
+    <div className="flex flex-col flex-1 gap-5 pt-1">
+      <Card className="gap-3 flex-1 overflow-hidden min-h-[523px]">
         <div className="flex items-center gap-2.5">
           <TvlSVG />
           <h2 className="font-bold text-white font-sm">
@@ -81,7 +73,7 @@ export default function DetailChart() {
           </div>
         </div>
       </Card>
-      <div className="flex gap-5">
+      <div className="flex gap-5 max-h-[363px] overflow-y-hidden p-1 -m-1">
         <Exposure showMarketplace isBreakdown className="flex-1" />
         <Exposure showCollection isBreakdown className="flex-1" />
       </div>

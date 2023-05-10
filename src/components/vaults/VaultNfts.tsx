@@ -19,7 +19,7 @@ export default function VaultNfts({ vault, showIcon, className }: Props) {
   );
 
   return (
-    <Card className="gap-5 overflow-hidden min-h-[360px] max-h-[360px]">
+    <Card className={`gap-5 overflow-hidden ${className}`}>
       <div className="flex items-center gap-2.5">
         {vault && (
           <Image

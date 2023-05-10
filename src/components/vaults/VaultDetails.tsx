@@ -35,8 +35,8 @@ export default function VaultDetails({ vault }: Props) {
   }, [prologueNftExpanded, setBlur]);
 
   return (
-    <div className="relative hidden md:flex tracking-wide w-full min-h-[838px] max-h-[calc(max(982px,100vh)-144px)] mt-[84px] px-8 pb-5 gap-5 overflow-hidden">
-      <div className="flex flex-col min-w-[41%] w-[41%] gap-5">
+    <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-144px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
+      <div className="flex flex-col min-w-[41%] w-[41%] gap-5 pt-1">
         <Card className="gap-3 !py-3">
           <div className="flex items-center justify-between gap-5">
             <div className="flex items-center gap-5">
@@ -172,7 +172,7 @@ export default function VaultDetails({ vault }: Props) {
             </div>
           </Card>
         )}
-        <LoanBreakdown vault={vault} />
+        <LoanBreakdown vault={vault} className="flex-1" />
       </div>
 
       <DetailChart />

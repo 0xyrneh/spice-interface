@@ -8,6 +8,7 @@ import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { Card } from "@/components/common";
 import { PieChart } from "@/components/portfolio";
 import { Vault } from "@/types/vault";
+import Table, { TableRowInfo } from "../common/Table";
 
 type Props = {
   showMarketplace?: boolean;
@@ -26,6 +27,33 @@ export default function Exposure({
 }: Props) {
   const [marketplaceSelected, setMarketplaceSelected] = useState(false);
 
+  const getRowInfos = (): TableRowInfo[] => {
+    return [
+      {
+        title: marketplaceSelected
+          ? `MARKETPLACES [${marketplaceExposure.length}]`
+          : `COLLECTIONS [${collectionExposure.length}]`,
+        key: "name",
+        noSort: true,
+        itemPrefix: (item) => (
+          <div
+            className="rounded w-3 h-3 mr-2"
+            style={{
+              backgroundColor: item.color,
+            }}
+          />
+        ),
+        rowClass: () => "w-[80%]",
+      },
+      {
+        title: "%",
+        key: "percent",
+        noSort: true,
+        itemSuffix: () => "%",
+      },
+    ];
+  };
+
   useEffect(() => {
     if (showMarketplace && !showCollection) {
       setMarketplaceSelected(true);
@@ -36,7 +64,7 @@ export default function Exposure({
 
   return (
     <Card className={`gap-3 ${className}`}>
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2.5 font-bold text-white font-sm whitespace-nowrap leading-[18px]">
         {vault && (
           <Image
             className="border-1 border-gray-200 rounded-full"
@@ -52,7 +80,7 @@ export default function Exposure({
           <UserSVG className="text-white" />
         )}
 
-        <h2 className="block lg:hidden font-bold text-white font-sm whitespace-nowrap">
+        <h2 className="block lg:hidden">
           {marketplaceSelected
             ? isBreakdown
               ? "MRKTPLACE"
@@ -62,7 +90,7 @@ export default function Exposure({
             : "NFT"}{" "}
           {isBreakdown ? "B/D" : "EXP."}
         </h2>
-        <h2 className="hidden lg:block xl:hidden font-bold text-white font-sm whitespace-nowrap">
+        <h2 className="hidden lg:block xl:hidden">
           {marketplaceSelected
             ? isBreakdown
               ? "MRKTPLACE"
@@ -70,7 +98,7 @@ export default function Exposure({
             : "COLLECTION"}{" "}
           {isBreakdown ? "BREAKDOWN" : "EXP."}
         </h2>
-        <h2 className="hidden xl:block font-bold text-white font-sm whitespace-nowrap">
+        <h2 className="hidden xl:block">
           {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"}{" "}
           {isBreakdown ? "BREAKDOWN" : "EXPOSURE"}
         </h2>
@@ -84,46 +112,19 @@ export default function Exposure({
           </button>
         )}
       </div>
-      <div className="flex gap-2.5">
-        <table className="flex-1 text-gray-200 text-xs border-y-1 border-y-gray-200 text-xs font-medium text-white">
-          <thead>
-            <tr className="table table-fixed w-full text-right border-b-1 border-b-gray-200 text-gray-100">
-              <th className="text-left pl-1 h-10 w-[80%] whitespace-nowrap">
-                {marketplaceSelected ? "MARKETPLACES" : "COLLECTIONS"} [
-                {marketplaceSelected
-                  ? marketplaceExposure.length
-                  : collectionExposure.length}
-                ]
-              </th>
-              <th className="h-10 pr-1">%</th>
-            </tr>
-          </thead>
-          <tbody className="block max-h-[240px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
-            {(marketplaceSelected
-              ? marketplaceExposure
-              : collectionExposure
-            ).map((exposure, index) => (
-              <tr
-                key={`vault-${index}`}
-                className="table table-fixed w-full text-right"
-              >
-                <td className="text-left h-10 w-[80%]">
-                  <div className="flex items-center gap-2 pl-1">
-                    <div
-                      className="rounded w-3 h-3"
-                      style={{
-                        backgroundColor: exposure.color,
-                      }}
-                    />
-                    <span>{exposure.name}</span>
-                  </div>
-                </td>
-                <td className="h-10  pr-1">{exposure.percent}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="hidden xl:flex flex-1 max-w-[160px] 3xl:max-w-[220px] items-center justify-center">
+      <div className="flex gap-2.5 overflow-hidden">
+        <div className="flex-1">
+          <Table
+            className="block h-full"
+            rowInfos={getRowInfos()}
+            items={
+              marketplaceSelected ? marketplaceExposure : collectionExposure
+            }
+            trStyle="h-10"
+            bodyClass="h-full no-scroll"
+          />
+        </div>
+        <div className="hidden xl:flex flex-1 min-h-[160px] 3xl:min-h-[220px] max-w-[160px] 3xl:max-w-[220px] items-center justify-center">
           <PieChart
             data={(marketplaceSelected
               ? marketplaceExposure

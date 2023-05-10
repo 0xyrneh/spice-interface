@@ -80,8 +80,8 @@ export default function Portfolio() {
   };
 
   return (
-    <div className="relative hidden md:flex tracking-wide w-full min-h-[838px] max-h-[calc(max(982px,100vh)-144px)] mt-[84px] px-8 pb-5 gap-5 overflow-hidden">
-      <div className="flex flex-col min-w-[41%] w-[41%] gap-5">
+    <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-144px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
+      <div className="flex flex-col min-w-[41%] w-[41%] gap-5 pt-1">
         <Card className="py-3 !flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-5 flex-1">
             <Image
@@ -105,7 +105,7 @@ export default function Portfolio() {
             <CopySVG />
           </button>
         </Card>
-        <Card className="gap-3 overflow-hidden">
+        <Card className="gap-3 overflow-hidden min-h-[379px] flex-1">
           <div className="flex items-center gap-2.5">
             <ExposureSVG />
             <h2 className="font-bold text-white font-sm">SELECT YOUR VAULT</h2>
@@ -145,19 +145,21 @@ export default function Portfolio() {
             />
           </div>
         </Card>
-        {vault && vault.receiptToken === ReceiptToken.ERC20 ? (
-          <LoanBreakdown
-            vault={vault}
-            showIcon
-            nonExpandedClassName="max-h-[360px]"
-          />
-        ) : (
-          <VaultNfts vault={vault} />
-        )}
+        <div className="max-h-[363px] overflow-y-hidden p-1 -m-1">
+          {vault && vault.receiptToken === ReceiptToken.ERC20 ? (
+            <LoanBreakdown
+              vault={vault}
+              showIcon
+              nonExpandedClassName="h-full"
+            />
+          ) : (
+            <VaultNfts vault={vault} className="h-full" />
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-col flex-1 gap-5">
-        <Card className="gap-3 flex-1 overflow-hidden">
+      <div className="flex flex-col flex-1 gap-5 pt-1">
+        <Card className="gap-3 flex-1 overflow-hidden min-h-[523px]">
           <div className="flex items-center gap-2.5">
             {vault && (
               <Image
@@ -230,7 +232,7 @@ export default function Portfolio() {
             </div>
           </div>
         </Card>
-        <div className="flex gap-5 max-h-[319px]">
+        <div className="flex gap-5 max-h-[303px] overflow-hidden p-1 -m-1">
           {vault && vault.receiptToken !== ReceiptToken.ERC20 ? (
             <LoanBreakdown className="flex-1" small showIcon vault={vault} />
           ) : (
