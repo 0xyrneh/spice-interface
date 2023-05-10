@@ -11,8 +11,10 @@ export default function PrologueNftCard({ nft, className, expanded }: Props) {
   return (
     <div
       key={`prologue-nft`}
-      className={`rounded flex flex-col text-orange-200 text-shadow-orange-200 font-bold ${className} border-1 ${
-        nft.featured ? "border-orange-200" : "border-transparent"
+      className={`rounded flex flex-col font-bold ${className} border-1 ${
+        nft.featured
+          ? "border-orange-200 drop-shadow-orange-200 text-shadow-orange-200 text-orange-200"
+          : "border-transparent text-white"
       }`}
     >
       <div
