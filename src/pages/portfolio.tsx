@@ -62,7 +62,7 @@ export default function Portfolio() {
         rowClass: () => "w-[70px]",
         component: () => (
           <Button type="secondary" className="px-1 h-[22px]">
-            <span className="text-xs">DETAILS</span>
+            <span className="text-xs font-bold">DETAILS</span>
           </Button>
         ),
       },
@@ -72,7 +72,7 @@ export default function Portfolio() {
         rowClass: () => "w-[70px]",
         component: () => (
           <Button type="primary" className="px-1 h-[22px]">
-            <span className="text-xs">DEPOSIT</span>
+            <span className="text-xs font-bold">DEPOSIT</span>
           </Button>
         ),
       },
@@ -117,7 +117,7 @@ export default function Portfolio() {
             />
             <Button
               type={!vault ? "third" : "secondary"}
-              className="flex-1 xl:flex-none xl:w-[170px] h-8 text-xs"
+              className="flex-1 xl:flex-none xl:w-[170px] h-8 text-xs font-bold"
               onClick={() => setVault(undefined)}
               disabled={!vault}
             >
@@ -179,7 +179,14 @@ export default function Portfolio() {
             <div className="flex gap-4 items-center">
               {!vault && <Stats title="Your Spice TVL" value="Ξ30.00" />}
               {vault && <Stats title="Position" value="Ξ30.00" />}
-              {vault && <Stats title="Net APY" value={`${vault.apy}%`} />}
+              {vault && (
+                <Stats
+                  title={
+                    vault.receiptToken === ReceiptToken.NFT ? "Net APY" : "APY"
+                  }
+                  value={`${vault.apy}%`}
+                />
+              )}
             </div>
             <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
               <div className="hidden 2xl:flex items-center gap-1">

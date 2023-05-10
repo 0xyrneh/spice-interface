@@ -84,7 +84,7 @@ const VaultList = ({ onClickVault }: Props) => {
         noSort: true,
         component: () => (
           <Button type="primary" className="p-1">
-            <span className="text-xs">DEPOSIT</span>
+            <span className="text-xs font-bold">DEPOSIT</span>
           </Button>
         ),
       },

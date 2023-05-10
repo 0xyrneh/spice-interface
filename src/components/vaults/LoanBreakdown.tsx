@@ -56,7 +56,6 @@ export default function LoanBreakdown({
             />
           </>
         ),
-        // rowClass: () => (loanExpanded ? "" : "w-[45%]"),
       },
       {
         title: "PRINCIPAL",

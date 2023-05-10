@@ -68,17 +68,17 @@ export default function VaultDetails({ vault }: Props) {
             <CircleDotSvg />
             <span className="font-semibold text-xs">LOW RISK</span>
           </div>
-          <span className="text-white text-xs font-medium whitespace-nowrap xl:whitespace-normal overflow-hidden leading-4 xl:h-8 h-auto">
+          <span className="tracking-normal text-white text-xs font-medium whitespace-nowrap xl:whitespace-normal overflow-hidden leading-4 xl:h-8 h-auto">
             This Vault routes liquidity to all whitelisted NFT lending
             marketplaces and NFT collections. Receipt tokens for deposits into
             this vault are represented by Prologue NFT.
           </span>
           <div className="flex xl:hidden items-center gap-5 flex-1">
             <Button type="primary" className="h-9 flex-1">
-              <span className="text-base">DEPOSIT</span>
+              <span className="text-base font-bold">DEPOSIT</span>
             </Button>
             <Button type="secondary" className="h-9 flex-1">
-              <span className="text-base">POSITION</span>
+              <span className="text-base font-bold">POSITION</span>
             </Button>
           </div>
         </Card>

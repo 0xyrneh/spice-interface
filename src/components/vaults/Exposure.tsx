@@ -14,6 +14,7 @@ type Props = {
   showCollection?: boolean;
   vault?: Vault;
   className?: string;
+  isBreakdown?: boolean;
 };
 
 export default function Exposure({
@@ -21,6 +22,7 @@ export default function Exposure({
   showCollection,
   vault,
   className,
+  isBreakdown,
 }: Props) {
   const [marketplaceSelected, setMarketplaceSelected] = useState(false);
 
@@ -49,14 +51,28 @@ export default function Exposure({
         ) : (
           <UserSVG className="text-white" />
         )}
+
         <h2 className="block lg:hidden font-bold text-white font-sm whitespace-nowrap">
-          {marketplaceSelected ? "MARKET" : "NFT"} EXP.
+          {marketplaceSelected
+            ? isBreakdown
+              ? "MRKTPLACE"
+              : "MARKET"
+            : isBreakdown
+            ? "COLLECTION"
+            : "NFT"}{" "}
+          {isBreakdown ? "B/D" : "EXP."}
         </h2>
         <h2 className="hidden lg:block xl:hidden font-bold text-white font-sm whitespace-nowrap">
-          {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"} EXP.
+          {marketplaceSelected
+            ? isBreakdown
+              ? "MRKTPLACE"
+              : "MARKETPLACE"
+            : "COLLECTION"}{" "}
+          {isBreakdown ? "BREAKDOWN" : "EXP."}
         </h2>
         <h2 className="hidden xl:block font-bold text-white font-sm whitespace-nowrap">
-          {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"} EXPOSURE
+          {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"}{" "}
+          {isBreakdown ? "BREAKDOWN" : "EXPOSURE"}
         </h2>
         {showMarketplace && showCollection && (
           <button onClick={() => setMarketplaceSelected(!marketplaceSelected)}>
