@@ -27,7 +27,9 @@ const VaultFooter = () => {
 
   return (
     <div
-      className={`w-full h-[60px] bg-gray-700 bg-opacity-90 hidden ${
+      className={`w-full ${
+        activeTab().bigFooter ? "h-[60px]" : "h-8"
+      } bg-gray-700 bg-opacity-90 hidden ${
         activeTab().breakpoint
       }:flex items-center justify-between px-8 text-gray-200 text-[10px] lg:text-xs xl:text-base max-w-[${
         activeTab().maxWidth

@@ -80,7 +80,7 @@ export default function Portfolio() {
   };
 
   return (
-    <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-144px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
+    <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
       <div className="flex flex-col min-w-[41%] w-[41%] gap-5 pt-1">
         <Card className="py-3 !flex-row items-center justify-between gap-5">
           <div className="flex items-center gap-5 flex-1">

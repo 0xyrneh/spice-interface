@@ -6,7 +6,13 @@ import {
 } from "@/types/common";
 
 export const NAV_OPTIONS: NavOption[] = [
-  { href: "/", name: "Vaults", maxWidth: "1536px", breakpoint: "sm" },
+  {
+    href: "/",
+    name: "Vaults",
+    maxWidth: "1536px",
+    breakpoint: "sm",
+    bigFooter: true,
+  },
   { href: "/portfolio", name: "Portfolio", breakpoint: "md" },
 ];
 

@@ -3,6 +3,7 @@ export type NavOption = {
   name: string;
   breakpoint: string;
   maxWidth?: string;
+  bigFooter?: boolean;
 };
 
 export type PieItem = {
