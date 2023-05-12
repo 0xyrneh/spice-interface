@@ -9,7 +9,7 @@ type Props = {
   children: ReactNode | ReactNode[];
   style?: object;
   disabled?: boolean;
-  onClick?: () => void;
+  onClick?: (e: any) => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 };
@@ -66,7 +66,9 @@ const Button = ({
       onMouseDown={() => setClicked(true)}
       onMouseUp={() => setClicked(false)}
       onMouseLeave={handleMouseLeave}
-      onClick={onClick}
+      onClick={(e) => {
+        if (onClick) onClick(e);
+      }}
       onMouseEnter={onMouseEnter}
     >
       {children}

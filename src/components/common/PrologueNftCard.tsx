@@ -3,11 +3,17 @@ import { PrologueNft } from "@/types/nft";
 
 type Props = {
   className?: string;
+  footerClassName?: string;
   nft: PrologueNft;
   expanded?: boolean;
 };
 
-export default function PrologueNftCard({ nft, className, expanded }: Props) {
+export default function PrologueNftCard({
+  nft,
+  className,
+  footerClassName,
+  expanded,
+}: Props) {
   return (
     <div
       key={`prologue-nft`}
@@ -48,7 +54,7 @@ export default function PrologueNftCard({ nft, className, expanded }: Props) {
       <div
         className={`flex items-center justify-between bg-gray-700 text-xs p-2 ${
           expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
-        }`}
+        } ${footerClassName}`}
       >
         <span>#{nft.rank}</span>
         <span>Ξ{nft.tvl}</span>

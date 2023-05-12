@@ -15,12 +15,15 @@ import {
   COLLECTION_FILTERS,
 } from "@/constants";
 import { TableRowInfo } from "../common/Table";
+import { useUI } from "@/hooks";
 
 type Props = {
   onClickVault: (vault: Vault) => void;
 };
 
 const VaultList = ({ onClickVault }: Props) => {
+  const { showDepositModal } = useUI();
+
   const [vaultFilter, setVaultFilter] = useState(VaultFilter.All);
   const [marketplaceFilters, setMarketplaceFilters] = useState<string[]>([]);
   const [collectionFilters, setCollectionFilters] = useState<string[]>([]);
@@ -83,7 +86,14 @@ const VaultList = ({ onClickVault }: Props) => {
         title: "DEPOSIT",
         noSort: true,
         component: () => (
-          <Button type="primary" className="p-1">
+          <Button
+            type="primary"
+            className="p-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              showDepositModal();
+            }}
+          >
             <span className="text-xs font-bold">DEPOSIT</span>
           </Button>
         ),
