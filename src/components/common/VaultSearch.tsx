@@ -84,7 +84,7 @@ const VaultSearch = () => {
       >
         <SearchSVG />
         <input
-          className="text-xs font-medium bg-transparent outline-0 placeholder:text-gray-200 text-white"
+          className="text-xs font-medium placeholder:text-gray-200 text-white"
           placeholder="Search Vaults and NFTs"
           onFocus={() => setOpened(true)}
           onChange={(e) => setSearchQuery(e.target.value)}

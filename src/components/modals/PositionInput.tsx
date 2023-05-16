@@ -1,18 +1,33 @@
 import { Button, Card } from "../common";
 import WethSVG from "@/assets/icons/weth.svg";
+import EthSVG from "@/assets/icons/eth.svg";
+import TriangleSVG from "@/assets/icons/triangle.svg";
 
 type Props = {
   isDeposit: boolean;
+  useWeth: boolean;
+  value: string;
+  txHash?: string;
   setIsDeposit: (isDeposit: boolean) => void;
+  setValue: (value: string) => void;
+  toggleEth: () => void;
 };
 
-export default function PositionInput({ isDeposit, setIsDeposit }: Props) {
+export default function PositionInput({
+  isDeposit,
+  useWeth,
+  setIsDeposit,
+  toggleEth,
+  value,
+  setValue,
+  txHash,
+}: Props) {
   return (
-    <div className="flex flex-col px-2 pt-3 pb-10 flex-1">
+    <div className="flex flex-col px-2 py-3 flex-1">
       <div className="flex items-center gap-2">
         <Button
           type={isDeposit ? "third" : "secondary"}
-          className={`h-6 w-[78px] flex items-center justify-center border-0 ${
+          className={`h-6 w-[78px] flex items-center justify-center !border-0 ${
             isDeposit ? "" : "shadow-transparent"
           }`}
           onClick={() => setIsDeposit(true)}
@@ -21,7 +36,7 @@ export default function PositionInput({ isDeposit, setIsDeposit }: Props) {
         </Button>
         <Button
           type={!isDeposit ? "third" : "secondary"}
-          className={`h-6 w-[78px] flex items-center justify-center border-0 ${
+          className={`h-6 w-[78px] flex items-center justify-center !border-0 ${
             !isDeposit ? "" : "shadow-transparent"
           }`}
           onClick={() => setIsDeposit(false)}
@@ -33,13 +48,22 @@ export default function PositionInput({ isDeposit, setIsDeposit }: Props) {
         <Card className="mx-2.5 border-1 border-gray-200 shadow-transparent px-8 py-5 text-gray-200 gap-1 text-xs max-w-[324px] w-full">
           <div className="flex items-center justify-between">
             <input
-              className="text-2xl bg-transparent outline-0 w-[100px] flex-1"
+              className="text-2xl w-[100px] flex-1 hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
               placeholder="0.000"
+              type="number"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
             />
-            <div className="flex items-center gap-2 bg-gray-200 bg-opacity-20 h-7 rounded px-3">
-              <WethSVG />
-              <span className="text-white text-base">WETH</span>
-            </div>
+            <button
+              className="flex items-center gap-2 bg-gray-200 bg-opacity-20 h-7 rounded px-3"
+              onClick={toggleEth}
+            >
+              {useWeth ? <WethSVG /> : <EthSVG />}
+              <span className="text-white text-base text-left w-[47px]">
+                {useWeth ? "WETH" : "ETH"}
+              </span>
+              <TriangleSVG className={useWeth ? "" : "rotate-180"} />
+            </button>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-xs">$0.00</span>
@@ -52,6 +76,18 @@ export default function PositionInput({ isDeposit, setIsDeposit }: Props) {
           </div>
         </Card>
       </div>
+      <span
+        className={`text-gray-200 text-xs ${
+          txHash ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        Tx Hash:{" "}
+        {txHash && (
+          <a className="underline" href="https://etherscan.io" target="__blank">
+            {txHash}
+          </a>
+        )}
+      </span>
     </div>
   );
 }

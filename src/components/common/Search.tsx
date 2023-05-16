@@ -23,7 +23,7 @@ export default function Search({
     >
       <SearchSVG />
       <input
-        className="min-w-[0px] flex-1 text-white font-medium bg-transparent outline-0 placeholder:text-gray-200 placeholder:text-opacity-50"
+        className="min-w-[0px] flex-1 text-white font-medium placeholder:text-gray-200 placeholder:text-opacity-50"
         placeholder={placeholder}
         value={value}
         onChange={(e) => {

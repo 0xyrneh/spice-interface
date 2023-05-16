@@ -85,7 +85,7 @@ export default function CustomizedSlider({
   marks,
 }: Props) {
   return (
-    <div className="flex flex-col px-5">
+    <div className="relative flex flex-col px-5">
       <AirbnbSlider
         slots={{ thumb: AirbnbThumbComponent }}
         value={value}
@@ -99,6 +99,18 @@ export default function CustomizedSlider({
           }
         }}
       />
+      {max && value < max && (
+        <button
+          className="text-xs absolute right-2.5 top-1/2 transform -translate-y-1/2 text-orange-900 text-shadow-orange-900"
+          onClick={() => {
+            if (onChange && max) {
+              onChange(max);
+            }
+          }}
+        >
+          MAX
+        </button>
+      )}
     </div>
   );
 }

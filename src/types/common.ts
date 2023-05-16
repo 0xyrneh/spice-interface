@@ -41,3 +41,9 @@ export enum VaultNftsSortFilter {
   ApyHighToLow = "High to low APY",
   ApyLowToHigh = "Low to high APY",
 }
+
+export enum TxStatus {
+  None,
+  Pending,
+  Finish,
+}
