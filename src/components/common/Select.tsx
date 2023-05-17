@@ -18,7 +18,8 @@ type Props = {
 
 const defaultClass = {
   primary: "border-orange-200 text-orange-200 drop-shadow-orange-200",
-  default: "border-gray-200 text-gray-200 hover:text-gray-300 hover:border-gray-300",
+  default:
+    "border-gray-200 text-gray-200 hover:text-gray-300 hover:border-gray-300",
 };
 
 const defaultOptionsClass = {
