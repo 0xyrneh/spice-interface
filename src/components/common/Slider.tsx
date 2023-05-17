@@ -13,9 +13,10 @@ const AirbnbSlider = styled(Slider)((component) => ({
       : "rgba(253, 167, 57, 0.8)",
     border: component.disabled ? "2px solid #A1A1A1" : "2px solid #FDA739",
   },
-  "& .MuiSlider-thumb.Mui-focusVisible, & .MuiSlider-thumb:hover": {
-    boxShadow: "none !important",
-  },
+  "& .MuiSlider-thumb.Mui-focusVisible, & .MuiSlider-thumb.Mui-active, & .MuiSlider-thumb:hover":
+    {
+      boxShadow: "none !important",
+    },
   "& .MuiSlider-track": {
     height: 40,
     background: "transparent",
@@ -66,6 +67,7 @@ function AirbnbThumbComponent(props: AirbnbThumbComponentProps) {
   const { children, ...other } = props;
   return (
     <SliderThumb {...other}>
+      {children}
       <MenuSVG />
     </SliderThumb>
   );
