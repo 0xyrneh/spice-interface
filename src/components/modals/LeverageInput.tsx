@@ -1,3 +1,4 @@
+import { TxStatus } from "@/types/common";
 import { Button, Slider } from "../common";
 import LeverageSVG from "@/assets/icons/leverage.svg";
 
@@ -12,6 +13,7 @@ type Props = {
   tab: LeverageTab;
   leverage: number;
   value: string;
+  txStatus: TxStatus;
   txHash?: string;
   setLeverage: (leverage: number) => void;
   setValue: (value: string) => void;
@@ -25,10 +27,13 @@ export default function LeverageInput({
   leverage,
   value,
   txHash,
+  txStatus,
   setLeverage,
   setValue,
   setTab,
 }: Props) {
+  const processing = () => txStatus === TxStatus.Pending;
+
   return (
     <div className="flex flex-col px-2 pt-3 flex-1">
       <div className="pl-[70px] lg:pl-[50%] flex items-center gap-2">
@@ -61,61 +66,71 @@ export default function LeverageInput({
         </Button>
       </div>
       <div className="flex flex-1 items-center justify-center">
-        <div className="flex flex-col mx-2.5 text-gray-200 gap-1 text-xs max-w-[324px] w-full gap-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center border-1 rounded gap-3 px-3 py-2 w-[110px]">
-              <LeverageSVG />
-              <input
-                className="flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
-                placeholder="0.00"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                type="number"
+        {tab === LeverageTab.Refinance ? (
+          <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">
+            <span className="text-2xl">5.09%</span>
+            <span className="text-xs">New Borrow APR</span>
+          </div>
+        ) : (
+          <div className="flex flex-col mx-2.5 text-gray-200 gap-1 text-xs max-w-[324px] w-full gap-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center border-1 rounded gap-3 px-3 py-2 w-[110px]">
+                <LeverageSVG />
+                <input
+                  className="flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
+                  placeholder="0.00"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  type="number"
+                />
+              </div>
+              <div className="flex flex-col items-end">
+                <span>Max Leverage:</span>
+                <span>Ξ5.004 / 150% LTV</span>
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <Slider
+                disabled={processing()}
+                value={leverage}
+                min={0}
+                max={150}
+                step={30}
+                onChange={setLeverage}
               />
-            </div>
-            <div className="flex flex-col items-end">
-              <span>Max Leverage:</span>
-              <span>Ξ5.004 / 150% LTV</span>
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <Slider
-              value={leverage}
-              min={0}
-              max={150}
-              step={30}
-              onChange={setLeverage}
-            />
-            <div className="relative flex justify-between mt-1.5 mx-5">
-              {leverages.map((item, idx) => (
-                <button
-                  key={`leverage-${item}`}
-                  className={`absolute ${
-                    idx > 0 && idx < leverages.length - 1
-                      ? "-translate-x-2/4"
-                      : ""
-                  } ${
-                    item === leverage
-                      ? "text-orange-200 text-shadow-orange-900"
-                      : ""
-                  }`}
-                  style={{
-                    left:
-                      idx === 0
-                        ? "-20px"
-                        : idx === leverages.length - 1
-                        ? undefined
-                        : (100 * idx) / (leverages.length - 1) + "%",
-                    right: idx === leverages.length - 1 ? "-20px" : undefined,
-                  }}
-                  onClick={() => setLeverage(item)}
-                >
-                  {item}%
-                </button>
-              ))}
+              <div className="relative flex justify-between mt-1.5 mx-5">
+                {leverages.map((item, idx) => (
+                  <button
+                    key={`leverage-${item}`}
+                    className={`absolute ${
+                      idx > 0 && idx < leverages.length - 1
+                        ? "-translate-x-2/4"
+                        : ""
+                    } ${
+                      item === leverage
+                        ? processing()
+                          ? "text-shadow-white"
+                          : "text-orange-200 text-shadow-orange-900"
+                        : ""
+                    }`}
+                    style={{
+                      left:
+                        idx === 0
+                          ? "-20px"
+                          : idx === leverages.length - 1
+                          ? undefined
+                          : (100 * idx) / (leverages.length - 1) + "%",
+                      right: idx === leverages.length - 1 ? "-20px" : undefined,
+                    }}
+                    onClick={() => setLeverage(item)}
+                  >
+                    {item}%
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <div className="flex items-center justify-between mb-3 mx-1">
         <span

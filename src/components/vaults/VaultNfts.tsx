@@ -62,7 +62,7 @@ export default function VaultNfts({ vault, showIcon, className }: Props) {
           {prologueNfts.map((nft, idx) => (
             <PrologueNftCard
               key={`prologue-nft-${idx}`}
-              nft={nft}
+              nfts={[nft]}
               className="w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
             />
           ))}

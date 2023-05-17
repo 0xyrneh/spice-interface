@@ -2,11 +2,13 @@ import { Button, Card } from "../common";
 import WethSVG from "@/assets/icons/weth.svg";
 import EthSVG from "@/assets/icons/eth.svg";
 import TriangleSVG from "@/assets/icons/triangle.svg";
+import { TxStatus } from "@/types/common";
 
 type Props = {
   isDeposit: boolean;
   useWeth: boolean;
   value: string;
+  txStatus: TxStatus;
   txHash?: string;
   setIsDeposit: (isDeposit: boolean) => void;
   setValue: (value: string) => void;
@@ -21,7 +23,10 @@ export default function PositionInput({
   value,
   setValue,
   txHash,
+  txStatus,
 }: Props) {
+  const processing = () => txStatus === TxStatus.Pending;
+
   return (
     <div className="flex flex-col px-2 py-3 flex-1">
       <div className="flex items-center gap-2">
@@ -69,7 +74,11 @@ export default function PositionInput({
             <span className="text-xs">$0.00</span>
             <div className="flex items-center gap-2">
               <span className="">Balance: 1.245</span>
-              <Button className="text-orange-900 text-shadow-orange-900">
+              <Button
+                className={
+                  processing() ? "" : "text-orange-900 text-shadow-orange-900"
+                }
+              >
                 MAX
               </Button>
             </div>

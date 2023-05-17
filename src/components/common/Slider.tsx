@@ -3,13 +3,15 @@ import Slider, { SliderThumb } from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import MenuSVG from "@/assets/icons/menu.svg";
 
-const AirbnbSlider = styled(Slider)(() => ({
+const AirbnbSlider = styled(Slider)((component) => ({
   "& .MuiSlider-thumb": {
     height: 40,
     width: 40,
     borderRadius: "4px",
-    backgroundColor: "rgba(253, 167, 57, 0.8)",
-    border: "2px solid #FDA739",
+    backgroundColor: component.disabled
+      ? "rgba(161, 161, 161, 0.8)"
+      : "rgba(253, 167, 57, 0.8)",
+    border: component.disabled ? "2px solid #A1A1A1" : "2px solid #FDA739",
   },
   "& .MuiSlider-thumb.Mui-focusVisible, & .MuiSlider-thumb:hover": {
     boxShadow: "none !important",
@@ -26,7 +28,9 @@ const AirbnbSlider = styled(Slider)(() => ({
       width: "calc(100% + 40px)",
       height: 40,
       borderRadius: 4,
-      background: "rgba(255, 227, 202, 0.2)",
+      background: component.disabled
+        ? "rgba(161, 161, 161, 0.2)"
+        : "rgba(255, 227, 202, 0.2)",
       border: "1px solid #A1A1A1",
       transform: "translateX(-20px)",
       zIndex: -10000,
@@ -69,6 +73,7 @@ function AirbnbThumbComponent(props: AirbnbThumbComponentProps) {
 
 type Props = {
   value: number;
+  disabled?: boolean;
   min?: number;
   max?: number;
   step?: number;
@@ -78,6 +83,7 @@ type Props = {
 
 export default function CustomizedSlider({
   value,
+  disabled,
   min,
   max,
   step,
@@ -93,6 +99,7 @@ export default function CustomizedSlider({
         max={max}
         step={step}
         marks={marks}
+        disabled={disabled}
         onChange={(_, val) => {
           if (onChange) {
             onChange(val as number);
@@ -101,7 +108,11 @@ export default function CustomizedSlider({
       />
       {max && value < max && (
         <button
-          className="text-xs absolute right-2.5 top-1/2 transform -translate-y-1/2 text-orange-900 text-shadow-orange-900"
+          className={`text-xs absolute right-2.5 top-1/2 transform -translate-y-1/2 ${
+            disabled
+              ? "text-gray-200"
+              : "text-orange-900 text-shadow-orange-900"
+          }`}
           onClick={() => {
             if (onChange && max) {
               onChange(max);

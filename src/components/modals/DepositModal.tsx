@@ -19,11 +19,11 @@ export default function DepositModal({ open, onClose }: Props) {
   const [leverage, setLeverage] = useState(0);
   const [levValue, setLevValue] = useState("");
   const [useWeth, setUseWeth] = useState(true);
-  const [processing, setProcessing] = useState(false);
   const [positionTxHash, setPositionTxHash] = useState<string>();
   const [positionStatus, setPositionStatus] = useState(TxStatus.None);
   const [leverageTxHash, setLeverageTxHash] = useState<string>();
   const [leverageStatus, setLeverageStatus] = useState(TxStatus.None);
+  const [selectedIdx, setSelectedIdx] = useState(0);
 
   const onConfirmPosition = () => {
     if (positionStatus === TxStatus.None) {
@@ -31,7 +31,7 @@ export default function DepositModal({ open, onClose }: Props) {
       setPositionTxHash("0xabcdef");
       setTimeout(() => {
         setPositionStatus(TxStatus.Finish);
-      }, 3000);
+      }, 5000);
     } else if (positionStatus === TxStatus.Finish) {
       setPositionTxHash(undefined);
       setPositionStatus(TxStatus.None);
@@ -44,7 +44,7 @@ export default function DepositModal({ open, onClose }: Props) {
       setLeverageTxHash("0xabcdef");
       setTimeout(() => {
         setLeverageStatus(TxStatus.Finish);
-      }, 3000);
+      }, 5000);
     } else if (leverageStatus === TxStatus.Finish) {
       setLeverageTxHash(undefined);
       setLeverageStatus(TxStatus.None);
@@ -56,6 +56,14 @@ export default function DepositModal({ open, onClose }: Props) {
       return positionAmount !== "";
     } else {
       return leverage > 0 || levValue !== "";
+    }
+  };
+
+  const processing = () => {
+    if (positionSelected) {
+      return positionStatus === TxStatus.Pending;
+    } else {
+      return leverageStatus === TxStatus.Pending;
     }
   };
 
@@ -81,7 +89,9 @@ export default function DepositModal({ open, onClose }: Props) {
             </div>
           </Card>
           <PrologueNftCard
-            nft={prologueNfts[0]}
+            nfts={[prologueNfts[0], prologueNfts[2], prologueNfts[3]]}
+            selectedIdx={selectedIdx}
+            onItemChanged={(_, idx) => setSelectedIdx(idx)}
             footerClassName="!h-10"
             expanded
           />
@@ -119,6 +129,7 @@ export default function DepositModal({ open, onClose }: Props) {
               toggleEth={() => setUseWeth(!useWeth)}
               value={positionAmount}
               setValue={setPositionAmount}
+              txStatus={positionStatus}
               txHash={positionTxHash}
             />
           ) : (
@@ -129,6 +140,7 @@ export default function DepositModal({ open, onClose }: Props) {
               value={levValue}
               setValue={setLevValue}
               setTab={setLeverageTab}
+              txStatus={leverageStatus}
               txHash={leverageTxHash}
             />
           )}
@@ -144,7 +156,7 @@ export default function DepositModal({ open, onClose }: Props) {
           <Card className="flex flex-col border-1 border-gray-200 gap-2 !px-3 h-full justify-between !bg-gray-700 !bg-opacity-95">
             <button
               className={`${
-                processing ? "text-gray-200" : "text-orange-900"
+                processing() ? "text-gray-200" : "text-orange-900"
               } flex items-center font-medium gap-2`}
             >
               <ArrowLeftSVG />

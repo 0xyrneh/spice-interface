@@ -159,7 +159,7 @@ export default function VaultDetails({ vault }: Props) {
                 {prologueNfts.map((nft, idx) => (
                   <PrologueNftCard
                     key={`prologue-nft-${idx}`}
-                    nft={nft}
+                    nfts={[nft]}
                     expanded={prologueNftExpanded}
                     className={`${
                       prologueNftExpanded
