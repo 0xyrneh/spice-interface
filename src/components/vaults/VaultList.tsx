@@ -85,13 +85,13 @@ const VaultList = ({ onClickVault }: Props) => {
       {
         title: "DEPOSIT",
         noSort: true,
-        component: () => (
+        component: (item) => (
           <Button
             type="primary"
             className="p-1"
             onClick={(e) => {
               e.stopPropagation();
-              showDepositModal();
+              showDepositModal(item);
             }}
           >
             <span className="text-xs font-bold">DEPOSIT</span>

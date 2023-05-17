@@ -1,5 +1,5 @@
 import prologueNfts from "@/constants/prologueNfts";
-import { Card, PrologueNftCard } from "../common";
+import { Card, Erc20Card, PrologueNftCard } from "../common";
 import PositionInput from "./PositionInput";
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "./Modal";
@@ -8,10 +8,13 @@ import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
 import PositionConfirm from "./PositionConfirm";
 import LeverageConfirm from "./LeverageConfirm";
 import { TxStatus } from "@/types/common";
+import { ReceiptToken, Vault } from "@/types/vault";
 
-interface Props extends ModalProps {}
+interface Props extends ModalProps {
+  vault: Vault;
+}
 
-export default function DepositModal({ open, onClose }: Props) {
+export default function DepositModal({ open, vault, onClose }: Props) {
   const [positionSelected, setPositionSelected] = useState(true);
   const [leverageTab, setLeverageTab] = useState(LeverageTab.Increase);
   const [positionAmount, setPositionAmount] = useState("");
@@ -88,13 +91,17 @@ export default function DepositModal({ open, onClose }: Props) {
               </div>
             </div>
           </Card>
-          <PrologueNftCard
-            nfts={[prologueNfts[0], prologueNfts[2], prologueNfts[3]]}
-            selectedIdx={selectedIdx}
-            onItemChanged={(_, idx) => setSelectedIdx(idx)}
-            footerClassName="!h-10"
-            expanded
-          />
+          {vault.receiptToken === ReceiptToken.NFT ? (
+            <PrologueNftCard
+              nfts={[prologueNfts[0], prologueNfts[2], prologueNfts[3]]}
+              selectedIdx={selectedIdx}
+              onItemChanged={(_, idx) => setSelectedIdx(idx)}
+              footerClassName="!h-10"
+              expanded
+            />
+          ) : (
+            <Erc20Card nft={prologueNfts[0]} footerClassName="!h-10" expanded />
+          )}
         </div>
         <Card className="flex flex-col border-1 border-gray-200 !py-0 !px-0 h-full flex-1 !bg-gray-700 !bg-opacity-95 w-[calc(min(50vw,500px))] lg:w-[500px]">
           <div className="flex items-center border-b-1 border-gray-200 h-10 text-xs">
