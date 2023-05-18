@@ -130,7 +130,12 @@ export default function DepositModal({ open, vault, onClose }: Props) {
               expanded
             />
           ) : (
-            <Erc20Card nft={prologueNfts[0]} footerClassName="!h-10" expanded />
+            <Erc20Card
+              className="w-[176px] lg:w-[198px]"
+              nft={prologueNfts[0]}
+              footerClassName="!h-10"
+              expanded
+            />
           )}
         </div>
         <Card
