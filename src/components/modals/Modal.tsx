@@ -1,4 +1,4 @@
-import { useUI } from "@/hooks";
+import { useScrollLock, useUI } from "@/hooks";
 import { ReactNode, useEffect } from "react";
 
 export interface ModalProps {
@@ -9,10 +9,17 @@ export interface ModalProps {
 
 export default function Modal({ children, open, onClose }: ModalProps) {
   const { setBlur } = useUI();
+  const { lockScroll, unlockScroll } = useScrollLock();
 
   useEffect(() => {
     setBlur(!!open);
-  }, [open, setBlur]);
+
+    if (open) {
+      lockScroll();
+    } else {
+      unlockScroll();
+    }
+  }, [open, setBlur, lockScroll, unlockScroll]);
 
   return (
     <div
