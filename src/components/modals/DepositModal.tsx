@@ -105,27 +105,24 @@ export default function DepositModal({ open, vault, onClose }: Props) {
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
         <div className="flex flex-col gap-3 pt-10 h-full">
           <Card
-            className="!py-0 flex-1 justify-center items-center leading-5 border-1 border-gray-200 !bg-gray-700 !bg-opacity-95"
+            className="!pt-4 !pb-2 !px-2 justify-center items-center leading-5 border-1 border-gray-200 !bg-gray-700 !bg-opacity-95"
             notBlur
           >
-            <h2 className="font-base text-white mb-1">Prologue Vault</h2>
-            <div className="flex flex-col lg:flex-row lg:gap-3">
+            <h2 className="font-base text-white leading-5">Prologue Vault</h2>
+            <div className="flex flex-col lg:flex-row gap-x-3 font-bold text-base text-orange-200 my-1 tracking-tight">
               <div className="flex gap-1 items-center">
-                <span className="font-bold text-base text-orange-200 drop-shadow-orange-200">
-                  Ξ300.5
-                </span>
+                <span className="drop-shadow-orange-200 leading-5">Ξ300.5</span>
                 <span className="text-xs text-gray-200">TVL</span>
               </div>
               <div className="flex gap-1 items-center">
-                <span className="font-bold text-base text-orange-200 drop-shadow-orange-200">
-                  12.00%
-                </span>
+                <span className="drop-shadow-orange-200 leading-5">12.00%</span>
                 <span className="text-xs text-gray-200">APY</span>
               </div>
             </div>
           </Card>
           {vault.receiptToken === ReceiptToken.NFT ? (
             <PrologueNftCard
+              className="w-[176px] lg:w-[198px]"
               nfts={[prologueNfts[0], prologueNfts[2], prologueNfts[3]]}
               selectedIdx={selectedIdx}
               onItemChanged={(_, idx) => setSelectedIdx(idx)}
