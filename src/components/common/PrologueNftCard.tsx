@@ -63,7 +63,7 @@ export default function PrologueNftCard({
         )}
       </div>
       <div
-        className={`flex items-center justify-between bg-gray-700 text-xs p-2 ${
+        className={`rounded-b flex items-center justify-between bg-gray-700 text-xs p-2 ${
           expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
         } ${footerClassName}`}
       >
@@ -71,7 +71,9 @@ export default function PrologueNftCard({
         {nfts.length > 1 && (
           <Dropdown opened={opened} onClose={() => setOpened(false)}>
             <button
-              className="flex items-center justify-between border-1 rounded border-gray-200 hover:border-gray-300 w-[68px] h-7 px-2"
+              className={`flex items-center justify-between border-1 border-gray-200 hover:border-gray-300 w-[68px] h-7 px-2 ${
+                opened ? "rounded-t" : "rounded"
+              }`}
               onClick={() => setOpened(!opened)}
             >
               <span>#{activeNft().rank}</span>

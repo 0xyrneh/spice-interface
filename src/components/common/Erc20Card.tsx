@@ -25,7 +25,7 @@ export default function Erc20Card({
         }}
       />
       <div
-        className={`flex items-center justify-center bg-gray-700 text-base p-2 ${
+        className={`rounded-b flex items-center justify-center bg-gray-700 text-base p-2 ${
           expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
         } ${footerClassName}`}
       >

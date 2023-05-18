@@ -13,6 +13,8 @@ type Props = {
   setIsDeposit: (isDeposit: boolean) => void;
   setValue: (value: string) => void;
   toggleEth: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
 };
 
 export default function PositionInput({
@@ -24,33 +26,40 @@ export default function PositionInput({
   setValue,
   txHash,
   txStatus,
+  onFocus,
+  onBlur,
 }: Props) {
   const processing = () => txStatus === TxStatus.Pending;
 
   return (
     <div className="flex flex-col px-2 py-3 flex-1">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-1/2 pr-2">
         <Button
           type={isDeposit ? "third" : "secondary"}
-          className={`h-6 w-[78px] flex items-center justify-center !border-0 ${
+          className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
             isDeposit ? "" : "shadow-transparent"
           }`}
+          disabled={isDeposit}
           onClick={() => setIsDeposit(true)}
         >
           <span className="text-xs">DEPOSIT</span>
         </Button>
         <Button
           type={!isDeposit ? "third" : "secondary"}
-          className={`h-6 w-[78px] flex items-center justify-center !border-0 ${
+          className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
             !isDeposit ? "" : "shadow-transparent"
           }`}
+          disabled={!isDeposit}
           onClick={() => setIsDeposit(false)}
         >
           <span className="text-xs">WITHDRAW</span>
         </Button>
       </div>
       <div className="flex flex-1 items-center justify-center">
-        <Card className="mx-2.5 border-1 border-gray-200 shadow-transparent px-8 py-5 text-gray-200 gap-1 text-xs max-w-[324px] w-full">
+        <Card
+          className="mx-2.5 border-1 border-gray-200 shadow-transparent px-8 py-5 text-gray-200 gap-1 text-xs max-w-[324px] w-full"
+          notBlur
+        >
           <div className="flex items-center justify-between">
             <input
               className="text-2xl w-[100px] flex-1 hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
@@ -58,6 +67,8 @@ export default function PositionInput({
               type="number"
               value={value}
               onChange={(e) => setValue(e.target.value)}
+              onFocus={onFocus}
+              onBlur={onBlur}
             />
             <button
               className="flex items-center gap-2 bg-gray-200 bg-opacity-20 h-7 rounded px-3"
@@ -85,18 +96,23 @@ export default function PositionInput({
           </div>
         </Card>
       </div>
-      <span
-        className={`text-gray-200 text-xs ${
-          txHash ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        Tx Hash:{" "}
-        {txHash && (
-          <a className="underline" href="https://etherscan.io" target="__blank">
-            {txHash}
-          </a>
+      <div className="flex justify-between text-gray-200 text-xs">
+        <span className={`${txHash ? "opacity-100" : "opacity-0"}`}>
+          Tx Hash:{" "}
+          {txHash && (
+            <a
+              className="underline"
+              href="https://etherscan.io"
+              target="__blank"
+            >
+              {txHash}
+            </a>
+          )}
+        </span>
+        {!isDeposit && (txHash || processing()) && (
+          <span>Vault Liquid Balance: Ξ300</span>
         )}
-      </span>
+      </div>
     </div>
   );
 }

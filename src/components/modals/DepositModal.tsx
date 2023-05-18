@@ -3,7 +3,7 @@ import { Card, Erc20Card, PrologueNftCard } from "../common";
 import PositionInput from "./PositionInput";
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "./Modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
 import PositionConfirm from "./PositionConfirm";
 import LeverageConfirm from "./LeverageConfirm";
@@ -20,13 +20,26 @@ export default function DepositModal({ open, vault, onClose }: Props) {
   const [positionAmount, setPositionAmount] = useState("");
   const [isDeposit, setIsDeposit] = useState(true);
   const [leverage, setLeverage] = useState(0);
-  const [levValue, setLevValue] = useState("");
+  const [targetLeverage, setTargetLeverage] = useState("");
   const [useWeth, setUseWeth] = useState(true);
   const [positionTxHash, setPositionTxHash] = useState<string>();
   const [positionStatus, setPositionStatus] = useState(TxStatus.None);
   const [leverageTxHash, setLeverageTxHash] = useState<string>();
   const [leverageStatus, setLeverageStatus] = useState(TxStatus.None);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [focused, setFocused] = useState(false);
+  const [closed, setClosed] = useState(false);
+
+  const reset = () => {
+    setPositionAmount("");
+    setLeverage(0);
+    setTargetLeverage("");
+    setPositionTxHash(undefined);
+    setPositionStatus(TxStatus.None);
+    setLeverageTxHash(undefined);
+    setLeverageStatus(TxStatus.None);
+    setClosed(false);
+  };
 
   const onConfirmPosition = () => {
     if (positionStatus === TxStatus.None) {
@@ -36,8 +49,7 @@ export default function DepositModal({ open, vault, onClose }: Props) {
         setPositionStatus(TxStatus.Finish);
       }, 5000);
     } else if (positionStatus === TxStatus.Finish) {
-      setPositionTxHash(undefined);
-      setPositionStatus(TxStatus.None);
+      reset();
     }
   };
 
@@ -49,16 +61,21 @@ export default function DepositModal({ open, vault, onClose }: Props) {
         setLeverageStatus(TxStatus.Finish);
       }, 5000);
     } else if (leverageStatus === TxStatus.Finish) {
-      setLeverageTxHash(undefined);
-      setLeverageStatus(TxStatus.None);
+      reset();
     }
   };
 
   const showRightModal = () => {
+    if (closed) return false;
+    if (focused) return true;
     if (positionSelected) {
       return positionAmount !== "";
     } else {
-      return leverage > 0 || levValue !== "";
+      return (
+        leverageTab === LeverageTab.Refinance ||
+        leverage > 0 ||
+        targetLeverage !== ""
+      );
     }
   };
 
@@ -70,11 +87,27 @@ export default function DepositModal({ open, vault, onClose }: Props) {
     }
   };
 
+  useEffect(() => {
+    setClosed(false);
+    setFocused(false);
+  }, [positionAmount, leverage, targetLeverage]);
+
+  useEffect(() => {
+    setClosed(false);
+  }, [focused]);
+
+  useEffect(() => {
+    reset();
+  }, [isDeposit, positionSelected, leverageTab]);
+
   return (
     <Modal open={open} onClose={onClose}>
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
         <div className="flex flex-col gap-3 pt-10 h-full">
-          <Card className="!py-0 flex-1 justify-center items-center leading-5 border-1 border-gray-200 !bg-gray-700 !bg-opacity-95">
+          <Card
+            className="!py-0 flex-1 justify-center items-center leading-5 border-1 border-gray-200 !bg-gray-700 !bg-opacity-95"
+            notBlur
+          >
             <h2 className="font-base text-white mb-1">Prologue Vault</h2>
             <div className="flex flex-col lg:flex-row lg:gap-3">
               <div className="flex gap-1 items-center">
@@ -103,7 +136,10 @@ export default function DepositModal({ open, vault, onClose }: Props) {
             <Erc20Card nft={prologueNfts[0]} footerClassName="!h-10" expanded />
           )}
         </div>
-        <Card className="flex flex-col border-1 border-gray-200 !py-0 !px-0 h-full flex-1 !bg-gray-700 !bg-opacity-95 w-[calc(min(50vw,500px))] lg:w-[500px]">
+        <Card
+          className="flex flex-col border-1 border-gray-200 !py-0 !px-0 h-full flex-1 !bg-gray-700 !bg-opacity-95 w-[calc(min(50vw,500px))] lg:w-[500px]"
+          notBlur
+        >
           <div className="flex items-center border-b-1 border-gray-200 h-10 text-xs">
             <button
               className={`${
@@ -113,6 +149,7 @@ export default function DepositModal({ open, vault, onClose }: Props) {
                   ? "bg-orange-200 bg-opacity-10 rounded-r text-orange-200 text-shadow-orange-200"
                   : "text-gray-200"
               }`}
+              disabled={positionSelected}
               onClick={() => setPositionSelected(true)}
             >
               POSITION
@@ -123,6 +160,7 @@ export default function DepositModal({ open, vault, onClose }: Props) {
                   ? "bg-orange-200 bg-opacity-10 rounded-r text-orange-200 text-shadow-orange-200"
                   : "text-gray-200"
               }`}
+              disabled={!positionSelected}
               onClick={() => setPositionSelected(false)}
             >
               LEVERAGE
@@ -138,17 +176,29 @@ export default function DepositModal({ open, vault, onClose }: Props) {
               setValue={setPositionAmount}
               txStatus={positionStatus}
               txHash={positionTxHash}
+              onFocus={() => setFocused(true)}
+              onBlur={() => {
+                setTimeout(() => {
+                  setFocused(false);
+                }, 100);
+              }}
             />
           ) : (
             <LeverageInput
               tab={leverageTab}
               leverage={leverage}
               setLeverage={setLeverage}
-              value={levValue}
-              setValue={setLevValue}
+              targetLeverage={targetLeverage}
+              setTargetLeverage={setTargetLeverage}
               setTab={setLeverageTab}
               txStatus={leverageStatus}
               txHash={leverageTxHash}
+              onFocus={() => setFocused(true)}
+              onBlur={() => {
+                setTimeout(() => {
+                  setFocused(false);
+                }, 100);
+              }}
             />
           )}
         </Card>
@@ -160,11 +210,15 @@ export default function DepositModal({ open, vault, onClose }: Props) {
               : "w-0 max-w-0 overflow-x-hidden opacity-0"
           } transition-all duration-[1000ms] ease-in`}
         >
-          <Card className="flex flex-col border-1 border-gray-200 gap-2 !px-3 h-full justify-between !bg-gray-700 !bg-opacity-95">
+          <Card
+            className="flex flex-col border-1 border-gray-200 gap-2 !px-3 h-full justify-between !bg-gray-700 !bg-opacity-95"
+            notBlur
+          >
             <button
               className={`${
                 processing() ? "text-gray-200" : "text-orange-900"
-              } flex items-center font-medium gap-2`}
+              } flex items-center font-medium gap-2 text-xs leading-[15.31px]`}
+              onClick={() => setClosed(true)}
             >
               <ArrowLeftSVG />
               Back

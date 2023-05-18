@@ -5,9 +5,11 @@ import { FaChevronRight } from "react-icons/fa";
 import { Vault } from "@/types/vault";
 import { News, VaultList } from "@/components/vaults";
 import { Button } from "@/components/common";
+import { useUI } from "@/hooks";
 
 export default function VaultInfo() {
   const router = useRouter();
+  const { blur } = useUI();
 
   const [activeVaultIndex, setActiveVaultIndex] = useState(0);
   const [focusedVaultIndex, setFocusedVaultIndex] = useState(-1);
@@ -17,7 +19,11 @@ export default function VaultInfo() {
     (vault ?? getActiveVault()).bg ?? "/assets/images/bgEmptyVault.png";
 
   return (
-    <div className="flex flex-col tracking-wide max-w-[1536px] w-full">
+    <div
+      className={`flex flex-col tracking-wide max-w-[1536px] w-full ${
+        blur ? "blur-[5px]" : ""
+      }`}
+    >
       <div
         className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[982px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-warm-gray-50 font-semibold shadow-black"
         style={{

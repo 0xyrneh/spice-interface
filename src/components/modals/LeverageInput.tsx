@@ -12,12 +12,14 @@ export enum LeverageTab {
 type Props = {
   tab: LeverageTab;
   leverage: number;
-  value: string;
+  targetLeverage: string;
   txStatus: TxStatus;
   txHash?: string;
   setLeverage: (leverage: number) => void;
-  setValue: (value: string) => void;
+  setTargetLeverage: (value: string) => void;
   setTab: (tab: LeverageTab) => void;
+  onFocus: () => void;
+  onBlur: () => void;
 };
 
 const leverages = [0, 30, 60, 90, 120, 150];
@@ -25,45 +27,52 @@ const leverages = [0, 30, 60, 90, 120, 150];
 export default function LeverageInput({
   tab,
   leverage,
-  value,
+  targetLeverage,
   txHash,
   txStatus,
   setLeverage,
-  setValue,
+  setTargetLeverage,
   setTab,
+  onFocus,
+  onBlur,
 }: Props) {
   const processing = () => txStatus === TxStatus.Pending;
 
   return (
-    <div className="flex flex-col px-2 pt-3 flex-1">
-      <div className="pl-[70px] lg:pl-[50%] flex items-center gap-2">
-        <Button
-          type={tab === LeverageTab.Increase ? "third" : "secondary"}
-          className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-            tab === LeverageTab.Increase ? "" : "shadow-transparent"
-          }`}
-          onClick={() => setTab(LeverageTab.Increase)}
-        >
-          <span className="text-xs">INCREASE</span>
-        </Button>
-        <Button
-          type={tab === LeverageTab.Decrease ? "third" : "secondary"}
-          className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-            tab === LeverageTab.Decrease ? "" : "shadow-transparent"
-          }`}
-          onClick={() => setTab(LeverageTab.Decrease)}
-        >
-          <span className="text-xs">DECREASE</span>
-        </Button>
-        <Button
-          type={tab === LeverageTab.Refinance ? "third" : "secondary"}
-          className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-            tab === LeverageTab.Refinance ? "" : "shadow-transparent"
-          }`}
-          onClick={() => setTab(LeverageTab.Refinance)}
-        >
-          <span className="text-xs">RECREASE</span>
-        </Button>
+    <div className="flex flex-col px-2 py-3 flex-1">
+      <div className="flex flex-row-reverse">
+        <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
+          <Button
+            type={tab === LeverageTab.Increase ? "third" : "secondary"}
+            className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+              tab === LeverageTab.Increase ? "" : "shadow-transparent"
+            }`}
+            disabled={tab === LeverageTab.Increase}
+            onClick={() => setTab(LeverageTab.Increase)}
+          >
+            <span className="text-xs">INCREASE</span>
+          </Button>
+          <Button
+            type={tab === LeverageTab.Decrease ? "third" : "secondary"}
+            className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+              tab === LeverageTab.Decrease ? "" : "shadow-transparent"
+            }`}
+            disabled={tab === LeverageTab.Decrease}
+            onClick={() => setTab(LeverageTab.Decrease)}
+          >
+            <span className="text-xs">DECREASE</span>
+          </Button>
+          <Button
+            type={tab === LeverageTab.Refinance ? "third" : "secondary"}
+            className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+              tab === LeverageTab.Refinance ? "" : "shadow-transparent"
+            }`}
+            disabled={tab === LeverageTab.Refinance}
+            onClick={() => setTab(LeverageTab.Refinance)}
+          >
+            <span className="text-xs">REFINANCE</span>
+          </Button>
+        </div>
       </div>
       <div className="flex flex-1 items-center justify-center">
         {tab === LeverageTab.Refinance ? (
@@ -74,18 +83,26 @@ export default function LeverageInput({
         ) : (
           <div className="flex flex-col mx-2.5 text-gray-200 gap-1 text-xs max-w-[324px] w-full gap-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center border-1 rounded gap-3 px-3 py-2 w-[110px]">
+              <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 rounded gap-3 px-3 py-2 w-[110px]">
                 <LeverageSVG />
                 <input
                   className="flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
                   placeholder="0.00"
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
+                  value={targetLeverage}
+                  onChange={(e) => setTargetLeverage(e.target.value)}
                   type="number"
+                  onFocus={onFocus}
+                  onBlur={onBlur}
                 />
               </div>
               <div className="flex flex-col items-end">
-                <span>Max Leverage:</span>
+                <span>
+                  Max{" "}
+                  {tab === LeverageTab.Increase || tab === LeverageTab.Decrease
+                    ? tab
+                    : "Leverage"}
+                  :
+                </span>
                 <span>Ξ5.004 / 150% LTV</span>
               </div>
             </div>
@@ -132,12 +149,8 @@ export default function LeverageInput({
           </div>
         )}
       </div>
-      <div className="flex items-center justify-between mb-3 mx-1">
-        <span
-          className={`text-gray-200 text-xs ${
-            txHash ? "opacity-100" : "opacity-0"
-          }`}
-        >
+      <div className="flex justify-between text-gray-200 text-xs">
+        <span className={`${txHash ? "opacity-100" : "opacity-0"}`}>
           Tx Hash:{" "}
           {txHash && (
             <a
@@ -149,9 +162,10 @@ export default function LeverageInput({
             </a>
           )}
         </span>
-        <span className="text-right text-xs text-gray-200">
-          Prologue Vault Liquid Balance: Ξ300
-        </span>
+        {(tab === LeverageTab.Increase || tab === LeverageTab.LeverUp) &&
+          (txHash || processing()) && (
+            <span>Leverage Vault Liquid Balance: Ξ300</span>
+          )}
       </div>
     </div>
   );

@@ -5,10 +5,17 @@ type Props = {
   className?: string;
   children: ReactNode | ReactNode[];
   expanded?: boolean;
+  notBlur?: boolean;
   onCollapse?: () => void;
 };
 
-const Card = ({ className, children, expanded, onCollapse }: Props) => {
+const Card = ({
+  className,
+  children,
+  expanded,
+  onCollapse,
+  notBlur,
+}: Props) => {
   const { blur } = useUI();
 
   return (
@@ -24,7 +31,7 @@ const Card = ({ className, children, expanded, onCollapse }: Props) => {
           expanded
             ? "absolute top-5 left-1/2 -translate-x-1/2 w-[calc(min(1176px,100vw-104px))] bottom-10 z-50 bg-opacity-95"
             : "bg-opacity-80"
-        } ${blur && !expanded ? "blur-[5px]" : ""}`}
+        } ${!notBlur && blur && !expanded ? "blur-[5px]" : ""}`}
       >
         {children}
       </div>
