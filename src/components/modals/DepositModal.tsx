@@ -212,9 +212,9 @@ export default function DepositModal({ open, vault, onClose }: Props) {
         <div
           className={`flex pt-10 h-full ${
             showRightModal()
-              ? "w-auto opacity-100"
-              : "w-0 max-w-0 overflow-x-hidden opacity-0"
-          } transition-all duration-[1000ms] ease-in`}
+              ? "max-w-[1000px] opacity-100"
+              : "max-w-[0] opacity-0"
+          } transition-all duration-[700ms]`}
         >
           <Card
             className="flex flex-col border-1 border-gray-200 gap-2 !px-3 h-full justify-between !bg-gray-700 !bg-opacity-95"

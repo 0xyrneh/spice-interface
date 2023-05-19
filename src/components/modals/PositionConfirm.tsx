@@ -53,7 +53,9 @@ export default function PositionConfirm({
   return (
     <div className="flex flex-col flex-1 justify-between">
       <h2
-        className={`font-base ${processing() ? "text-gray-200" : "text-white"}`}
+        className={`font-base ${
+          processing() ? "text-gray-200" : "text-white"
+        } whitespace-nowrap`}
       >
         Position Details
       </h2>
