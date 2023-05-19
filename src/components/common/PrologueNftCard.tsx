@@ -76,7 +76,11 @@ export default function PrologueNftCard({
               }`}
               onClick={() => setOpened(!opened)}
             >
-              <span>#{activeNft().rank}</span>
+              <span
+                className={activeNft().featured ? "text-shadow-orange-900" : ""}
+              >
+                #{activeNft().rank}
+              </span>
               <FaChevronDown className="text-gray-200" />
             </button>
             <div className="bg-gray-700 bg-opacity-95 border-x-1 border-b-1 border-gray-300 rounded-b p-2 text-xs max-h-[356px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">

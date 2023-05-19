@@ -29,16 +29,18 @@ export default function DepositModal({ open, vault, onClose }: Props) {
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [focused, setFocused] = useState(false);
   const [closed, setClosed] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const reset = () => {
     setPositionAmount("");
-    setLeverage(0);
+    setLeverage(leverageTab === LeverageTab.Decrease ? 150 : 0);
     setTargetLeverage("");
     setPositionTxHash(undefined);
     setPositionStatus(TxStatus.None);
     setLeverageTxHash(undefined);
     setLeverageStatus(TxStatus.None);
     setClosed(false);
+    setFocused(false);
   };
 
   const onConfirmPosition = () => {
@@ -73,7 +75,9 @@ export default function DepositModal({ open, vault, onClose }: Props) {
     } else {
       return (
         leverageTab === LeverageTab.Refinance ||
-        leverage > 0 ||
+        (leverageTab === LeverageTab.Decrease
+          ? leverage < 150
+          : leverage > 0) ||
         targetLeverage !== ""
       );
     }
@@ -163,7 +167,16 @@ export default function DepositModal({ open, vault, onClose }: Props) {
                   : "text-gray-200"
               }`}
               disabled={!positionSelected}
-              onClick={() => setPositionSelected(false)}
+              onClick={() => {
+                if (vault.receiptToken === ReceiptToken.NFT) {
+                  setPositionSelected(false);
+                }
+              }}
+              onMouseEnter={() => {
+                if (vault.receiptToken === ReceiptToken.ERC20) {
+                  setTooltipVisible(true);
+                }
+              }}
             >
               LEVERAGE
             </button>
@@ -178,12 +191,8 @@ export default function DepositModal({ open, vault, onClose }: Props) {
               setValue={setPositionAmount}
               txStatus={positionStatus}
               txHash={positionTxHash}
+              showTooltip={tooltipVisible}
               onFocus={() => setFocused(true)}
-              onBlur={() => {
-                setTimeout(() => {
-                  setFocused(false);
-                }, 100);
-              }}
             />
           ) : (
             <LeverageInput
@@ -196,11 +205,6 @@ export default function DepositModal({ open, vault, onClose }: Props) {
               txStatus={leverageStatus}
               txHash={leverageTxHash}
               onFocus={() => setFocused(true)}
-              onBlur={() => {
-                setTimeout(() => {
-                  setFocused(false);
-                }, 100);
-              }}
             />
           )}
         </Card>

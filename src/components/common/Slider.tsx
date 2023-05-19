@@ -108,7 +108,7 @@ export default function CustomizedSlider({
           }
         }}
       />
-      {max && value < max && (
+      {max !== undefined && value < max && (
         <button
           className={`text-xs absolute right-2.5 top-1/2 transform -translate-y-1/2 ${
             disabled

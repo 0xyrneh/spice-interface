@@ -10,11 +10,12 @@ type Props = {
   value: string;
   txStatus: TxStatus;
   txHash?: string;
+  showTooltip?: boolean;
   setIsDeposit: (isDeposit: boolean) => void;
   setValue: (value: string) => void;
   toggleEth: () => void;
-  onFocus: () => void;
-  onBlur: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 };
 
 export default function PositionInput({
@@ -28,32 +29,46 @@ export default function PositionInput({
   txStatus,
   onFocus,
   onBlur,
+  showTooltip,
 }: Props) {
   const processing = () => txStatus === TxStatus.Pending;
 
   return (
     <div className="flex flex-col px-2 py-3 flex-1">
-      <div className="flex items-center gap-2 w-1/2 pr-2">
-        <Button
-          type={isDeposit ? "third" : "secondary"}
-          className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
-            isDeposit ? "" : "shadow-transparent"
-          }`}
-          disabled={isDeposit}
-          onClick={() => setIsDeposit(true)}
-        >
-          <span className="text-xs">DEPOSIT</span>
-        </Button>
-        <Button
-          type={!isDeposit ? "third" : "secondary"}
-          className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
-            !isDeposit ? "" : "shadow-transparent"
-          }`}
-          disabled={!isDeposit}
-          onClick={() => setIsDeposit(false)}
-        >
-          <span className="text-xs">WITHDRAW</span>
-        </Button>
+      <div className="flex items-center">
+        <div className="flex items-center gap-2 w-1/2 pr-2">
+          <Button
+            type={isDeposit ? "third" : "secondary"}
+            className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
+              isDeposit ? "" : "shadow-transparent"
+            }`}
+            disabled={isDeposit}
+            onClick={() => setIsDeposit(true)}
+          >
+            <span className="text-xs">DEPOSIT</span>
+          </Button>
+          <Button
+            type={!isDeposit ? "third" : "secondary"}
+            className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
+              !isDeposit ? "" : "shadow-transparent"
+            }`}
+            disabled={!isDeposit}
+            onClick={() => setIsDeposit(false)}
+          >
+            <span className="text-xs">WITHDRAW</span>
+          </Button>
+        </div>
+        {showTooltip && (
+          <Button
+            type="secondary"
+            className="flex-1 h-6 w-[78px] flex items-center justify-center !border-0 shadow-transparent text-xs gap-1"
+            disabled
+          >
+            <a className="underline">Prologue NFT</a>
+            <span className="lg:hidden">only.</span>
+            <span className="hidden lg:block">exclusive feature.</span>
+          </Button>
+        )}
       </div>
       <div className="flex flex-1 items-center justify-center">
         <Card

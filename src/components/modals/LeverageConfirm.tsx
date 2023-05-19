@@ -41,9 +41,9 @@ export default function LeverageConfirm({ txStatus, onConfirm, tab }: Props) {
     if (txStatus === TxStatus.Pending) {
       return "WORKING";
     } else if (txStatus === TxStatus.Finish) {
-      return "Finish";
+      return "FINISH";
     } else {
-      return tab;
+      return tab.toUpperCase();
     }
   };
 

@@ -1,5 +1,5 @@
 import { useScrollLock, useUI } from "@/hooks";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useCallback, useEffect } from "react";
 
 export interface ModalProps {
   open?: boolean;
@@ -11,6 +11,17 @@ export default function Modal({ children, open, onClose }: ModalProps) {
   const { setBlur } = useUI();
   const { lockScroll, unlockScroll } = useScrollLock();
 
+  const onEscHandler = useCallback(
+    (event: any) => {
+      if (event.key === "Escape") {
+        if (onClose) {
+          onClose();
+        }
+      }
+    },
+    [onClose]
+  );
+
   useEffect(() => {
     setBlur(!!open);
 
@@ -20,6 +31,18 @@ export default function Modal({ children, open, onClose }: ModalProps) {
       unlockScroll();
     }
   }, [open, setBlur, lockScroll, unlockScroll]);
+
+  useEffect(() => {
+    if (open) {
+      document.addEventListener("keydown", onEscHandler, false);
+    } else {
+      document.removeEventListener("keydown", onEscHandler, false);
+    }
+
+    return () => {
+      document.removeEventListener("keydown", onEscHandler, false);
+    };
+  }, [open, onEscHandler]);
 
   return (
     <div

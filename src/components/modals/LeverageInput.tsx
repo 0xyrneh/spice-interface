@@ -18,11 +18,12 @@ type Props = {
   setLeverage: (leverage: number) => void;
   setTargetLeverage: (value: string) => void;
   setTab: (tab: LeverageTab) => void;
-  onFocus: () => void;
-  onBlur: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 };
 
 const leverages = [0, 30, 60, 90, 120, 150];
+const decreaseLeverage = [150, 120, 90, 60, 30, 0];
 
 export default function LeverageInput({
   tab,
@@ -37,6 +38,15 @@ export default function LeverageInput({
   onBlur,
 }: Props) {
   const processing = () => txStatus === TxStatus.Pending;
+
+  const leverageUpdateText = () => {
+    const _targetLev = targetLeverage === "" ? "0.00" : targetLeverage;
+    if (tab === LeverageTab.LeverUp) {
+      return `Ξ${_targetLev} / ${leverage}% LTV`;
+    } else {
+      return `Ξ${_targetLev} ${tab.toLowerCase()} to ${leverage}% LTV`;
+    }
+  };
 
   return (
     <div className="flex flex-col px-2 py-3 flex-1">
@@ -83,7 +93,7 @@ export default function LeverageInput({
         ) : (
           <div className="flex flex-col mx-2.5 text-gray-200 gap-1 text-xs max-w-[324px] w-full gap-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 rounded gap-3 px-3 py-2 w-[110px]">
+              <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 text-gray-200 hover:text-gray-300 rounded gap-3 px-3 py-2 w-[110px]">
                 <LeverageSVG />
                 <input
                   className="flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
@@ -103,20 +113,23 @@ export default function LeverageInput({
                     : "Leverage"}
                   :
                 </span>
-                <span>Ξ5.004 / 150% LTV</span>
+                <span>{leverageUpdateText()}</span>
               </div>
             </div>
             <div className="flex flex-col">
               <Slider
                 disabled={processing()}
-                value={leverage}
-                min={0}
-                max={150}
+                value={tab === LeverageTab.Decrease ? leverage * -1 : leverage}
+                min={tab === LeverageTab.Decrease ? -150 : 0}
+                max={tab === LeverageTab.Decrease ? 0 : 150}
                 step={30}
-                onChange={setLeverage}
+                onChange={(_val) => setLeverage(Math.abs(_val))}
               />
               <div className="relative flex justify-between mt-1.5 mx-5">
-                {leverages.map((item, idx) => (
+                {(tab === LeverageTab.Decrease
+                  ? decreaseLeverage
+                  : leverages
+                ).map((item, idx) => (
                   <button
                     key={`leverage-${item}`}
                     className={`absolute ${
