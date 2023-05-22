@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useUI } from "@/hooks";
 import { motion } from "framer-motion";
 
@@ -18,6 +18,20 @@ const Card = ({
   notBlur,
 }: Props) => {
   const { blur } = useUI();
+  const comp = useRef();
+
+  const onLayoutAnimationComplete = () => {
+    if (!expanded) {
+      console.log("XXXX");
+      (comp.current as any).style.zIndex = "0";
+    }
+  };
+
+  useEffect(() => {
+    if (expanded) {
+      (comp.current as any).style.zIndex = "50";
+    }
+  }, [expanded]);
 
   return (
     <>
@@ -28,10 +42,13 @@ const Card = ({
         />
       )}
       <motion.div
+        ref={comp as any}
         layout
+        transition={{ duration: 0.4 }}
+        onLayoutAnimationComplete={onLayoutAnimationComplete}
         className={`flex flex-col bg-gray-700 rounded shadow-card px-4 py-5 ${className} ${
           expanded
-            ? "absolute top-5 left-[calc(50vw-min(1176px,100vw-104px)/2)] w-[calc(min(1176px,100vw-104px))] bottom-10 z-50 bg-opacity-95"
+            ? "absolute top-5 left-[calc(50vw-min(1176px,100vw-104px)/2)] w-[calc(min(1176px,100vw-104px))] bottom-10 bg-opacity-95"
             : "bg-opacity-80"
         } ${!notBlur && blur && !expanded ? "blur-[5px]" : ""}`}
       >
