@@ -36,7 +36,7 @@ export default function PrologueNftCard({
       <div
         className="flex flex-col w-full bg-cover aspect-square relative justify-center"
         style={{
-          backgroundImage: `url(${activeNft().icon})`,
+          backgroundImage: `url(${activeNft().logo})`,
         }}
       >
         {activeNft().featured && (

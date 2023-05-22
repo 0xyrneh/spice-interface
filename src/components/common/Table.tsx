@@ -11,6 +11,7 @@ export type TableRowInfo = {
   itemSuffix?: (item: any) => ReactNode;
   itemClass?: (item: any) => string;
   rowClass?: () => string;
+  format?: (item: any) => string;
 };
 
 type Props = {
@@ -38,11 +39,11 @@ const Table = ({
 }: Props) => {
   const [sortKey, setSortKey] = useState<string | undefined>(defaultSortKey);
   const [sortAsc, setSortAsc] = useState(false);
-  const [sortedItems, setSortedItems] = useState(items);
 
   const getSortedItems = () => {
     if (sortKey) {
       return items.sort((a, b) => {
+        if (!a[sortKey] || !b[sortKey]) return false;
         if (typeof a[sortKey] === "number") {
           if (sortAsc) {
             return a[sortKey] > b[sortKey] ? 1 : -1;
@@ -125,7 +126,7 @@ const Table = ({
                   {row.itemPrefix && row.itemPrefix(item)}
                   {row.key ? (
                     <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                      {item[row.key]}
+                      {row.format ? row.format(item) : item[row.key]}
                     </span>
                   ) : (
                     row.component!(item)

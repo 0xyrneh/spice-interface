@@ -39,7 +39,7 @@ const VaultList = ({ onClickVault }: Props) => {
         itemPrefix: (item) => (
           <Image
             className="mr-2 border-1 border-gray-200 rounded-full"
-            src={item.icon}
+            src={item.logo}
             width={20}
             height={20}
             alt=""

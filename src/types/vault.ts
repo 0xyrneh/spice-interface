@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+
 import { VaultFilter } from "./common";
 
 export enum ReceiptToken {
@@ -25,3 +27,54 @@ export type Nft = {
   tvl: number;
   icon: string;
 };
+
+export interface VaultInfo {
+  name: string;
+  address: string;
+  tvl?: number;
+  wethBalance?: BigNumber;
+  totalShares?: number;
+  apr?: number;
+  apy?: number;
+  totalSupply?: number;
+  maxSupply?: number;
+  tvlChange?: number;
+  aprChange?: number;
+  sponsor?: string;
+  depositedAmt?: number;
+  description?: string;
+  okrs?: any;
+  readable?: string;
+  userInfo: any;
+  historicalRecords?: any[];
+  userNftPortfolios?: any[];
+
+  depositable?: boolean;
+  leverage?: boolean;
+  deprecated?: boolean;
+  fungible?: boolean;
+  type?: string;
+
+  logo: string;
+  bg?: string;
+  userPositionRaw?: BigNumber;
+  userPosition?: number;
+  receiptToken: ReceiptToken;
+  id: number;
+}
+
+export interface LeverageVaultInfo {
+  name: string;
+  address: string;
+  sponsor?: string;
+  wethBalance?: BigNumber;
+  totalAssets?: BigNumber;
+  description?: string;
+  readable?: string;
+
+  depositable?: boolean;
+  leverage?: boolean;
+  deprecated?: boolean;
+  fungible?: boolean;
+  type?: string;
+}

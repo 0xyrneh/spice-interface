@@ -3,12 +3,12 @@ import Image from "next/image";
 import prologueNfts from "@/constants/prologueNfts";
 import { Card, PrologueNftCard, Search, Select } from "@/components/common";
 import KeySVG from "@/assets/icons/key.svg";
-import { Vault } from "@/types/vault";
+import { VaultInfo } from "@/types/vault";
 import { VaultNftsSortFilter } from "@/types/common";
 import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
 
 type Props = {
-  vault?: Vault;
+  vault?: VaultInfo;
   showIcon?: boolean;
   className?: string;
 };
@@ -24,7 +24,7 @@ export default function VaultNfts({ vault, showIcon, className }: Props) {
         {vault && (
           <Image
             className="border-1 border-gray-200 rounded-full"
-            src={vault.icon}
+            src={vault.logo}
             width={16}
             height={16}
             alt=""
