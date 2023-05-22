@@ -8,6 +8,10 @@ export const OFFCHAIN_VAULT_API = `${BACKEND_SERVER_URL}/api/off-chain-vaults`;
 export const VAULT_LOANS = `${BACKEND_SERVER_URL}/api/vaults/loans`;
 export const VAULT_RESULT_API = `${BACKEND_SERVER_URL}/api/vaults`;
 
+// leverage API URLS
+export const LEVERAGE_API_BASE = `${BACKEND_SERVER_URL}/api/loan`;
+export const LEVERAGE_API_TERMS = `${LEVERAGE_API_BASE}/terms`;
+
 // collection API URLS
 export const COLLECTION_API_BASE = `${BACKEND_SERVER_URL}/api/collections`;
 

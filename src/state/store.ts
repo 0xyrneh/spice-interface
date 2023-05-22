@@ -2,6 +2,7 @@ import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query/react";
 
 import vault from "./vault/vaultSlice";
+import lend from "./lend/lendSlice";
 
 const customizedMiddleware = getDefaultMiddleware({
   serializableCheck: false,
@@ -10,6 +11,7 @@ const customizedMiddleware = getDefaultMiddleware({
 export const store = configureStore({
   reducer: {
     vault,
+    lend,
   },
   middleware: customizedMiddleware,
   devTools: process.env.NODE_ENV !== "production",
