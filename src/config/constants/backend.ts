@@ -1,10 +1,10 @@
-export const backendServerUrl =
-  process.env.NEXT_PUBLIC_BACKEND_SERVER_URL || "http://localhost:5000";
-export const BACKEND_SERVER_URL = process.env.NEXT_PUBLIC_BACKEND_SERVER_URL;
+const DEFAULT_BACKEND_SERVER_URL = "https://testapi.spicefi.xyz/v1";
+
+export const BACKEND_SERVER_URL =
+  process.env.NEXT_PUBLIC_BACKEND_SERVER_URL || DEFAULT_BACKEND_SERVER_URL;
 
 // vault API URLS
 export const OFFCHAIN_VAULT_API = `${BACKEND_SERVER_URL}/api/off-chain-vaults`;
-
 export const VAULT_LOANS = `${BACKEND_SERVER_URL}/api/vaults/loans`;
 export const VAULT_RESULT_API = `${BACKEND_SERVER_URL}/api/vaults`;
 
