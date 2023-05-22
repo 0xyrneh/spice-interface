@@ -16,9 +16,10 @@ import {
   CombineExposure,
   LoanExposure,
 } from "@/components/vaults";
+import { VaultsTable } from "@/components/portfolio";
 import VaultNfts from "@/components/vaults/VaultNfts";
 import { useAppSelector } from "@/state/hooks";
-import { VaultInfo, ReceiptToken, Vault } from "@/types/vault";
+import { VaultInfo, ReceiptToken } from "@/types/vault";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { activeChainId } from "@/utils/web3";
 import { getNftPortfolios } from "@/utils/nft";
@@ -61,85 +62,27 @@ export default function Portfolio() {
     };
   });
 
-  const onSelectVault = (item: VaultInfo) => {
-    setSelectedVaultAddr(item.address);
+  const onSelectVault = (item?: VaultInfo) => {
+    if (!item) setSelectedVaultAddr(undefined);
+    else setSelectedVaultAddr(item.address);
   };
 
   const selectedVault = vaults.find(
     (row: VaultInfo) => row.address === selectedVaultAddr
   );
 
-  const getRowInfos = (): TableRowInfo[] => {
-    return [
-      {
-        title: `VAULTS [${vaults.length}]`,
-        key: "readable",
-        itemPrefix: (item) => (
-          <Image
-            className="mr-2 border-1 border-gray-200 rounded-full"
-            src={item.logo}
-            width={20}
-            height={20}
-            alt=""
-          />
-        ),
-      },
-      {
-        title: "POSITION",
-        key: "userPosition",
-        rowClass: () => "hidden lg:table-cell w-[85px]",
-        itemPrefix: () => "Ξ",
-        format: (item) => {
-          return (item?.userPosition || 0).toFixed(2);
-        },
-      },
-      {
-        title: "TVL",
-        key: "tvl",
-        rowClass: () => "hidden 3xl:table-cell  w-[75px]",
-        itemPrefix: () => "Ξ",
-        format: (item) => {
-          return (item?.tvl || 0).toFixed(2);
-        },
-      },
-      {
-        title: "APY",
-        key: "apy",
-        rowClass: () => "hidden xl:table-cell w-[75px]",
-        itemSuffix: () => "%",
-        format: (item) => (item?.apy || 0).toFixed(2),
-      },
-      {
-        title: "RECEIPT",
-        key: "receiptToken",
-        rowClass: () => "hidden 2xl:table-cell  w-[75px]",
-      },
-      {
-        title: "DETAILS",
-        noSort: true,
-        rowClass: () => "w-[70px]",
-        component: () => (
-          <Button type="secondary" className="px-1 h-[22px]">
-            <span className="text-xs font-bold">DETAILS</span>
-          </Button>
-        ),
-      },
-      {
-        title: "DEPOSIT",
-        noSort: true,
-        rowClass: () => "w-[70px]",
-        component: () => (
-          <Button type="primary" className="px-1 h-[22px]">
-            <span className="text-xs font-bold">DEPOSIT</span>
-          </Button>
-        ),
-      },
-    ];
+  const getUserTotalPosition = () => {
+    let userTotalPosition = 0;
+    vaults.map((vault: VaultInfo) => {
+      userTotalPosition += vault?.userPosition || 0;
+    });
+    return userTotalPosition;
   };
 
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
       <div className="flex flex-col min-w-[41%] w-[41%] gap-5 pt-1">
+        {/* account card */}
         {account && (
           <Card className="py-3 !flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-5 flex-1">
@@ -165,46 +108,14 @@ export default function Portfolio() {
             </button>
           </Card>
         )}
-        <Card className="gap-3 overflow-hidden min-h-[379px] flex-1">
-          <div className="flex items-center gap-2.5">
-            <ExposureSVG />
-            <h2 className="font-bold text-white font-sm">SELECT YOUR VAULT</h2>
-          </div>
-          <div className="flex items-center justify-between gap-5">
-            <Search
-              placeholder="Search your Vaults"
-              className="hidden xl:flex flex-1 xl:flex-none"
-            />
-            <Button
-              type={!selectedVault ? "third" : "secondary"}
-              className="flex-1 xl:flex-none xl:w-[170px] h-8 text-xs font-bold"
-              onClick={() => setSelectedVaultAddr(undefined)}
-              disabled={!selectedVault}
-            >
-              TOTAL SPICE POSITION
-            </Button>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <Table
-              className="block h-full"
-              rowInfos={getRowInfos()}
-              items={vaults.map((vault) => ({
-                ...vault,
-                position: 2,
-              }))}
-              trStyle="h-10"
-              rowStyle="h-8"
-              defaultSortKey="apy"
-              bodyClass="h-[calc(100%-40px)]"
-              onClickItem={(item) => {
-                onSelectVault(item);
-              }}
-              isActive={(item) => {
-                return !!selectedVault && item.id === selectedVault.id;
-              }}
-            />
-          </div>
-        </Card>
+
+        {/* vault list table */}
+        <VaultsTable
+          vaults={vaults}
+          selectedVault={selectedVault}
+          onSelectVault={onSelectVault}
+        />
+
         <div className="max-h-[363px] overflow-y-hidden p-1 -m-1">
           {selectedVault &&
           selectedVault.receiptToken === ReceiptToken.ERC20 ? (
@@ -220,6 +131,7 @@ export default function Portfolio() {
       </div>
 
       <div className="flex flex-col flex-1 gap-5 pt-1">
+        {/* vault chart graph */}
         <Card className="gap-3 flex-1 overflow-hidden min-h-[523px]">
           <div className="flex items-center gap-2.5">
             {selectedVault && (
@@ -243,7 +155,10 @@ export default function Portfolio() {
           <div className="flex items-end justify-between text-gray-200 px-12">
             <div className="flex gap-4 items-center">
               {!selectedVault && (
-                <Stats title="Your Spice TVL" value={`Ξ${(0).toFixed(2)}`} />
+                <Stats
+                  title="Your Spice TVL"
+                  value={`Ξ${getUserTotalPosition().toFixed(2)}`}
+                />
               )}
               {selectedVault && (
                 <Stats
@@ -304,6 +219,8 @@ export default function Portfolio() {
             </div>
           </div>
         </Card>
+
+        {/* vault details info */}
         {selectedVault && !selectedVault?.leverage && (
           <div className="flex gap-5 max-h-[303px] overflow-hidden p-1 -m-1">
             {selectedVault &&
