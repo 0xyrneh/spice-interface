@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { useUI } from "@/hooks";
+import { motion } from "framer-motion";
 
 type Props = {
   className?: string;
@@ -26,15 +27,16 @@ const Card = ({
           onClick={onCollapse}
         />
       )}
-      <div
+      <motion.div
+        layout
         className={`flex flex-col bg-gray-700 rounded shadow-card px-4 py-5 ${className} ${
           expanded
-            ? "absolute top-5 left-1/2 -translate-x-1/2 w-[calc(min(1176px,100vw-104px))] bottom-10 z-50 bg-opacity-95"
+            ? "absolute top-5 left-[calc(50vw-min(1176px,100vw-104px)/2)] w-[calc(min(1176px,100vw-104px))] bottom-10 z-50 bg-opacity-95"
             : "bg-opacity-80"
         } ${!notBlur && blur && !expanded ? "blur-[5px]" : ""}`}
       >
         {children}
-      </div>
+      </motion.div>
     </>
   );
 };
