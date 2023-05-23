@@ -3,6 +3,7 @@ import { setupListeners } from "@reduxjs/toolkit/query/react";
 
 import vault from "./vault/vaultSlice";
 import lend from "./lend/lendSlice";
+import nft from "./nft/nftSlice";
 
 const customizedMiddleware = getDefaultMiddleware({
   serializableCheck: false,
@@ -12,6 +13,7 @@ export const store = configureStore({
   reducer: {
     vault,
     lend,
+    nft,
   },
   middleware: customizedMiddleware,
   devTools: process.env.NODE_ENV !== "production",

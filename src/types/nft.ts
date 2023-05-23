@@ -27,8 +27,7 @@ export type Loan = {
 };
 
 export interface PrologueNftInfo {
-  rank: number;
-  address: string;
+  owner: string;
   amount: number;
   tokenId: number;
   tokenImg: string;

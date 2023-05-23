@@ -9,10 +9,7 @@ import ChartSVG from "@/assets/icons/chart.svg";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
-import { getSpiceNfts } from "@/utils/subgraph";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
-import { getTokenImageFromReservoir } from "@/utils/nft";
-import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 import { PrologueNftInfo } from "@/types/nft";
 
 type Props = {
@@ -21,8 +18,10 @@ type Props = {
 
 export default function VaultDetails({ vault }: Props) {
   const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
+  const [prologueNftExpanded, setPrologueNftExpanded] = useState(false);
 
   const { data: lendData } = useAppSelector((state) => state.lend);
+  const { allNfts } = useAppSelector((state) => state.nft);
   const loans = accLoans(lendData);
   const userNftIds = loans.map((row: any) => row.tokenId);
 
@@ -31,12 +30,11 @@ export default function VaultDetails({ vault }: Props) {
     const vaultTvl = vault?.tvl || 0;
     const vaultTotalShares = vault?.totalShares || 0;
 
-    const nftsRawData = await getSpiceNfts();
-    const nfts1 = nftsRawData.map((row: any) => {
+    const nfts1 = allNfts.map((row: any) => {
       const tokenId = Number(row.tokenId);
       const isEscrowed = userNftIds.includes(tokenId);
       return {
-        address: row.owner.address,
+        owner: row.owner.address,
         amount: getBalanceInEther(
           vaultTotalShares === 0
             ? BigNumber.from(row.shares)
@@ -47,7 +45,7 @@ export default function VaultDetails({ vault }: Props) {
                 )
         ),
         tokenId,
-        tokenImg: getTokenImageFromReservoir(PROLOGUE_NFT_ADDRESS, tokenId),
+        tokenImg: row.tokenImg,
         isEscrowed,
         apy: isEscrowed ? 45.24 : 0,
       };

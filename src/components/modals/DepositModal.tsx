@@ -10,10 +10,7 @@ import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
 import { useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
-import { getSpiceNfts } from "@/utils/subgraph";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
-import { getTokenImageFromReservoir } from "@/utils/nft";
-import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 import PositionConfirm from "./PositionConfirm";
 import LeverageConfirm from "./LeverageConfirm";
 import { Card, Erc20Card, PrologueNftCard } from "../common";
@@ -43,6 +40,8 @@ export default function DepositModal({ open, vault, onClose }: Props) {
 
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
+  const { allNfts } = useAppSelector((state) => state.nft);
+
   const loans = accLoans(lendData);
   const userNftIds = loans.map((row: any) => row.tokenId);
 
@@ -51,12 +50,11 @@ export default function DepositModal({ open, vault, onClose }: Props) {
     const vaultTvl = vault?.tvl || 0;
     const vaultTotalShares = vault?.totalShares || 0;
 
-    const nftsRawData = await getSpiceNfts();
-    const nfts1 = nftsRawData.map((row: any) => {
+    const nfts1 = allNfts.map((row: any) => {
       const tokenId = Number(row.tokenId);
       const isEscrowed = userNftIds.includes(tokenId);
       return {
-        address: row.owner.address,
+        owner: row.owner.address,
         amount: getBalanceInEther(
           vaultTotalShares === 0
             ? BigNumber.from(row.shares)
@@ -66,8 +64,8 @@ export default function DepositModal({ open, vault, onClose }: Props) {
                   BigNumber.from(getBalanceInWei(vaultTotalShares.toString()))
                 )
         ),
+        tokenImg: row.tokenImg,
         tokenId,
-        tokenImg: getTokenImageFromReservoir(PROLOGUE_NFT_ADDRESS, tokenId),
         isEscrowed,
         apy: isEscrowed ? 45.24 : 0,
       };
@@ -158,7 +156,7 @@ export default function DepositModal({ open, vault, onClose }: Props) {
 
   const userNfts = nfts.filter(
     (row) =>
-      row.address.toLowerCase() === account?.toLowerCase() ||
+      row.owner.toLowerCase() === account?.toLowerCase() ||
       userNftIds.includes(row.tokenId)
   );
 

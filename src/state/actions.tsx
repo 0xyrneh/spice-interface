@@ -14,4 +14,6 @@ export {
   removeLendUserLoanData,
 } from "./lend/lendSlice";
 
+export { fetchNftGlobalDataAsync } from "./nft/nftSlice";
+
 export {};

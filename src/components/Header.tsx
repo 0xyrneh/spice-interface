@@ -11,6 +11,7 @@ import { useUI } from "@/hooks";
 import {
   fetchVaultGlobalDataAsync,
   fetchLendGlobalDataAsync,
+  fetchNftGlobalDataAsync,
   fetchVaultUserDataAsync,
   fetchLendUserLoanDataAsync,
   fetchLendUserWethDataAsync,
@@ -26,6 +27,7 @@ const Header = () => {
 
   const { account } = useWeb3React();
   const { vaults, defaultVault } = useAppSelector((state) => state.vault);
+  const { allNfts } = useAppSelector((state) => state.nft);
   const router = useRouter();
   const { blur } = useUI();
   const lendAddrs = getSpiceFiLendingAddresses();
@@ -35,6 +37,7 @@ const Header = () => {
   const fetchData = async () => {
     dispatch(fetchVaultGlobalDataAsync());
     dispatch(fetchLendGlobalDataAsync());
+    dispatch(fetchNftGlobalDataAsync());
   };
 
   useEffect(() => {
