@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BigNumber } from "ethers";
+import { useWeb3React } from "@web3-react/core";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "./Modal";
@@ -9,10 +10,7 @@ import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
 import { useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
-import { getSpiceNfts } from "@/utils/subgraph";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
-import { getTokenImageFromReservoir } from "@/utils/nft";
-import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 import PositionConfirm from "./PositionConfirm";
 import LeverageConfirm from "./LeverageConfirm";
 import { Card, Erc20Card, PrologueNftCard } from "../common";
@@ -40,7 +38,10 @@ export default function DepositModal({ open, vault, onClose }: Props) {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
 
+  const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
+  const { allNfts } = useAppSelector((state) => state.nft);
+
   const loans = accLoans(lendData);
   const userNftIds = loans.map((row: any) => row.tokenId);
 
@@ -49,12 +50,11 @@ export default function DepositModal({ open, vault, onClose }: Props) {
     const vaultTvl = vault?.tvl || 0;
     const vaultTotalShares = vault?.totalShares || 0;
 
-    const nftsRawData = await getSpiceNfts();
-    const nfts1 = nftsRawData.map((row: any) => {
+    const nfts1 = allNfts.map((row: any) => {
       const tokenId = Number(row.tokenId);
       const isEscrowed = userNftIds.includes(tokenId);
       return {
-        address: row.owner.address,
+        owner: row.owner.address,
         amount: getBalanceInEther(
           vaultTotalShares === 0
             ? BigNumber.from(row.shares)
@@ -64,8 +64,8 @@ export default function DepositModal({ open, vault, onClose }: Props) {
                   BigNumber.from(getBalanceInWei(vaultTotalShares.toString()))
                 )
         ),
+        tokenImg: row.tokenImg,
         tokenId,
-        tokenImg: getTokenImageFromReservoir(PROLOGUE_NFT_ADDRESS, tokenId),
         isEscrowed,
         apy: isEscrowed ? 45.24 : 0,
       };
@@ -154,6 +154,12 @@ export default function DepositModal({ open, vault, onClose }: Props) {
     reset();
   }, [isDeposit, positionSelected, leverageTab]);
 
+  const userNfts = nfts.filter(
+    (row) =>
+      row.owner.toLowerCase() === account?.toLowerCase() ||
+      userNftIds.includes(row.tokenId)
+  );
+
   return (
     <Modal open={open} onClose={onClose}>
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
@@ -177,19 +183,23 @@ export default function DepositModal({ open, vault, onClose }: Props) {
           {vault.receiptToken === ReceiptToken.NFT ? (
             <PrologueNftCard
               className="w-[176px] lg:w-[198px]"
-              nfts={nfts}
+              nfts={userNfts}
               selectedIdx={selectedIdx}
               onItemChanged={(_, idx) => setSelectedIdx(idx)}
               footerClassName="!h-10"
               expanded
             />
           ) : (
-            <Erc20Card
-              className="w-[176px] lg:w-[198px]"
-              nft={nfts[0]}
-              footerClassName="!h-10"
-              expanded
-            />
+            <>
+              {userNfts.length > 0 && (
+                <Erc20Card
+                  className="w-[176px] lg:w-[198px]"
+                  nft={userNfts[0]}
+                  footerClassName="!h-10"
+                  expanded
+                />
+              )}
+            </>
           )}
         </div>
         <Card

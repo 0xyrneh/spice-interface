@@ -8,7 +8,7 @@ import {
 } from "@/config/constants/vault";
 import multicall from "@/utils/multicall";
 import { getBalanceInEther } from "@/utils/formatBalance";
-import { VaultInfo } from "@/types/vault";
+import { VaultInfo, ReceiptToken } from "@/types/vault";
 import { getVaultDisplayName } from "@/utils/string";
 import VaultAbi from "@/config/abi/SpiceFiVault.json";
 import SpiceFiNFT4626Abi from "@/config/abi/SpiceFiNFT4626.json";
@@ -105,6 +105,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           name: getVaultDisplayName(row?.name),
           logo: "/assets/images/vaultIcon.svg",
           bg: "/assets/images/bgVaults.jpg",
+          receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
           userInfo: {
             allowance: BigNumber.from(0),
             tokenBalance: BigNumber.from(0),
@@ -125,6 +126,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
         name: getVaultDisplayName(row?.name),
         logo: "/assets/images/vaultIcon.svg",
         bg: "/assets/images/bgVaults.jpg",
+        receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
         userInfo: {
           allowance: BigNumber.from(0),
           tokenBalance: BigNumber.from(0),

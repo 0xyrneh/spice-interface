@@ -18,14 +18,12 @@ export default function App({ Component, pageProps }: AppProps) {
       <Provider store={store}>
         <UIProvider>
           <NotificationProvider>
-            {/* <WalletProvider> */}
             <div className="flex flex-col h-full w-full relative main font-SpaceGrotesk items-center">
               <Header />
               <Component {...pageProps} />
               <Footer />
               <NotSupported />
             </div>
-            {/* </WalletProvider> */}
           </NotificationProvider>
         </UIProvider>
       </Provider>

@@ -1,22 +1,33 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import vaults from "@/constants/vaults";
 import { FaChevronRight } from "react-icons/fa";
-import { Vault } from "@/types/vault";
+
+import { VaultInfo } from "@/types/vault";
 import { News, VaultList } from "@/components/vaults";
 import { Button } from "@/components/common";
 import { useUI } from "@/hooks";
+import { useAppSelector } from "@/state/hooks";
+import { VAULT_BACKGROUND_IMAGES } from "@/config/constants/vault";
 
-export default function VaultInfo() {
-  const router = useRouter();
-  const { blur } = useUI();
-
+export default function Vaults() {
   const [activeVaultIndex, setActiveVaultIndex] = useState(0);
   const [focusedVaultIndex, setFocusedVaultIndex] = useState(-1);
 
-  const getActiveVault = () => vaults[activeVaultIndex];
-  const getVaultBackground = (vault?: Vault) =>
-    (vault ?? getActiveVault()).bg ?? "/assets/images/bgEmptyVault.png";
+  const router = useRouter();
+  const { blur } = useUI();
+  const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
+
+  const vaults = vaultsOrigin.map((row: VaultInfo, id) => {
+    return {
+      ...row,
+      oneDayChange: 0,
+      sevenDayChange: 0,
+      sponsor: row.sponsor || "SpiceDAO",
+      backgroundImage: VAULT_BACKGROUND_IMAGES[id],
+    };
+  });
+
+  const activeVault = vaults[activeVaultIndex];
 
   return (
     <div
@@ -27,7 +38,9 @@ export default function VaultInfo() {
       <div
         className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[982px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-warm-gray-50 font-semibold shadow-black"
         style={{
-          backgroundImage: `url(${getVaultBackground()})`,
+          backgroundImage: `url(${
+            activeVault?.backgroundImage || VAULT_BACKGROUND_IMAGES[0]
+          })`,
         }}
       >
         <div
@@ -51,7 +64,9 @@ export default function VaultInfo() {
               hoverClassName="hover:drop-shadow-sm hover:border-white hover:-translate-y-2"
               clickClassName="hover:drop-shadow-orange-200 hover:border-orange-200"
               style={{
-                backgroundImage: `url(${getVaultBackground(vault)})`,
+                backgroundImage: `url(${
+                  vault?.backgroundImage || VAULT_BACKGROUND_IMAGES[0]
+                })`,
                 transition: "transform 450ms",
               }}
               onClick={() => setActiveVaultIndex(index)}
@@ -59,35 +74,47 @@ export default function VaultInfo() {
               onMouseLeave={() => setFocusedVaultIndex(-1)}
             >
               <span className="text-sm font-bold whitespace-nowrap overflow-hidden w-full text-ellipsis">
-                {vault.name}
+                {vault?.readable || ""}
               </span>
             </Button>
           ))}
         </div>
-        <div className="flex items-center mt-3 gap-7">
-          <div className="flex flex-col gap-1">
-            <span className="text-gray-200 text-sm font-medium">TVL</span>
-            <span className="text-xl font-bold">Ξ{getActiveVault().tvl}</span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-gray-200 text-sm font-medium">APY</span>
-            <span className="text-xl font-bold">{getActiveVault().apy}%</span>
-          </div>
-          <Button
-            className="flex justify-between h-10 items-center rounded bg-gray-700 bg-opacity-45 px-4 gap-3 box-border"
-            hoverClassName="hover:bg-white hover:bg-opacity-20"
-            onClick={() => {
-              router.push(`/vault/${getActiveVault().id}`);
-            }}
-          >
-            <span className="text-sm">View Vault</span>
-            <FaChevronRight size={16} />
-          </Button>
-        </div>
-        <h3 className="text-xl font-bold">By {getActiveVault().creator}</h3>
-        <h2 className="text-xl font-bold">
-          {getActiveVault().name.toUpperCase()}
-        </h2>
+
+        {/* active vault info */}
+        {activeVault && (
+          <>
+            <div className="flex items-center mt-3 gap-7">
+              <div className="flex flex-col gap-1">
+                <span className="text-gray-200 text-sm font-medium">TVL</span>
+                <span className="text-xl font-bold">
+                  {`Ξ${(activeVault?.tvl || 0)?.toFixed(2)}`}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-gray-200 text-sm font-medium">APY</span>
+                <span className="text-xl font-bold">
+                  {`${(activeVault?.apy || 0)?.toFixed(2)}%`}
+                </span>
+              </div>
+              <Button
+                className="flex justify-between h-10 items-center rounded bg-gray-700 bg-opacity-45 px-4 gap-3 box-border"
+                hoverClassName="hover:bg-white hover:bg-opacity-20"
+                onClick={() => {
+                  router.push(`/vault/${activeVault.id}`);
+                }}
+              >
+                <span className="text-sm">View Vault</span>
+                <FaChevronRight size={16} />
+              </Button>
+            </div>
+            <h3 className="text-xl font-bold">
+              {`By ${activeVault?.sponsor || ""}`}
+            </h3>
+            <h2 className="text-xl font-bold uppercase">
+              {activeVault?.readable || ""}
+            </h2>
+          </>
+        )}
       </div>
       <News />
       <VaultList
