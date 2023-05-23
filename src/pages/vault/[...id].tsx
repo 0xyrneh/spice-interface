@@ -53,8 +53,12 @@ export default function VaultDetailsPage() {
       return;
     }
 
-    if (id && id.length && Number(id[0]) < vaults.length) {
-      setVault(vaults[Number(id[0])]);
+    const selectedVault = vaults.find(
+      (vault: VaultInfo) => id && vault.id === Number(id[0])
+    );
+
+    if (selectedVault) {
+      setVault(selectedVault);
     } else {
       router.push(`/`);
     }
