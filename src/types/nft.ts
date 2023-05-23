@@ -25,3 +25,13 @@ export type Loan = {
   // TODO: changed to date
   initiated: string;
 };
+
+export interface PrologueNftInfo {
+  rank: number;
+  address: string;
+  amount: number;
+  tokenId: number;
+  tokenImg: string;
+  isEscrowed?: boolean;
+  apy: number;
+}

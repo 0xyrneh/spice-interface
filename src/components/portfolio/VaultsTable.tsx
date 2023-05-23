@@ -1,0 +1,129 @@
+import Image from "next/image";
+
+import { VaultInfo } from "@/types/vault";
+import { Button, Card, Search, Table } from "@/components/common";
+import { TableRowInfo } from "@/components/common/Table";
+import ExposureSVG from "@/assets/icons/exposure.svg";
+
+type Props = {
+  vaults: VaultInfo[];
+  selectedVault?: VaultInfo | undefined;
+  onSelectVault: (vault: VaultInfo | undefined) => void;
+};
+
+export default function VaultsTable({
+  vaults,
+  selectedVault,
+  onSelectVault,
+}: Props) {
+  const getRowInfos = (): TableRowInfo[] => {
+    return [
+      {
+        title: `VAULTS [${vaults.length}]`,
+        key: "readable",
+        itemPrefix: (item) => (
+          <Image
+            className="mr-2 border-1 border-gray-200 rounded-full"
+            src={item.logo}
+            width={20}
+            height={20}
+            alt=""
+          />
+        ),
+      },
+      {
+        title: "POSITION",
+        key: "userPosition",
+        rowClass: () => "hidden lg:table-cell w-[85px]",
+        itemPrefix: () => "Ξ",
+        format: (item) => {
+          return (item?.userPosition || 0).toFixed(2);
+        },
+      },
+      {
+        title: "TVL",
+        key: "tvl",
+        rowClass: () => "hidden 3xl:table-cell  w-[75px]",
+        itemPrefix: () => "Ξ",
+        format: (item) => {
+          return (item?.tvl || 0).toFixed(2);
+        },
+      },
+      {
+        title: "APY",
+        key: "apy",
+        rowClass: () => "hidden xl:table-cell w-[75px]",
+        itemSuffix: () => "%",
+        format: (item) => (item?.apy || 0).toFixed(2),
+      },
+      {
+        title: "RECEIPT",
+        key: "receiptToken",
+        rowClass: () => "hidden 2xl:table-cell  w-[75px]",
+      },
+      {
+        title: "DETAILS",
+        noSort: true,
+        rowClass: () => "w-[70px]",
+        component: () => (
+          <Button type="secondary" className="px-1 h-[22px]">
+            <span className="text-xs font-bold">DETAILS</span>
+          </Button>
+        ),
+      },
+      {
+        title: "DEPOSIT",
+        noSort: true,
+        rowClass: () => "w-[70px]",
+        component: () => (
+          <Button type="primary" className="px-1 h-[22px]">
+            <span className="text-xs font-bold">DEPOSIT</span>
+          </Button>
+        ),
+      },
+    ];
+  };
+
+  return (
+    <Card className="gap-3 overflow-hidden min-h-[379px] flex-1">
+      <div className="flex items-center gap-2.5">
+        <ExposureSVG />
+        <h2 className="font-bold text-white font-sm">SELECT YOUR VAULT</h2>
+      </div>
+      <div className="flex items-center justify-between gap-5">
+        <Search
+          placeholder="Search your Vaults"
+          className="hidden xl:flex flex-1 xl:flex-none"
+        />
+        <Button
+          type={!selectedVault ? "third" : "secondary"}
+          className="flex-1 xl:flex-none xl:w-[170px] h-8 text-xs font-bold"
+          onClick={() => onSelectVault(undefined)}
+          disabled={!selectedVault}
+        >
+          TOTAL SPICE POSITION
+        </Button>
+      </div>
+      <div className="flex-1 overflow-hidden">
+        <Table
+          className="block h-full"
+          rowInfos={getRowInfos()}
+          items={vaults.map((vault) => ({
+            ...vault,
+            position: 2,
+          }))}
+          trStyle="h-10"
+          rowStyle="h-8"
+          defaultSortKey="apy"
+          bodyClass="h-[calc(100%-40px)]"
+          onClickItem={(item) => {
+            onSelectVault(item);
+          }}
+          isActive={(item) => {
+            return !!selectedVault && item.id === selectedVault.id;
+          }}
+        />
+      </div>
+    </Card>
+  );
+}

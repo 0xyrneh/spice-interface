@@ -9,6 +9,16 @@ const nextConfig = {
 
     return config;
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.reservoir.tools",
+        port: "",
+        pathname: "/redirect/tokens/**/image/v1",
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { PrologueNft } from "@/types/nft";
+import { PrologueNftInfo } from "@/types/nft";
 import Dropdown from "./Dropdown";
 import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
@@ -7,9 +7,9 @@ import { FaChevronDown } from "react-icons/fa";
 type Props = {
   className?: string;
   footerClassName?: string;
-  nfts: PrologueNft[];
+  nfts: PrologueNftInfo[];
   selectedIdx?: number;
-  onItemChanged?: (nft: PrologueNft, idx: number) => void;
+  onItemChanged?: (nft: PrologueNftInfo, idx: number) => void;
   expanded?: boolean;
 };
 
@@ -22,24 +22,24 @@ export default function PrologueNftCard({
   onItemChanged,
 }: Props) {
   const [opened, setOpened] = useState(false);
-  const activeNft = () => nfts[selectedIdx ?? 0];
+  const activeNft = nfts[selectedIdx ?? 0];
 
   return (
     <div
       key={`prologue-nft`}
       className={`rounded flex flex-col font-bold ${className} border-1 ${
-        activeNft().featured
+        activeNft?.isEscrowed
           ? "border-orange-200 drop-shadow-orange-200 text-shadow-orange-200 text-orange-200"
           : "border-transparent text-white"
       }`}
     >
       <div
-        className="flex flex-col w-full bg-cover aspect-square relative justify-center"
+        className="flex flex-col w-full bg-cover aspect-square relative justify-center rounded"
         style={{
-          backgroundImage: `url(${activeNft().icon})`,
+          backgroundImage: `url(${activeNft?.tokenImg})`,
         }}
       >
-        {activeNft().featured && (
+        {activeNft?.isEscrowed && (
           <Image
             className="absolute -top-1.5 -left-1.5"
             src="/assets/icons/circle-dot.svg"
@@ -48,7 +48,7 @@ export default function PrologueNftCard({
             alt=""
           />
         )}
-        {activeNft().featured && (
+        {activeNft?.isEscrowed && (
           <span
             className={`text-center font-bold whitespace-nowrap tracking-normal ${
               expanded ? "text-base" : "text-xs md:text-sm xl:text-base"
@@ -56,9 +56,9 @@ export default function PrologueNftCard({
           >
             [LEVERED]
             <br />
-            Net APY:
-            <br className={expanded ? "lg:hidden" : "2xl:hidden"} />{" "}
-            {activeNft().apy}%
+            {`Net APY: `}
+            <br className={expanded ? "lg:hidden" : "2xl:hidden"} />
+            {`${(activeNft?.apy || 0).toFixed(2)}%`}
           </span>
         )}
       </div>
@@ -67,7 +67,7 @@ export default function PrologueNftCard({
           expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
         } ${footerClassName}`}
       >
-        {nfts.length === 1 && <span>#{activeNft().rank}</span>}
+        {nfts.length === 1 && <span>{`#${activeNft?.tokenId}`}</span>}
         {nfts.length > 1 && (
           <Dropdown opened={opened} onClose={() => setOpened(false)}>
             <button
@@ -77,9 +77,11 @@ export default function PrologueNftCard({
               onClick={() => setOpened(!opened)}
             >
               <span
-                className={activeNft().featured ? "text-shadow-orange-900" : ""}
+                className={
+                  activeNft?.isEscrowed ? "text-shadow-orange-900" : ""
+                }
               >
-                #{activeNft().rank}
+                {`#${activeNft.tokenId}`}
               </span>
               <FaChevronDown className="text-gray-200" />
             </button>
@@ -88,7 +90,7 @@ export default function PrologueNftCard({
                 <button
                   key={`nfts--${nft}-${idx}}`}
                   className={`h-8 flex items-center gap-2 hover:text-gray-300 ${
-                    nft.featured
+                    nft.isEscrowed
                       ? "text-orange-200 text-shadow-orange-900"
                       : "text-gray-200"
                   } ${idx === (selectedIdx ?? 0) ? "hidden" : ""}`}
@@ -97,13 +99,13 @@ export default function PrologueNftCard({
                     setOpened(false);
                   }}
                 >
-                  <span>#{nft.rank}</span>
+                  <span>#{nft.tokenId}</span>
                 </button>
               ))}
             </div>
           </Dropdown>
         )}
-        <span>Ξ{activeNft().tvl}</span>
+        <span>Ξ{(activeNft?.amount || 0).toFixed(2)}</span>
       </div>
     </div>
   );

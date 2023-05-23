@@ -1,0 +1,559 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  { "inputs": [], "name": "InvalidAddress", "type": "error" },
+  { "inputs": [], "name": "InvalidLoanTerms", "type": "error" },
+  { "inputs": [], "name": "InvalidMsgSender", "type": "error" },
+  { "inputs": [], "name": "InvalidSignature", "type": "error" },
+  { "inputs": [], "name": "InvalidSigner", "type": "error" },
+  {
+    "inputs": [{ "internalType": "enum LibLoan.LoanState", "name": "state", "type": "uint8" }],
+    "name": "InvalidState",
+    "type": "error"
+  },
+  { "inputs": [], "name": "LoanAmountExceeded", "type": "error" },
+  { "inputs": [], "name": "LoanTermsExpired", "type": "error" },
+  { "inputs": [], "name": "NotLiquidatible", "type": "error" },
+  { "inputs": [], "name": "ParameterOutOfBounds", "type": "error" },
+  {
+    "inputs": [{ "internalType": "bytes", "name": "signature", "type": "bytes" }],
+    "name": "SignatureUsed",
+    "type": "error"
+  },
+  { "inputs": [], "name": "SignerNotEnabled", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint8", "name": "version", "type": "uint8" }],
+    "name": "Initialized",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "interestFee", "type": "uint256" }],
+    "name": "InterestFeeUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "liquidationFeeRatio", "type": "uint256" }],
+    "name": "LiquidationFeeRatioUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "liquidationRatio", "type": "uint256" }],
+    "name": "LiquidationRatioUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "loanId", "type": "uint256" }],
+    "name": "LoanLiquidated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "loanRatio", "type": "uint256" }],
+    "name": "LoanRatioUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "loanId", "type": "uint256" }],
+    "name": "LoanRepaid",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": false, "internalType": "uint256", "name": "loanId", "type": "uint256" },
+      { "indexed": false, "internalType": "address", "name": "borrower", "type": "address" }
+    ],
+    "name": "LoanStarted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "uint256", "name": "loanId", "type": "uint256" }],
+    "name": "LoanUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }],
+    "name": "Paused",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32" },
+      { "indexed": true, "internalType": "bytes32", "name": "previousAdminRole", "type": "bytes32" },
+      { "indexed": true, "internalType": "bytes32", "name": "newAdminRole", "type": "bytes32" }
+    ],
+    "name": "RoleAdminChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32" },
+      { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "sender", "type": "address" }
+    ],
+    "name": "RoleGranted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32" },
+      { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "sender", "type": "address" }
+    ],
+    "name": "RoleRevoked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }],
+    "name": "Unpaused",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "DEFAULT_ADMIN_ROLE",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DENOMINATOR",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ONE_YEAR",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SIGNER_ROLE",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SPICE_NFT_ROLE",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SPICE_ROLE",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "borrowerNote",
+    "outputs": [{ "internalType": "contract INote", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "collateralToLoanId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_loanId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "deposit",
+    "outputs": [{ "internalType": "uint256", "name": "shares", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_loanId", "type": "uint256" }],
+    "name": "depositETH",
+    "outputs": [{ "internalType": "uint256", "name": "shares", "type": "uint256" }],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "borrower", "type": "address" }],
+    "name": "getActiveLoans",
+    "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_loanId", "type": "uint256" }],
+    "name": "getLoanData",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "enum LibLoan.LoanState", "name": "state", "type": "uint8" },
+          {
+            "components": [
+              { "internalType": "address", "name": "lender", "type": "address" },
+              { "internalType": "uint256", "name": "loanAmount", "type": "uint256" },
+              { "internalType": "uint160", "name": "interestRate", "type": "uint160" },
+              { "internalType": "uint32", "name": "duration", "type": "uint32" },
+              { "internalType": "address", "name": "collateralAddress", "type": "address" },
+              { "internalType": "uint256", "name": "collateralId", "type": "uint256" },
+              { "internalType": "address", "name": "borrower", "type": "address" },
+              { "internalType": "uint256", "name": "expiration", "type": "uint256" },
+              { "internalType": "address", "name": "currency", "type": "address" },
+              { "internalType": "bool", "name": "priceLiquidation", "type": "bool" }
+            ],
+            "internalType": "struct LibLoan.LoanTerms",
+            "name": "terms",
+            "type": "tuple"
+          },
+          { "internalType": "uint256", "name": "startedAt", "type": "uint256" },
+          { "internalType": "uint256", "name": "balance", "type": "uint256" },
+          { "internalType": "uint256", "name": "interestAccrued", "type": "uint256" },
+          { "internalType": "uint256", "name": "updatedAt", "type": "uint256" }
+        ],
+        "internalType": "struct LibLoan.LoanData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getNextLoanId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "role", "type": "bytes32" }],
+    "name": "getRoleAdmin",
+    "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+      { "internalType": "uint256", "name": "index", "type": "uint256" }
+    ],
+    "name": "getRoleMember",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "role", "type": "bytes32" }],
+    "name": "getRoleMemberCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "grantRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "hasRole",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_signer", "type": "address" },
+      { "internalType": "contract INote", "name": "_lenderNote", "type": "address" },
+      { "internalType": "contract INote", "name": "_borrowerNote", "type": "address" },
+      { "internalType": "uint256", "name": "_interestFee", "type": "uint256" },
+      { "internalType": "uint256", "name": "_liquidationRatio", "type": "uint256" },
+      { "internalType": "uint256", "name": "_liquidationFeeRatio", "type": "uint256" },
+      { "internalType": "uint256", "name": "_loanRatio", "type": "uint256" },
+      { "internalType": "address", "name": "_feeRecipient", "type": "address" }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "lender", "type": "address" },
+          { "internalType": "uint256", "name": "loanAmount", "type": "uint256" },
+          { "internalType": "uint160", "name": "interestRate", "type": "uint160" },
+          { "internalType": "uint32", "name": "duration", "type": "uint32" },
+          { "internalType": "address", "name": "collateralAddress", "type": "address" },
+          { "internalType": "uint256", "name": "collateralId", "type": "uint256" },
+          { "internalType": "address", "name": "borrower", "type": "address" },
+          { "internalType": "uint256", "name": "expiration", "type": "uint256" },
+          { "internalType": "address", "name": "currency", "type": "address" },
+          { "internalType": "bool", "name": "priceLiquidation", "type": "bool" }
+        ],
+        "internalType": "struct LibLoan.LoanTerms",
+        "name": "_terms",
+        "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "_signature", "type": "bytes" }
+    ],
+    "name": "initiateLoan",
+    "outputs": [{ "internalType": "uint256", "name": "loanId", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "interestFee",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lenderNote",
+    "outputs": [{ "internalType": "contract INote", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_loanId", "type": "uint256" }],
+    "name": "liquidate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidationFeeRatio",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidationRatio",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "loanRatio",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "loans",
+    "outputs": [
+      { "internalType": "enum LibLoan.LoanState", "name": "state", "type": "uint8" },
+      {
+        "components": [
+          { "internalType": "address", "name": "lender", "type": "address" },
+          { "internalType": "uint256", "name": "loanAmount", "type": "uint256" },
+          { "internalType": "uint160", "name": "interestRate", "type": "uint160" },
+          { "internalType": "uint32", "name": "duration", "type": "uint32" },
+          { "internalType": "address", "name": "collateralAddress", "type": "address" },
+          { "internalType": "uint256", "name": "collateralId", "type": "uint256" },
+          { "internalType": "address", "name": "borrower", "type": "address" },
+          { "internalType": "uint256", "name": "expiration", "type": "uint256" },
+          { "internalType": "address", "name": "currency", "type": "address" },
+          { "internalType": "bool", "name": "priceLiquidation", "type": "bool" }
+        ],
+        "internalType": "struct LibLoan.LoanTerms",
+        "name": "terms",
+        "type": "tuple"
+      },
+      { "internalType": "uint256", "name": "startedAt", "type": "uint256" },
+      { "internalType": "uint256", "name": "balance", "type": "uint256" },
+      { "internalType": "uint256", "name": "interestAccrued", "type": "uint256" },
+      { "internalType": "uint256", "name": "updatedAt", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "bytes", "name": "", "type": "bytes" }
+    ],
+    "name": "onERC721Received",
+    "outputs": [{ "internalType": "bytes4", "name": "", "type": "bytes4" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_loanId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_payment", "type": "uint256" }
+    ],
+    "name": "partialRepay",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "renounceRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_loanId", "type": "uint256" }],
+    "name": "repay",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_loanId", "type": "uint256" }],
+    "name": "repayAmount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
+    "name": "revokeRole",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_interestFee", "type": "uint256" }],
+    "name": "setInterestFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_liquidationFeeRatio", "type": "uint256" }],
+    "name": "setLiquidationFeeRatio",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_liquidationRatio", "type": "uint256" }],
+    "name": "setLiquidationRatio",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_loanRatio", "type": "uint256" }],
+    "name": "setLoanRatio",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "signatureUsed",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes4", "name": "interfaceId", "type": "bytes4" }],
+    "name": "supportsInterface",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_loanId", "type": "uint256" },
+      {
+        "components": [
+          { "internalType": "address", "name": "lender", "type": "address" },
+          { "internalType": "uint256", "name": "loanAmount", "type": "uint256" },
+          { "internalType": "uint160", "name": "interestRate", "type": "uint160" },
+          { "internalType": "uint32", "name": "duration", "type": "uint32" },
+          { "internalType": "address", "name": "collateralAddress", "type": "address" },
+          { "internalType": "uint256", "name": "collateralId", "type": "uint256" },
+          { "internalType": "address", "name": "borrower", "type": "address" },
+          { "internalType": "uint256", "name": "expiration", "type": "uint256" },
+          { "internalType": "address", "name": "currency", "type": "address" },
+          { "internalType": "bool", "name": "priceLiquidation", "type": "bool" }
+        ],
+        "internalType": "struct LibLoan.LoanTerms",
+        "name": "_terms",
+        "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "_signature", "type": "bytes" }
+    ],
+    "name": "updateLoan",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_loanId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "withdraw",
+    "outputs": [{ "internalType": "uint256", "name": "shares", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_loanId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "withdrawETH",
+    "outputs": [{ "internalType": "uint256", "name": "shares", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

@@ -1,13 +1,18 @@
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useWeb3React } from "@web3-react/core";
+
 import { useWallet, useNotification } from "@/hooks";
 import { shortAddress, checkIfBlocked } from "@/utils";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/common";
+import useAuth from "@/hooks/useAuth";
+import { ConnectorNames } from "@/types/wallet";
 
 const ConnectWallet = () => {
-  const { connect, account } = useWallet();
   const [blockedRegion, setBlockedRegion] = useState<string>();
 
+  const { account } = useWeb3React();
+  const { login } = useAuth();
   const { showNotification, hideNotification } = useNotification();
 
   useEffect(() => {
@@ -31,7 +36,9 @@ const ConnectWallet = () => {
 
   const handleConnect = async () => {
     if (!blockedRegion) {
-      await connect();
+      // TODO: should be changed automatically later once wallet modal is prepared
+      const defaultConnectName = ConnectorNames.Injected;
+      await login(defaultConnectName);
     }
   };
 

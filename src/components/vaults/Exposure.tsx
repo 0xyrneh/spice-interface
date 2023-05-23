@@ -7,13 +7,13 @@ import UserSVG from "@/assets/icons/user.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { Card } from "@/components/common";
 import { PieChart } from "@/components/portfolio";
-import { Vault } from "@/types/vault";
+import { VaultInfo } from "@/types/vault";
 import Table, { TableRowInfo } from "../common/Table";
 
 type Props = {
   showMarketplace?: boolean;
   showCollection?: boolean;
-  vault?: Vault;
+  vault?: VaultInfo;
   className?: string;
   isBreakdown?: boolean;
 };
@@ -68,7 +68,7 @@ export default function Exposure({
         {vault && (
           <Image
             className="border-1 border-gray-200 rounded-full"
-            src={vault.icon}
+            src={vault.logo}
             width={16}
             height={16}
             alt=""
@@ -102,7 +102,7 @@ export default function Exposure({
           {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"}{" "}
           {isBreakdown ? "BREAKDOWN" : "EXPOSURE"}
         </h2>
-        {showMarketplace && showCollection && (
+        {(showMarketplace || showCollection) && (
           <button onClick={() => setMarketplaceSelected(!marketplaceSelected)}>
             <SortUpSVG
               className={`text-gray-100 hover:text-white ${

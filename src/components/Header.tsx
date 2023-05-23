@@ -1,18 +1,76 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useWeb3React } from "@web3-react/core";
+
 import LogoSVG from "@/assets/icons/logo.svg";
 import { NavOption } from "@/types/common";
 import { VaultSearch, ConnectWallet } from "@/components/common";
 import { NAV_OPTIONS } from "@/constants";
 import { useUI } from "@/hooks";
+import {
+  fetchVaultGlobalDataAsync,
+  fetchLendGlobalDataAsync,
+  fetchVaultUserDataAsync,
+  fetchLendUserLoanDataAsync,
+  fetchLendUserWethDataAsync,
+  resetLendUserLoanData,
+} from "@/state/actions";
+import { useAppDispatch, useAppSelector } from "@/state/hooks";
+import { VaultInfo } from "@/types/vault";
+import { getSpiceFiLendingAddresses } from "@/utils/addressHelpers";
 
 const Header = () => {
-  const router = useRouter();
-  const { blur } = useUI();
-
   const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const { account } = useWeb3React();
+  const { vaults, defaultVault } = useAppSelector((state) => state.vault);
+  const router = useRouter();
+  const { blur } = useUI();
+  const lendAddrs = getSpiceFiLendingAddresses();
+
+  const dispatch = useAppDispatch();
+
+  const fetchData = async () => {
+    dispatch(fetchVaultGlobalDataAsync());
+    dispatch(fetchLendGlobalDataAsync());
+  };
+
+  useEffect(() => {
+    fetchData();
+    setInterval(() => {
+      fetchData();
+    }, 60000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (vaults.length === 0) return;
+
+    vaults.map((row: VaultInfo) => {
+      dispatch(fetchVaultUserDataAsync(account, row));
+      return row;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, vaults.length]);
+
+  useEffect(() => {
+    dispatch(resetLendUserLoanData());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account]);
+
+  useEffect(() => {
+    lendAddrs.map((lendAddr: any) => {
+      dispatch(
+        fetchLendUserLoanDataAsync(lendAddr, account, defaultVault?.address)
+      );
+      dispatch(fetchLendUserWethDataAsync(lendAddr, account));
+      return lendAddr;
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, defaultVault]);
 
   const controlNavbar = () => {
     if (typeof window !== "undefined") {

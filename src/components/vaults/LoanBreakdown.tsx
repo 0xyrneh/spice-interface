@@ -5,11 +5,11 @@ import { Card, Search, Table } from "@/components/common";
 import { TableRowInfo } from "@/components/common/Table";
 import ExposureSVG from "@/assets/icons/exposure.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
-import { Vault } from "@/types/vault";
+import { VaultInfo } from "@/types/vault";
 import { useUI } from "@/hooks";
 
 type Props = {
-  vault: Vault;
+  vault: VaultInfo;
   small?: boolean;
   showIcon?: boolean;
   nonExpandedClassName?: string;
@@ -49,7 +49,7 @@ export default function LoanBreakdown({
             )}
             <Image
               className="mr-1 border-1 border-gray-200 rounded-full"
-              src={item.icon}
+              src={item.logo}
               width={16}
               height={16}
               alt=""
@@ -156,7 +156,7 @@ export default function LoanBreakdown({
           {showIcon && (
             <Image
               className="border-1 border-gray-200 rounded-full"
-              src={vault.icon}
+              src={vault.logo}
               width={16}
               height={16}
               alt=""
