@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import useBreakpoint from "use-breakpoint";
 import { Card, PrologueNftCard, Search, Select } from "@/components/common";
 import UserSVG from "@/assets/icons/user.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
-import { VaultInfo } from "@/types/vault";
 import { useUI } from "@/hooks";
 import { VaultNftsSortFilter } from "@/types/common";
-import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
+import { BREAKPOINTS, VAULT_NFTS_SORT_FILTERS } from "@/constants";
 import { PrologueNftInfo } from "@/types/nft";
 
 type Props = {
@@ -15,11 +15,47 @@ type Props = {
 
 export default function PrologueNfts({ nfts, className }: Props) {
   const { setBlur } = useUI();
+  const { breakpoint } = useBreakpoint(BREAKPOINTS);
 
   const [prologueNftExpanded, setPrologueNftExpanded] = useState(false);
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
     VaultNftsSortFilter.ValueHighToLow
   );
+  const [selectedIdx, setSelectedIdx] = useState<number>();
+
+  useEffect(() => {
+    setSelectedIdx(undefined);
+  }, [prologueNftExpanded]);
+
+  const cardInRow = () => {
+    if (prologueNftExpanded) {
+      if (breakpoint === "3xl" || breakpoint === "2xl" || breakpoint === "xl")
+        return 8;
+      else if (breakpoint === "lg") return 7;
+      else return 6;
+    } else {
+      if (breakpoint === "3xl") return 6;
+      else if (breakpoint === "2xl" || breakpoint === "xl") return 5;
+      else if (breakpoint === "lg") return 4;
+      else return 3;
+    }
+  };
+
+  const side = (idx: number) => {
+    const _cardInRow = cardInRow();
+    const sides: string[] = [];
+    if (idx % _cardInRow === 0) sides.push("left");
+    else if ((idx + 1) % _cardInRow === 0) sides.push("right");
+    if (prologueNftExpanded) {
+      if (idx < _cardInRow) sides.push("top");
+      else if (nfts.length - idx < nfts.length % _cardInRow)
+        sides.push("bottom");
+    } else {
+      sides.push("bottom");
+    }
+
+    return sides as any;
+  };
 
   useEffect(() => {
     setBlur(prologueNftExpanded);
@@ -27,7 +63,7 @@ export default function PrologueNfts({ nfts, className }: Props) {
 
   return (
     <Card
-      className={`gap-3 ${className}`}
+      className={`gap-3 relative ${className}`}
       expanded={prologueNftExpanded}
       onCollapse={() => setPrologueNftExpanded(false)}
     >
@@ -76,20 +112,27 @@ export default function PrologueNfts({ nfts, className }: Props) {
           className={`flex gap-y-3 gap-px custom-scroll ${
             prologueNftExpanded
               ? "overflow-y-auto flex-wrap"
-              : "overflow-x-hidden"
+              : "overflow-hidden"
           }`}
         >
           {nfts.map((nft, idx) => (
-            <PrologueNftCard
+            <div
               key={`prologue-nft-${idx}`}
-              nfts={[nft]}
-              expanded={prologueNftExpanded}
               className={`${
                 prologueNftExpanded
                   ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)]"
                   : "min-w-[calc((100%-2px)/3)] lg:min-w-[calc((100%-3px)/4)] xl:min-w-[calc((100%-4px)/5)] 3xl:min-w-[calc((100%-5px)/6)]"
               }`}
-            />
+            >
+              <PrologueNftCard
+                nfts={[nft]}
+                expanded={prologueNftExpanded}
+                active={idx === selectedIdx}
+                side={side(idx)}
+                className={`${idx === selectedIdx ? "" : ""}`}
+                onClick={() => setSelectedIdx(idx)}
+              />
+            </div>
           ))}
         </div>
       </div>

@@ -1,16 +1,20 @@
 import Image from "next/image";
 import { PrologueNftInfo } from "@/types/nft";
 import Dropdown from "./Dropdown";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 type Props = {
   className?: string;
   footerClassName?: string;
+  active?: boolean;
   nfts: PrologueNftInfo[];
   selectedIdx?: number;
+  side?: ("left" | "top" | "right" | "bottom")[];
   onItemChanged?: (nft: PrologueNftInfo, idx: number) => void;
   expanded?: boolean;
+  onClick?: () => void;
 };
 
 export default function PrologueNftCard({
@@ -19,19 +23,69 @@ export default function PrologueNftCard({
   className,
   footerClassName,
   expanded,
+  active,
+  side,
   onItemChanged,
+  onClick,
 }: Props) {
-  const [opened, setOpened] = useState(false);
+  const comp = useRef();
+
+  const [dropdownOpened, setDropdownOpened] = useState(false);
   const activeNft = nfts[selectedIdx ?? 0];
 
+  useEffect(() => {
+    let currentComp = comp.current as any;
+
+    const scale = 1.4;
+
+    if (active) {
+      const prevWidth = currentComp.offsetWidth;
+      const prevHeight = currentComp.offsetHeight;
+      currentComp.style.position = "absolute";
+      currentComp.style.width = `${prevWidth}px`;
+      currentComp.style.zIndex = 50;
+
+      if (side) {
+        const marginY = (prevHeight * (scale - 1)) / 2;
+        const marginX = (prevWidth * (scale - 1)) / 2;
+
+        if (side.includes("bottom")) {
+          currentComp.style.marginTop = `${marginY * -1}px`;
+        }
+        if (side.includes("top")) {
+          currentComp.style.marginTop = `${marginY}px`;
+        }
+        if (side.includes("left")) {
+          currentComp.style.marginLeft = `${marginX}px`;
+        }
+        if (side.includes("right")) {
+          currentComp.style.marginLeft = `${marginX * -1}px`;
+        }
+      }
+      currentComp.style.scale = scale;
+    } else {
+      currentComp.style.position = "static";
+      currentComp.style.scale = 1;
+      currentComp.style.width = "auto";
+      currentComp.style.zIndex = 0;
+      currentComp.style.marginTop = 0;
+      currentComp.style.marginLeft = 0;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
   return (
-    <div
+    <motion.div
+      ref={comp as any}
+      layout
+      transition={{ duration: 0.4 }}
       key={`prologue-nft`}
       className={`rounded flex flex-col font-bold ${className} border-1 ${
         activeNft?.isEscrowed
           ? "border-orange-200 drop-shadow-orange-200 text-shadow-orange-200 text-orange-200"
           : "border-transparent text-white"
       }`}
+      onClick={onClick}
     >
       <div
         className="flex flex-col w-full bg-cover aspect-square relative justify-center rounded"
@@ -69,12 +123,15 @@ export default function PrologueNftCard({
       >
         {nfts.length === 1 && <span>{`#${activeNft?.tokenId}`}</span>}
         {nfts.length > 1 && (
-          <Dropdown opened={opened} onClose={() => setOpened(false)}>
+          <Dropdown
+            opened={dropdownOpened}
+            onClose={() => setDropdownOpened(false)}
+          >
             <button
               className={`flex items-center justify-between border-1 border-gray-200 hover:border-gray-300 w-[68px] h-7 px-2 ${
-                opened ? "rounded-t" : "rounded"
+                dropdownOpened ? "rounded-t" : "rounded"
               }`}
-              onClick={() => setOpened(!opened)}
+              onClick={() => setDropdownOpened(!dropdownOpened)}
             >
               <span
                 className={
@@ -96,7 +153,7 @@ export default function PrologueNftCard({
                   } ${idx === (selectedIdx ?? 0) ? "hidden" : ""}`}
                   onClick={() => {
                     if (onItemChanged) onItemChanged(nft, idx);
-                    setOpened(false);
+                    setDropdownOpened(false);
                   }}
                 >
                   <span>#{nft.tokenId}</span>
@@ -107,6 +164,6 @@ export default function PrologueNftCard({
         )}
         <span>Ξ{(activeNft?.amount || 0).toFixed(2)}</span>
       </div>
-    </div>
+    </motion.div>
   );
 }

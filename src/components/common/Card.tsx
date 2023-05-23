@@ -22,7 +22,6 @@ const Card = ({
 
   const onLayoutAnimationComplete = () => {
     if (!expanded) {
-      console.log("XXXX");
       (comp.current as any).style.zIndex = "0";
     }
   };

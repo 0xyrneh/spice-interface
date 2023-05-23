@@ -4635,6 +4635,7 @@ framer-motion@^10.12.12:
     tslib "^2.4.0"
   optionalDependencies:
     "@emotion/is-prop-valid" "^0.8.2"
+
 fresh@0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/fresh/-/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
@@ -7523,6 +7524,11 @@ url-set-query@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/url-set-query/-/url-set-query-1.0.0.tgz#016e8cfd7c20ee05cafe7795e892bd0702faa339"
   integrity sha512-3AChu4NiXquPfeckE5R5cGdiHCMWJx1dwCWOmWIL4KHAziJNOFIYJlpGFeKDvwLPHovZRCxK3cYlwzqI9Vp+Gg==
+
+use-breakpoint@^3.0.7:
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/use-breakpoint/-/use-breakpoint-3.0.7.tgz#7dace4fc2b0a45e70005590d7a66435c00251fa2"
+  integrity sha512-9jAE9fY6N+PYhAMrzJ7BjYmGB1aXuizv3LiZvMPIpQKuaimc1uYAvEmpXLwmxhRujb/4uMFjj/pNso9pAGt1XQ==
 
 use-sync-external-store@^1.0.0:
   version "1.2.0"
