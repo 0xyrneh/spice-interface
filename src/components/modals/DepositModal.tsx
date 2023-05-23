@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BigNumber } from "ethers";
+import { useWeb3React } from "@web3-react/core";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "./Modal";
@@ -40,6 +41,7 @@ export default function DepositModal({ open, vault, onClose }: Props) {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
 
+  const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
   const userNftIds = loans.map((row: any) => row.tokenId);
@@ -154,6 +156,12 @@ export default function DepositModal({ open, vault, onClose }: Props) {
     reset();
   }, [isDeposit, positionSelected, leverageTab]);
 
+  const userNfts = nfts.filter(
+    (row) =>
+      row.address.toLowerCase() === account?.toLowerCase() ||
+      userNftIds.includes(row.tokenId)
+  );
+
   return (
     <Modal open={open} onClose={onClose}>
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
@@ -177,19 +185,23 @@ export default function DepositModal({ open, vault, onClose }: Props) {
           {vault.receiptToken === ReceiptToken.NFT ? (
             <PrologueNftCard
               className="w-[176px] lg:w-[198px]"
-              nfts={nfts}
+              nfts={userNfts}
               selectedIdx={selectedIdx}
               onItemChanged={(_, idx) => setSelectedIdx(idx)}
               footerClassName="!h-10"
               expanded
             />
           ) : (
-            <Erc20Card
-              className="w-[176px] lg:w-[198px]"
-              nft={nfts[0]}
-              footerClassName="!h-10"
-              expanded
-            />
+            <>
+              {userNfts.length > 0 && (
+                <Erc20Card
+                  className="w-[176px] lg:w-[198px]"
+                  nft={userNfts[0]}
+                  footerClassName="!h-10"
+                  expanded
+                />
+              )}
+            </>
           )}
         </div>
         <Card

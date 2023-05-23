@@ -1,11 +1,11 @@
 import { DepositModal } from "@/components/modals";
-import { Vault } from "@/types/vault";
+import { VaultInfo } from "@/types/vault";
 import { createContext, ReactNode, useState } from "react";
 
 interface UIContextType {
   blur: boolean;
   setBlur: (val: boolean) => void;
-  showDepositModal: (vault: Vault) => void;
+  showDepositModal: (vault: VaultInfo) => void;
 }
 
 export const UIContext = createContext<UIContextType>({} as UIContextType);
@@ -19,7 +19,7 @@ const UIProvider = ({ children }: Props) => {
   const [depositModalVisible, setDepositModalVisible] = useState(false);
   const [depositModalProps, setDepositModalProps] = useState<any>();
 
-  const showDepositModal = (vault: Vault) => {
+  const showDepositModal = (vault: VaultInfo) => {
     setDepositModalVisible(true);
     setDepositModalProps({
       vault: vault,
