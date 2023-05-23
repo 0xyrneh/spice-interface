@@ -9,7 +9,7 @@ import { useUI } from "@/hooks";
 import { useAppSelector } from "@/state/hooks";
 import { VAULT_BACKGROUND_IMAGES } from "@/config/constants/vault";
 
-export default function Home() {
+export default function Vaults() {
   const [activeVaultIndex, setActiveVaultIndex] = useState(0);
   const [focusedVaultIndex, setFocusedVaultIndex] = useState(-1);
 
