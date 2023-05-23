@@ -1,13 +1,12 @@
 import { InjectedConnector } from "@web3-react/injected-connector";
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import { WalletLinkConnector } from "@web3-react/walletlink-connector";
-import { Web3Provider } from "@ethersproject/providers";
+import Web3 from "web3";
 
 import { ConnectorNames } from "@/types/wallet";
 import getNodeUrl from "@/utils/getRpcUrl";
 import { spiceTestnetNodes, spiceMainnetNodes } from "./getRpcUrl";
-
-const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "1", 10);
+import { activeChainId } from "@/utils/web3";
 
 const rpcUrl = getNodeUrl();
 
@@ -35,12 +34,12 @@ const testnetParams = {
   blockExplorerUrls: ["https://goerli.etherscan.io/"],
 };
 
-const params = chainId === 1 ? mainnetParams : testnetParams;
+const params = activeChainId === 1 ? mainnetParams : testnetParams;
 
 const injected = new InjectedConnector({ supportedChainIds: [1, 5] });
 
 const walletconnect = new WalletConnectConnector({
-  rpc: { [chainId]: rpcUrl },
+  rpc: { [activeChainId]: rpcUrl },
   bridge: "https://bridge.walletconnect.org",
   qrcode: true,
 });

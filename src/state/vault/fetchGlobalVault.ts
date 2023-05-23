@@ -16,8 +16,7 @@ import WethAbi from "@/config/abi/WETH.json";
 import { getWethAddress } from "@/utils/addressHelpers";
 import { activeChainId } from "@/utils/web3";
 
-const apiEnv =
-  Number(process.env.NEXT_PUBLIC_CHAIN_ID) === 1 ? "prod" : "goerli";
+const apiEnv = activeChainId === 1 ? "prod" : "goerli";
 
 // fetch onchain/offchain data of active vaults
 export const fetchActiveVaults = async (vaults: any[]) => {

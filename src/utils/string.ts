@@ -1,3 +1,5 @@
+import { activeChainId } from "@/utils/web3";
+
 export const formatTo2Digit = (value: number): string =>
   value.toLocaleString("en-US", {
     minimumIntegerDigits: 2,
@@ -26,7 +28,7 @@ export const getExpolorerUrl = (txHash: string): string => {
   if (!txHash) return "";
 
   const baseExplorerUrl =
-    Number(process.env.NEXT_PUBLIC_CHAIN_ID) === 1
+    activeChainId === 1
       ? "https://etherscan.io/"
       : "https://goerli.etherscan.io";
 
