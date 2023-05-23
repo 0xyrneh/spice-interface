@@ -8,3 +8,4 @@ export { default as MarketplaceExposure } from "./MarketplaceExposure";
 export { default as CollectionExposure } from "./CollectionExposure";
 export { default as CombineExposure } from "./CombineExposure";
 export { default as LoanExposure } from "./LoanExposure";
+export { default as PrologueNfts } from "./PrologueNfts";

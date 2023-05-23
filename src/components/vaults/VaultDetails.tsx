@@ -2,23 +2,11 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { BigNumber } from "ethers";
 
-import {
-  Button,
-  Card,
-  Select,
-  Stats,
-  PrologueNftCard,
-  Search,
-} from "@/components/common";
-import { DetailChart, LoanBreakdown } from "@/components/vaults";
-import { VaultNftsSortFilter } from "@/types/common";
+import { Button, Card, Stats } from "@/components/common";
+import { DetailChart, LoanBreakdown, PrologueNfts } from "@/components/vaults";
 import CircleDotSvg from "@/assets/icons/circle-dot.svg";
-import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import ChartSVG from "@/assets/icons/chart.svg";
-import UserSVG from "@/assets/icons/user.svg";
-import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
-import { useUI } from "@/hooks";
 import { useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
 import { getSpiceNfts } from "@/utils/subgraph";
@@ -32,13 +20,8 @@ type Props = {
 };
 
 export default function VaultDetails({ vault }: Props) {
-  const { setBlur } = useUI();
-  const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
-    VaultNftsSortFilter.ValueHighToLow
-  );
   const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
 
-  const [prologueNftExpanded, setPrologueNftExpanded] = useState(false);
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
   const userNftIds = loans.map((row: any) => row.tokenId);
@@ -79,10 +62,6 @@ export default function VaultDetails({ vault }: Props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vault?.address, userNftIds.length]);
-
-  useEffect(() => {
-    setBlur(prologueNftExpanded);
-  }, [prologueNftExpanded, setBlur]);
 
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
@@ -151,76 +130,7 @@ export default function VaultDetails({ vault }: Props) {
           </div>
         </Card>
         {vault.receiptToken === ReceiptToken.NFT && (
-          <Card
-            className="gap-3"
-            expanded={prologueNftExpanded}
-            onCollapse={() => setPrologueNftExpanded(false)}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5 text-white">
-                <UserSVG />
-                <h2 className="font-bold text-white font-sm">PROLOGUE NFTS</h2>
-              </div>
-              <button
-                onClick={() => setPrologueNftExpanded(!prologueNftExpanded)}
-              >
-                <ExternalLinkSVG
-                  className={`text-gray-100 hover:text-white ${
-                    prologueNftExpanded ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-            </div>
-            <div className="flex items-center justify-between gap-5">
-              <Search
-                placeholder={`Search NFTID [${nfts.length}]`}
-                className={`${
-                  prologueNftExpanded ? "flex-none" : "flex-1 xl:flex-none"
-                }`}
-              />
-              <div
-                className={`${
-                  prologueNftExpanded ? "flex" : "hidden xl:flex"
-                } flex-1 justify-end text-gray-200 font-medium text-xs`}
-              >
-                <Select
-                  className="w-[170px] text-gray-200 border-gray-200 hover:text-gray-300 hover:border-gray-300"
-                  itemClassName="text-gray-200 hover:text-gray-300"
-                  dropdownClassName="bg-gray-700 bg-opacity-95"
-                  title={vaultNftsSortFilter}
-                  values={[vaultNftsSortFilter]}
-                  items={VAULT_NFTS_SORT_FILTERS.filter(
-                    (item) => item !== vaultNftsSortFilter
-                  )}
-                  onChange={(item) =>
-                    setVaultNftsSortFilter(item as VaultNftsSortFilter)
-                  }
-                />
-              </div>
-            </div>
-            <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 h-full overflow-y-auto">
-              <div
-                className={`flex gap-y-3 gap-px custom-scroll ${
-                  prologueNftExpanded
-                    ? "overflow-y-auto flex-wrap"
-                    : "overflow-x-hidden"
-                }`}
-              >
-                {nfts.map((nft, idx) => (
-                  <PrologueNftCard
-                    key={`prologue-nft-${idx}`}
-                    nfts={[nft]}
-                    expanded={prologueNftExpanded}
-                    className={`${
-                      prologueNftExpanded
-                        ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)]"
-                        : "min-w-[calc((100%-2px)/3)] lg:min-w-[calc((100%-3px)/4)] xl:min-w-[calc((100%-4px)/5)] 3xl:min-w-[calc((100%-5px)/6)]"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </Card>
+          <PrologueNfts nfts={nfts} />
         )}
         <LoanBreakdown vault={vault} className="flex-1" />
       </div>
