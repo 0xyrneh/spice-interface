@@ -32,12 +32,9 @@
     "eslint": "8.37.0",
     "eslint-config-next": "13.2.4",
     "ethers": "5",
-<<<<<<< HEAD
     "framer-motion": "^10.12.12",
-=======
     "graphql": "^16.6.0",
     "lodash": "^4.17.21",
->>>>>>> e429eac (feat: integrate real data on portfolio page)
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "next": "13.2.4",
