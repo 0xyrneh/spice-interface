@@ -1,4 +1,4 @@
-import LeverageDefault from 'assets/images/leverage_default.png';
+import LeverageDefault from "assets/images/leverage_default.png";
 
 export const MOCK_LOGO = LeverageDefault;
 

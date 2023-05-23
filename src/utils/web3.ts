@@ -15,8 +15,8 @@ const web3NoAccount = new Web3(httpProvider);
 const activeChainId: SupportedChainId = Number(
   process.env.NEXT_PUBLIC_CHAIN_ID || "1"
 );
-const mainNetChainId: SupportedChainId = 1;
-const testNetChainId: SupportedChainId = 5;
+const mainNetChainId: SupportedChainId = SupportedChainId.MAINNET;
+const testNetChainId: SupportedChainId = SupportedChainId.GOERLI;
 
 /**
  * Provides a web3 instance using our own private provider httpProver

@@ -3,14 +3,11 @@ import Image from "next/image";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 
-import { Button, Card, Search, Stats, Table } from "@/components/common";
-import { PositionChart } from "@/components/portfolio";
-import { PeriodFilter } from "@/types/common";
 import PositionSVG from "@/assets/icons/position.svg";
 import CopySVG from "@/assets/icons/copy.svg";
-import ExposureSVG from "@/assets/icons/exposure.svg";
 import { shortAddress } from "@/utils";
-import { TableRowInfo } from "@/components/common/Table";
+import { Card, Stats } from "@/components/common";
+import { PositionChart } from "@/components/portfolio";
 import {
   MarketplaceExposure,
   CombineExposure,
@@ -20,10 +17,12 @@ import { VaultsTable } from "@/components/portfolio";
 import VaultNfts from "@/components/vaults/VaultNfts";
 import { useAppSelector } from "@/state/hooks";
 import { VaultInfo, ReceiptToken } from "@/types/vault";
+import { PeriodFilter } from "@/types/common";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { activeChainId } from "@/utils/web3";
 import { getNftPortfolios } from "@/utils/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
+import { accLoans } from "@/utils/lend";
 
 export default function Portfolio() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
@@ -31,9 +30,8 @@ export default function Portfolio() {
 
   const { account } = useWeb3React();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
-
-  // TODO: should be fetched from lending loans
-  const loans: any = [];
+  const { data: lendData } = useAppSelector((state) => state.lend);
+  const loans = accLoans(lendData);
 
   const vaults = vaultsOrigin.map((row: VaultInfo) => {
     let userPositionRaw = BigNumber.from(0);

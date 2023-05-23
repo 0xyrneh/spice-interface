@@ -2,7 +2,6 @@ import random from "lodash/random";
 
 import { SPICE_RPC_URLS } from "@/config/constants/rpc";
 import { SupportedChainId } from "@/config/constants/chains";
-import { activeChainId } from "@/utils/web3";
 
 // ethereum mainnet
 export const spiceMainnetNodes = [
@@ -19,6 +18,9 @@ export const spiceTestnetNodes = [
 ];
 
 const getNodeUrl = (networkId?: number): string => {
+  const activeChainId: SupportedChainId = Number(
+    process.env.NEXT_PUBLIC_CHAIN_ID || "1"
+  );
   const chainId = networkId || activeChainId;
   const nodes = chainId === 1 ? spiceMainnetNodes : spiceTestnetNodes;
   const randomIndex = random(0, nodes.length - 1);

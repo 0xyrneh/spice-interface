@@ -107,7 +107,7 @@ const VaultSearch = () => {
                 <div className="flex items-center gap-3 text-left w-[calc(100%-60px)]">
                   <Image
                     className="border-1 border-gray-200 rounded-full"
-                    src={vault.logo}
+                    src={vault.icon}
                     width={16}
                     height={16}
                     alt=""
@@ -139,7 +139,7 @@ const VaultSearch = () => {
                 <div className="flex items-center gap-3 text-left w-[calc(100%-60px)]">
                   <Image
                     className="border-1 border-gray-200 rounded-full"
-                    src={vault.logo}
+                    src={vault.icon}
                     width={16}
                     height={16}
                     alt=""
@@ -168,7 +168,7 @@ const VaultSearch = () => {
                 <div className="flex items-center gap-3 text-left">
                   <Image
                     className="border-1 border-gray-200 rounded-full"
-                    src={vault.logo}
+                    src={vault.icon}
                     width={16}
                     height={16}
                     alt=""

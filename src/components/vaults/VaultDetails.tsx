@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { BigNumber } from "ethers";
+
 import {
   Button,
   Card,
@@ -9,18 +11,24 @@ import {
   Search,
 } from "@/components/common";
 import { DetailChart, LoanBreakdown } from "@/components/vaults";
-import prologueNfts from "@/constants/prologueNfts";
 import { VaultNftsSortFilter } from "@/types/common";
 import CircleDotSvg from "@/assets/icons/circle-dot.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import ChartSVG from "@/assets/icons/chart.svg";
 import UserSVG from "@/assets/icons/user.svg";
 import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
-import { ReceiptToken, Vault } from "@/types/vault";
+import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { useUI } from "@/hooks";
+import { useAppSelector } from "@/state/hooks";
+import { accLoans } from "@/utils/lend";
+import { getSpiceNfts } from "@/utils/subgraph";
+import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
+import { getTokenImageFromReservoir } from "@/utils/nft";
+import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
+import { PrologueNftInfo } from "@/types/nft";
 
 type Props = {
-  vault: Vault;
+  vault: VaultInfo;
 };
 
 export default function VaultDetails({ vault }: Props) {
@@ -28,7 +36,49 @@ export default function VaultDetails({ vault }: Props) {
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
     VaultNftsSortFilter.ValueHighToLow
   );
+  const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
+
   const [prologueNftExpanded, setPrologueNftExpanded] = useState(false);
+  const { data: lendData } = useAppSelector((state) => state.lend);
+  const loans = accLoans(lendData);
+  const userNftIds = loans.map((row: any) => row.tokenId);
+
+  // fetch nft information from backend
+  const fetchData = async () => {
+    const vaultTvl = vault?.tvl || 0;
+    const vaultTotalShares = vault?.totalShares || 0;
+
+    const nftsRawData = await getSpiceNfts();
+    const nfts1 = nftsRawData.map((row: any) => {
+      const tokenId = Number(row.tokenId);
+      const isEscrowed = userNftIds.includes(tokenId);
+      return {
+        address: row.owner.address,
+        amount: getBalanceInEther(
+          vaultTotalShares === 0
+            ? BigNumber.from(row.shares)
+            : BigNumber.from(row.shares)
+                .mul(BigNumber.from(getBalanceInWei(vaultTvl.toString())))
+                .div(
+                  BigNumber.from(getBalanceInWei(vaultTotalShares.toString()))
+                )
+        ),
+        tokenId,
+        tokenImg: getTokenImageFromReservoir(PROLOGUE_NFT_ADDRESS, tokenId),
+        isEscrowed,
+        apy: isEscrowed ? 45.24 : 0,
+      };
+    });
+
+    setNfts([...nfts1]);
+  };
+
+  useEffect(() => {
+    if (vault?.address) {
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vault?.address, userNftIds.length]);
 
   useEffect(() => {
     setBlur(prologueNftExpanded);
@@ -123,7 +173,7 @@ export default function VaultDetails({ vault }: Props) {
             </div>
             <div className="flex items-center justify-between gap-5">
               <Search
-                placeholder={`Search NFTID [${prologueNfts.length}]`}
+                placeholder={`Search NFTID [${nfts.length}]`}
                 className={`${
                   prologueNftExpanded ? "flex-none" : "flex-1 xl:flex-none"
                 }`}
@@ -156,7 +206,7 @@ export default function VaultDetails({ vault }: Props) {
                     : "overflow-x-hidden"
                 }`}
               >
-                {prologueNfts.map((nft, idx) => (
+                {nfts.map((nft, idx) => (
                   <PrologueNftCard
                     key={`prologue-nft-${idx}`}
                     nfts={[nft]}
