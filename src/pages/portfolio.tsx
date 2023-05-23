@@ -56,7 +56,6 @@ export default function Portfolio() {
       userPositionRaw,
       userPosition: getBalanceInEther(userPositionRaw),
       userNftPortfolios,
-      receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
     };
   });
 

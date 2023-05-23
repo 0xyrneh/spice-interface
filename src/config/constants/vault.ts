@@ -27,3 +27,11 @@ export const VAULT_COLLECTION_COLORS = [
   "#FDBA74",
   "#CA9970",
 ];
+
+export const VAULT_BACKGROUND_IMAGES = [
+  "/assets/images/bgVaults.png",
+  "/assets/images/bgVaults1.png",
+  "/assets/images/bgVaults2.png",
+  "/assets/images/bgVaults.png",
+  "/assets/images/bgVaults1.png",
+];

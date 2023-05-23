@@ -1,9 +1,11 @@
 import Image from "next/image";
-import vaults from "@/constants/vaults";
-import { Vault } from "@/types/vault";
+
+// import vaults from "@/constants/vaults";
+import { VaultInfo } from "@/types/vault";
 import { useEffect, useState } from "react";
 import { VaultFilter } from "@/types/common";
 import { Button, Dropdown, Search, Select, Table } from "@/components/common";
+import { useAppSelector } from "@/state/hooks";
 import CircleXSVG from "@/assets/icons/circleX.svg";
 import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
 import UserSVG from "@/assets/icons/user.svg";
@@ -14,28 +16,41 @@ import {
   VAULT_FILTERS,
   COLLECTION_FILTERS,
 } from "@/constants";
-import { TableRowInfo } from "../common/Table";
 import { useUI } from "@/hooks";
+import { TableRowInfo } from "../common/Table";
 
 type Props = {
-  onClickVault: (vault: Vault) => void;
+  onClickVault: (vault: VaultInfo) => void;
 };
 
 const VaultList = ({ onClickVault }: Props) => {
-  const { showDepositModal } = useUI();
-
   const [vaultFilter, setVaultFilter] = useState(VaultFilter.All);
   const [marketplaceFilters, setMarketplaceFilters] = useState<string[]>([]);
   const [collectionFilters, setCollectionFilters] = useState<string[]>([]);
-  const [filteredVaults, setFilteredVaults] = useState<Vault[]>(vaults);
   const [filterOpened, setFilterOpened] = useState(false);
   const [filterQuery, setFilterQuery] = useState("");
+
+  const { showDepositModal } = useUI();
+  const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
+
+  const vaults = vaultsOrigin.map((row) => {
+    return {
+      ...row,
+      oneDayChange: 0,
+      sevenDayChange: 0,
+    };
+  });
+
+  const getFilteredVaults = () => {
+    if (vaultFilter === VaultFilter.All) return vaults;
+    return vaults.filter((vault) => vault.type === vaultFilter);
+  };
 
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
         title: `VAULT [${filteredVaults.length}]`,
-        key: "name",
+        key: "readable",
         itemPrefix: (item) => (
           <Image
             className="mr-2 border-1 border-gray-200 rounded-full"
@@ -51,6 +66,9 @@ const VaultList = ({ onClickVault }: Props) => {
         title: "APY",
         key: "apy",
         itemSuffix: () => "%",
+        format: (item) => {
+          return (item?.apy || 0).toFixed(2);
+        },
       },
       {
         title: "1D CHANGE",
@@ -72,11 +90,17 @@ const VaultList = ({ onClickVault }: Props) => {
         title: "TVL",
         key: "tvl",
         itemPrefix: () => "Ξ",
+        format: (item) => {
+          return (item?.tvl || 0).toFixed(2);
+        },
       },
       {
         title: "CREATOR",
-        key: "creator",
+        key: "sponsor",
         rowClass: () => "hidden md:table-cell",
+        format: (item) => {
+          return item?.sponsor || "SpiceDAO";
+        },
       },
       {
         title: "RECEIPT",
@@ -101,15 +125,6 @@ const VaultList = ({ onClickVault }: Props) => {
     ];
   };
 
-  useEffect(() => {
-    const _vaults =
-      vaultFilter === VaultFilter.All
-        ? vaults
-        : vaults.filter((vault) => vault.type === vaultFilter);
-
-    setFilteredVaults(_vaults);
-  }, [vaultFilter]);
-
   const toggleMarketplaceFilter = (filter: string) => {
     const idx = marketplaceFilters.findIndex((_item) => _item === filter);
     if (idx === -1) {
@@ -131,6 +146,8 @@ const VaultList = ({ onClickVault }: Props) => {
       setCollectionFilters(newValues);
     }
   };
+
+  const filteredVaults = getFilteredVaults();
 
   return (
     <div className="hidden sm:flex flex-col text-white font-medium px-8 pt-[72px] pb-6 gap-4">

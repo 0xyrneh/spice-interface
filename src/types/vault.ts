@@ -61,6 +61,7 @@ export interface VaultInfo {
   userPosition?: number;
   receiptToken: ReceiptToken;
   id: number;
+  backgroundImage?: string;
 }
 
 export interface LeverageVaultInfo {
