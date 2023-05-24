@@ -48,7 +48,7 @@ export default function PrologueNfts({ nfts, className }: Props) {
     else if ((idx + 1) % _cardInRow === 0) sides.push("right");
     if (prologueNftExpanded) {
       if (idx < _cardInRow) sides.push("top");
-      else if (nfts.length - idx < nfts.length % _cardInRow)
+      else if (nfts.length - idx <= nfts.length % _cardInRow)
         sides.push("bottom");
     } else {
       sides.push("bottom");
@@ -63,10 +63,16 @@ export default function PrologueNfts({ nfts, className }: Props) {
 
   return (
     <Card
-      className={`gap-3 relative ${className}`}
+      className={`gap-3 ${className}`}
       expanded={prologueNftExpanded}
       onCollapse={() => setPrologueNftExpanded(false)}
     >
+      {selectedIdx !== undefined && (
+        <div
+          className="z-10 absolute top-0 left-0 right-0 bottom-0 bg-gray-700 bg-opacity-80"
+          onClick={() => setSelectedIdx(undefined)}
+        />
+      )}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5 text-white">
           <UserSVG />
@@ -120,7 +126,7 @@ export default function PrologueNfts({ nfts, className }: Props) {
               key={`prologue-nft-${idx}`}
               className={`${
                 prologueNftExpanded
-                  ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)]"
+                  ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)] max-w-[calc((100%-5px)/6)] lg:max-w-[calc((100%-6px)/7)] xl:max-w-[calc((100%-7px)/8)]"
                   : "min-w-[calc((100%-2px)/3)] lg:min-w-[calc((100%-3px)/4)] xl:min-w-[calc((100%-4px)/5)] 3xl:min-w-[calc((100%-5px)/6)]"
               }`}
             >

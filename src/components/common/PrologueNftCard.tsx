@@ -4,6 +4,8 @@ import Dropdown from "./Dropdown";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { BREAKPOINTS } from "@/constants";
+import useBreakpoint from "use-breakpoint";
 
 type Props = {
   className?: string;
@@ -29,6 +31,7 @@ export default function PrologueNftCard({
   onClick,
 }: Props) {
   const comp = useRef();
+  const { breakpoint } = useBreakpoint(BREAKPOINTS);
 
   const [dropdownOpened, setDropdownOpened] = useState(false);
   const activeNft = nfts[selectedIdx ?? 0];
@@ -41,16 +44,28 @@ export default function PrologueNftCard({
     if (active) {
       const prevWidth = currentComp.offsetWidth;
       const prevHeight = currentComp.offsetHeight;
-      currentComp.style.position = "absolute";
+      if (!expanded) {
+        currentComp.style.position = "absolute";
+      }
       currentComp.style.width = `${prevWidth}px`;
       currentComp.style.zIndex = 50;
 
       if (side) {
+        const headerSize = expanded
+          ? breakpoint === "xl" || breakpoint === "2xl" || breakpoint === "3xl"
+            ? 32
+            : 28
+          : breakpoint === "3xl" || breakpoint === "2xl"
+          ? 32
+          : breakpoint === "xl"
+          ? 28
+          : 24;
+
         const marginY = (prevHeight * (scale - 1)) / 2;
         const marginX = (prevWidth * (scale - 1)) / 2;
 
         if (side.includes("bottom")) {
-          currentComp.style.marginTop = `${marginY * -1}px`;
+          currentComp.style.marginTop = `${marginY * -1 - headerSize}px`;
         }
         if (side.includes("top")) {
           currentComp.style.marginTop = `${marginY}px`;
@@ -64,12 +79,12 @@ export default function PrologueNftCard({
       }
       currentComp.style.scale = scale;
     } else {
-      currentComp.style.position = "static";
+      currentComp.style.position = "relative";
       currentComp.style.scale = 1;
       currentComp.style.width = "auto";
-      currentComp.style.zIndex = 0;
       currentComp.style.marginTop = 0;
       currentComp.style.marginLeft = 0;
+      (comp.current as any).style.zIndex = 0;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
@@ -78,7 +93,7 @@ export default function PrologueNftCard({
     <motion.div
       ref={comp as any}
       layout
-      transition={{ duration: 0.4 }}
+      transition={{ duration: active ? 0.3 : 0 }}
       key={`prologue-nft`}
       className={`rounded flex flex-col font-bold ${className} border-1 ${
         activeNft?.isEscrowed
@@ -87,8 +102,28 @@ export default function PrologueNftCard({
       }`}
       onClick={onClick}
     >
+      {active && (
+        <div
+          className={`rounded-t flex items-center justify-between bg-gray-700 text-xs p-2 ${
+            expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
+          }`}
+        >
+          <span className="text-ellipsis overflow-hidden whitespace-nowrap">
+            0xb7abacacdcdsf
+          </span>
+          <Image
+            src="/assets/icons/copy.svg"
+            width={14}
+            height={14}
+            alt=""
+            className="cursor-pointer"
+          />
+        </div>
+      )}
       <div
-        className="flex flex-col w-full bg-cover aspect-square relative justify-center rounded"
+        className={`flex flex-col w-full bg-cover aspect-square relative justify-center ${
+          active ? "" : "rounded-t"
+        }`}
         style={{
           backgroundImage: `url(${activeNft?.tokenImg})`,
         }}
