@@ -67,6 +67,7 @@ export default function PrologueNfts({ nfts, className }: Props) {
       className={`gap-3 ${className} ${expanded ? "" : "relative"}`}
       expanded={expanded}
       onCollapse={() => setExpanded(false)}
+      animate
     >
       {selectedIdx !== undefined && (
         <div

@@ -7,6 +7,7 @@ type Props = {
   children: ReactNode | ReactNode[];
   expanded?: boolean;
   notBlur?: boolean;
+  animate?: boolean;
   onCollapse?: () => void;
 };
 
@@ -15,6 +16,7 @@ const Card = ({
   children,
   expanded,
   onCollapse,
+  animate,
   notBlur,
 }: Props) => {
   const { blur } = useUI();
@@ -43,7 +45,7 @@ const Card = ({
       <motion.div
         ref={comp as any}
         layout
-        transition={{ duration: 0.4 }}
+        transition={{ duration: animate ? 0.4 : 0 }}
         onLayoutAnimationComplete={onLayoutAnimationComplete}
         className={`flex flex-col bg-gray-700 rounded shadow-card px-4 py-5 ${className} ${
           expanded
