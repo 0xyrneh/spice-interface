@@ -189,17 +189,16 @@ export default function LoanBreakdown({
       <div className="flex">
         <Search placeholder="Search loans" className="xl:flex-none w-full" />
       </div>
-      <div className="flex-1 overflow-hidden">
-        <Table
-          className="block h-full"
-          rowInfos={getRowInfos()}
-          items={loans}
-          trStyle="h-10"
-          rowStyle="h-8"
-          defaultSortKey="apy"
-          bodyClass="h-[calc(100%-40px)]"
-        />
-      </div>
+      <Table
+        containerClassName="flex-1"
+        className="block h-full"
+        rowInfos={getRowInfos()}
+        items={loans}
+        trStyle="h-10"
+        rowStyle="h-8"
+        defaultSortKey="apy"
+        bodyClass="h-[calc(100%-40px)]"
+      />
     </Card>
   );
 }

@@ -147,6 +147,10 @@ a {
   @apply styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200;
 }
 
+.custom-scroll-transparent {
+  @apply styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-transparent;
+}
+
 .no-scroll {
   @apply styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-none scrollbar-thumb-gray-200;
 }

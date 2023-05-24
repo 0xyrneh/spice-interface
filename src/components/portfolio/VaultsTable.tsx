@@ -104,26 +104,25 @@ export default function VaultsTable({
           TOTAL SPICE POSITION
         </Button>
       </div>
-      <div className="flex-1 overflow-hidden">
-        <Table
-          className="block h-full"
-          rowInfos={getRowInfos()}
-          items={vaults.map((vault) => ({
-            ...vault,
-            position: 2,
-          }))}
-          trStyle="h-10"
-          rowStyle="h-8"
-          defaultSortKey="apy"
-          bodyClass="h-[calc(100%-40px)]"
-          onClickItem={(item) => {
-            onSelectVault(item);
-          }}
-          isActive={(item) => {
-            return !!selectedVault && item.id === selectedVault.id;
-          }}
-        />
-      </div>
+      <Table
+        containerClassName="flex-1"
+        className="block h-full"
+        rowInfos={getRowInfos()}
+        items={vaults.map((vault) => ({
+          ...vault,
+          position: 2,
+        }))}
+        trStyle="h-10"
+        rowStyle="h-8"
+        defaultSortKey="apy"
+        bodyClass="h-[calc(100%-40px)]"
+        onClickItem={(item) => {
+          onSelectVault(item);
+        }}
+        isActive={(item) => {
+          return !!selectedVault && item.id === selectedVault.id;
+        }}
+      />
     </Card>
   );
 }

@@ -113,17 +113,14 @@ export default function Exposure({
         )}
       </div>
       <div className="flex gap-2.5 overflow-hidden">
-        <div className="flex-1">
-          <Table
-            className="block h-full"
-            rowInfos={getRowInfos()}
-            items={
-              marketplaceSelected ? marketplaceExposure : collectionExposure
-            }
-            trStyle="h-10"
-            bodyClass="h-full no-scroll"
-          />
-        </div>
+        <Table
+          containerClassName="flex-1"
+          className="block h-full"
+          rowInfos={getRowInfos()}
+          items={marketplaceSelected ? marketplaceExposure : collectionExposure}
+          trStyle="h-10"
+          bodyClass="h-full no-scroll"
+        />
         <div className="hidden xl:flex flex-1 min-h-[160px] 3xl:min-h-[220px] max-w-[160px] 3xl:max-w-[220px] items-center justify-center">
           <PieChart
             data={(marketplaceSelected

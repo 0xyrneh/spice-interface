@@ -25,7 +25,7 @@
   }
 
   tbody {
-    @apply block overflow-y-auto custom-scroll -mr-3 pr-2;
+    @apply block overflow-y-auto -mr-3 pr-2;
 
     tr {
       @apply table table-fixed w-full text-right [&>td:first-child>div]:justify-start [&>td:first-child>div]:pl-1 [&>td:first-child>div]:rounded-l [&>td:last-child>div]:pr-1 [&>td:last-child>div]:rounded-r;
