@@ -48,6 +48,7 @@ module.exports = {
         card: "0px 0px 4px rgba(255, 255, 255, 0.4)",
         "orange-200": "0px 0px 4px rgba(255, 227, 202, 0.4)",
         black: "inset 0px 4px 50px 15px rgba(0, 0, 0, 0.5)",
+        nft: "inset 0px 0px 8px #D4D4D4",
       },
       dropShadow: {
         sm: "0px 0px 4px rgba(255, 255, 255, 0.4)",

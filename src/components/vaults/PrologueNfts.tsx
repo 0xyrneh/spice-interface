@@ -17,7 +17,7 @@ export default function PrologueNfts({ nfts, className }: Props) {
   const { setBlur } = useUI();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
 
-  const [prologueNftExpanded, setPrologueNftExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
     VaultNftsSortFilter.ValueHighToLow
   );
@@ -25,10 +25,10 @@ export default function PrologueNfts({ nfts, className }: Props) {
 
   useEffect(() => {
     setSelectedIdx(undefined);
-  }, [prologueNftExpanded]);
+  }, [expanded]);
 
   const cardInRow = () => {
-    if (prologueNftExpanded) {
+    if (expanded) {
       if (breakpoint === "3xl" || breakpoint === "2xl" || breakpoint === "xl")
         return 8;
       else if (breakpoint === "lg") return 7;
@@ -46,7 +46,7 @@ export default function PrologueNfts({ nfts, className }: Props) {
     const sides: string[] = [];
     if (idx % _cardInRow === 0) sides.push("left");
     else if ((idx + 1) % _cardInRow === 0) sides.push("right");
-    if (prologueNftExpanded) {
+    if (expanded) {
       if (idx < _cardInRow) sides.push("top");
       else if (nfts.length - idx <= nfts.length % _cardInRow)
         sides.push("bottom");
@@ -58,14 +58,14 @@ export default function PrologueNfts({ nfts, className }: Props) {
   };
 
   useEffect(() => {
-    setBlur(prologueNftExpanded);
-  }, [prologueNftExpanded, setBlur]);
+    setBlur(expanded);
+  }, [expanded, setBlur]);
 
   return (
     <Card
-      className={`gap-3 ${className}`}
-      expanded={prologueNftExpanded}
-      onCollapse={() => setPrologueNftExpanded(false)}
+      className={`gap-3 ${className} ${expanded ? "" : "relative"}`}
+      expanded={expanded}
+      onCollapse={() => setExpanded(false)}
     >
       {selectedIdx !== undefined && (
         <div
@@ -78,10 +78,10 @@ export default function PrologueNfts({ nfts, className }: Props) {
           <UserSVG />
           <h2 className="font-bold text-white font-sm">PROLOGUE NFTS</h2>
         </div>
-        <button onClick={() => setPrologueNftExpanded(!prologueNftExpanded)}>
+        <button onClick={() => setExpanded(!expanded)}>
           <ExternalLinkSVG
             className={`text-gray-100 hover:text-white ${
-              prologueNftExpanded ? "rotate-180" : ""
+              expanded ? "rotate-180" : ""
             }`}
           />
         </button>
@@ -89,13 +89,11 @@ export default function PrologueNfts({ nfts, className }: Props) {
       <div className="flex items-center justify-between gap-5">
         <Search
           placeholder={`Search NFTID [${nfts.length}]`}
-          className={`${
-            prologueNftExpanded ? "flex-none" : "flex-1 xl:flex-none"
-          }`}
+          className={`${expanded ? "flex-none" : "flex-1 xl:flex-none"}`}
         />
         <div
           className={`${
-            prologueNftExpanded ? "flex" : "hidden xl:flex"
+            expanded ? "flex" : "hidden xl:flex"
           } flex-1 justify-end text-gray-200 font-medium text-xs`}
         >
           <Select
@@ -116,26 +114,27 @@ export default function PrologueNfts({ nfts, className }: Props) {
       <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 h-full overflow-y-auto">
         <div
           className={`flex gap-y-3 gap-px custom-scroll ${
-            prologueNftExpanded
-              ? "overflow-y-auto flex-wrap"
-              : "overflow-hidden"
+            expanded ? "overflow-y-auto flex-wrap" : "overflow-hidden"
           }`}
         >
           {nfts.map((nft, idx) => (
             <div
               key={`prologue-nft-${idx}`}
               className={`${
-                prologueNftExpanded
+                expanded
                   ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)] max-w-[calc((100%-5px)/6)] lg:max-w-[calc((100%-6px)/7)] xl:max-w-[calc((100%-7px)/8)]"
                   : "min-w-[calc((100%-2px)/3)] lg:min-w-[calc((100%-3px)/4)] xl:min-w-[calc((100%-4px)/5)] 3xl:min-w-[calc((100%-5px)/6)]"
-              }`}
+              } rounded`}
             >
               <PrologueNftCard
                 nfts={[nft]}
-                expanded={prologueNftExpanded}
+                expanded={expanded}
+                selectable
                 active={idx === selectedIdx}
                 side={side(idx)}
-                className={`${idx === selectedIdx ? "" : ""}`}
+                className={`${
+                  selectedIdx === undefined ? "hover:cursor-pointer" : ""
+                }`}
                 onClick={() => setSelectedIdx(idx)}
               />
             </div>

@@ -10,6 +10,7 @@ import useBreakpoint from "use-breakpoint";
 type Props = {
   className?: string;
   footerClassName?: string;
+  selectable?: boolean;
   active?: boolean;
   nfts: PrologueNftInfo[];
   selectedIdx?: number;
@@ -24,6 +25,7 @@ export default function PrologueNftCard({
   selectedIdx,
   className,
   footerClassName,
+  selectable,
   expanded,
   active,
   side,
@@ -95,7 +97,7 @@ export default function PrologueNftCard({
       layout
       transition={{ duration: active ? 0.3 : 0 }}
       key={`prologue-nft`}
-      className={`rounded flex flex-col font-bold ${className} border-1 ${
+      className={`relative rounded flex flex-col font-bold ${className} border-1 ${
         activeNft?.isEscrowed
           ? "border-orange-200 drop-shadow-orange-200 text-shadow-orange-200 text-orange-200"
           : "border-transparent text-white"
@@ -199,6 +201,9 @@ export default function PrologueNftCard({
         )}
         <span>Ξ{(activeNft?.amount || 0).toFixed(2)}</span>
       </div>
+      {selectable && !active && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 hover:shadow-nft z-50 rounded" />
+      )}
     </motion.div>
   );
 }
