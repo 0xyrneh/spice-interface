@@ -68,11 +68,22 @@ export default function PrologueNftCard({
         const marginY = (prevHeight * (scale - 1)) / 2;
         const marginX = (prevWidth * (scale - 1)) / 2;
 
-        let marginTop = parent.current.scrollTop * -1;
+        let marginTop = 0;
 
-        if (side.includes("bottom")) {
-          marginTop -= marginY + headerSize;
+        if (parent) {
+          marginTop += parent.current.scrollTop * -1;
+
+          let offsetFromParent =
+            parent.current.offsetHeight -
+            (currentComp.offsetTop -
+              parent.current.offsetTop -
+              parent.current.scrollTop +
+              currentComp.offsetHeight);
+          if (offsetFromParent < marginY) {
+            marginTop += offsetFromParent - marginY;
+          }
         }
+
         if (side.includes("top")) {
           marginTop += marginY;
         }
