@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useBreakpoint from "use-breakpoint";
 import { Card, PrologueNftCard, Search, Select } from "@/components/common";
 import UserSVG from "@/assets/icons/user.svg";
@@ -16,6 +16,7 @@ type Props = {
 export default function PrologueNfts({ nfts, className }: Props) {
   const { setBlur } = useUI();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
+  const container = useRef();
 
   const [expanded, setExpanded] = useState(false);
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
@@ -113,31 +114,30 @@ export default function PrologueNfts({ nfts, className }: Props) {
       </div>
       <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 h-full overflow-y-auto">
         <div
+          ref={container as any}
           className={`flex gap-y-3 gap-px custom-scroll ${
             expanded ? "overflow-y-auto flex-wrap" : "overflow-hidden"
           }`}
         >
           {nfts.map((nft, idx) => (
-            <div
+            <PrologueNftCard
               key={`prologue-nft-${idx}`}
-              className={`${
+              nfts={[nft]}
+              expanded={expanded}
+              selectable
+              active={idx === selectedIdx}
+              side={side(idx)}
+              containerClassName={
                 expanded
                   ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)] max-w-[calc((100%-5px)/6)] lg:max-w-[calc((100%-6px)/7)] xl:max-w-[calc((100%-7px)/8)]"
                   : "min-w-[calc((100%-2px)/3)] lg:min-w-[calc((100%-3px)/4)] xl:min-w-[calc((100%-4px)/5)] 3xl:min-w-[calc((100%-5px)/6)]"
-              } rounded`}
-            >
-              <PrologueNftCard
-                nfts={[nft]}
-                expanded={expanded}
-                selectable
-                active={idx === selectedIdx}
-                side={side(idx)}
-                className={`${
-                  selectedIdx === undefined ? "hover:cursor-pointer" : ""
-                }`}
-                onClick={() => setSelectedIdx(idx)}
-              />
-            </div>
+              }
+              className={`${
+                selectedIdx === undefined ? "hover:cursor-pointer" : ""
+              }`}
+              parent={container}
+              onClick={() => setSelectedIdx(idx)}
+            />
           ))}
         </div>
       </div>

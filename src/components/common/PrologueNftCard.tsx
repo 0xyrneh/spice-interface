@@ -8,27 +8,31 @@ import { BREAKPOINTS } from "@/constants";
 import useBreakpoint from "use-breakpoint";
 
 type Props = {
+  containerClassName?: string;
   className?: string;
   footerClassName?: string;
   selectable?: boolean;
   active?: boolean;
   nfts: PrologueNftInfo[];
   selectedIdx?: number;
-  side?: ("left" | "top" | "right" | "bottom")[];
-  onItemChanged?: (nft: PrologueNftInfo, idx: number) => void;
   expanded?: boolean;
+  side?: ("left" | "top" | "right" | "bottom")[];
+  parent?: any;
+  onItemChanged?: (nft: PrologueNftInfo, idx: number) => void;
   onClick?: () => void;
 };
 
 export default function PrologueNftCard({
   nfts,
   selectedIdx,
+  containerClassName,
   className,
   footerClassName,
   selectable,
   expanded,
   active,
   side,
+  parent,
   onItemChanged,
   onClick,
 }: Props) {
@@ -44,11 +48,13 @@ export default function PrologueNftCard({
     const scale = 1.4;
 
     if (active) {
+      console.log("xx", parent.current.scrollTop);
+      console.log(currentComp.offsetTop);
       const prevWidth = currentComp.offsetWidth;
       const prevHeight = currentComp.offsetHeight;
-      if (!expanded) {
-        currentComp.style.position = "absolute";
-      }
+      // if (!expanded) {
+      currentComp.style.position = "absolute";
+      // }
       currentComp.style.width = `${prevWidth}px`;
       currentComp.style.zIndex = 50;
 
@@ -66,12 +72,15 @@ export default function PrologueNftCard({
         const marginY = (prevHeight * (scale - 1)) / 2;
         const marginX = (prevWidth * (scale - 1)) / 2;
 
+        let marginTop = parent.current.scrollTop * -1;
+
         if (side.includes("bottom")) {
-          currentComp.style.marginTop = `${marginY * -1 - headerSize}px`;
+          marginTop -= marginY + headerSize;
         }
         if (side.includes("top")) {
-          currentComp.style.marginTop = `${marginY}px`;
+          marginTop += marginY;
         }
+        currentComp.style.marginTop = `${marginTop}px`;
         if (side.includes("left")) {
           currentComp.style.marginLeft = `${marginX}px`;
         }
@@ -92,118 +101,120 @@ export default function PrologueNftCard({
   }, [active]);
 
   return (
-    <motion.div
-      ref={comp as any}
-      layout
-      transition={{ duration: active ? 0.3 : 0 }}
-      key={`prologue-nft`}
-      className={`relative rounded flex flex-col font-bold ${className} border-1 ${
-        activeNft?.isEscrowed
-          ? "border-orange-200 drop-shadow-orange-200 text-shadow-orange-200 text-orange-200"
-          : "border-transparent text-white"
-      }`}
-      onClick={onClick}
-    >
-      {active && (
-        <div
-          className={`rounded-t flex items-center justify-between bg-gray-700 text-xs p-2 ${
-            expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
-          }`}
-        >
-          <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-            0xb7abacacdcdsf
-          </span>
-          <Image
-            src="/assets/icons/copy.svg"
-            width={14}
-            height={14}
-            alt=""
-            className="cursor-pointer"
-          />
-        </div>
-      )}
-      <div
-        className={`flex flex-col w-full bg-cover aspect-square relative justify-center ${
-          active ? "" : "rounded-t"
+    <div className={`rounded ${containerClassName}`}>
+      <motion.div
+        ref={comp as any}
+        layout
+        transition={{ duration: active ? 0.3 : 0 }}
+        key={`prologue-nft`}
+        className={`relative rounded flex flex-col font-bold ${className} border-1 ${
+          activeNft?.isEscrowed
+            ? "border-orange-200 drop-shadow-orange-200 text-shadow-orange-200 text-orange-200"
+            : "border-transparent text-white"
         }`}
-        style={{
-          backgroundImage: `url(${activeNft?.tokenImg})`,
-        }}
+        onClick={onClick}
       >
-        {activeNft?.isEscrowed && (
-          <Image
-            className="absolute -top-1.5 -left-1.5"
-            src="/assets/icons/circle-dot.svg"
-            width={28}
-            height={28}
-            alt=""
-          />
-        )}
-        {activeNft?.isEscrowed && (
-          <span
-            className={`text-center font-bold whitespace-nowrap tracking-normal ${
-              expanded ? "text-base" : "text-xs md:text-sm xl:text-base"
+        {active && (
+          <div
+            className={`rounded-t flex items-center justify-between bg-gray-700 text-xs p-2 ${
+              expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
             }`}
           >
-            [LEVERED]
-            <br />
-            {`Net APY: `}
-            <br className={expanded ? "lg:hidden" : "2xl:hidden"} />
-            {`${(activeNft?.apy || 0).toFixed(2)}%`}
-          </span>
+            <span className="text-ellipsis overflow-hidden whitespace-nowrap">
+              0xb7abacacdcdsf
+            </span>
+            <Image
+              src="/assets/icons/copy.svg"
+              width={14}
+              height={14}
+              alt=""
+              className="cursor-pointer"
+            />
+          </div>
         )}
-      </div>
-      <div
-        className={`rounded-b flex items-center justify-between bg-gray-700 text-xs p-2 ${
-          expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
-        } ${footerClassName}`}
-      >
-        {nfts.length === 1 && <span>{`#${activeNft?.tokenId}`}</span>}
-        {nfts.length > 1 && (
-          <Dropdown
-            opened={dropdownOpened}
-            onClose={() => setDropdownOpened(false)}
-          >
-            <button
-              className={`flex items-center justify-between border-1 border-gray-200 hover:border-gray-300 w-[68px] h-7 px-2 ${
-                dropdownOpened ? "rounded-t" : "rounded"
+        <div
+          className={`flex flex-col w-full bg-cover aspect-square relative justify-center ${
+            active ? "" : "rounded-t"
+          }`}
+          style={{
+            backgroundImage: `url(${activeNft?.tokenImg})`,
+          }}
+        >
+          {activeNft?.isEscrowed && (
+            <Image
+              className="absolute -top-1.5 -left-1.5"
+              src="/assets/icons/circle-dot.svg"
+              width={28}
+              height={28}
+              alt=""
+            />
+          )}
+          {activeNft?.isEscrowed && (
+            <span
+              className={`text-center font-bold whitespace-nowrap tracking-normal ${
+                expanded ? "text-base" : "text-xs md:text-sm xl:text-base"
               }`}
-              onClick={() => setDropdownOpened(!dropdownOpened)}
             >
-              <span
-                className={
-                  activeNft?.isEscrowed ? "text-shadow-orange-900" : ""
-                }
+              [LEVERED]
+              <br />
+              {`Net APY: `}
+              <br className={expanded ? "lg:hidden" : "2xl:hidden"} />
+              {`${(activeNft?.apy || 0).toFixed(2)}%`}
+            </span>
+          )}
+        </div>
+        <div
+          className={`rounded-b flex items-center justify-between bg-gray-700 text-xs p-2 ${
+            expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
+          } ${footerClassName}`}
+        >
+          {nfts.length === 1 && <span>{`#${activeNft?.tokenId}`}</span>}
+          {nfts.length > 1 && (
+            <Dropdown
+              opened={dropdownOpened}
+              onClose={() => setDropdownOpened(false)}
+            >
+              <button
+                className={`flex items-center justify-between border-1 border-gray-200 hover:border-gray-300 w-[68px] h-7 px-2 ${
+                  dropdownOpened ? "rounded-t" : "rounded"
+                }`}
+                onClick={() => setDropdownOpened(!dropdownOpened)}
               >
-                {`#${activeNft.tokenId}`}
-              </span>
-              <FaChevronDown className="text-gray-200" />
-            </button>
-            <div className="bg-gray-700 bg-opacity-95 border-x-1 border-b-1 border-gray-300 rounded-b p-2 text-xs max-h-[356px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
-              {nfts.map((nft, idx) => (
-                <button
-                  key={`nfts--${nft}-${idx}}`}
-                  className={`h-8 flex items-center gap-2 hover:text-gray-300 ${
-                    nft.isEscrowed
-                      ? "text-orange-200 text-shadow-orange-900"
-                      : "text-gray-200"
-                  } ${idx === (selectedIdx ?? 0) ? "hidden" : ""}`}
-                  onClick={() => {
-                    if (onItemChanged) onItemChanged(nft, idx);
-                    setDropdownOpened(false);
-                  }}
+                <span
+                  className={
+                    activeNft?.isEscrowed ? "text-shadow-orange-900" : ""
+                  }
                 >
-                  <span>#{nft.tokenId}</span>
-                </button>
-              ))}
-            </div>
-          </Dropdown>
+                  {`#${activeNft.tokenId}`}
+                </span>
+                <FaChevronDown className="text-gray-200" />
+              </button>
+              <div className="bg-gray-700 bg-opacity-95 border-x-1 border-b-1 border-gray-300 rounded-b p-2 text-xs max-h-[356px] overflow-y-auto styled-scrollbars scrollbar scrollbar-track-transparent scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-gray-100">
+                {nfts.map((nft, idx) => (
+                  <button
+                    key={`nfts--${nft}-${idx}}`}
+                    className={`h-8 flex items-center gap-2 hover:text-gray-300 ${
+                      nft.isEscrowed
+                        ? "text-orange-200 text-shadow-orange-900"
+                        : "text-gray-200"
+                    } ${idx === (selectedIdx ?? 0) ? "hidden" : ""}`}
+                    onClick={() => {
+                      if (onItemChanged) onItemChanged(nft, idx);
+                      setDropdownOpened(false);
+                    }}
+                  >
+                    <span>#{nft.tokenId}</span>
+                  </button>
+                ))}
+              </div>
+            </Dropdown>
+          )}
+          <span>Ξ{(activeNft?.amount || 0).toFixed(2)}</span>
+        </div>
+        {selectable && !active && (
+          <div className="absolute top-0 left-0 right-0 bottom-0 hover:shadow-nft z-50 rounded" />
         )}
-        <span>Ξ{(activeNft?.amount || 0).toFixed(2)}</span>
-      </div>
-      {selectable && !active && (
-        <div className="absolute top-0 left-0 right-0 bottom-0 hover:shadow-nft z-50 rounded" />
-      )}
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }

@@ -182,7 +182,7 @@ export default function DepositModal({ open, vault, onClose }: Props) {
           </Card>
           {vault.receiptToken === ReceiptToken.NFT ? (
             <PrologueNftCard
-              className="w-[176px] lg:w-[198px]"
+              containerClassName="w-[176px] lg:w-[198px]"
               nfts={userNfts}
               selectedIdx={selectedIdx}
               onItemChanged={(_, idx) => setSelectedIdx(idx)}
