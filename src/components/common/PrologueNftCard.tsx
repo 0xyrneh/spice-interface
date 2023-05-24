@@ -48,8 +48,6 @@ export default function PrologueNftCard({
     const scale = 1.4;
 
     if (active) {
-      console.log("xx", parent.current.scrollTop);
-      console.log(currentComp.offsetTop);
       const prevWidth = currentComp.offsetWidth;
       const prevHeight = currentComp.offsetHeight;
       // if (!expanded) {
