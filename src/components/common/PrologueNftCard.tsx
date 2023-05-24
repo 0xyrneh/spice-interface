@@ -50,9 +50,7 @@ export default function PrologueNftCard({
     if (active) {
       const prevWidth = currentComp.offsetWidth;
       const prevHeight = currentComp.offsetHeight;
-      // if (!expanded) {
       currentComp.style.position = "absolute";
-      // }
       currentComp.style.width = `${prevWidth}px`;
       currentComp.style.zIndex = 50;
 
