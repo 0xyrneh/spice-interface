@@ -1,5 +1,6 @@
 import { ReactNode, useState } from "react";
 import SortDownSVG from "@/assets/icons/sort-down.svg";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 
 export type TableRowInfo = {
   title: string;
@@ -23,6 +24,7 @@ type Props = {
   rowStyle?: string;
   defaultSortKey?: string;
   bodyClass?: string;
+  isLoading?: boolean;
   onClickItem?: (item: any) => void;
   isActive?: (item: any) => boolean;
 };
@@ -38,6 +40,7 @@ const Table = ({
   className,
   onClickItem,
   isActive,
+  isLoading,
 }: Props) => {
   const [sortKey, setSortKey] = useState<string | undefined>(defaultSortKey);
   const [sortAsc, setSortAsc] = useState(false);
@@ -113,40 +116,50 @@ const Table = ({
           onMouseEnter={() => setHoverBody(true)}
           onMouseLeave={() => setHoverBody(false)}
         >
-          {getSortedItems().map((item, index) => (
-            <tr
-              key={`item-${index}`}
-              className={`${trStyle} ${
-                onClickItem ? "vault-row cursor-pointer" : ""
-              } ${isActive && isActive(item) ? "active" : ""}`}
-              onClick={() => {
-                if (onClickItem) onClickItem(item);
-              }}
-            >
-              {rowInfos.map((row, idx) => (
-                <td
-                  key={`item-${index}-${row.title}-${idx}`}
-                  className={`${row.rowClass ? row.rowClass() : ""}`}
-                >
-                  <div
-                    className={`${rowStyle} ${
-                      row.itemClass ? row.itemClass(item) : ""
-                    }`}
-                  >
-                    {row.itemPrefix && row.itemPrefix(item)}
-                    {row.key ? (
-                      <span className="whitespace-nowrap overflow-hidden text-ellipsis">
-                        {row.format ? row.format(item) : item[row.key]}
-                      </span>
-                    ) : (
-                      row.component!(item)
-                    )}
-                    {row.itemSuffix && row.itemSuffix(item)}
-                  </div>
-                </td>
-              ))}
+          {isLoading && (
+            <tr>
+              <td>
+                <span className="flex justify-center align-center mt-2">
+                  <LoadingSpinner />
+                </span>
+              </td>
             </tr>
-          ))}
+          )}
+          {!isLoading &&
+            getSortedItems().map((item, index) => (
+              <tr
+                key={`item-${index}`}
+                className={`${trStyle} ${
+                  onClickItem ? "vault-row cursor-pointer" : ""
+                } ${isActive && isActive(item) ? "active" : ""}`}
+                onClick={() => {
+                  if (onClickItem) onClickItem(item);
+                }}
+              >
+                {rowInfos.map((row, idx) => (
+                  <td
+                    key={`item-${index}-${row.title}-${idx}`}
+                    className={`${row.rowClass ? row.rowClass() : ""}`}
+                  >
+                    <div
+                      className={`${rowStyle} ${
+                        row.itemClass ? row.itemClass(item) : ""
+                      }`}
+                    >
+                      {row.itemPrefix && row.itemPrefix(item)}
+                      {row.key ? (
+                        <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                          {row.format ? row.format(item) : item[row.key]}
+                        </span>
+                      ) : (
+                        row.component!(item)
+                      )}
+                      {row.itemSuffix && row.itemSuffix(item)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

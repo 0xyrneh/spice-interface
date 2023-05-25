@@ -16,7 +16,7 @@ import {
 import { VaultsTable } from "@/components/portfolio";
 import VaultNfts from "@/components/vaults/VaultNfts";
 import { useAppSelector } from "@/state/hooks";
-import { VaultInfo, ReceiptToken } from "@/types/vault";
+import { VaultInfo, ReceiptToken, Vault } from "@/types/vault";
 import { PeriodFilter } from "@/types/common";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { activeChainId } from "@/utils/web3";
@@ -33,31 +33,33 @@ export default function Portfolio() {
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
 
-  const vaults = vaultsOrigin.map((row: VaultInfo) => {
-    let userPositionRaw = BigNumber.from(0);
-    let userNftPortfolios: any[] = [];
-    if (row.fungible) {
-      userPositionRaw = row?.userInfo?.depositAmnt || BigNumber.from(0);
-    } else {
-      const userNfts = row?.userInfo?.nftsRaw || [];
-      userNftPortfolios =
-        row.address === DEFAULT_AGGREGATOR_VAULT[activeChainId]
-          ? getNftPortfolios(loans, userNfts)
-          : [];
+  const vaults = vaultsOrigin
+    .map((row: VaultInfo) => {
+      let userPositionRaw = BigNumber.from(0);
+      let userNftPortfolios: any[] = [];
+      if (row.fungible) {
+        userPositionRaw = row?.userInfo?.depositAmnt || BigNumber.from(0);
+      } else {
+        const userNfts = row?.userInfo?.nftsRaw || [];
+        userNftPortfolios =
+          row.address === DEFAULT_AGGREGATOR_VAULT[activeChainId]
+            ? getNftPortfolios(loans, userNfts)
+            : [];
 
-      userNftPortfolios.map((row1: any) => {
-        userPositionRaw = userPositionRaw.add(row1.value);
-        return row1;
-      });
-    }
+        userNftPortfolios.map((row1: any) => {
+          userPositionRaw = userPositionRaw.add(row1.value);
+          return row1;
+        });
+      }
 
-    return {
-      ...row,
-      userPositionRaw,
-      userPosition: getBalanceInEther(userPositionRaw),
-      userNftPortfolios,
-    };
-  });
+      return {
+        ...row,
+        userPositionRaw,
+        userPosition: getBalanceInEther(userPositionRaw),
+        userNftPortfolios,
+      };
+    })
+    .filter((row1: VaultInfo) => row1.userPosition && row1.userPosition > 0);
 
   const onSelectVault = (item?: VaultInfo) => {
     if (!item) setSelectedVaultAddr(undefined);
