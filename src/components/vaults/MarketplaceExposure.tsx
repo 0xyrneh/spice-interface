@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import axios from "axios";
+import axios, { all } from "axios";
 
 import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
@@ -136,7 +136,7 @@ export default function MarketplaceExposure({
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
-        title: `MARKETPLACES [${Math.max(allocations.length - 1, 0)}]`,
+        title: `MARKETPLACES [${allocations.length}]`,
         key: "name",
         noSort: true,
         itemPrefix: (item) => (

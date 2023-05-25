@@ -104,7 +104,7 @@ export default function CollectionExposure({
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
-        title: `COLLECTIONS [${Math.max(allocations.length - 1, 0)}]`,
+        title: `COLLECTIONS [${allocations.length}]`,
         key: "name",
         noSort: true,
         itemPrefix: (item) => (
