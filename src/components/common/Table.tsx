@@ -119,7 +119,7 @@ const Table = ({
           {isLoading && (
             <tr>
               <td>
-                <span className="flex justify-center align-center mt-2">
+                <span className="flex justify-center align-center my-2">
                   <LoadingSpinner />
                 </span>
               </td>
