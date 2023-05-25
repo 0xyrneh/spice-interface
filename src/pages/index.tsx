@@ -7,7 +7,8 @@ import { News, VaultList } from "@/components/vaults";
 import { Button } from "@/components/common";
 import { useUI } from "@/hooks";
 import { useAppSelector } from "@/state/hooks";
-import { VAULT_BACKGROUND_IMAGES } from "@/config/constants/vault";
+import { DEFAULT_VAULT_BACKGROUND_IMAGE } from "@/config/constants/vault";
+import { getVaultBackgroundImage } from "@/utils/vault";
 
 export default function Vaults() {
   const [activeVaultIndex, setActiveVaultIndex] = useState(0);
@@ -23,7 +24,11 @@ export default function Vaults() {
       oneDayChange: 0,
       sevenDayChange: 0,
       sponsor: row.sponsor || "SpiceDAO",
-      backgroundImage: VAULT_BACKGROUND_IMAGES[id],
+      backgroundImage: getVaultBackgroundImage(
+        row?.fungible,
+        row?.type,
+        row?.deprecated
+      ),
     };
   });
 
@@ -39,7 +44,7 @@ export default function Vaults() {
         className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[982px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-warm-gray-50 font-semibold shadow-black"
         style={{
           backgroundImage: `url(${
-            activeVault?.backgroundImage || VAULT_BACKGROUND_IMAGES[0]
+            activeVault?.backgroundImage || DEFAULT_VAULT_BACKGROUND_IMAGE
           })`,
         }}
       >
@@ -65,7 +70,7 @@ export default function Vaults() {
               clickClassName="hover:drop-shadow-orange-200 hover:border-orange-200"
               style={{
                 backgroundImage: `url(${
-                  vault?.backgroundImage || VAULT_BACKGROUND_IMAGES[0]
+                  vault?.backgroundImage || DEFAULT_VAULT_BACKGROUND_IMAGE
                 })`,
                 transition: "transform 450ms",
               }}
@@ -111,7 +116,9 @@ export default function Vaults() {
               {`By ${activeVault?.sponsor || ""}`}
             </h3>
             <h2 className="text-xl font-bold uppercase">
-              {activeVault?.readable || ""}
+              {`${activeVault?.readable || ""} ${
+                activeVault?.deprecated ? "[WITHDRAW ONLY]" : ""
+              }`}
             </h2>
           </>
         )}

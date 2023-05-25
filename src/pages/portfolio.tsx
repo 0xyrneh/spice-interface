@@ -16,7 +16,7 @@ import {
 import { VaultsTable } from "@/components/portfolio";
 import VaultNfts from "@/components/vaults/VaultNfts";
 import { useAppSelector } from "@/state/hooks";
-import { VaultInfo, ReceiptToken } from "@/types/vault";
+import { VaultInfo, ReceiptToken, Vault } from "@/types/vault";
 import { PeriodFilter } from "@/types/common";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { activeChainId } from "@/utils/web3";
@@ -33,31 +33,33 @@ export default function Portfolio() {
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
 
-  const vaults = vaultsOrigin.map((row: VaultInfo) => {
-    let userPositionRaw = BigNumber.from(0);
-    let userNftPortfolios: any[] = [];
-    if (row.fungible) {
-      userPositionRaw = row?.userInfo?.depositAmnt || BigNumber.from(0);
-    } else {
-      const userNfts = row?.userInfo?.nftsRaw || [];
-      userNftPortfolios =
-        row.address === DEFAULT_AGGREGATOR_VAULT[activeChainId]
-          ? getNftPortfolios(loans, userNfts)
-          : [];
+  const vaults = vaultsOrigin
+    .map((row: VaultInfo) => {
+      let userPositionRaw = BigNumber.from(0);
+      let userNftPortfolios: any[] = [];
+      if (row.fungible) {
+        userPositionRaw = row?.userInfo?.depositAmnt || BigNumber.from(0);
+      } else {
+        const userNfts = row?.userInfo?.nftsRaw || [];
+        userNftPortfolios =
+          row.address === DEFAULT_AGGREGATOR_VAULT[activeChainId]
+            ? getNftPortfolios(loans, userNfts)
+            : [];
 
-      userNftPortfolios.map((row1: any) => {
-        userPositionRaw = userPositionRaw.add(row1.value);
-        return row1;
-      });
-    }
+        userNftPortfolios.map((row1: any) => {
+          userPositionRaw = userPositionRaw.add(row1.value);
+          return row1;
+        });
+      }
 
-    return {
-      ...row,
-      userPositionRaw,
-      userPosition: getBalanceInEther(userPositionRaw),
-      userNftPortfolios,
-    };
-  });
+      return {
+        ...row,
+        userPositionRaw,
+        userPosition: getBalanceInEther(userPositionRaw),
+        userNftPortfolios,
+      };
+    })
+    .filter((row1: VaultInfo) => row1.userPosition && row1.userPosition > 0);
 
   const onSelectVault = (item?: VaultInfo) => {
     if (!item) setSelectedVaultAddr(undefined);
@@ -113,7 +115,7 @@ export default function Portfolio() {
           onSelectVault={onSelectVault}
         />
 
-        <div className="max-h-[363px] overflow-y-hidden p-1 -m-1">
+        <div className="h-[44%] overflow-y-hidden p-1 -m-1">
           {selectedVault &&
           selectedVault.receiptToken === ReceiptToken.ERC20 ? (
             <LoanExposure
@@ -129,7 +131,7 @@ export default function Portfolio() {
 
       <div className="flex flex-col flex-1 gap-5 pt-1">
         {/* vault chart graph */}
-        <Card className="gap-3 flex-1 overflow-hidden min-h-[523px]">
+        <Card className="gap-3 flex-1 overflow-hidden min-h-[323px] h-[50%]">
           <div className="flex items-center gap-2.5">
             {selectedVault && (
               <Image
@@ -218,27 +220,24 @@ export default function Portfolio() {
         </Card>
 
         {/* vault details info */}
-        {selectedVault && !selectedVault?.leverage && (
-          <div className="flex gap-5 max-h-[303px] overflow-hidden p-1 -m-1">
-            {selectedVault &&
-            selectedVault.receiptToken === ReceiptToken.NFT ? (
-              <LoanExposure
-                className="flex-1"
-                small
-                showIcon
-                vault={selectedVault}
-              />
-            ) : (
-              <MarketplaceExposure className="flex-1" vault={selectedVault} />
-            )}
-            <CombineExposure
+        <div className="flex gap-5 h-[37%] overflow-hidden p-1 -m-1">
+          {selectedVault && selectedVault.receiptToken === ReceiptToken.NFT ? (
+            <LoanExposure
+              className="flex-1"
+              small
+              showIcon
               vault={selectedVault}
-              hasToggle={
-                selectedVault && selectedVault.receiptToken === ReceiptToken.NFT
-              }
             />
-          </div>
-        )}
+          ) : (
+            <MarketplaceExposure className="flex-1" vault={selectedVault} />
+          )}
+          <CombineExposure
+            vault={selectedVault}
+            hasToggle={
+              selectedVault && selectedVault.receiptToken === ReceiptToken.NFT
+            }
+          />
+        </div>
       </div>
     </div>
   );

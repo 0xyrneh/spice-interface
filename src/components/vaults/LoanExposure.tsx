@@ -36,14 +36,14 @@ export default function LoanExposure({
 }: Props) {
   const [loanExpanded, setLoanExpanded] = useState(false);
   const [loans, setLoans] = useState<any[]>([]);
-  const [isLoading, setLoading] = useState<boolean | undefined>();
+  const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
 
   const { setBlur } = useUI();
 
   const isLeverageVault = !!vault?.leverage;
 
   const fetchLoans = async () => {
-    if (isLoading === undefined) setLoading(true);
+    setIsFetching(true);
 
     const apiEnv =
       Number(process.env.REACT_APP_CHAIN_ID) === 1 ? "prod" : "goerli";
@@ -101,7 +101,7 @@ export default function LoanExposure({
     } catch {
       console.log("loans fetching error");
     }
-    setLoading(false);
+    setIsFetching(false);
   };
 
   const formatMaturity = (date: number) => {
@@ -111,13 +111,9 @@ export default function LoanExposure({
     const timeLeft = moment.duration(matureDate.diff(now));
 
     const dayLeft = Math.floor(timeLeft.asDays());
-    const hourLeft = Math.floor(timeLeft.asHours() % 24);
-    const minuteLeft = Math.floor(timeLeft.asMinutes() % 60);
 
     if (dayLeft > 0) return `${dayLeft}d`;
-    if (hourLeft > 0) return `${hourLeft}h`;
-    if (minuteLeft > 0) return `${minuteLeft}m`;
-    return isLeverageVault ? "renewing" : "matured";
+    return "0";
   };
 
   useEffect(() => {
@@ -229,7 +225,7 @@ export default function LoanExposure({
         },
       },
       {
-        title: "DUE",
+        title: "RENEW",
         key: "matureDate",
         rowClass: () =>
           loanExpanded
@@ -315,6 +311,7 @@ export default function LoanExposure({
         rowStyle="h-8"
         defaultSortKey="apy"
         bodyClass="h-[calc(100%-40px)]"
+        isLoading={isFetching}
       />
     </Card>
   );

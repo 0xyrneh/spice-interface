@@ -73,7 +73,7 @@ export default function DetailChart() {
           </div>
         </div>
       </Card>
-      <div className="flex gap-5 max-h-[363px] overflow-hidden p-1 -m-1">
+      <div className="flex gap-5 overflow-hidden p-1 -m-1">
         <Exposure showMarketplace isBreakdown className="flex-1" />
         <Exposure showCollection isBreakdown className="flex-1" />
       </div>

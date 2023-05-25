@@ -133,7 +133,7 @@ export default function VaultNfts({ vault, className }: Props) {
           />
         </div>
       </div>
-      <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 overflow-y-hidden">
+      <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 overflow-y-hidden h-full">
         <span className="font-medium text-white text-xs">Prologue NFT</span>
         <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto no-scroll">
           {sortedNfts.map((nft, idx) => (

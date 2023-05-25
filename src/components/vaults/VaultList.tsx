@@ -29,9 +29,16 @@ const VaultList = ({ onClickVault }: Props) => {
   const [collectionFilters, setCollectionFilters] = useState<string[]>([]);
   const [filterOpened, setFilterOpened] = useState(false);
   const [filterQuery, setFilterQuery] = useState("");
+  const [isFetching, setIsFetching] = useState<boolean>(true);
 
   const { showDepositModal } = useUI();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsFetching(false);
+    }, 3000);
+  }, []);
 
   const vaults = vaultsOrigin.map((row) => {
     return {
@@ -294,6 +301,7 @@ const VaultList = ({ onClickVault }: Props) => {
         rowStyle="h-10"
         defaultSortKey="apy"
         bodyClass="max-h-[528px]"
+        isLoading={isFetching}
         onClickItem={onClickVault}
       />
     </div>

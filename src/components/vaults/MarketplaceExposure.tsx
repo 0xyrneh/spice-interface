@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import axios from "axios";
+import axios, { all } from "axios";
 
 import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
@@ -70,6 +70,13 @@ export default function MarketplaceExposure({
         return row;
       })
     );
+
+    if (protocolAllocations1.length === 0) {
+      protocolAllocations1 = [
+        ...protocolAllocations1,
+        { name: "SpiceDAO", allocation: 1 },
+      ];
+    }
     setAllocations(
       protocolAllocations1.sort((a, b) =>
         a.allocation >= b.allocation ? -1 : 1
@@ -129,7 +136,7 @@ export default function MarketplaceExposure({
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
-        title: `MARKETPLACES [${Math.max(allocations.length - 1, 0)}]`,
+        title: `MARKETPLACES [${allocations.length}]`,
         key: "name",
         noSort: true,
         itemPrefix: (item) => (
@@ -148,7 +155,9 @@ export default function MarketplaceExposure({
         noSort: true,
         itemSuffix: () => "%",
         format: (item) => {
-          return (100 * (item.allocation || 0)).toFixed(1);
+          return (100 * (item.allocation || 0)).toFixed(
+            item.allocation === 1 ? 0 : 1
+          );
         },
       },
     ];

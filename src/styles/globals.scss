@@ -169,3 +169,21 @@ input[type="number"] {
 input {
   @apply outline-0 bg-transparent;
 }
+
+// gradient color
+.text-green-gradient {
+  color: '#ff0000'
+}
+
+.loading-spinner-rotate {
+  animation: rotation 1s infinite linear;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}

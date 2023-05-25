@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useWeb3React } from "@web3-react/core";
 
 import { VaultInfo } from "@/types/vault";
 import { Button, Card, Search, Table } from "@/components/common";
@@ -16,6 +18,24 @@ export default function VaultsTable({
   selectedVault,
   onSelectVault,
 }: Props) {
+  const [isFetching, setIsFetching] = useState<boolean>(true);
+
+  const { account } = useWeb3React();
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsFetching(false);
+    }, 2500);
+  }, []);
+
+  useEffect(() => {
+    setIsFetching(true);
+
+    setTimeout(() => {
+      setIsFetching(false);
+    }, 2500);
+  }, [account]);
+
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
@@ -85,7 +105,7 @@ export default function VaultsTable({
   };
 
   return (
-    <Card className="gap-3 overflow-hidden min-h-[379px] flex-1">
+    <Card className="gap-3 overflow-hidden min-h-[300px] flex-1">
       <div className="flex items-center gap-2.5">
         <ExposureSVG />
         <h2 className="font-bold text-white font-sm">SELECT YOUR VAULT</h2>
@@ -116,11 +136,12 @@ export default function VaultsTable({
         rowStyle="h-8"
         defaultSortKey="apy"
         bodyClass="h-[calc(100%-40px)]"
-        onClickItem={(item) => {
-          onSelectVault(item);
-        }}
         isActive={(item) => {
           return !!selectedVault && item.id === selectedVault.id;
+        }}
+        isLoading={isFetching}
+        onClickItem={(item) => {
+          onSelectVault(item);
         }}
       />
     </Card>
