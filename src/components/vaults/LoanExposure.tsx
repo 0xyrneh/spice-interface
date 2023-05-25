@@ -36,14 +36,14 @@ export default function LoanExposure({
 }: Props) {
   const [loanExpanded, setLoanExpanded] = useState(false);
   const [loans, setLoans] = useState<any[]>([]);
-  const [isLoading, setLoading] = useState<boolean | undefined>();
+  const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
 
   const { setBlur } = useUI();
 
   const isLeverageVault = !!vault?.leverage;
 
   const fetchLoans = async () => {
-    if (isLoading === undefined) setLoading(true);
+    setIsFetching(true);
 
     const apiEnv =
       Number(process.env.REACT_APP_CHAIN_ID) === 1 ? "prod" : "goerli";
@@ -101,7 +101,7 @@ export default function LoanExposure({
     } catch {
       console.log("loans fetching error");
     }
-    setLoading(false);
+    setIsFetching(false);
   };
 
   const formatMaturity = (date: number) => {
@@ -311,6 +311,7 @@ export default function LoanExposure({
         rowStyle="h-8"
         defaultSortKey="apy"
         bodyClass="h-[calc(100%-40px)]"
+        isLoading={isFetching}
       />
     </Card>
   );
