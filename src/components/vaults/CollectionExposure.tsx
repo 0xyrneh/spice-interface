@@ -62,7 +62,7 @@ export default function CollectionExposure({
     if (collectionAllocations0.length === 0) {
       collectionAllocations0 = [
         ...collectionAllocations0,
-        { name: "prologue", slug: "prologue", allocation: 1 },
+        { name: "Prologue", slug: "Prologue", allocation: 1 },
       ];
     }
 
