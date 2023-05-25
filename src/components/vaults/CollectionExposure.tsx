@@ -32,7 +32,7 @@ export default function CollectionExposure({
   const updateAllocations = async () => {
     const collectionAllocationsOrigin =
       vault?.okrs?.collection_allocations || {};
-    const collectionAllocations0 = await Promise.all(
+    let collectionAllocations0 = await Promise.all(
       Object.keys(collectionAllocationsOrigin).map(async (key) => {
         try {
           const collectionRes = await axios.get(
@@ -58,6 +58,13 @@ export default function CollectionExposure({
         };
       })
     );
+
+    if (collectionAllocations0.length === 0) {
+      collectionAllocations0 = [
+        ...collectionAllocations0,
+        { name: "prologue", slug: "prologue", allocation: 1 },
+      ];
+    }
 
     setAllocations(
       collectionAllocations0.sort((a, b) =>
@@ -116,7 +123,9 @@ export default function CollectionExposure({
         noSort: true,
         itemSuffix: () => "%",
         format: (item) => {
-          return (100 * (item?.allocation || 0)).toFixed(1);
+          return (100 * (item.allocation || 0)).toFixed(
+            item.allocation === 1 ? 0 : 1
+          );
         },
       },
     ];
