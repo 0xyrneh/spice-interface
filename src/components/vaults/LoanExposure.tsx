@@ -111,14 +111,9 @@ export default function LoanExposure({
     const timeLeft = moment.duration(matureDate.diff(now));
 
     const dayLeft = Math.floor(timeLeft.asDays());
-    const hourLeft = Math.floor(timeLeft.asHours() % 24);
-    const minuteLeft = Math.floor(timeLeft.asMinutes() % 60);
 
     if (dayLeft > 0) return `${dayLeft}d`;
-    if (hourLeft > 0) return `${hourLeft}h`;
-    if (minuteLeft > 0) return `${minuteLeft}m`;
     return "0";
-    // return isLeverageVault ? "renewing" : "matured";
   };
 
   useEffect(() => {
