@@ -113,7 +113,7 @@ export default function Portfolio() {
           onSelectVault={onSelectVault}
         />
 
-        <div className="max-h-[363px] h-[50%] overflow-y-hidden p-1 -m-1">
+        <div className="h-[44%] overflow-y-hidden p-1 -m-1">
           {selectedVault &&
           selectedVault.receiptToken === ReceiptToken.ERC20 ? (
             <LoanExposure
@@ -129,7 +129,7 @@ export default function Portfolio() {
 
       <div className="flex flex-col flex-1 gap-5 pt-1">
         {/* vault chart graph */}
-        <Card className="gap-3 flex-1 overflow-hidden min-h-[523px]">
+        <Card className="gap-3 flex-1 overflow-hidden min-h-[323px] h-[50%]">
           <div className="flex items-center gap-2.5">
             {selectedVault && (
               <Image
@@ -218,27 +218,24 @@ export default function Portfolio() {
         </Card>
 
         {/* vault details info */}
-        {selectedVault && !selectedVault?.leverage && (
-          <div className="flex gap-5 max-h-[303px] overflow-hidden p-1 -m-1">
-            {selectedVault &&
-            selectedVault.receiptToken === ReceiptToken.NFT ? (
-              <LoanExposure
-                className="flex-1"
-                small
-                showIcon
-                vault={selectedVault}
-              />
-            ) : (
-              <MarketplaceExposure className="flex-1" vault={selectedVault} />
-            )}
-            <CombineExposure
+        <div className="flex gap-5 h-[37%] overflow-hidden p-1 -m-1">
+          {selectedVault && selectedVault.receiptToken === ReceiptToken.NFT ? (
+            <LoanExposure
+              className="flex-1"
+              small
+              showIcon
               vault={selectedVault}
-              hasToggle={
-                selectedVault && selectedVault.receiptToken === ReceiptToken.NFT
-              }
             />
-          </div>
-        )}
+          ) : (
+            <MarketplaceExposure className="flex-1" vault={selectedVault} />
+          )}
+          <CombineExposure
+            vault={selectedVault}
+            hasToggle={
+              selectedVault && selectedVault.receiptToken === ReceiptToken.NFT
+            }
+          />
+        </div>
       </div>
     </div>
   );

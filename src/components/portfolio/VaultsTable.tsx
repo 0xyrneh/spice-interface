@@ -85,7 +85,7 @@ export default function VaultsTable({
   };
 
   return (
-    <Card className="gap-3 overflow-hidden min-h-[379px] flex-1">
+    <Card className="gap-3 overflow-hidden min-h-[300px] flex-1">
       <div className="flex items-center gap-2.5">
         <ExposureSVG />
         <h2 className="font-bold text-white font-sm">SELECT YOUR VAULT</h2>
