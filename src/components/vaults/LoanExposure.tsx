@@ -117,7 +117,8 @@ export default function LoanExposure({
     if (dayLeft > 0) return `${dayLeft}d`;
     if (hourLeft > 0) return `${hourLeft}h`;
     if (minuteLeft > 0) return `${minuteLeft}m`;
-    return isLeverageVault ? "renewing" : "matured";
+    return "0";
+    // return isLeverageVault ? "renewing" : "matured";
   };
 
   useEffect(() => {
@@ -229,7 +230,7 @@ export default function LoanExposure({
         },
       },
       {
-        title: "DUE",
+        title: "RENEW",
         key: "matureDate",
         rowClass: () =>
           loanExpanded
