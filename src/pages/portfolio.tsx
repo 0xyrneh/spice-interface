@@ -113,7 +113,7 @@ export default function Portfolio() {
           onSelectVault={onSelectVault}
         />
 
-        <div className="max-h-[363px] overflow-y-hidden p-1 -m-1">
+        <div className="max-h-[363px] h-[50%] overflow-y-hidden p-1 -m-1">
           {selectedVault &&
           selectedVault.receiptToken === ReceiptToken.ERC20 ? (
             <LoanExposure
