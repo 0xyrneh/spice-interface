@@ -25,7 +25,7 @@ export default function VaultsTable({
   useEffect(() => {
     setTimeout(() => {
       setIsFetching(false);
-    }, 2000);
+    }, 2500);
   }, []);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function VaultsTable({
 
     setTimeout(() => {
       setIsFetching(false);
-    }, 2000);
+    }, 2500);
   }, [account]);
 
   const getRowInfos = (): TableRowInfo[] => {
