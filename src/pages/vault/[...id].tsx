@@ -59,10 +59,11 @@ export default function VaultDetailsPage() {
 
     if (selectedVault) {
       setVault(selectedVault);
-    } else {
+    }
+    if (!selectedVault && vaults.length > 0) {
       router.push(`/`);
     }
-  }, [id, router]);
+  }, [id, router, vaults.length]);
 
   if (vault) {
     return <VaultDetails vault={vault} />;

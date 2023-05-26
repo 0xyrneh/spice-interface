@@ -13,11 +13,11 @@ import { VAULT_LOANS } from "@/config/constants/backend";
 import {
   getNFTCollectionAddressConvert,
   getNFTCollectionAddressFromSlug,
+  getTokenImageFromReservoir,
 } from "@/utils/nft";
 import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getSpiceFiLendingAddress } from "@/utils/addressHelpers";
 import { getLoanData } from "@/state/lend/fetchGlobalLend";
-import { getTokenImageFromReservoir } from "@/utils/nft";
 
 type Props = {
   vault: VaultInfo;
