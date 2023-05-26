@@ -35,4 +35,10 @@ export const VAULT_BACKGROUND_IMAGES = {
   leverageWithrawOnly: "/assets/images/bg-leverage-vault-withdraw-only.png",
 };
 
+export const VAULT_LOGOS = {
+  flagship: "/assets/icons/flagship-vault-logo.png",
+  prologue: "/assets/icons/prologue-vault-logo.png",
+  leverage: "/assets/icons/leverage-vault-logo.png",
+};
+
 export const DEFAULT_VAULT_BACKGROUND_IMAGE = VAULT_BACKGROUND_IMAGES.prologue;

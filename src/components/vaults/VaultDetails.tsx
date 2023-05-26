@@ -79,7 +79,7 @@ export default function VaultDetails({ vault }: Props) {
             <div className="flex items-center gap-5">
               <Image
                 className="border-1 border-gray-200 rounded-full"
-                src="/assets/images/vaultIcon.svg"
+                src={vault.logo}
                 width={40}
                 height={40}
                 alt=""

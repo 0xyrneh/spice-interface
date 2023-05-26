@@ -1,4 +1,4 @@
-import { VAULT_BACKGROUND_IMAGES } from "@/config/constants/vault";
+import { VAULT_BACKGROUND_IMAGES, VAULT_LOGOS } from "@/config/constants/vault";
 
 const NONFUNGIBLE_AGGREGATOR_VAULT_DESCRIPTION = `Spice’s first vault represents a medium risk strategy that allocates capital to BendDAO, DropsDAO, NFTfi, Arcade, X2Y2, ParaSpace, and MetaStreet. Receipt tokens for deposits into this vault are represented by Prologue NFTs.`;
 const FUNGIBLE_AGGREGATOR_VAULT_DESCRIPTION = `Spice’s first public-access aggregator vault represents a medium risk strategy that allocates capital to BendDAO, DropsDAO, NFTfi, Arcade, X2Y2, ParaSpace, and MetaStreet. Receipt tokens for deposits into this vault are represented by ERC-20 tokens.`;
@@ -32,4 +32,19 @@ export const getVaultBackgroundImage = (
     return VAULT_BACKGROUND_IMAGES.leverage;
   }
   return VAULT_BACKGROUND_IMAGES.prologue;
+};
+
+// get vault logo
+export const getVaultLogo = (
+  isFungible?: boolean,
+  type?: string,
+  isDeprecated?: boolean
+): string => {
+  if (isFungible) {
+    if (type === "aggregator") {
+      return VAULT_LOGOS.flagship;
+    }
+    return VAULT_LOGOS.leverage;
+  }
+  return VAULT_LOGOS.prologue;
 };
