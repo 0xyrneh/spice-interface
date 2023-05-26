@@ -186,16 +186,17 @@ export default function CollectionExposure({
         trStyle="h-10"
         bodyClass="h-[calc(100%-40px)]"
       />
-      <div className="hidden xl:flex gap-3.5 overflow-hidden">
+      <div className="hidden xl:flex xl:h-full gap-3.5 overflow-hidden">
         <Table
           containerClassName="flex-1"
-          className="block h-full"
+          className="block h-full xl:min-w-[160px]"
           rowInfos={getRowInfos()}
           items={allocations}
           trStyle="h-10"
           bodyClass="h-[calc(100%-40px)]"
         />
-        <div className="flex flex-1 min-h-[160px] 3xl:min-h-[220px] max-w-[160px] 3xl:max-w-[220px] items-center justify-center">
+        {/* <div className="flex flex-1 min-h-[140px] 3xl:min-h-[220px] max-w-[160px] 3xl:max-w-[220px] items-center justify-center"> */}
+        <div className="flex flex-1 max-w-[160px] 3xl:max-w-[220px] items-center justify-center">
           <PieChart data={getChartData()} />
         </div>
       </div>

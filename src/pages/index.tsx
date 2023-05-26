@@ -8,7 +8,6 @@ import { Button } from "@/components/common";
 import { useUI } from "@/hooks";
 import { useAppSelector } from "@/state/hooks";
 import { DEFAULT_VAULT_BACKGROUND_IMAGE } from "@/config/constants/vault";
-import { getVaultBackgroundImage } from "@/utils/vault";
 
 export default function Vaults() {
   const [activeVaultIndex, setActiveVaultIndex] = useState(0);
@@ -24,11 +23,6 @@ export default function Vaults() {
       oneDayChange: 0,
       sevenDayChange: 0,
       sponsor: row.sponsor || "SpiceDAO",
-      backgroundImage: getVaultBackgroundImage(
-        row?.fungible,
-        row?.type,
-        row?.deprecated
-      ),
     };
   });
 

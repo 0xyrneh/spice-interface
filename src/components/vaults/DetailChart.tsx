@@ -1,18 +1,24 @@
 import { useState } from "react";
+
 import { Card, Stats } from "@/components/common";
 import { PositionChart, PerformanceChart } from "@/components/portfolio";
 import { PeriodFilter } from "@/types/common";
 import TvlSVG from "@/assets/icons/tvl.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
-import Exposure from "./Exposure";
+import { MarketplaceExposure, CollectionExposure } from "@/components/vaults";
+import { VaultInfo } from "@/types/vault";
 
-export default function DetailChart() {
+type Props = {
+  vault: VaultInfo;
+};
+
+export default function DetailChart({ vault }: Props) {
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
   const [showPerformance, setShowPerformance] = useState(false);
 
   return (
     <div className="flex flex-col flex-1 gap-5 pt-1">
-      <Card className="gap-3 flex-1 overflow-hidden min-h-[523px]">
+      <Card className="gap-3 flex-1 overflow-hidden min-h-[323px] h-[50%]">
         <div className="flex items-center gap-2.5">
           <TvlSVG />
           <h2 className="font-bold text-white font-sm">
@@ -73,9 +79,9 @@ export default function DetailChart() {
           </div>
         </div>
       </Card>
-      <div className="flex gap-5 overflow-hidden p-1 -m-1">
-        <Exposure showMarketplace isBreakdown className="flex-1" />
-        <Exposure showCollection isBreakdown className="flex-1" />
+      <div className="flex gap-5 h-[37%]  overflow-hidden p-1 -m-1">
+        <MarketplaceExposure className="flex-1" vault={vault} />
+        <CollectionExposure className="flex-1" vault={vault} />
       </div>
     </div>
   );

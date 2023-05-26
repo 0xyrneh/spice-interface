@@ -15,6 +15,7 @@ import SpiceFiNFT4626Abi from "@/config/abi/SpiceFiNFT4626.json";
 import WethAbi from "@/config/abi/WETH.json";
 import { getWethAddress } from "@/utils/addressHelpers";
 import { activeChainId } from "@/utils/web3";
+import { getVaultBackgroundImage, getVaultLogo } from "@/utils/vault";
 
 const apiEnv = activeChainId === 1 ? "prod" : "goerli";
 
@@ -103,8 +104,12 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           apr: 100 * (row?.okrs?.expected_return || 0),
           apy: 100 * (row?.okrs?.expected_return || 0),
           name: getVaultDisplayName(row?.name),
-          logo: "/assets/images/vaultIcon.svg",
-          bg: "/assets/images/bgVaults.jpg",
+          logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated),
+          backgroundImage: getVaultBackgroundImage(
+            row?.fungible,
+            row?.type,
+            row?.deprecated
+          ),
           receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
           userInfo: {
             allowance: BigNumber.from(0),
@@ -124,8 +129,12 @@ export const fetchActiveVaults = async (vaults: any[]) => {
         apr: 100 * (row?.okrs?.expected_return || 0),
         apy: 100 * (row?.okrs?.expected_return || 0),
         name: getVaultDisplayName(row?.name),
-        logo: "/assets/images/vaultIcon.svg",
-        bg: "/assets/images/bgVaults.jpg",
+        logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated),
+        backgroundImage: getVaultBackgroundImage(
+          row?.fungible,
+          row?.type,
+          row?.deprecated
+        ),
         receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
         userInfo: {
           allowance: BigNumber.from(0),

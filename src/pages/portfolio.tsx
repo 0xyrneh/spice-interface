@@ -80,7 +80,7 @@ export default function Portfolio() {
 
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
-      <div className="flex flex-col min-w-[41%] w-[41%] gap-5 pt-1">
+      <div className="flex flex-col min-w-[35%] w-[41%] gap-5 pt-1">
         {/* account card */}
         {account && (
           <Card className="py-3 !flex-row items-center justify-between gap-5">
