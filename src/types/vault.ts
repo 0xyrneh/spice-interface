@@ -79,3 +79,8 @@ export interface LeverageVaultInfo {
   fungible?: boolean;
   type?: string;
 }
+
+export interface ChartValue {
+  x: number | string;
+  y: number | string;
+}

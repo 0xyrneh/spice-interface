@@ -7,7 +7,7 @@ import PositionSVG from "@/assets/icons/position.svg";
 import CopySVG from "@/assets/icons/copy.svg";
 import { shortAddress } from "@/utils";
 import { Card, Stats } from "@/components/common";
-import { PositionChart } from "@/components/portfolio";
+import { LineChart } from "@/components/portfolio";
 import {
   MarketplaceExposure,
   CombineExposure,
@@ -16,13 +16,14 @@ import {
 import { VaultsTable } from "@/components/portfolio";
 import VaultNfts from "@/components/vaults/VaultNfts";
 import { useAppSelector } from "@/state/hooks";
-import { VaultInfo, ReceiptToken, Vault } from "@/types/vault";
+import { VaultInfo, ReceiptToken } from "@/types/vault";
 import { PeriodFilter } from "@/types/common";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { activeChainId } from "@/utils/web3";
 import { getNftPortfolios } from "@/utils/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { accLoans } from "@/utils/lend";
+import { ExampleTotalTvl } from "@/constants";
 
 export default function Portfolio() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
@@ -193,7 +194,11 @@ export default function Portfolio() {
           </div>
           <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)]">
             <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)]  max-h-[calc(100%-18px)] lg:max-h-[100%]">
-              <PositionChart />
+              <LineChart
+                data={ExampleTotalTvl[selectedPeriod]}
+                period={selectedPeriod}
+                yPrefix="Ξ"
+              />
             </div>
             <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
               {[
@@ -208,8 +213,9 @@ export default function Portfolio() {
                   className={`w-[34px] lg:w-full border-1 rounded text-xs bg-opacity-10 ${
                     period === selectedPeriod
                       ? "text-orange-200 border-orange-200 shadow-orange-200 bg-orange-200"
-                      : "text-gray-200 border-gray-200 bg-gray-200"
+                      : "text-gray-200 border-gray-200 bg-gray-200 hover:text-gray-300 hover:bg-gray-300 hover:bg-opacity-10 hover:border-gray-300"
                   }`}
+                  disabled={period === selectedPeriod}
                   onClick={() => setPeriod(period)}
                 >
                   {period}

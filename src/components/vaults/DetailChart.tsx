@@ -1,12 +1,13 @@
 import { useState } from "react";
 
 import { Card, Stats } from "@/components/common";
-import { PositionChart, PerformanceChart } from "@/components/portfolio";
+import { LineChart } from "@/components/portfolio";
 import { PeriodFilter } from "@/types/common";
 import TvlSVG from "@/assets/icons/tvl.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { MarketplaceExposure, CollectionExposure } from "@/components/vaults";
 import { VaultInfo } from "@/types/vault";
+import { ExampleShare, ExampleTotalTvl } from "@/constants";
 
 type Props = {
   vault: VaultInfo;
@@ -54,7 +55,18 @@ export default function DetailChart({ vault }: Props) {
         </div>
         <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)]">
           <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)] max-h-[calc(100%-18px)] lg:max-h-[100%]">
-            {showPerformance ? <PerformanceChart /> : <PositionChart />}
+            {showPerformance ? (
+              <LineChart
+                data={ExampleShare[selectedPeriod]}
+                period={selectedPeriod}
+              />
+            ) : (
+              <LineChart
+                data={ExampleTotalTvl[selectedPeriod]}
+                period={selectedPeriod}
+                yPrefix="Ξ"
+              />
+            )}
           </div>
           <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
             {[
@@ -69,8 +81,9 @@ export default function DetailChart({ vault }: Props) {
                 className={`w-[34px] lg:w-full border-1 rounded text-xs bg-opacity-10 ${
                   period === selectedPeriod
                     ? "text-orange-200 border-orange-200 shadow-orange-200 bg-orange-200"
-                    : "text-gray-200 border-gray-200 bg-gray-200"
+                    : "text-gray-200 border-gray-200 bg-gray-200 hover:text-gray-300 hover:bg-gray-300 hover:bg-opacity-10 hover:border-gray-300"
                 }`}
+                disabled={period === selectedPeriod}
                 onClick={() => setPeriod(period)}
               >
                 {period}
