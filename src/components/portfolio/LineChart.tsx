@@ -28,6 +28,9 @@ ChartJS.register(
 );
 
 const getOptions = (period: PeriodFilter, yPrefix?: string) => ({
+  animation: {
+    duration: 0,
+  },
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
