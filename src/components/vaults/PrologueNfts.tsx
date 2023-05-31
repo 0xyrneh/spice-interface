@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import useBreakpoint from "use-breakpoint";
+import { BigNumber } from "ethers";
+import { useWeb3React } from "@web3-react/core";
+
 import { Card, PrologueNftCard, Search, Select } from "@/components/common";
 import UserSVG from "@/assets/icons/user.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
@@ -7,26 +10,134 @@ import { useUI } from "@/hooks";
 import { VaultNftsSortFilter } from "@/types/common";
 import { BREAKPOINTS, VAULT_NFTS_SORT_FILTERS } from "@/constants";
 import { PrologueNftInfo } from "@/types/nft";
+import { VaultInfo } from "@/types/vault";
+import { getBalanceInEther } from "@/utils/formatBalance";
+import { accLoans } from "@/utils/lend";
+import { getNetApy } from "@/utils/apy";
+import { getTokenImageFromReservoir } from "@/utils/nft";
+import { YEAR_IN_SECONDS } from "@/config/constants/time";
+import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
+import { useAppSelector } from "@/state/hooks";
 
 type Props = {
-  nfts: PrologueNftInfo[];
+  vault?: VaultInfo;
   className?: string;
 };
 
-export default function PrologueNfts({ nfts, className }: Props) {
+export default function PrologueNfts({ vault, className }: Props) {
   const { setBlur } = useUI();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
   const container = useRef();
 
   const [expanded, setExpanded] = useState(false);
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
-    VaultNftsSortFilter.ValueHighToLow
+    VaultNftsSortFilter.ApyHighToLow
   );
   const [selectedIdx, setSelectedIdx] = useState<number>();
+
+  const { account } = useWeb3React();
+  const { data: lendData } = useAppSelector((state) => state.lend);
+
+  const loans = accLoans(lendData);
+  const userNfts = vault?.userInfo?.nftsRaw || [];
 
   useEffect(() => {
     setSelectedIdx(undefined);
   }, [expanded]);
+
+  useEffect(() => {
+    setBlur(expanded);
+  }, [expanded, setBlur]);
+
+  const getNftPortolios = () => {
+    if (!account) return [];
+    return loans.map((row: any) => {
+      const userNft = userNfts.find(
+        (row1: any) => row1.tokenId === row.tokenId
+      );
+
+      const value =
+        row?.loan?.tokenAmntInVault ||
+        userNft?.depositAmnt ||
+        BigNumber.from(0);
+
+      const debtOwed = row?.loan?.repayAmount || BigNumber.from(0);
+
+      const borrowApr = row.loan?.terms?.interestRate
+        ? row.loan?.terms?.interestRate.toNumber() / 10000
+        : 0;
+      const loanDuration = row.loan?.terms?.duration || 0;
+
+      // calculate net APY
+      let netApy = 0;
+      let borrowApy = 0;
+      if (loanDuration > 0) {
+        const m = YEAR_IN_SECONDS / loanDuration;
+        // eslint-disable-next-line no-restricted-properties
+        borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
+        const vaultApy = (vault?.apr || 0) / 100;
+
+        netApy = getNetApy(
+          getBalanceInEther(value),
+          vaultApy,
+          getBalanceInEther(debtOwed),
+          borrowApy
+        );
+      }
+
+      return {
+        owner: account,
+        amount: getBalanceInEther(value),
+        tokenId: row.tokenId,
+        tokenImg: getTokenImageFromReservoir(
+          PROLOGUE_NFT_ADDRESS,
+          Number(row.tokenId)
+        ),
+        isEscrowed: !!row?.loan?.loanId,
+        apy: netApy,
+      };
+    });
+  };
+
+  const sortNfts = (): PrologueNftInfo[] => {
+    const myPrologueNfts = getNftPortolios();
+
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueHighToLow) {
+      return myPrologueNfts.sort((a, b) => (a.amount <= b.amount ? 1 : -1));
+    }
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
+      return myPrologueNfts.sort((a, b) => (a.amount >= b.amount ? 1 : -1));
+    }
+    // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
+      return myPrologueNfts
+        .sort((a, b) => (a.apy <= b.apy ? 1 : -1))
+        .sort((a, b) => {
+          if (a.isEscrowed || b.isEscrowed) return 0;
+          return a.amount <= b.amount ? 1 : -1;
+        });
+    }
+    // show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyLowToHigh) {
+      return myPrologueNfts
+        .sort((a, b) => {
+          return a.apy > b.apy ? 1 : -1;
+        })
+        .sort((a, b) => {
+          if (a.isEscrowed) return -1;
+          return 1;
+        })
+        .sort((a, b) => {
+          if (a.isEscrowed && b.isEscrowed) return a.apy > b.apy ? 1 : -1;
+          return a.amount <= b.amount ? 1 : -1;
+        });
+    }
+
+    return myPrologueNfts;
+  };
+
+  // get sorted nfts
+  const nfts = sortNfts();
 
   const cardInRow = () => {
     if (expanded) {
@@ -58,13 +169,11 @@ export default function PrologueNfts({ nfts, className }: Props) {
     return sides as any;
   };
 
-  useEffect(() => {
-    setBlur(expanded);
-  }, [expanded, setBlur]);
-
   return (
     <Card
-      className={`gap-3 ${className} ${expanded ? "" : "relative"}`}
+      className={`gap-3 ${className} ${
+        expanded ? "h-[90%] my-auto" : "relative"
+      }`}
       expanded={expanded}
       onCollapse={() => setExpanded(false)}
       animate
@@ -117,7 +226,8 @@ export default function PrologueNfts({ nfts, className }: Props) {
         <div
           ref={container as any}
           className={`flex gap-y-3 gap-px custom-scroll ${
-            expanded ? "overflow-y-auto flex-wrap" : "overflow-hidden"
+            // !expanded ? "overflow-y-auto flex-wrap" : "overflow-hidden"
+            "overflow-y-auto flex-wrap"
           }`}
         >
           {nfts.map((nft, idx) => (

@@ -1,16 +1,10 @@
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { BigNumber } from "ethers";
 
 import { Button, Card, Stats } from "@/components/common";
 import { DetailChart, LoanBreakdown, PrologueNfts } from "@/components/vaults";
 import CircleDotSvg from "@/assets/icons/circle-dot.svg";
 import ChartSVG from "@/assets/icons/chart.svg";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
-import { useAppSelector } from "@/state/hooks";
-import { accLoans } from "@/utils/lend";
-import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
-import { PrologueNftInfo } from "@/types/nft";
 import { activeChainId } from "@/utils/web3";
 
 type Props = {
@@ -18,13 +12,6 @@ type Props = {
 };
 
 export default function VaultDetails({ vault }: Props) {
-  const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
-
-  const { data: lendData } = useAppSelector((state) => state.lend);
-  const { allNfts } = useAppSelector((state) => state.nft);
-  const loans = accLoans(lendData);
-  const userNftIds = loans.map((row: any) => row.tokenId);
-
   const getVaultHistoricalApy = () => {
     const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
     return (
@@ -34,42 +21,6 @@ export default function VaultDetails({ vault }: Props) {
   };
 
   const getExpectedReturn = () => ((vault?.tvl || 0) * (vault?.apr || 0)) / 100;
-
-  // fetch nft information from backend
-  const fetchData = async () => {
-    const vaultTvl = vault?.tvl || 0;
-    const vaultTotalShares = vault?.totalShares || 0;
-
-    const nfts1 = allNfts.map((row: any) => {
-      const tokenId = Number(row.tokenId);
-      const isEscrowed = userNftIds.includes(tokenId);
-      return {
-        owner: row.owner.address,
-        amount: getBalanceInEther(
-          vaultTotalShares === 0
-            ? BigNumber.from(row.shares)
-            : BigNumber.from(row.shares)
-                .mul(BigNumber.from(getBalanceInWei(vaultTvl.toString())))
-                .div(
-                  BigNumber.from(getBalanceInWei(vaultTotalShares.toString()))
-                )
-        ),
-        tokenId,
-        tokenImg: row.tokenImg,
-        isEscrowed,
-        apy: isEscrowed ? 45.24 : 0,
-      };
-    });
-
-    setNfts([...nfts1]);
-  };
-
-  useEffect(() => {
-    if (vault?.address) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address, userNftIds.length]);
 
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
@@ -146,7 +97,7 @@ export default function VaultDetails({ vault }: Props) {
           </div>
         </Card>
         {vault.receiptToken === ReceiptToken.NFT && (
-          <PrologueNfts nfts={nfts} className="h-[30%]" />
+          <PrologueNfts vault={vault} className="h-[30%]" />
         )}
         <LoanBreakdown vault={vault} className="flex-1 h-[34%]" />
       </div>
