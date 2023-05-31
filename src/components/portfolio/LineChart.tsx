@@ -49,10 +49,16 @@ const getOptions = (period: PeriodFilter, yPrefix?: string) => ({
         drawTicks: false,
       },
       time: {
-        unit: period === PeriodFilter.Day ? "hour" : "day",
+        unit:
+          period === PeriodFilter.Day
+            ? "hour"
+            : period === PeriodFilter.Year || period === PeriodFilter.All
+            ? "month"
+            : "day",
         displayFormats: {
           hour: "hh:mm a",
           day: "MM/DD/YYYY",
+          month: "MM/DD/YYYY",
         },
       },
       adapters: {
@@ -61,7 +67,24 @@ const getOptions = (period: PeriodFilter, yPrefix?: string) => ({
         },
       },
       ticks: {
+        autoSkip: true,
+        maxTicksLimit: 7,
+        minTicksLimit: 7,
         padding: 10,
+        callback: function (value: any, index: number, ticks: any) {
+          if (
+            index === 0 ||
+            (period !== PeriodFilter.Year &&
+              period !== PeriodFilter.All &&
+              index === ticks.length - 1)
+          ) {
+            return "";
+          }
+          console.log(ticks);
+          return moment(value).format(
+            period === PeriodFilter.Day ? "hh:mm a" : "MM/DD/YYYY"
+          );
+        },
       },
     },
     y: {
