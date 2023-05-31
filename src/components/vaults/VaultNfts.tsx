@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
@@ -9,9 +9,13 @@ import { VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
 import { VaultNftsSortFilter } from "@/types/common";
 import { VAULT_NFTS_SORT_FILTERS } from "@/constants";
-import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
-import { useAppSelector } from "@/state/hooks";
+import { getBalanceInEther } from "@/utils/formatBalance";
 import { accLoans } from "@/utils/lend";
+import { getNetApy } from "@/utils/apy";
+import { getTokenImageFromReservoir } from "@/utils/nft";
+import { YEAR_IN_SECONDS } from "@/config/constants/time";
+import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
+import { useAppSelector } from "@/state/hooks";
 
 type Props = {
   vault?: VaultInfo;
@@ -20,74 +24,96 @@ type Props = {
 
 export default function VaultNfts({ vault, className }: Props) {
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
-    VaultNftsSortFilter.ValueHighToLow
+    VaultNftsSortFilter.ApyHighToLow
   );
-  const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
 
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
-  const { allNfts } = useAppSelector((state) => state.nft);
+
   const loans = accLoans(lendData);
-  const userNftIds = loans.map((row: any) => row.tokenId);
+  const userNfts = vault?.userInfo?.nftsRaw || [];
 
-  // fetch nft information from backend
-  const fetchData = async () => {
-    const vaultTvl = vault?.tvl || 0;
-    const vaultTotalShares = vault?.totalShares || 0;
+  const getNftPortolios = () => {
+    if (!account) return [];
+    return loans.map((row: any) => {
+      const userNft = userNfts.find(
+        (row1: any) => row1.tokenId === row.tokenId
+      );
 
-    const nfts1 = allNfts.map((row: any) => {
-      const tokenId = Number(row.tokenId);
-      const isEscrowed = userNftIds.includes(tokenId);
+      const value =
+        row?.loan?.tokenAmntInVault ||
+        userNft?.depositAmnt ||
+        BigNumber.from(0);
+      const debtOwed = row?.loan?.repayAmount || BigNumber.from(0);
+
+      const borrowApr = row.loan?.terms?.interestRate
+        ? row.loan?.terms?.interestRate.toNumber() / 10000
+        : 0;
+      const loanDuration = row.loan?.terms?.duration || 0;
+
+      // calculate net APY
+      let netApy = 0;
+      let borrowApy = 0;
+      if (loanDuration > 0) {
+        const m = YEAR_IN_SECONDS / loanDuration;
+        // eslint-disable-next-line no-restricted-properties
+        borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
+        const vaultApy = (vault?.apr || 0) / 100;
+
+        netApy = getNetApy(
+          getBalanceInEther(value),
+          vaultApy,
+          getBalanceInEther(debtOwed),
+          borrowApy
+        );
+      }
+
       return {
-        owner: row.owner.address,
-        amount: getBalanceInEther(
-          vaultTotalShares === 0
-            ? BigNumber.from(row.shares)
-            : BigNumber.from(row.shares)
-                .mul(BigNumber.from(getBalanceInWei(vaultTvl.toString())))
-                .div(
-                  BigNumber.from(getBalanceInWei(vaultTotalShares.toString()))
-                )
+        owner: account,
+        amount: getBalanceInEther(value),
+        tokenId: row.tokenId,
+        tokenImg: getTokenImageFromReservoir(
+          PROLOGUE_NFT_ADDRESS,
+          Number(row.tokenId)
         ),
-        tokenId,
-        tokenImg: row.tokenImg,
-        isEscrowed,
-        apy: isEscrowed ? 45.24 : 0,
+        isEscrowed: !!row?.loan?.loanId,
+        apy: netApy,
       };
     });
-
-    setNfts([...nfts1]);
   };
 
-  useEffect(() => {
-    if (vault?.address) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address, userNftIds.length]);
-
-  const myPrologueNfts = nfts.filter(
-    (row) =>
-      row.owner.toLowerCase() === account?.toLowerCase() ||
-      userNftIds.includes(row.tokenId)
-  );
-
   const sortNfts = (): PrologueNftInfo[] => {
+    const myPrologueNfts = getNftPortolios();
+
     if (vaultNftsSortFilter === VaultNftsSortFilter.ValueHighToLow) {
       return myPrologueNfts.sort((a, b) => (a.amount <= b.amount ? 1 : -1));
     }
     if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
       return myPrologueNfts.sort((a, b) => (a.amount >= b.amount ? 1 : -1));
     }
-    // TODO: show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
+    // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
     if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
-      return myPrologueNfts.sort((a, b) => (a.apy <= b.apy ? 1 : -1));
+      return myPrologueNfts
+        .sort((a, b) => (a.apy <= b.apy ? 1 : -1))
+        .sort((a, b) => {
+          if (a.isEscrowed || b.isEscrowed) return 0;
+          return a.amount <= b.amount ? 1 : -1;
+        });
     }
-    // TODO: show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)
+    // show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)
     if (vaultNftsSortFilter === VaultNftsSortFilter.ApyLowToHigh) {
-      return myPrologueNfts.sort((a, b) => {
-        return a.apy >= b.apy ? 1 : -1;
-      });
+      return myPrologueNfts
+        .sort((a, b) => {
+          return a.apy > b.apy ? 1 : -1;
+        })
+        .sort((a, b) => {
+          if (a.isEscrowed) return -1;
+          return 1;
+        })
+        .sort((a, b) => {
+          if (a.isEscrowed && b.isEscrowed) return a.apy > b.apy ? 1 : -1;
+          return a.amount <= b.amount ? 1 : -1;
+        });
     }
 
     return myPrologueNfts;
