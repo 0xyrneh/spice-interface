@@ -75,6 +75,13 @@ export default function DepositModal({ open, vault, onClose }: Props) {
   };
 
   useEffect(() => {
+    setTooltipVisible(false);
+    setPositionSelected(true);
+    setIsDeposit(true);
+    setLeverageTab(LeverageTab.Increase);
+  }, [open, vault, onClose]);
+
+  useEffect(() => {
     if (vault?.address) {
       fetchData();
     }
@@ -300,6 +307,10 @@ export default function DepositModal({ open, vault, onClose }: Props) {
                 txStatus={leverageStatus}
                 onConfirm={onConfirmLeverage}
                 tab={leverageTab}
+                onMaxClicked={() => {
+                  setLeverage(150);
+                  setTargetLeverage("4");
+                }}
               />
             )}
           </Card>

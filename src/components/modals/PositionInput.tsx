@@ -124,9 +124,7 @@ export default function PositionInput({
             </a>
           )}
         </span>
-        {!isDeposit && (txHash || processing()) && (
-          <span>Vault Liquid Balance: Ξ300</span>
-        )}
+        {!isDeposit && <span>Vault Liquid Balance: Ξ300</span>}
       </div>
     </div>
   );

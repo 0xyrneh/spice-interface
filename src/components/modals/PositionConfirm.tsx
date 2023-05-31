@@ -66,7 +66,7 @@ export default function PositionConfirm({
         size="xs"
       />
       <Stats
-        title="Deposit"
+        title={isDeposit ? "Deposit" : "Withdraw"}
         value="Ξ30.00"
         type={processing() ? "gray" : undefined}
         size="xs"

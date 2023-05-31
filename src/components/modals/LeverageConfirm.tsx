@@ -7,9 +7,15 @@ interface Props {
   txStatus: TxStatus;
   tab: LeverageTab;
   onConfirm: () => void;
+  onMaxClicked?: () => void;
 }
 
-export default function LeverageConfirm({ txStatus, onConfirm, tab }: Props) {
+export default function LeverageConfirm({
+  txStatus,
+  onConfirm,
+  onMaxClicked,
+  tab,
+}: Props) {
   const [dots, setDots] = useState("");
   const [dotsTimer, setDotsTimer] = useState<NodeJS.Timer>();
 
@@ -70,6 +76,8 @@ export default function LeverageConfirm({ txStatus, onConfirm, tab }: Props) {
           title="Net APY"
           value="23.56%"
           size="xs"
+          showMax={tab === LeverageTab.LeverUp || tab === LeverageTab.Increase}
+          onMaxClicked={onMaxClicked}
         />
       </div>
       <div className="flex items-center gap-3">

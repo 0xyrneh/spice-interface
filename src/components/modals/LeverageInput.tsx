@@ -40,11 +40,15 @@ export default function LeverageInput({
   const processing = () => txStatus === TxStatus.Pending;
 
   const leverageUpdateText = () => {
-    const _targetLev = targetLeverage === "" ? "0.00" : targetLeverage;
+    // const _targetLev = targetLeverage === "" ? "0.00" : targetLeverage;
     if (tab === LeverageTab.LeverUp) {
-      return `Ξ${_targetLev} / ${leverage}% LTV`;
+      // return `Ξ${10.00} / ${leverage}% LTV`;
     } else {
-      return `Ξ${_targetLev} ${tab.toLowerCase()} to ${leverage}% LTV`;
+      return `Ξ10.0 ${tab.toLowerCase()} to ${
+        tab === LeverageTab.Increase
+          ? leverages[leverages.length - 1]
+          : decreaseLeverage[decreaseLeverage.length - 1]
+      }% LTV`;
     }
   };
 
@@ -175,10 +179,9 @@ export default function LeverageInput({
             </a>
           )}
         </span>
-        {(tab === LeverageTab.Increase || tab === LeverageTab.LeverUp) &&
-          (txHash || processing()) && (
-            <span>Leverage Vault Liquid Balance: Ξ300</span>
-          )}
+        {(tab === LeverageTab.Increase || tab === LeverageTab.LeverUp) && (
+          <span>Leverage Vault Liquid Balance: Ξ300</span>
+        )}
       </div>
     </div>
   );

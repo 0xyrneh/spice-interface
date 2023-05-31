@@ -135,6 +135,10 @@ a {
   text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.4);
 }
 
+.text-shadow-orange-900-sm {
+  text-shadow: 0px 0px 4px rgba(253, 167, 57, 0.4);
+}
+
 .styled-scrollbars::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -172,7 +176,7 @@ input {
 
 // gradient color
 .text-green-gradient {
-  color: '#ff0000'
+  color: "#ff0000";
 }
 
 .loading-spinner-rotate {
