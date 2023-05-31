@@ -13,7 +13,7 @@ import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import PositionConfirm from "./PositionConfirm";
 import LeverageConfirm from "./LeverageConfirm";
-import { Card, Erc20Card, PrologueNftCard } from "../common";
+import { Button, Card, Erc20Card, PrologueNftCard } from "../common";
 import PositionInput from "./PositionInput";
 
 interface Props extends ModalProps {
@@ -249,30 +249,119 @@ export default function DepositModal({ open, vault, onClose }: Props) {
             </button>
           </div>
           {positionSelected ? (
-            <PositionInput
-              isDeposit={isDeposit}
-              setIsDeposit={setIsDeposit}
-              useWeth={useWeth}
-              toggleEth={() => setUseWeth(!useWeth)}
-              value={positionAmount}
-              setValue={setPositionAmount}
-              txStatus={positionStatus}
-              txHash={positionTxHash}
-              showTooltip={tooltipVisible}
-              onFocus={() => setFocused(true)}
-            />
+            <>
+              <div className="flex items-center px-2 py-3">
+                <div className="flex items-center gap-2 w-1/2 pr-2">
+                  <Button
+                    type={isDeposit ? "third" : "secondary"}
+                    className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
+                      isDeposit ? "" : "shadow-transparent"
+                    }`}
+                    disabled={isDeposit}
+                    onClick={() => setIsDeposit(true)}
+                  >
+                    <span className="text-xs">DEPOSIT</span>
+                  </Button>
+                  <Button
+                    type={!isDeposit ? "third" : "secondary"}
+                    className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
+                      !isDeposit ? "" : "shadow-transparent"
+                    }`}
+                    disabled={!isDeposit}
+                    onClick={() => setIsDeposit(false)}
+                  >
+                    <span className="text-xs">WITHDRAW</span>
+                  </Button>
+                </div>
+                {tooltipVisible && (
+                  <Button
+                    type="secondary"
+                    className="flex-1 h-6 w-[78px] flex items-center justify-center !border-0 shadow-transparent text-xs gap-1"
+                    disabled
+                  >
+                    <a className="underline">Prologue NFT</a>
+                    <span className="lg:hidden">only.</span>
+                    <span className="hidden lg:block">exclusive feature.</span>
+                  </Button>
+                )}
+              </div>
+              <PositionInput
+                isDeposit={isDeposit}
+                useWeth={useWeth}
+                toggleEth={() => setUseWeth(!useWeth)}
+                value={positionAmount}
+                setValue={setPositionAmount}
+                txStatus={positionStatus}
+                txHash={positionTxHash}
+                showTooltip={tooltipVisible}
+                onFocus={() => setFocused(true)}
+              />
+            </>
           ) : (
-            <LeverageInput
-              tab={leverageTab}
-              leverage={leverage}
-              setLeverage={setLeverage}
-              targetLeverage={targetLeverage}
-              setTargetLeverage={setTargetLeverage}
-              setTab={setLeverageTab}
-              txStatus={leverageStatus}
-              txHash={leverageTxHash}
-              onFocus={() => setFocused(true)}
-            />
+            <>
+              <div className="flex flex-row-reverse px-2 py-3">
+                <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
+                  <Button
+                    type={
+                      leverageTab === LeverageTab.Increase
+                        ? "third"
+                        : "secondary"
+                    }
+                    className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                      leverageTab === LeverageTab.Increase
+                        ? ""
+                        : "shadow-transparent"
+                    }`}
+                    disabled={leverageTab === LeverageTab.Increase}
+                    onClick={() => setLeverageTab(LeverageTab.Increase)}
+                  >
+                    <span className="text-xs">INCREASE</span>
+                  </Button>
+                  <Button
+                    type={
+                      leverageTab === LeverageTab.Decrease
+                        ? "third"
+                        : "secondary"
+                    }
+                    className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                      leverageTab === LeverageTab.Decrease
+                        ? ""
+                        : "shadow-transparent"
+                    }`}
+                    disabled={leverageTab === LeverageTab.Decrease}
+                    onClick={() => setLeverageTab(LeverageTab.Decrease)}
+                  >
+                    <span className="text-xs">DECREASE</span>
+                  </Button>
+                  <Button
+                    type={
+                      leverageTab === LeverageTab.Refinance
+                        ? "third"
+                        : "secondary"
+                    }
+                    className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                      leverageTab === LeverageTab.Refinance
+                        ? ""
+                        : "shadow-transparent"
+                    }`}
+                    disabled={leverageTab === LeverageTab.Refinance}
+                    onClick={() => setLeverageTab(LeverageTab.Refinance)}
+                  >
+                    <span className="text-xs">REFINANCE</span>
+                  </Button>
+                </div>
+              </div>
+              <LeverageInput
+                tab={leverageTab}
+                leverage={leverage}
+                setLeverage={setLeverage}
+                targetLeverage={targetLeverage}
+                setTargetLeverage={setTargetLeverage}
+                txStatus={leverageStatus}
+                txHash={leverageTxHash}
+                onFocus={() => setFocused(true)}
+              />
+            </>
           )}
         </Card>
 

@@ -1,5 +1,5 @@
 import { TxStatus } from "@/types/common";
-import { Button, Slider } from "../common";
+import { Slider } from "../common";
 import LeverageSVG from "@/assets/icons/leverage.svg";
 
 export enum LeverageTab {
@@ -17,7 +17,6 @@ type Props = {
   txHash?: string;
   setLeverage: (leverage: number) => void;
   setTargetLeverage: (value: string) => void;
-  setTab: (tab: LeverageTab) => void;
   onFocus?: () => void;
   onBlur?: () => void;
 };
@@ -33,7 +32,6 @@ export default function LeverageInput({
   txStatus,
   setLeverage,
   setTargetLeverage,
-  setTab,
   onFocus,
   onBlur,
 }: Props) {
@@ -53,41 +51,7 @@ export default function LeverageInput({
   };
 
   return (
-    <div className="flex flex-col px-2 py-3 flex-1">
-      <div className="flex flex-row-reverse">
-        <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
-          <Button
-            type={tab === LeverageTab.Increase ? "third" : "secondary"}
-            className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-              tab === LeverageTab.Increase ? "" : "shadow-transparent"
-            }`}
-            disabled={tab === LeverageTab.Increase}
-            onClick={() => setTab(LeverageTab.Increase)}
-          >
-            <span className="text-xs">INCREASE</span>
-          </Button>
-          <Button
-            type={tab === LeverageTab.Decrease ? "third" : "secondary"}
-            className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-              tab === LeverageTab.Decrease ? "" : "shadow-transparent"
-            }`}
-            disabled={tab === LeverageTab.Decrease}
-            onClick={() => setTab(LeverageTab.Decrease)}
-          >
-            <span className="text-xs">DECREASE</span>
-          </Button>
-          <Button
-            type={tab === LeverageTab.Refinance ? "third" : "secondary"}
-            className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-              tab === LeverageTab.Refinance ? "" : "shadow-transparent"
-            }`}
-            disabled={tab === LeverageTab.Refinance}
-            onClick={() => setTab(LeverageTab.Refinance)}
-          >
-            <span className="text-xs">REFINANCE</span>
-          </Button>
-        </div>
-      </div>
+    <div className="flex flex-col px-2 pb-3 flex-1">
       <div className="flex flex-1 items-center justify-center">
         {tab === LeverageTab.Refinance ? (
           <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">
