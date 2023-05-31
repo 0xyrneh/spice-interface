@@ -210,13 +210,13 @@ export default function PrologueNftCard({
                       setDropdownOpened(false);
                     }}
                   >
-                    <span>#{nft.tokenId}</span>
+                    <span>{`#${nft.tokenId}`}</span>
                   </button>
                 ))}
               </div>
             </Dropdown>
           )}
-          <span>Ξ{(activeNft?.amount || 0).toFixed(2)}</span>
+          <span>{`Ξ${(activeNft?.amount || 0).toFixed(2)}`}</span>
         </div>
         {selectable && !active && (
           <div className="absolute top-0 left-0 right-0 bottom-0 hover:shadow-nft z-50 rounded" />

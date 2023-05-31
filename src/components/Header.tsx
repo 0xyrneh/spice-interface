@@ -16,6 +16,7 @@ import {
   fetchLendUserLoanDataAsync,
   fetchLendUserWethDataAsync,
   resetLendUserLoanData,
+  fetchLendUserNftApproveDataAsync,
 } from "@/state/actions";
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { VaultInfo } from "@/types/vault";
@@ -31,6 +32,7 @@ const Header = () => {
   const router = useRouter();
   const { blur } = useUI();
   const lendAddrs = getSpiceFiLendingAddresses();
+  const userNfts = defaultVault?.userInfo?.nftsRaw || [];
 
   const dispatch = useAppDispatch();
 
@@ -74,6 +76,20 @@ const Header = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, defaultVault]);
+
+  useEffect(() => {
+    if (userNfts.length === 0) return;
+
+    lendAddrs.map((lendAddr: any) =>
+      userNfts.map((row: any) => {
+        dispatch(
+          fetchLendUserNftApproveDataAsync(lendAddr, row.tokenId, account)
+        );
+        return row;
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userNfts.length]);
 
   const controlNavbar = () => {
     if (typeof window !== "undefined") {
