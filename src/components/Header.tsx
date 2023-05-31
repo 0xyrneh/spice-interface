@@ -28,7 +28,6 @@ const Header = () => {
 
   const { account } = useWeb3React();
   const { vaults, defaultVault } = useAppSelector((state) => state.vault);
-  const { allNfts } = useAppSelector((state) => state.nft);
   const router = useRouter();
   const { blur } = useUI();
   const lendAddrs = getSpiceFiLendingAddresses();
