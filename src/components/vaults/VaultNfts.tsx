@@ -29,9 +29,11 @@ export default function VaultNfts({ vault, className }: Props) {
 
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
+  const { defaultVault } = useAppSelector((state) => state.vault);
 
   const loans = accLoans(lendData);
-  const userNfts = vault?.userInfo?.nftsRaw || [];
+  const activeVault = vault || defaultVault;
+  const userNfts = activeVault?.userInfo?.nftsRaw || [];
 
   const getNftPortolios = () => {
     if (!account) return [];
@@ -58,7 +60,7 @@ export default function VaultNfts({ vault, className }: Props) {
         const m = YEAR_IN_SECONDS / loanDuration;
         // eslint-disable-next-line no-restricted-properties
         borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
-        const vaultApy = (vault?.apr || 0) / 100;
+        const vaultApy = (activeVault?.apr || 0) / 100;
 
         netApy = getNetApy(
           getBalanceInEther(value),
