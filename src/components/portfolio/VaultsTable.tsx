@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { useWeb3React } from "@web3-react/core";
 
 import { VaultInfo } from "@/types/vault";
@@ -27,6 +28,7 @@ export default function VaultsTable({
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const { account } = useWeb3React();
+  const router = useRouter();
 
   useEffect(() => {
     setTimeout(() => {
@@ -92,8 +94,14 @@ export default function VaultsTable({
         title: "DETAILS",
         noSort: true,
         rowClass: () => "w-[70px]",
-        component: () => (
-          <Button type="secondary" className="px-1 h-[22px]">
+        component: (item) => (
+          <Button
+            type="secondary"
+            className="px-1 h-[22px]"
+            onClick={() => {
+              router.push(`/vault/${item.id}`);
+            }}
+          >
             <span className="text-xs font-bold">DETAILS</span>
           </Button>
         ),
