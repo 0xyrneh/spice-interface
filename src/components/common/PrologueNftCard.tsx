@@ -161,7 +161,7 @@ export default function PrologueNftCard({
               className={`text-center font-bold tracking-normal ${
                 expanded
                   ? "text-base whitespace-nowrap"
-                  : "text-xs md:text-sm xl:text-base whitespace-break-spaces px-1"
+                  : "text-xs md:text-sm xl:text-md whitespace-break-spaces px-1"
               }`}
             >
               [LEVERED]

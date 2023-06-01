@@ -3,7 +3,13 @@ import Image from "next/image";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 
-import { Card, PrologueNftCard, Search, Select } from "@/components/common";
+import {
+  Card,
+  PrologueNftCard,
+  Search,
+  Select,
+  ConnectWallet,
+} from "@/components/common";
 import KeySVG from "@/assets/icons/key.svg";
 import { VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
@@ -163,14 +169,20 @@ export default function VaultNfts({ vault, className }: Props) {
       </div>
       <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 overflow-y-hidden h-full">
         <span className="font-medium text-white text-xs">Prologue NFT</span>
-        <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto no-scroll">
-          {sortedNfts.map((nft, idx) => (
-            <PrologueNftCard
-              key={`prologue-nft-${idx}`}
-              nfts={[nft]}
-              containerClassName="w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
-            />
-          ))}
+        <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto no-scroll h-full">
+          {!account && (
+            <div className="flex mx-auto items-center">
+              <ConnectWallet />
+            </div>
+          )}
+          {account &&
+            sortedNfts.map((nft, idx) => (
+              <PrologueNftCard
+                key={`prologue-nft-${idx}`}
+                nfts={[nft]}
+                containerClassName="w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
+              />
+            ))}
         </div>
       </div>
     </Card>

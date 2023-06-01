@@ -1,6 +1,9 @@
 import { ReactNode, useState } from "react";
+import { useWeb3React } from "@web3-react/core";
+
 import SortDownSVG from "@/assets/icons/sort-down.svg";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { ConnectWallet } from "@/components/common";
 
 export type TableRowInfo = {
   title: string;
@@ -45,6 +48,8 @@ const Table = ({
   const [sortKey, setSortKey] = useState<string | undefined>(defaultSortKey);
   const [sortAsc, setSortAsc] = useState(false);
   const [hoverBody, setHoverBody] = useState(false);
+
+  const { account } = useWeb3React();
 
   const getSortedItems = () => {
     if (sortKey) {
@@ -116,8 +121,17 @@ const Table = ({
           onMouseEnter={() => setHoverBody(true)}
           onMouseLeave={() => setHoverBody(false)}
         >
-          {isLoading && (
-            <tr>
+          {!account && (
+            <tr className="h-full">
+              <td>
+                <span className="flex justify-center align-center my-2">
+                  <ConnectWallet />
+                </span>
+              </td>
+            </tr>
+          )}
+          {account && isLoading && (
+            <tr className="h-full">
               <td>
                 <span className="flex justify-center align-center my-2">
                   <LoadingSpinner />
@@ -125,7 +139,8 @@ const Table = ({
               </td>
             </tr>
           )}
-          {!isLoading &&
+          {account &&
+            !isLoading &&
             getSortedItems().map((item, index) => (
               <tr
                 key={`item-${index}`}

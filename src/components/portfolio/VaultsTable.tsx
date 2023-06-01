@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 
 import { VaultInfo } from "@/types/vault";
-import { Button, Card, Search, Table } from "@/components/common";
+import {
+  Button,
+  Card,
+  Search,
+  Table,
+  ConnectWallet,
+} from "@/components/common";
 import { TableRowInfo } from "@/components/common/Table";
 import ExposureSVG from "@/assets/icons/exposure.svg";
 
