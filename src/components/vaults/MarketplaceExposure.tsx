@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import axios, { all } from "axios";
+import axios from "axios";
+import { useWeb3React } from "@web3-react/core";
 
 import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
@@ -30,7 +31,11 @@ export default function MarketplaceExposure({
 }: Props) {
   const [allocations, setAllocations] = useState<any[]>([]);
 
+  const { account } = useWeb3React();
+
   const updateAllocations = async () => {
+    if (!account) return;
+
     const protocolAllocationsOrigin = vault?.okrs?.protocol_allocations || {};
     const protocolAllocations0 = Object.keys(protocolAllocationsOrigin)
       .map((key) => ({
@@ -126,7 +131,7 @@ export default function MarketplaceExposure({
     setAllocations([]);
     updateAllocations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address]);
+  }, [vault?.address, account]);
 
   const onSwitchTable = () => {
     if (!hasToggle) return;

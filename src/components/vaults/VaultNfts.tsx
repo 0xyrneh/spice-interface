@@ -3,7 +3,13 @@ import Image from "next/image";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 
-import { Card, PrologueNftCard, Search, Select } from "@/components/common";
+import {
+  Card,
+  PrologueNftCard,
+  Search,
+  Select,
+  ConnectWallet,
+} from "@/components/common";
 import KeySVG from "@/assets/icons/key.svg";
 import { VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
@@ -29,9 +35,11 @@ export default function VaultNfts({ vault, className }: Props) {
 
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
+  const { defaultVault } = useAppSelector((state) => state.vault);
 
   const loans = accLoans(lendData);
-  const userNfts = vault?.userInfo?.nftsRaw || [];
+  const activeVault = vault || defaultVault;
+  const userNfts = activeVault?.userInfo?.nftsRaw || [];
 
   const getNftPortolios = () => {
     if (!account) return [];
@@ -58,7 +66,7 @@ export default function VaultNfts({ vault, className }: Props) {
         const m = YEAR_IN_SECONDS / loanDuration;
         // eslint-disable-next-line no-restricted-properties
         borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
-        const vaultApy = (vault?.apr || 0) / 100;
+        const vaultApy = (activeVault?.apr || 0) / 100;
 
         netApy = getNetApy(
           getBalanceInEther(value),
@@ -161,14 +169,20 @@ export default function VaultNfts({ vault, className }: Props) {
       </div>
       <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 overflow-y-hidden h-full">
         <span className="font-medium text-white text-xs">Prologue NFT</span>
-        <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto no-scroll">
-          {sortedNfts.map((nft, idx) => (
-            <PrologueNftCard
-              key={`prologue-nft-${idx}`}
-              nfts={[nft]}
-              containerClassName="w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
-            />
-          ))}
+        <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto no-scroll h-full">
+          {!account && (
+            <div className="flex mx-auto items-center">
+              <ConnectWallet />
+            </div>
+          )}
+          {account &&
+            sortedNfts.map((nft, idx) => (
+              <PrologueNftCard
+                key={`prologue-nft-${idx}`}
+                nfts={[nft]}
+                containerClassName="w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
+              />
+            ))}
         </div>
       </div>
     </Card>

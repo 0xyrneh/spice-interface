@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import CircleDotSvg from "@/assets/icons/circle-dot.svg";
 import DocsSVG from "@/assets/icons/docs.svg";
 import GithubSVG from "@/assets/icons/github.svg";
@@ -7,10 +8,12 @@ import TwitterSVG from "@/assets/icons/twitter.svg";
 import { useRouter } from "next/router";
 import { NAV_OPTIONS } from "@/constants";
 import { useUI } from "@/hooks";
+import { useAppSelector } from "@/state/hooks";
 
 const VaultFooter = () => {
   const router = useRouter();
   const { blur } = useUI();
+  const { vaults } = useAppSelector((state) => state.vault);
 
   const activeTab = () => {
     for (let i = 0; i < NAV_OPTIONS.length; i += 1) {
@@ -24,6 +27,16 @@ const VaultFooter = () => {
     }
     return NAV_OPTIONS[1];
   };
+
+  const getTvl = () => {
+    let tvl = 0;
+    vaults.map((vault: any) => {
+      tvl += vault.tvl;
+    });
+    return tvl;
+  };
+
+  const totalTvl = getTvl();
 
   return (
     <div
@@ -43,7 +56,7 @@ const VaultFooter = () => {
           </span>
         </div>
         <span className="text-xs text-orange-200 text-shadow-orange-900 font-bold">
-          Ξ600 TVL
+          {`Ξ${totalTvl.toFixed(0)} TVL`}
         </span>
         <Link
           target="__blank"

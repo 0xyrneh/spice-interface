@@ -56,7 +56,10 @@ const VaultList = ({ onClickVault }: Props) => {
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
-        title: `VAULT [${filteredVaults.length}]`,
+        title:
+          filteredVaults.length > 1
+            ? `VAULTS [${filteredVaults.length}]`
+            : `VAULT [${filteredVaults.length}]`,
         key: "readable",
         itemPrefix: (item) => (
           <Image

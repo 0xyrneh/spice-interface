@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
+import { useWeb3React } from "@web3-react/core";
 
 import UserSVG from "@/assets/icons/user.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
@@ -29,7 +30,11 @@ export default function CollectionExposure({
 }: Props) {
   const [allocations, setAllocations] = useState<any[]>([]);
 
+  const { account } = useWeb3React();
+
   const updateAllocations = async () => {
+    if (!account) return;
+
     const collectionAllocationsOrigin =
       vault?.okrs?.collection_allocations || {};
     let collectionAllocations0 = await Promise.all(
@@ -140,7 +145,7 @@ export default function CollectionExposure({
     setAllocations([]);
     updateAllocations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address]);
+  }, [vault?.address, account]);
 
   const onSwitchTable = () => {
     if (!hasToggle) return;

@@ -1,9 +1,16 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { useWeb3React } from "@web3-react/core";
 
 import { VaultInfo } from "@/types/vault";
-import { Button, Card, Search, Table } from "@/components/common";
+import {
+  Button,
+  Card,
+  Search,
+  Table,
+  ConnectWallet,
+} from "@/components/common";
 import { TableRowInfo } from "@/components/common/Table";
 import ExposureSVG from "@/assets/icons/exposure.svg";
 
@@ -18,9 +25,10 @@ export default function VaultsTable({
   selectedVault,
   onSelectVault,
 }: Props) {
-  const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const { account } = useWeb3React();
+  const router = useRouter();
 
   useEffect(() => {
     setTimeout(() => {
@@ -29,6 +37,7 @@ export default function VaultsTable({
   }, []);
 
   useEffect(() => {
+    if (!account) return;
     setIsFetching(true);
 
     setTimeout(() => {
@@ -85,8 +94,14 @@ export default function VaultsTable({
         title: "DETAILS",
         noSort: true,
         rowClass: () => "w-[70px]",
-        component: () => (
-          <Button type="secondary" className="px-1 h-[22px]">
+        component: (item) => (
+          <Button
+            type="secondary"
+            className="px-1 h-[22px]"
+            onClick={() => {
+              router.push(`/vault/${item.id}`);
+            }}
+          >
             <span className="text-xs font-bold">DETAILS</span>
           </Button>
         ),
