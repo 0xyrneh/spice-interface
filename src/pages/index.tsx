@@ -40,6 +40,7 @@ export default function Vaults() {
           backgroundImage: `url(${
             activeVault?.backgroundImage || DEFAULT_VAULT_BACKGROUND_IMAGE
           })`,
+          backgroundPosition: "center",
         }}
       >
         <div
@@ -66,6 +67,7 @@ export default function Vaults() {
                 backgroundImage: `url(${
                   vault?.backgroundImage || DEFAULT_VAULT_BACKGROUND_IMAGE
                 })`,
+                backgroundPosition: "center",
                 transition: "transform 450ms",
               }}
               onClick={() => setActiveVaultIndex(index)}
