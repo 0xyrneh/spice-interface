@@ -18,7 +18,7 @@ export default function VaultsTable({
   selectedVault,
   onSelectVault,
 }: Props) {
-  const [isFetching, setIsFetching] = useState<boolean>(true);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const { account } = useWeb3React();
 
@@ -29,6 +29,7 @@ export default function VaultsTable({
   }, []);
 
   useEffect(() => {
+    if (!account) return;
     setIsFetching(true);
 
     setTimeout(() => {

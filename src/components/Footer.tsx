@@ -38,8 +38,6 @@ const VaultFooter = () => {
 
   const totalTvl = getTvl();
 
-  console.log("111--->", vaults, totalTvl);
-
   return (
     <div
       className={`w-full ${
