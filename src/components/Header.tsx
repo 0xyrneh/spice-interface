@@ -8,6 +8,7 @@ import { NavOption } from "@/types/common";
 import { VaultSearch, ConnectWallet } from "@/components/common";
 import { NAV_OPTIONS } from "@/constants";
 import { useUI } from "@/hooks";
+import useAuth from "@/hooks/useAuth";
 import {
   fetchVaultGlobalDataAsync,
   fetchLendGlobalDataAsync,
@@ -21,6 +22,8 @@ import {
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { VaultInfo } from "@/types/vault";
 import { getSpiceFiLendingAddresses } from "@/utils/addressHelpers";
+import { connectorLocalStorageKey } from "@/config/constants/wallet";
+import { ConnectorNames } from "@/types/wallet";
 
 const Header = () => {
   const [show, setShow] = useState(true);
@@ -30,10 +33,20 @@ const Header = () => {
   const { vaults, defaultVault } = useAppSelector((state) => state.vault);
   const router = useRouter();
   const { blur } = useUI();
+  const { login } = useAuth();
   const lendAddrs = getSpiceFiLendingAddresses();
   const userNfts = defaultVault?.userInfo?.nftsRaw || [];
 
   const dispatch = useAppDispatch();
+
+  const persistConnect = () => {
+    const connectorId = window.localStorage.getItem(
+      connectorLocalStorageKey
+    ) as ConnectorNames;
+    if (connectorId) {
+      login(connectorId);
+    }
+  };
 
   const fetchData = async () => {
     dispatch(fetchVaultGlobalDataAsync());
@@ -46,6 +59,11 @@ const Header = () => {
     setInterval(() => {
       fetchData();
     }, 60000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    persistConnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
