@@ -4,13 +4,7 @@ import { useRouter } from "next/router";
 import { useWeb3React } from "@web3-react/core";
 
 import { VaultInfo } from "@/types/vault";
-import {
-  Button,
-  Card,
-  Search,
-  Table,
-  ConnectWallet,
-} from "@/components/common";
+import { Button, Card, Search, Table } from "@/components/common";
 import { TableRowInfo } from "@/components/common/Table";
 import ExposureSVG from "@/assets/icons/exposure.svg";
 
@@ -143,10 +137,7 @@ export default function VaultsTable({
         containerClassName="flex-1"
         className="block h-full"
         rowInfos={getRowInfos()}
-        items={vaults.map((vault) => ({
-          ...vault,
-          position: 2,
-        }))}
+        items={vaults}
         trStyle="h-10"
         rowStyle="h-8"
         defaultSortKey="apy"

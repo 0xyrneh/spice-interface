@@ -10,3 +10,4 @@ export { default as PrologueNftCard } from "./PrologueNftCard";
 export { default as Erc20Card } from "./Erc20Card";
 export { default as Search } from "./Search";
 export { default as Slider } from "./Slider";
+export { default as BlurStats } from "./BlurStats";

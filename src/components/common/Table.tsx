@@ -14,6 +14,7 @@ export type TableRowInfo = {
   itemPrefix?: (item: any) => ReactNode;
   itemSuffix?: (item: any) => ReactNode;
   itemClass?: (item: any) => string;
+  headerClass?: string;
   rowClass?: () => string;
   format?: (item: any) => string;
 };
@@ -96,7 +97,7 @@ const Table = ({
                 }}
               >
                 <div
-                  className={`${rowStyle} ${
+                  className={`${row.headerClass} ${rowStyle} ${
                     !row.noSort && sortKey === row.key
                       ? "text-orange-200 text-shadow-orange-900"
                       : ""
@@ -163,7 +164,7 @@ const Table = ({
                     >
                       {row.itemPrefix && row.itemPrefix(item)}
                       {row.key ? (
-                        <span className="whitespace-nowrap overflow-hidden text-ellipsis">
+                        <span className="whitespace-nowrap overflow-hidden text-ellipsis tracking-normal">
                           {row.format ? row.format(item) : item[row.key]}
                         </span>
                       ) : (

@@ -9,9 +9,12 @@ import { shortAddress } from "@/utils";
 import { Card, Stats } from "@/components/common";
 import { LineChart } from "@/components/portfolio";
 import {
+  LoanAndBidExposure,
   MarketplaceExposure,
   CombineExposure,
   LoanExposure,
+  BlurRanking,
+  BlurPts,
 } from "@/components/vaults";
 import { VaultsTable } from "@/components/portfolio";
 import VaultNfts from "@/components/vaults/VaultNfts";
@@ -58,6 +61,9 @@ export default function Portfolio() {
         userPositionRaw,
         userPosition: getBalanceInEther(userPositionRaw),
         userNftPortfolios,
+
+        // TODO: remove later
+        isBlur: true,
       };
     })
     .filter((row1: VaultInfo) => row1.userPosition && row1.userPosition > 0);
@@ -118,13 +124,25 @@ export default function Portfolio() {
 
         <div className="h-[44%] overflow-y-hidden p-1 -m-1">
           {selectedVault &&
-          selectedVault.receiptToken === ReceiptToken.ERC20 ? (
-            <LoanExposure
-              vault={selectedVault}
-              showIcon
-              nonExpandedClassName="h-full"
-            />
-          ) : (
+            (selectedVault.isBlur ? (
+              <div className="flex flex-col h-full gap-5">
+                <BlurPts vault={selectedVault} showIcon />
+                <BlurRanking
+                  vault={selectedVault}
+                  showIcon
+                  nonExpandedClassName="flex-1"
+                />
+              </div>
+            ) : selectedVault.receiptToken === ReceiptToken.ERC20 ? (
+              <LoanExposure
+                vault={selectedVault}
+                showIcon
+                nonExpandedClassName="h-full"
+              />
+            ) : (
+              <VaultNfts vault={selectedVault} className="h-full" />
+            ))}
+          {!selectedVault && (
             <VaultNfts vault={selectedVault} className="h-full" />
           )}
         </div>
@@ -227,22 +245,36 @@ export default function Portfolio() {
 
         {/* vault details info */}
         <div className="flex gap-5 h-[37%] overflow-hidden p-1 -m-1">
-          {selectedVault && selectedVault.receiptToken === ReceiptToken.NFT ? (
-            <LoanExposure
-              className="flex-1"
-              small
-              showIcon
-              vault={selectedVault}
-            />
-          ) : (
+          {selectedVault &&
+            (selectedVault.isBlur ? (
+              <LoanAndBidExposure
+                className="flex-1"
+                small
+                showIcon
+                vault={selectedVault}
+              />
+            ) : selectedVault.receiptToken === ReceiptToken.NFT ? (
+              <LoanExposure
+                className="flex-1"
+                small
+                showIcon
+                vault={selectedVault}
+              />
+            ) : (
+              <MarketplaceExposure className="flex-1" vault={selectedVault} />
+            ))}
+
+          {!selectedVault && (
             <MarketplaceExposure className="flex-1" vault={selectedVault} />
           )}
-          <CombineExposure
-            vault={selectedVault}
-            hasToggle={
-              selectedVault && selectedVault.receiptToken === ReceiptToken.NFT
-            }
-          />
+          {(!selectedVault || !selectedVault.isBlur) && (
+            <CombineExposure
+              vault={selectedVault}
+              hasToggle={
+                selectedVault && selectedVault.receiptToken === ReceiptToken.NFT
+              }
+            />
+          )}
         </div>
       </div>
     </div>
