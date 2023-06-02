@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import type { AppProps } from "next/app";
 import { Provider } from "react-redux";
 import { Web3ReactProvider } from "@web3-react/core";
 
 import { Header, Footer, NotSupported } from "@/components";
-import WalletProvider from "@/contexts/WalletContext";
 import NotificationProvider from "@/contexts/NotificationContext";
 import UIProvider from "@/contexts/UIContext";
 import { store } from "@/state/store";

@@ -2,8 +2,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 
-import { useWallet, useNotification } from "@/hooks";
-import { shortAddress, checkIfBlocked } from "@/utils";
+import { useNotification } from "@/hooks";
+import { checkIfBlocked } from "@/utils";
 import { Button } from "@/components/common";
 import useAuth from "@/hooks/useAuth";
 import { ConnectorNames } from "@/types/wallet";

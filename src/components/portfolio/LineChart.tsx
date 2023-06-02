@@ -80,7 +80,6 @@ const getOptions = (period: PeriodFilter, yPrefix?: string) => ({
           ) {
             return "";
           }
-          console.log(ticks);
           return moment(value).format(
             period === PeriodFilter.Day ? "hh:mm a" : "MM/DD/YYYY"
           );
