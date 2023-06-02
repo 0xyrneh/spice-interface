@@ -11,6 +11,10 @@ import { getLibrary } from "@/utils/web3React";
 
 import "@/styles/globals.scss";
 
+declare global {
+  var ethereum: any;
+}
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
