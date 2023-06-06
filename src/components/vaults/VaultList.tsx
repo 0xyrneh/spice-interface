@@ -82,6 +82,11 @@ const VaultList = ({ onClickVault }: Props) => {
           />
         ),
         rowClass: () => "lg:w-[35%]",
+        format: (item) => {
+          return `${item?.readable || ""} ${
+            item?.deprecated ? "[WITHDRAW ONLY]" : ""
+          }`;
+        },
       },
       {
         title: "APY",
