@@ -22,6 +22,7 @@ import { getTokenImageFromReservoir } from "@/utils/nft";
 import { YEAR_IN_SECONDS } from "@/config/constants/time";
 import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 import { useAppSelector } from "@/state/hooks";
+import { useUI } from "@/hooks";
 
 type Props = {
   vault?: VaultInfo;
@@ -36,10 +37,21 @@ export default function VaultNfts({ vault, className }: Props) {
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { defaultVault } = useAppSelector((state) => state.vault);
+  const { showDepositModal } = useUI();
 
   const loans = accLoans(lendData);
   const activeVault = vault || defaultVault;
   const userNfts = activeVault?.userInfo?.nftsRaw || [];
+
+  const onClickPrologueNft = (item: PrologueNftInfo) => {
+    if (!defaultVault) return;
+    if (item.isEscrowed) {
+      // show increase leverage modal
+      showDepositModal(defaultVault, true);
+    } else {
+      showDepositModal(defaultVault);
+    }
+  };
 
   const getNftPortolios = () => {
     if (!account) return [];
@@ -181,6 +193,7 @@ export default function VaultNfts({ vault, className }: Props) {
                 key={`prologue-nft-${idx}`}
                 nfts={[nft]}
                 containerClassName="w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
+                onClick={onClickPrologueNft}
               />
             ))}
         </div>

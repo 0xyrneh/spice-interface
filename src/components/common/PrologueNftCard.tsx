@@ -19,7 +19,7 @@ type Props = {
   side?: ("left" | "top" | "right" | "bottom")[];
   parent?: any;
   onItemChanged?: (nft: PrologueNftInfo, idx: number) => void;
-  onClick?: () => void;
+  onClick?: (item: PrologueNftInfo) => void;
 };
 
 export default function PrologueNftCard({
@@ -108,7 +108,7 @@ export default function PrologueNftCard({
   }, [active]);
 
   return (
-    <div className={`rounded ${containerClassName}`}>
+    <div className={`rounded ${containerClassName} cursor-pointer`}>
       <motion.div
         ref={comp as any}
         layout
@@ -119,7 +119,10 @@ export default function PrologueNftCard({
             ? "border-orange-200 drop-shadow-orange-200 text-shadow-orange-200 text-orange-200"
             : "border-transparent text-white"
         }`}
-        onClick={onClick}
+        onClick={() => {
+          if (!activeNft) return;
+          if (onClick) onClick(activeNft);
+        }}
       >
         {active && (
           <div
