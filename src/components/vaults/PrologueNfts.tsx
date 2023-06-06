@@ -30,16 +30,16 @@ export default function PrologueNfts({
   className,
   walletConnectRequired,
 }: Props) {
-  const { setBlur } = useUI();
-  const { breakpoint } = useBreakpoint(BREAKPOINTS);
-  const container = useRef();
-
   const [expanded, setExpanded] = useState(false);
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
     VaultNftsSortFilter.ApyHighToLow
   );
   const [selectedIdx, setSelectedIdx] = useState<number>();
+  const [searchQuery, setSearchQuery] = useState("");
 
+  const { setBlur } = useUI();
+  const { breakpoint } = useBreakpoint(BREAKPOINTS);
+  const container = useRef();
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { allNfts } = useAppSelector((state) => state.nft);
@@ -158,7 +158,13 @@ export default function PrologueNfts({
   };
 
   // get sorted nfts
-  const nfts = sortNfts();
+  const sortedNfts = sortNfts();
+
+  // get queried nfts
+  const nfts =
+    searchQuery.length > 0
+      ? sortedNfts.filter((row) => String(row.tokenId).includes(searchQuery))
+      : sortedNfts;
 
   const cardInRow = () => {
     if (expanded) {
@@ -222,6 +228,7 @@ export default function PrologueNfts({
         <Search
           placeholder={`Search NFTID [${nfts.length}]`}
           className={`${expanded ? "flex-none" : "flex-1 xl:flex-none"}`}
+          onChange={(val) => setSearchQuery(val)}
         />
         <div
           className={`${
