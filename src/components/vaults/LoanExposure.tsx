@@ -312,6 +312,7 @@ export default function LoanExposure({
         defaultSortKey="apy"
         bodyClass="h-[calc(100%-40px)]"
         isLoading={isFetching}
+        walletConnectRequired={true}
       />
     </Card>
   );

@@ -2,36 +2,38 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 
-import { useNotification } from "@/hooks";
 import { checkIfBlocked } from "@/utils";
 import { Button } from "@/components/common";
 import useAuth from "@/hooks/useAuth";
 import { ConnectorNames } from "@/types/wallet";
 
-const ConnectWallet = () => {
+type Props = {
+  isHeader?: boolean;
+};
+
+const ConnectWallet = ({ isHeader }: Props) => {
   const [blockedRegion, setBlockedRegion] = useState<string>();
+  const [showToolTip, setShowToolTip] = useState<boolean>(false);
 
   const { account } = useWeb3React();
   const { login } = useAuth();
-  const { showNotification, hideNotification } = useNotification();
 
   useEffect(() => {
     checkIfBlocked().then(setBlockedRegion);
   }, []);
 
   const handleMouseEnter = () => {
-    if (blockedRegion) {
-      showNotification(
-        `You are accessing this website from ${blockedRegion}.`,
-        "The following countries are geo-blocked: United States, Canada, North Korea, Syria, Iran, Cuba, and Russia."
-      );
-    }
+    if (!blockedRegion) return;
+    if (!isHeader) return;
+
+    setShowToolTip(true);
   };
 
   const handleMouseLeave = () => {
-    if (blockedRegion) {
-      hideNotification();
-    }
+    if (!blockedRegion) return;
+    if (!isHeader) return;
+
+    setShowToolTip(false);
   };
 
   const handleConnect = async () => {
@@ -58,16 +60,25 @@ const ConnectWallet = () => {
           </span>
         </div>
       ) : (
-        <Button
-          className="px-2 h-8"
-          type="primary"
-          hideHoverStyle={!!blockedRegion}
-          onClick={handleConnect}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <span className="text-xs font-medium">CONNECT WALLET</span>
-        </Button>
+        <div className="relative">
+          <Button
+            className="px-2 h-8"
+            type="primary"
+            hideHoverStyle={!!blockedRegion}
+            onClick={handleConnect}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <span className="text-xs font-medium">CONNECT WALLET</span>
+          </Button>
+          {showToolTip && (
+            <div className="absolute bg-gray-700 bg-opacity-90 top-8 right-0 w-[300px] flex flex-col rounded-l rounded-b border-1 border-warm-gray-50 text-xs text-white p-2">
+              <span>{`You are accessing this website from ${blockedRegion}.`}</span>
+              <br />
+              <span>{`The following countries are geo-blocked: United States, Canada, North Korea, Syria, Iran, Cuba, and Russia. `}</span>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

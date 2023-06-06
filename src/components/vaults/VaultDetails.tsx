@@ -97,9 +97,17 @@ export default function VaultDetails({ vault }: Props) {
           </div>
         </Card>
         {vault.receiptToken === ReceiptToken.NFT && (
-          <PrologueNfts vault={vault} className="h-[30%]" />
+          <PrologueNfts
+            vault={vault}
+            walletConnectRequired={false}
+            className="h-[30%]"
+          />
         )}
-        <LoanBreakdown vault={vault} className="flex-1 h-[34%]" />
+        <LoanBreakdown
+          vault={vault}
+          walletConnectRequired={false}
+          className="flex-1 h-[34%]"
+        />
       </div>
 
       <DetailChart vault={vault} />

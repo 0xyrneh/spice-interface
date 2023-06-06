@@ -26,6 +26,7 @@ type Props = {
   showIcon?: boolean;
   nonExpandedClassName?: string;
   className?: string;
+  walletConnectRequired?: boolean;
 };
 
 export default function LoanBreakdown({
@@ -34,6 +35,7 @@ export default function LoanBreakdown({
   showIcon,
   className,
   nonExpandedClassName,
+  walletConnectRequired,
 }: Props) {
   const { setBlur } = useUI();
 
@@ -310,6 +312,7 @@ export default function LoanBreakdown({
         defaultSortKey="apy"
         bodyClass="h-[calc(100%-40px)]"
         isLoading={isFetching}
+        walletConnectRequired={walletConnectRequired}
       />
     </Card>
   );

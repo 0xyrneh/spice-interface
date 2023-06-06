@@ -93,8 +93,16 @@ export default function DetailChart({ vault }: Props) {
         </div>
       </Card>
       <div className="flex gap-5 h-[37%]  overflow-hidden p-1 -m-1">
-        <MarketplaceExposure className="flex-1" vault={vault} />
-        <CollectionExposure className="flex-1" vault={vault} />
+        <MarketplaceExposure
+          className="flex-1"
+          vault={vault}
+          walletConnectRequired={false}
+        />
+        <CollectionExposure
+          className="flex-1"
+          vault={vault}
+          walletConnectRequired={false}
+        />
       </div>
     </div>
   );

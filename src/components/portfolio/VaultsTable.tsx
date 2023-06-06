@@ -7,6 +7,9 @@ import { VaultInfo } from "@/types/vault";
 import { Button, Card, Search, Table } from "@/components/common";
 import { TableRowInfo } from "@/components/common/Table";
 import ExposureSVG from "@/assets/icons/exposure.svg";
+import { ConnectorNames } from "@/types/wallet";
+import useAuth from "@/hooks/useAuth";
+import { useUI } from "@/hooks";
 
 type Props = {
   vaults: VaultInfo[];
@@ -23,6 +26,8 @@ export default function VaultsTable({
 
   const { account } = useWeb3React();
   const router = useRouter();
+  const { login } = useAuth();
+  const { showDepositModal } = useUI();
 
   useEffect(() => {
     setTimeout(() => {
@@ -38,6 +43,12 @@ export default function VaultsTable({
       setIsFetching(false);
     }, 2500);
   }, [account]);
+
+  const handleConnect = async () => {
+    // TODO: should be changed automatically later once wallet modal is prepared
+    const defaultConnectName = ConnectorNames.Injected;
+    await login(defaultConnectName);
+  };
 
   const getRowInfos = (): TableRowInfo[] => {
     return [
@@ -104,9 +115,22 @@ export default function VaultsTable({
         title: "DEPOSIT",
         noSort: true,
         rowClass: () => "w-[70px]",
-        component: () => (
-          <Button type="primary" className="px-1 h-[22px]">
-            <span className="text-xs font-bold">DEPOSIT</span>
+        component: (item) => (
+          <Button
+            type="primary"
+            className="px-1 h-[22px]"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (account) {
+                showDepositModal(item);
+              } else {
+                handleConnect();
+              }
+            }}
+          >
+            <span className="text-xs font-bold">
+              {account ? "DEPOSIT" : "CONNECT"}
+            </span>{" "}
           </Button>
         ),
       },
@@ -146,6 +170,7 @@ export default function VaultsTable({
           return !!selectedVault && item.id === selectedVault.id;
         }}
         isLoading={isFetching}
+        walletConnectRequired={true}
         onClickItem={(item) => {
           onSelectVault(item);
         }}

@@ -18,6 +18,9 @@ import {
 } from "@/constants";
 import { useUI } from "@/hooks";
 import { TableRowInfo } from "../common/Table";
+import { ConnectorNames } from "@/types/wallet";
+import useAuth from "@/hooks/useAuth";
+import { useWeb3React } from "@web3-react/core";
 
 type Props = {
   onClickVault: (vault: VaultInfo) => void;
@@ -33,6 +36,8 @@ const VaultList = ({ onClickVault }: Props) => {
 
   const { showDepositModal } = useUI();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
+  const { account } = useWeb3React();
+  const { login } = useAuth();
 
   useEffect(() => {
     setTimeout(() => {
@@ -50,7 +55,13 @@ const VaultList = ({ onClickVault }: Props) => {
 
   const getFilteredVaults = () => {
     if (vaultFilter === VaultFilter.All) return vaults;
-    return vaults.filter((vault) => vault.type === vaultFilter);
+    return vaults.filter((vault) => vault.category === vaultFilter);
+  };
+
+  const handleConnect = async () => {
+    // TODO: should be changed automatically later once wallet modal is prepared
+    const defaultConnectName = ConnectorNames.Injected;
+    await login(defaultConnectName);
   };
 
   const getRowInfos = (): TableRowInfo[] => {
@@ -71,6 +82,11 @@ const VaultList = ({ onClickVault }: Props) => {
           />
         ),
         rowClass: () => "lg:w-[35%]",
+        format: (item) => {
+          return `${item?.readable || ""} ${
+            item?.deprecated ? "[WITHDRAW ONLY]" : ""
+          }`;
+        },
       },
       {
         title: "APY",
@@ -125,10 +141,16 @@ const VaultList = ({ onClickVault }: Props) => {
             className="p-1"
             onClick={(e) => {
               e.stopPropagation();
-              showDepositModal(item);
+              if (account) {
+                showDepositModal(item);
+              } else {
+                handleConnect();
+              }
             }}
           >
-            <span className="text-xs font-bold">DEPOSIT</span>
+            <span className="text-xs font-bold">
+              {account ? "DEPOSIT" : "CONNECT"}
+            </span>
           </Button>
         ),
       },
@@ -305,6 +327,7 @@ const VaultList = ({ onClickVault }: Props) => {
         defaultSortKey="apy"
         bodyClass="max-h-[528px]"
         isLoading={isFetching}
+        walletConnectRequired={false}
         onClickItem={onClickVault}
       />
     </div>

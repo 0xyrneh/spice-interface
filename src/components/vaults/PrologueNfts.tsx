@@ -22,9 +22,14 @@ import { useAppSelector } from "@/state/hooks";
 type Props = {
   vault?: VaultInfo;
   className?: string;
+  walletConnectRequired?: boolean;
 };
 
-export default function PrologueNfts({ vault, className }: Props) {
+export default function PrologueNfts({
+  vault,
+  className,
+  walletConnectRequired,
+}: Props) {
   const { setBlur } = useUI();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
   const container = useRef();
@@ -51,6 +56,7 @@ export default function PrologueNfts({ vault, className }: Props) {
 
   const getNftPortolios = () => {
     if (!account) return [];
+
     return loans.map((row: any) => {
       const userNft = userNfts.find(
         (row1: any) => row1.tokenId === row.tokenId

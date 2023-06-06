@@ -119,6 +119,7 @@ export default function Exposure({
         items={marketplaceSelected ? marketplaceExposure : collectionExposure}
         trStyle="h-10"
         bodyClass="h-[calc(100%-40px)]"
+        walletConnectRequired={true}
       />
       <div className="hidden xl:flex gap-3.5 overflow-hidden">
         <Table
@@ -128,6 +129,7 @@ export default function Exposure({
           items={marketplaceSelected ? marketplaceExposure : collectionExposure}
           trStyle="h-10"
           bodyClass="h-[calc(100%-40px)]"
+          walletConnectRequired={true}
         />
         <div className="flex flex-1 min-h-[160px] 3xl:min-h-[220px] max-w-[160px] 3xl:max-w-[220px] items-center justify-center">
           <PieChart

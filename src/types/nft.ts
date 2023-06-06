@@ -33,4 +33,5 @@ export interface PrologueNftInfo {
   tokenImg: string;
   isEscrowed?: boolean;
   apy: number;
+  name?: string;
 }

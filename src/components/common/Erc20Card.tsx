@@ -3,12 +3,12 @@ import { PrologueNftInfo } from "@/types/nft";
 type Props = {
   className?: string;
   footerClassName?: string;
-  nft: PrologueNftInfo;
+  bgImg: string;
   expanded?: boolean;
 };
 
 export default function Erc20Card({
-  nft,
+  bgImg,
   className,
   footerClassName,
   expanded,
@@ -21,7 +21,7 @@ export default function Erc20Card({
       <div
         className="flex flex-col w-full bg-cover aspect-square relative justify-center"
         style={{
-          backgroundImage: `url(${nft.tokenImg})`,
+          backgroundImage: `url(${bgImg})`,
         }}
       />
       <div
