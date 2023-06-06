@@ -4,6 +4,7 @@ type Props = {
   className?: string;
   type?: "green" | "gray";
   size?: "xs" | "sm" | "lg";
+  valueSize?: "xl" | "xs" | "sm" | "lg";
   showMax?: boolean;
   onMaxClicked?: () => void;
 };
@@ -26,6 +27,7 @@ export default function Stats({
   className,
   type,
   size,
+  valueSize,
   showMax,
   onMaxClicked,
 }: Props) {
@@ -48,7 +50,11 @@ export default function Stats({
           </button>
         )}
       </div>
-      <span className={`font-bold text-xl ${valueStyles[type ?? "default"]}`}>
+      <span
+        className={`font-bold ${valueSize ? "text-" + valueSize : "text-xl"} ${
+          valueStyles[type ?? "default"]
+        }`}
+      >
         {value}
       </span>
     </div>

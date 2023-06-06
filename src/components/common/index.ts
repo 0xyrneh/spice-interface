@@ -11,3 +11,4 @@ export { default as Erc20Card } from "./Erc20Card";
 export { default as Search } from "./Search";
 export { default as Slider } from "./Slider";
 export { default as BlurStats } from "./BlurStats";
+export { default as Tooltip } from "./Tooltip";

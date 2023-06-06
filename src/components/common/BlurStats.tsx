@@ -1,8 +1,11 @@
+import Tooltip from "./Tooltip";
+import Button from "@mui/material/Button";
 import QuestionSVG from "@/assets/icons/question.svg";
 
 type Props = {
   title: string;
   value: string;
+  tooltip: string;
   className?: string;
   type?: "orange";
 };
@@ -18,11 +21,17 @@ const titleStyles = {
 };
 
 const styles = {
-  default: "text-gray-200",
-  orange: "text-orange-200 text-shadow-orange-900",
+  default: "!text-gray-200",
+  orange: "!text-orange-200 !text-shadow-orange-900",
 };
 
-export default function BlurStats({ title, value, className, type }: Props) {
+export default function BlurStats({
+  title,
+  value,
+  className,
+  tooltip,
+  type,
+}: Props) {
   return (
     <div
       className={`flex flex-col tracking-normal border-2 rounded-lg px-3 py-2 gap-1 items-center ${
@@ -37,7 +46,9 @@ export default function BlurStats({ title, value, className, type }: Props) {
         <span className={`text-sm font-medium ${styles[type ?? "default"]}`}>
           {title}
         </span>
-        <QuestionSVG />
+        <Tooltip tooltip={tooltip} className={styles[type ?? "default"]}>
+          <QuestionSVG />
+        </Tooltip>
       </div>
       <span className={`font-bold text-xs ${styles[type ?? "default"]}`}>
         {value}

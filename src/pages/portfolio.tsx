@@ -13,8 +13,7 @@ import {
   MarketplaceExposure,
   CombineExposure,
   LoanExposure,
-  BlurRanking,
-  BlurPts,
+  BlurLeaderboard,
 } from "@/components/vaults";
 import { VaultsTable } from "@/components/portfolio";
 import VaultNfts from "@/components/vaults/VaultNfts";
@@ -126,8 +125,8 @@ export default function Portfolio() {
           {selectedVault &&
             (selectedVault.isBlur ? (
               <div className="flex flex-col h-full gap-5">
-                <BlurPts vault={selectedVault} showIcon />
-                <BlurRanking
+                <BlurLeaderboard vault={selectedVault} showIcon onlyPts />
+                <BlurLeaderboard
                   vault={selectedVault}
                   showIcon
                   nonExpandedClassName="flex-1"
@@ -178,13 +177,16 @@ export default function Portfolio() {
                   value={`Ξ${getUserTotalPosition().toFixed(2)}`}
                 />
               )}
-              {selectedVault && (
+              {selectedVault && selectedVault.isBlur && (
+                <Stats title="SP-BLUR" value={"1500"} />
+              )}
+              {selectedVault && !selectedVault.isBlur && (
                 <Stats
                   title="Position"
                   value={`Ξ${(selectedVault?.userPosition || 0).toFixed(2)}`}
                 />
               )}
-              {selectedVault && (
+              {selectedVault && !selectedVault.isBlur && (
                 <Stats
                   title={
                     selectedVault?.receiptToken === ReceiptToken.NFT
