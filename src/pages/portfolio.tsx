@@ -7,6 +7,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import PositionSVG from "@/assets/icons/position.svg";
 import CopyIconSVG from "@/assets/icons/copy.svg";
 import CheckIconSVG from "@/assets/icons/check.svg";
+import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { shortAddress } from "@/utils";
 import { Card, Stats } from "@/components/common";
 import { LineChart } from "@/components/portfolio";
@@ -33,6 +34,7 @@ export default function Portfolio() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
   const [isCopied, setCopied] = useState(false);
+  const [showPosition, setShowPosition] = useState(true)
 
   const { account } = useWeb3React();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
@@ -180,6 +182,13 @@ export default function Portfolio() {
                   ).toUpperCase()} POSITION`
                 : "TOTAL SPICE POSITION"}
             </h2>
+            {selectedVault && selectedVault.isBlur && <button onClick={() => setShowPosition(!showPosition)} >
+            <SortUpSVG
+              className={`text-gray-100 hover:text-white ${
+                showPosition ? "rotate-180" : ""
+              }`}
+            />
+          </button>}
           </div>
           <div className="flex items-end justify-between text-gray-200 px-12">
             <div className="flex gap-4 items-center">
@@ -189,16 +198,16 @@ export default function Portfolio() {
                   value={`Ξ${getUserTotalPosition().toFixed(2)}`}
                 />
               )}
-              {selectedVault && selectedVault.isBlur && (
+              {selectedVault && selectedVault.isBlur && !showPosition && (
                 <Stats title="SP-BLUR" value={"1500"} />
               )}
-              {selectedVault && !selectedVault.isBlur && (
+              {selectedVault && (!selectedVault.isBlur || showPosition) && (
                 <Stats
                   title="Position"
                   value={`Ξ${(selectedVault?.userPosition || 0).toFixed(2)}`}
                 />
               )}
-              {selectedVault && !selectedVault.isBlur && (
+              {selectedVault && (!selectedVault.isBlur || showPosition) && (
                 <Stats
                   title={
                     selectedVault?.receiptToken === ReceiptToken.NFT

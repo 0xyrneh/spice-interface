@@ -209,11 +209,11 @@ export default function BlurPts({
         >
           {expanded && (
             <div className="flex justify-between">
-              <Stats title="RANK" value="56" valueSize="sm" />
-              <div className="flex flex-col tracking-normal w-[50%]">
+              <Stats title="RANK" value="56" valueSize="sm" className="w-[60px]" />
+              <div className="flex flex-col tracking-normal flex-1">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-200">
-                    RANK
+                    WALLET
                   </span>
                 </div>
                 <div
@@ -232,9 +232,9 @@ export default function BlurPts({
                   YOU
                 </div>
               </div>
-              <Stats title="1D" value="1,500" valueSize="sm" />
-              <Stats title="1W" value="1,500" valueSize="sm" />
-              <Stats title="TOTAL SPB" value="15,000" valueSize="sm" />
+              <Stats title="1D" value="1,500" valueSize="sm" className="w-[16%] items-end" />
+              <Stats title="1W" value="1,500" valueSize="sm" className="w-[16%] items-end" />
+              <Stats title="TOTAL SPB" value="15,000" valueSize="sm" className="w-[16%] items-end" />
             </div>
           )}
           <div
