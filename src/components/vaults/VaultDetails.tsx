@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { BigNumber } from "ethers";
+import { useRouter } from "next/router";
 
 import { Button, Card, Stats } from "@/components/common";
 import { DetailChart, LoanBreakdown, PrologueNfts } from "@/components/vaults";
@@ -6,12 +8,54 @@ import CircleDotSvg from "@/assets/icons/circle-dot.svg";
 import ChartSVG from "@/assets/icons/chart.svg";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { activeChainId } from "@/utils/web3";
+import { useWeb3React } from "@web3-react/core";
+import { getNftPortfolios } from "@/utils/nft";
+import { getBalanceInEther } from "@/utils/formatBalance";
+import { accLoans } from "@/utils/lend";
+import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
+import { useAppSelector } from "@/state/hooks";
 
 type Props = {
   vault: VaultInfo;
 };
 
 export default function VaultDetails({ vault }: Props) {
+  const { account } = useWeb3React();
+  const { data: lendData } = useAppSelector((state) => state.lend);
+  const loans = accLoans(lendData);
+  const router = useRouter();
+
+  const getVaultWithPosition = () => {
+    let userPositionRaw = BigNumber.from(0);
+    let userNftPortfolios: any[] = [];
+
+    if (account) {
+      if (vault.fungible) {
+        userPositionRaw = vault?.userInfo?.depositAmnt || BigNumber.from(0);
+      } else {
+        const userNfts = vault?.userInfo?.nftsRaw || [];
+        userNftPortfolios =
+          vault.address === DEFAULT_AGGREGATOR_VAULT[activeChainId]
+            ? getNftPortfolios(loans, userNfts)
+            : [];
+
+        userNftPortfolios.map((row1: any) => {
+          userPositionRaw = userPositionRaw.add(row1.value);
+          return row1;
+        });
+      }
+    }
+
+    return {
+      ...vault,
+      userPositionRaw,
+      userPosition: getBalanceInEther(userPositionRaw),
+      userNftPortfolios,
+    };
+  };
+
+  const { userPosition } = getVaultWithPosition();
+
   const getVaultHistoricalApy = () => {
     const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
     return (
@@ -43,9 +87,17 @@ export default function VaultDetails({ vault }: Props) {
               <Button type="primary" className="h-9 flex-1 max-w-[148px]">
                 <span className="text-base">DEPOSIT</span>
               </Button>
-              <Button type="secondary" className="h-9 flex-1 max-w-[148px]">
-                <span className="text-base">POSITION</span>
-              </Button>
+              {userPosition > 0 && (
+                <Button
+                  type="secondary"
+                  className="h-9 flex-1 max-w-[148px]"
+                  onClick={() => {
+                    router.push(`/portfolio`);
+                  }}
+                >
+                  <span className="text-base">POSITION</span>
+                </Button>
+              )}
             </div>
             <div className="flex xl:hidden items-center text-green">
               <CircleDotSvg />
