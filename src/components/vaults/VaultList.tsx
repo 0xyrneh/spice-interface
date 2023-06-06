@@ -305,6 +305,7 @@ const VaultList = ({ onClickVault }: Props) => {
         defaultSortKey="apy"
         bodyClass="max-h-[528px]"
         isLoading={isFetching}
+        walletConnectRequired={false}
         onClickItem={onClickVault}
       />
     </div>

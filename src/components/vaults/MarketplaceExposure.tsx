@@ -19,6 +19,7 @@ type Props = {
   className?: string;
   isBreakdown?: boolean;
   hasToggle?: boolean;
+  walletConnectRequired?: boolean;
   onToggle?: () => void;
 };
 
@@ -27,6 +28,7 @@ export default function MarketplaceExposure({
   className,
   isBreakdown,
   hasToggle,
+  walletConnectRequired,
   onToggle,
 }: Props) {
   const [allocations, setAllocations] = useState<any[]>([]);
@@ -34,7 +36,7 @@ export default function MarketplaceExposure({
   const { account } = useWeb3React();
 
   const updateAllocations = async () => {
-    if (!account) return;
+    if (!account && walletConnectRequired) return;
 
     const protocolAllocationsOrigin = vault?.okrs?.protocol_allocations || {};
     const protocolAllocations0 = Object.keys(protocolAllocationsOrigin)
@@ -205,6 +207,7 @@ export default function MarketplaceExposure({
         items={allocations}
         trStyle="h-10"
         bodyClass="h-[calc(100%-40px)]"
+        walletConnectRequired={walletConnectRequired}
       />
       <div className="hidden xl:flex xl:h-full gap-3.5 overflow-hidden">
         <Table
@@ -214,6 +217,7 @@ export default function MarketplaceExposure({
           items={allocations}
           trStyle="h-10"
           bodyClass="h-[calc(100%-40px)]"
+          walletConnectRequired={walletConnectRequired}
         />
         {/* <div className="flex flex-1 max-h-full min-h-[140px] 3xl:min-h-[220px] max-w-[160px] 3xl:max-w-[220px] items-center justify-center"> */}
         <div className="flex flex-1 max-w-[160px] 3xl:max-w-[220px] items-center justify-center">

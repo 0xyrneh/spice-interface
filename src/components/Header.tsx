@@ -187,7 +187,7 @@ const Header = () => {
 
       <VaultSearch />
       <div className="flex-1 flex justify-end">
-        <ConnectWallet />
+        <ConnectWallet isHeader={true} />
       </div>
     </div>
   );

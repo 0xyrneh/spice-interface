@@ -146,6 +146,7 @@ export default function VaultsTable({
           return !!selectedVault && item.id === selectedVault.id;
         }}
         isLoading={isFetching}
+        walletConnectRequired={true}
         onClickItem={(item) => {
           onSelectVault(item);
         }}

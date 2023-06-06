@@ -29,6 +29,7 @@ type Props = {
   defaultSortKey?: string;
   bodyClass?: string;
   isLoading?: boolean;
+  walletConnectRequired?: boolean;
   onClickItem?: (item: any) => void;
   isActive?: (item: any) => boolean;
 };
@@ -45,6 +46,7 @@ const Table = ({
   onClickItem,
   isActive,
   isLoading,
+  walletConnectRequired,
 }: Props) => {
   const [sortKey, setSortKey] = useState<string | undefined>(defaultSortKey);
   const [sortAsc, setSortAsc] = useState(false);
@@ -122,7 +124,7 @@ const Table = ({
           onMouseEnter={() => setHoverBody(true)}
           onMouseLeave={() => setHoverBody(false)}
         >
-          {!account && (
+          {!account && walletConnectRequired && (
             <tr className="h-full">
               <td>
                 <span className="flex justify-center align-center my-2">
@@ -131,7 +133,7 @@ const Table = ({
               </td>
             </tr>
           )}
-          {account && isLoading && (
+          {(account || !walletConnectRequired) && isLoading && (
             <tr className="h-full">
               <td>
                 <span className="flex justify-center align-center my-2">
@@ -140,7 +142,7 @@ const Table = ({
               </td>
             </tr>
           )}
-          {account &&
+          {(account || !walletConnectRequired) &&
             !isLoading &&
             getSortedItems().map((item, index) => (
               <tr

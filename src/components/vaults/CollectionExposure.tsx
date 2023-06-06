@@ -18,6 +18,7 @@ type Props = {
   className?: string;
   isBreakdown?: boolean;
   hasToggle?: boolean;
+  walletConnectRequired?: boolean;
   onToggle?: () => void;
 };
 
@@ -26,6 +27,7 @@ export default function CollectionExposure({
   className,
   isBreakdown,
   hasToggle,
+  walletConnectRequired,
   onToggle,
 }: Props) {
   const [allocations, setAllocations] = useState<any[]>([]);
@@ -33,7 +35,7 @@ export default function CollectionExposure({
   const { account } = useWeb3React();
 
   const updateAllocations = async () => {
-    if (!account) return;
+    if (!account && walletConnectRequired) return;
 
     const collectionAllocationsOrigin =
       vault?.okrs?.collection_allocations || {};
@@ -190,6 +192,7 @@ export default function CollectionExposure({
         items={allocations}
         trStyle="h-10"
         bodyClass="h-[calc(100%-40px)]"
+        walletConnectRequired={walletConnectRequired}
       />
       <div className="hidden xl:flex xl:h-full gap-3.5 overflow-hidden">
         <Table
@@ -199,6 +202,7 @@ export default function CollectionExposure({
           items={allocations}
           trStyle="h-10"
           bodyClass="h-[calc(100%-40px)]"
+          walletConnectRequired={walletConnectRequired}
         />
         {/* <div className="flex flex-1 min-h-[140px] 3xl:min-h-[220px] max-w-[160px] 3xl:max-w-[220px] items-center justify-center"> */}
         <div className="flex flex-1 max-w-[160px] 3xl:max-w-[220px] items-center justify-center">
