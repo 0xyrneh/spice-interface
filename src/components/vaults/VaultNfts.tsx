@@ -109,7 +109,7 @@ export default function VaultNfts({ vault, className }: Props) {
       return myPrologueNfts.sort((a, b) => (a.amount <= b.amount ? 1 : -1));
     }
     if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
-      return myPrologueNfts.sort((a, b) => (a.amount >= b.amount ? 1 : -1));
+      return myPrologueNfts.sort((a, b) => (a.amount < b.amount ? -1 : 1));
     }
     // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
     if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
@@ -127,8 +127,8 @@ export default function VaultNfts({ vault, className }: Props) {
           return a.apy > b.apy ? 1 : -1;
         })
         .sort((a, b) => {
-          if (a.isEscrowed) return -1;
-          return 1;
+          if (a.isEscrowed) return 1;
+          return -1;
         })
         .sort((a, b) => {
           if (a.isEscrowed && b.isEscrowed) return a.apy > b.apy ? 1 : -1;
