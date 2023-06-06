@@ -7,7 +7,11 @@ import { Button } from "@/components/common";
 import useAuth from "@/hooks/useAuth";
 import { ConnectorNames } from "@/types/wallet";
 
-const ConnectWallet = () => {
+type Props = {
+  isHeader?: boolean;
+};
+
+const ConnectWallet = ({ isHeader }: Props) => {
   const [blockedRegion, setBlockedRegion] = useState<string>();
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
 
@@ -20,11 +24,15 @@ const ConnectWallet = () => {
 
   const handleMouseEnter = () => {
     if (!blockedRegion) return;
+    if (!isHeader) return;
+
     setShowToolTip(true);
   };
 
   const handleMouseLeave = () => {
     if (!blockedRegion) return;
+    if (!isHeader) return;
+
     setShowToolTip(false);
   };
 
