@@ -1,6 +1,7 @@
 import React from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
+
 import { PieItem } from "@/types/common";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -58,10 +59,14 @@ const externalTooltipHandler = (context: any) => {
       box.style.borderRadius = "4px";
       box.style.height = "14px";
       box.style.width = "14px";
+      box.style.minHeight = "14px";
+      box.style.minWidth = "14px";
 
       const title = document.createElement("span");
       title.appendChild(document.createTextNode(titleLines[i]));
       title.style.marginRight = "16px";
+      title.style.maxHeight = "2.2rem";
+      title.style.overflow = "hidden";
 
       const text = document.createTextNode(body + "%");
 
@@ -115,7 +120,7 @@ const propsToData = (props: PieItem[]) => {
     labels: props.map((item) => item.name),
     datasets: [
       {
-        data: props.map((item) => item.value),
+        data: props.map((item) => Number(item.value).toFixed(2)),
         backgroundColor: props.map((item) => item.color),
         borderColor: props.map(() => "#A1A1A1"),
         borderWidth: 1,
