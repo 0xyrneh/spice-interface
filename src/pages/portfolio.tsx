@@ -2,9 +2,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import PositionSVG from "@/assets/icons/position.svg";
-import CopySVG from "@/assets/icons/copy.svg";
+import CopyIconSVG from "@/assets/icons/copy.svg";
+import CheckIconSVG from "@/assets/icons/check.svg";
 import { shortAddress } from "@/utils";
 import { Card, Stats } from "@/components/common";
 import { LineChart } from "@/components/portfolio";
@@ -30,6 +32,7 @@ import { ExampleTotalTvl } from "@/constants";
 export default function Portfolio() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
+  const [isCopied, setCopied] = useState(false);
 
   const { account } = useWeb3React();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
@@ -84,6 +87,13 @@ export default function Portfolio() {
     return userTotalPosition;
   };
 
+  const onCopyWallet = () => {
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 3000);
+  };
+
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
       <div className="flex flex-col min-w-[35%] w-[41%] gap-5 pt-1">
@@ -108,9 +118,11 @@ export default function Portfolio() {
                 {shortAddress(account, 10, account.length)}
               </span>
             </div>
-            <button className="min-w-[24px] min-w-[24px]">
-              <CopySVG />
-            </button>
+            <CopyToClipboard onCopy={onCopyWallet} text={account}>
+              <button className="min-w-[24px] min-w-[24px]">
+                {!isCopied ? <CopyIconSVG /> : <CheckIconSVG />}
+              </button>
+            </CopyToClipboard>
           </Card>
         )}
 

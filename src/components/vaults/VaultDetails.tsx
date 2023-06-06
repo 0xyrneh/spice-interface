@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { BigNumber } from "ethers";
+import { useRouter } from "next/router";
 
 import { Button, Card, Stats } from "@/components/common";
 import { DetailChart, LoanBreakdown, PrologueNfts } from "@/components/vaults";
@@ -6,12 +8,65 @@ import CircleDotSvg from "@/assets/icons/circle-dot.svg";
 import ChartSVG from "@/assets/icons/chart.svg";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { activeChainId } from "@/utils/web3";
+import { useWeb3React } from "@web3-react/core";
+import { getNftPortfolios } from "@/utils/nft";
+import { getBalanceInEther } from "@/utils/formatBalance";
+import { accLoans } from "@/utils/lend";
+import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
+import { useAppSelector } from "@/state/hooks";
+import { useUI } from "@/hooks";
+import { ConnectorNames } from "@/types/wallet";
+import useAuth from "@/hooks/useAuth";
 
 type Props = {
   vault: VaultInfo;
 };
 
 export default function VaultDetails({ vault }: Props) {
+  const { account } = useWeb3React();
+  const { data: lendData } = useAppSelector((state) => state.lend);
+  const loans = accLoans(lendData);
+  const router = useRouter();
+  const { showDepositModal } = useUI();
+  const { login } = useAuth();
+
+  const handleConnect = async () => {
+    // TODO: should be changed automatically later once wallet modal is prepared
+    const defaultConnectName = ConnectorNames.Injected;
+    await login(defaultConnectName);
+  };
+
+  const getVaultWithPosition = () => {
+    let userPositionRaw = BigNumber.from(0);
+    let userNftPortfolios: any[] = [];
+
+    if (account) {
+      if (vault.fungible) {
+        userPositionRaw = vault?.userInfo?.depositAmnt || BigNumber.from(0);
+      } else {
+        const userNfts = vault?.userInfo?.nftsRaw || [];
+        userNftPortfolios =
+          vault.address === DEFAULT_AGGREGATOR_VAULT[activeChainId]
+            ? getNftPortfolios(loans, userNfts)
+            : [];
+
+        userNftPortfolios.map((row1: any) => {
+          userPositionRaw = userPositionRaw.add(row1.value);
+          return row1;
+        });
+      }
+    }
+
+    return {
+      ...vault,
+      userPositionRaw,
+      userPosition: getBalanceInEther(userPositionRaw),
+      userNftPortfolios,
+    };
+  };
+
+  const { userPosition } = getVaultWithPosition();
+
   const getVaultHistoricalApy = () => {
     const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
     return (
@@ -21,6 +76,7 @@ export default function VaultDetails({ vault }: Props) {
   };
 
   const getExpectedReturn = () => ((vault?.tvl || 0) * (vault?.apr || 0)) / 100;
+  const isWithdrawOnly = vault.deprecated;
 
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
@@ -37,15 +93,36 @@ export default function VaultDetails({ vault }: Props) {
               />
               <h2 className="font-bold text-white font-base">
                 {vault?.readable || vault?.name}
+                {isWithdrawOnly ? " [WITHDRAW ONLY]" : ""}
               </h2>
             </div>
             <div className="hidden xl:flex items-center justify-end gap-5 flex-1">
-              <Button type="primary" className="h-9 flex-1 max-w-[148px]">
-                <span className="text-base">DEPOSIT</span>
-              </Button>
-              <Button type="secondary" className="h-9 flex-1 max-w-[148px]">
-                <span className="text-base">POSITION</span>
-              </Button>
+              {!isWithdrawOnly && (
+                <Button
+                  type="primary"
+                  className="h-9 flex-1 max-w-[148px]"
+                  onClick={() => {
+                    if (account) {
+                      showDepositModal(vault);
+                    } else {
+                      handleConnect();
+                    }
+                  }}
+                >
+                  <span className="text-base">DEPOSIT</span>
+                </Button>
+              )}
+              {userPosition > 0 && (
+                <Button
+                  type="secondary"
+                  className="h-9 flex-1 max-w-[148px]"
+                  onClick={() => {
+                    router.push(`/portfolio`);
+                  }}
+                >
+                  <span className="text-base">POSITION</span>
+                </Button>
+              )}
             </div>
             <div className="flex xl:hidden items-center text-green">
               <CircleDotSvg />

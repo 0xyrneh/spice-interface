@@ -18,9 +18,15 @@ import PositionInput from "./PositionInput";
 
 interface Props extends ModalProps {
   vault: VaultInfo;
+  isLeverageModal?: boolean;
 }
 
-export default function DepositModal({ open, vault, onClose }: Props) {
+export default function DepositModal({
+  open,
+  isLeverageModal,
+  vault,
+  onClose,
+}: Props) {
   const [positionSelected, setPositionSelected] = useState(true);
   const [leverageTab, setLeverageTab] = useState(LeverageTab.Increase);
   const [positionAmount, setPositionAmount] = useState("");
@@ -76,10 +82,10 @@ export default function DepositModal({ open, vault, onClose }: Props) {
 
   useEffect(() => {
     setTooltipVisible(false);
-    setPositionSelected(true);
+    setPositionSelected(isLeverageModal ? false : true);
     setIsDeposit(true);
     setLeverageTab(LeverageTab.Increase);
-  }, [open, vault, onClose]);
+  }, [open, isLeverageModal, vault, onClose]);
 
   useEffect(() => {
     if (vault?.address) {
