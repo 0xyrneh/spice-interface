@@ -175,7 +175,9 @@ export default function DepositModal({ open, vault, onClose }: Props) {
             className="!pt-4 !pb-2 !px-2 justify-center items-center leading-5 border-1 border-gray-200 !bg-gray-700 !bg-opacity-95"
             notBlur
           >
-            <h2 className="font-base text-white leading-5">Prologue Vault</h2>
+            <h2 className="font-base text-white leading-5">
+              {vault?.readable || ""}
+            </h2>
             <div className="flex flex-col lg:flex-row gap-x-3 font-bold text-base text-orange-200 my-1 tracking-tight">
               <div className="flex gap-1 items-center">
                 <span className="drop-shadow-orange-200 leading-5">Ξ300.5</span>
