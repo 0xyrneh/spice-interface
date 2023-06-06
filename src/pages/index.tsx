@@ -17,14 +17,23 @@ export default function Vaults() {
   const { blur } = useUI();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
 
-  const vaults = vaultsOrigin.map((row: VaultInfo, id) => {
-    return {
-      ...row,
-      oneDayChange: 0,
-      sevenDayChange: 0,
-      sponsor: row.sponsor || "SpiceDAO",
-    };
-  });
+  const vaults = vaultsOrigin
+    .map((row: VaultInfo, id) => {
+      let orderIdx = 0;
+      if (row.type === "aggregator" && !row.fungible) orderIdx = 0;
+      if (row.type === "aggregator" && row.fungible) orderIdx = 1;
+      if (row.type !== "aggregator" && !row.deprecated) orderIdx = 2;
+      if (row.type !== "aggregator" && row.deprecated) orderIdx = 3;
+
+      return {
+        ...row,
+        oneDayChange: 0,
+        sevenDayChange: 0,
+        sponsor: row.sponsor || "SpiceDAO",
+        orderIdx: orderIdx,
+      };
+    })
+    .sort((a, b) => (a.orderIdx < b.orderIdx ? -1 : 1));
 
   const activeVault = vaults[activeVaultIndex];
 
