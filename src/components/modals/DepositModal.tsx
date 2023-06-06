@@ -198,14 +198,12 @@ export default function DepositModal({ open, vault, onClose }: Props) {
             />
           ) : (
             <>
-              {userNfts.length > 0 && (
-                <Erc20Card
-                  className="w-[176px] lg:w-[198px]"
-                  nft={userNfts[0]}
-                  footerClassName="!h-10"
-                  expanded
-                />
-              )}
+              <Erc20Card
+                className="w-[176px] lg:w-[198px]"
+                bgImg={vault.logo}
+                footerClassName="!h-10"
+                expanded
+              />
             </>
           )}
         </div>
