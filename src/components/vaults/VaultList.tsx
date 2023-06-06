@@ -55,7 +55,7 @@ const VaultList = ({ onClickVault }: Props) => {
 
   const getFilteredVaults = () => {
     if (vaultFilter === VaultFilter.All) return vaults;
-    return vaults.filter((vault) => vault.type === vaultFilter);
+    return vaults.filter((vault) => vault.category === vaultFilter);
   };
 
   const handleConnect = async () => {

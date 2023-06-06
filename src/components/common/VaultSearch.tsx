@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
-import vaults from "@/constants/vaults";
-import nfts from "@/constants/nfts";
-import { Vault, Nft } from "@/types/vault";
 import SearchSVG from "@/assets/icons/search.svg";
 import { VaultFilter } from "@/types/common";
 import Dropdown from "./Dropdown";
+import { useAppSelector } from "@/state/hooks";
+import { VaultInfo } from "@/types/vault";
+import { PrologueNftInfo } from "@/types/nft";
 
 const VaultSearch = () => {
   const router = useRouter();
@@ -14,9 +14,17 @@ const VaultSearch = () => {
   const [opened, setOpened] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredVipVaults, setFilteredVipVaults] = useState<Vault[]>([]);
-  const [filteredVaults, setFilteredVaults] = useState<Vault[]>([]);
-  const [filteredNfts, setFilteredNfts] = useState<Nft[]>([]);
+  const [filteredVipVaults, setFilteredVipVaults] = useState<VaultInfo[]>([]);
+  const [filteredVaults, setFilteredVaults] = useState<VaultInfo[]>([]);
+
+  const [filteredNfts, setFilteredNfts] = useState<PrologueNftInfo[]>([]);
+
+  const { vaults } = useAppSelector((state) => state.vault);
+  const { allNfts: spiceNfts } = useAppSelector((state) => state.nft);
+
+  const nfts = spiceNfts.map((row) => {
+    return { ...row, name: `Prologue NFT #${row.tokenId}` };
+  });
 
   useEffect(() => {
     if (!opened) setSearchQuery("");
@@ -27,14 +35,14 @@ const VaultSearch = () => {
       vaults
         .filter(
           (vault) =>
-            vault.type === VaultFilter.VIP &&
-            vault.name
+            vault.category === VaultFilter.VIP &&
+            (vault?.readable || "")
               .toLowerCase()
               .trim()
               .includes(searchQuery.toLowerCase().trim())
         )
         .sort((a, b) => {
-          if (a.tvl < b.tvl) return 1;
+          if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
           return -1;
         })
         .slice(0, 5)
@@ -44,14 +52,14 @@ const VaultSearch = () => {
       vaults
         .filter(
           (vault) =>
-            vault.type === VaultFilter.Public &&
-            vault.name
+            vault.category === VaultFilter.Public &&
+            (vault?.readable || "")
               .toLowerCase()
               .trim()
               .includes(searchQuery.toLowerCase().trim())
         )
         .sort((a, b) => {
-          if (a.tvl < b.tvl) return 1;
+          if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
           return -1;
         })
         .slice(0, 5)
@@ -60,13 +68,13 @@ const VaultSearch = () => {
     setFilteredNfts(
       nfts
         .filter((nft) =>
-          nft.name
+          (nft.name || "")
             .toLowerCase()
             .trim()
             .includes(searchQuery.toLowerCase().trim())
         )
         .sort((a, b) => {
-          if (a.tvl < b.tvl) return 1;
+          if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
           return -1;
         })
         .slice(0, 5)
@@ -107,17 +115,17 @@ const VaultSearch = () => {
                 <div className="flex items-center gap-3 text-left w-[calc(100%-60px)]">
                   <Image
                     className="border-1 border-gray-200 rounded-full"
-                    src={vault.icon}
+                    src={vault.logo}
                     width={16}
                     height={16}
                     alt=""
                   />
                   <span className="whitespace-nowrap overflow-hidden w-full text-ellipsis">
-                    {vault.name}
+                    {vault.readable}
                   </span>
                 </div>
                 <span className="w-[60px] whitespace-nowrap text-right">
-                  {vault.apy}% APY
+                  {`${vault.apy?.toFixed(2)}% APY`}
                 </span>
               </button>
             ))}
@@ -139,17 +147,17 @@ const VaultSearch = () => {
                 <div className="flex items-center gap-3 text-left w-[calc(100%-60px)]">
                   <Image
                     className="border-1 border-gray-200 rounded-full"
-                    src={vault.icon}
+                    src={vault.logo}
                     width={16}
                     height={16}
                     alt=""
                   />
                   <span className="whitespace-nowrap overflow-hidden w-full text-ellipsis">
-                    {vault.name}
+                    {vault.readable}
                   </span>
                 </div>
                 <span className="w-[60px] whitespace-nowrap text-right">
-                  {vault.apy}% APY
+                  {`${vault.apy?.toFixed(2)}% APY`}
                 </span>
               </button>
             ))}
@@ -160,7 +168,7 @@ const VaultSearch = () => {
         <div className="flex flex-col gap-1">
           <span className="text-xs text-gray-300">NFTS</span>
           <div className="flex flex-col gap-px">
-            {filteredNfts.map((vault, index) => (
+            {filteredNfts.map((nft, index) => (
               <button
                 key={`vault-${index}`}
                 className="flex justify-between items-center text-xs rounded p-[5px] hover:bg-gray-300 hover:bg-opacity-10"
@@ -168,17 +176,16 @@ const VaultSearch = () => {
                 <div className="flex items-center gap-3 text-left">
                   <Image
                     className="border-1 border-gray-200 rounded-full"
-                    src={vault.icon}
+                    src={nft.tokenImg}
                     width={16}
                     height={16}
                     alt=""
                   />
-                  {vault.name}
+                  {nft?.name || ""}
                 </div>
-                {/* <span>{vault.tvl}</span> */}
               </button>
             ))}
-            {filteredNfts.length === 0 && <span>No vault found</span>}
+            {filteredNfts.length === 0 && <span>No nft found</span>}
           </div>
         </div>
       </div>

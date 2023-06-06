@@ -16,6 +16,7 @@ import WethAbi from "@/config/abi/WETH.json";
 import { getWethAddress } from "@/utils/addressHelpers";
 import { activeChainId } from "@/utils/web3";
 import { getVaultBackgroundImage, getVaultLogo } from "@/utils/vault";
+import { VaultFilter } from "@/types/common";
 
 const apiEnv = activeChainId === 1 ? "prod" : "goerli";
 
@@ -95,12 +96,14 @@ export const fetchActiveVaults = async (vaults: any[]) => {
     );
 
     const vaultsWithTvl = vaultsWithDetails.map((row: VaultInfo, i: number) => {
-      if (row.type !== "aggregator") {
+      if (row.type === "aggregator") {
         return {
           ...row,
-          tvl: getBalanceInEther(onChainInfo[i][0][0]),
+          totalShares: getBalanceInEther(onChainInfo[i][0][0]),
+          tvl: getBalanceInEther(onChainInfo[i][1][0]),
           wethBalance: vaultWethInfo[i][0][0],
-          totalSupply: 0,
+          totalSupply: row?.fungible ? 0 : onChainInfo[i][2][0].toNumber(),
+          maxSupply: row?.fungible ? 0 : onChainInfo[i][3][0].toNumber(),
           apr: 100 * (row?.okrs?.expected_return || 0),
           apy: 100 * (row?.okrs?.expected_return || 0),
           name: getVaultDisplayName(row?.name),
@@ -117,15 +120,14 @@ export const fetchActiveVaults = async (vaults: any[]) => {
             nfts: [],
             amount: BigNumber.from(0),
           },
+          category: row.fungible ? VaultFilter.Public : VaultFilter.VIP,
         };
       }
       return {
         ...row,
-        totalShares: getBalanceInEther(onChainInfo[i][0][0]),
-        tvl: getBalanceInEther(onChainInfo[i][1][0]),
+        tvl: getBalanceInEther(onChainInfo[i][0][0]),
         wethBalance: vaultWethInfo[i][0][0],
-        totalSupply: row?.fungible ? 0 : onChainInfo[i][2][0].toNumber(),
-        maxSupply: row?.fungible ? 0 : onChainInfo[i][3][0].toNumber(),
+        totalSupply: 0,
         apr: 100 * (row?.okrs?.expected_return || 0),
         apy: 100 * (row?.okrs?.expected_return || 0),
         name: getVaultDisplayName(row?.name),
@@ -142,6 +144,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           nfts: [],
           amount: BigNumber.from(0),
         },
+        category: VaultFilter.Public,
       };
     });
 
@@ -185,6 +188,7 @@ export const fetchLeverageVaults = async (vaults: any[]) => {
       ...row,
       wethBalance: onChainInfo[i][0][0],
       totalAssets: onChainInfo[i][1][0],
+      category: VaultFilter.Public,
     }));
 
     return data;

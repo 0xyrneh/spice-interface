@@ -62,7 +62,7 @@ export interface VaultInfo {
   receiptToken: ReceiptToken;
   id: number;
   backgroundImage?: string;
-
+  category: VaultFilter;
   // TODO: remove later since this is template type for blur vault
   isBlur?: boolean;
 }
