@@ -76,6 +76,7 @@ export default function VaultDetails({ vault }: Props) {
   };
 
   const getExpectedReturn = () => ((vault?.tvl || 0) * (vault?.apr || 0)) / 100;
+  const isWithdrawOnly = vault.deprecated;
 
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
@@ -92,22 +93,25 @@ export default function VaultDetails({ vault }: Props) {
               />
               <h2 className="font-bold text-white font-base">
                 {vault?.readable || vault?.name}
+                {isWithdrawOnly ? " [WITHDRAW ONLY]" : ""}
               </h2>
             </div>
             <div className="hidden xl:flex items-center justify-end gap-5 flex-1">
-              <Button
-                type="primary"
-                className="h-9 flex-1 max-w-[148px]"
-                onClick={() => {
-                  if (account) {
-                    showDepositModal(vault);
-                  } else {
-                    handleConnect();
-                  }
-                }}
-              >
-                <span className="text-base">DEPOSIT</span>
-              </Button>
+              {!isWithdrawOnly && (
+                <Button
+                  type="primary"
+                  className="h-9 flex-1 max-w-[148px]"
+                  onClick={() => {
+                    if (account) {
+                      showDepositModal(vault);
+                    } else {
+                      handleConnect();
+                    }
+                  }}
+                >
+                  <span className="text-base">DEPOSIT</span>
+                </Button>
+              )}
               {userPosition > 0 && (
                 <Button
                   type="secondary"
