@@ -149,7 +149,7 @@ const VaultList = ({ onClickVault }: Props) => {
             }}
           >
             <span className="text-xs font-bold">
-              {account ? "DEPOSIT" : "CONNECT"}
+              {account ? (item.deprecated ? "WITHDRAW" : "DEPOSIT") : "CONNECT"}
             </span>
           </Button>
         ),
