@@ -1,4 +1,10 @@
-import { VAULT_BACKGROUND_IMAGES, VAULT_LOGOS } from "@/config/constants/vault";
+import moment from "moment-timezone";
+
+import {
+  VAULT_BACKGROUND_IMAGES,
+  VAULT_LOGOS,
+  VAULT_CREATION_TIMESTAMPS,
+} from "@/config/constants/vault";
 
 const NONFUNGIBLE_AGGREGATOR_VAULT_DESCRIPTION = `Spice’s first vault represents a medium risk strategy that allocates capital to BendDAO, DropsDAO, NFTfi, Arcade, X2Y2, ParaSpace, and MetaStreet. Receipt tokens for deposits into this vault are represented by Prologue NFTs.`;
 const FUNGIBLE_AGGREGATOR_VAULT_DESCRIPTION = `Spice’s first public-access aggregator vault represents a medium risk strategy that allocates capital to BendDAO, DropsDAO, NFTfi, Arcade, X2Y2, ParaSpace, and MetaStreet. Receipt tokens for deposits into this vault are represented by ERC-20 tokens.`;
@@ -47,4 +53,18 @@ export const getVaultLogo = (
     return VAULT_LOGOS.leverage;
   }
   return VAULT_LOGOS.prologue;
+};
+
+// get vault up time
+export const getVaultUpTime = (address: string): number => {
+  if (!address) return 0;
+  const creationTimeStamp: number = VAULT_CREATION_TIMESTAMPS[address];
+
+  if (creationTimeStamp) {
+    const timeDiff = moment.duration(
+      moment().diff(moment(creationTimeStamp * 1000))
+    );
+    return Math.floor(timeDiff.asDays());
+  }
+  return 0;
 };

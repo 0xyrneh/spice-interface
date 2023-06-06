@@ -46,10 +46,27 @@ const VaultList = ({ onClickVault }: Props) => {
   }, []);
 
   const vaults = vaultsOrigin.map((row) => {
+    let oneDayChange = 0;
+    let sevenDayChange = 0;
+
+    if (row?.historicalRecords) {
+      if (row?.historicalRecords[1]) {
+        oneDayChange =
+          100 *
+          (row?.historicalRecords[0]?.okrs?.expected_return -
+            row?.historicalRecords[1]?.okrs?.expected_return);
+      }
+      if (row?.historicalRecords[6]) {
+        sevenDayChange =
+          100 *
+          (row?.historicalRecords[0]?.okrs?.expected_return -
+            row?.historicalRecords[6]?.okrs?.expected_return);
+      }
+    }
     return {
       ...row,
-      oneDayChange: 0,
-      sevenDayChange: 0,
+      oneDayChange,
+      sevenDayChange,
     };
   });
 
@@ -103,6 +120,9 @@ const VaultList = ({ onClickVault }: Props) => {
         itemSuffix: () => "%",
         itemClass: (item) =>
           item.oneDayChange >= 0 ? "text-green" : "text-red",
+        format: (item) => {
+          return (item?.oneDayChange || 0).toFixed(2);
+        },
       },
       {
         title: "7D CHANGE",
@@ -111,6 +131,9 @@ const VaultList = ({ onClickVault }: Props) => {
         itemSuffix: () => "%",
         itemClass: (item) =>
           item.sevenDayChange >= 0 ? "text-green" : "text-red",
+        format: (item) => {
+          return (item?.sevenDayChange || 0).toFixed(2);
+        },
       },
       {
         title: "TVL",
@@ -149,7 +172,7 @@ const VaultList = ({ onClickVault }: Props) => {
             }}
           >
             <span className="text-xs font-bold">
-              {account ? "DEPOSIT" : "CONNECT"}
+              {account ? (item.deprecated ? "WITHDRAW" : "DEPOSIT") : "CONNECT"}
             </span>
           </Button>
         ),
