@@ -14,6 +14,9 @@ import { getBalanceInEther } from "@/utils/formatBalance";
 import { accLoans } from "@/utils/lend";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { useAppSelector } from "@/state/hooks";
+import { useUI } from "@/hooks";
+import { ConnectorNames } from "@/types/wallet";
+import useAuth from "@/hooks/useAuth";
 
 type Props = {
   vault: VaultInfo;
@@ -24,6 +27,14 @@ export default function VaultDetails({ vault }: Props) {
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
   const router = useRouter();
+  const { showDepositModal } = useUI();
+  const { login } = useAuth();
+
+  const handleConnect = async () => {
+    // TODO: should be changed automatically later once wallet modal is prepared
+    const defaultConnectName = ConnectorNames.Injected;
+    await login(defaultConnectName);
+  };
 
   const getVaultWithPosition = () => {
     let userPositionRaw = BigNumber.from(0);
@@ -84,7 +95,17 @@ export default function VaultDetails({ vault }: Props) {
               </h2>
             </div>
             <div className="hidden xl:flex items-center justify-end gap-5 flex-1">
-              <Button type="primary" className="h-9 flex-1 max-w-[148px]">
+              <Button
+                type="primary"
+                className="h-9 flex-1 max-w-[148px]"
+                onClick={() => {
+                  if (account) {
+                    showDepositModal(vault);
+                  } else {
+                    handleConnect();
+                  }
+                }}
+              >
                 <span className="text-base">DEPOSIT</span>
               </Button>
               {userPosition > 0 && (
