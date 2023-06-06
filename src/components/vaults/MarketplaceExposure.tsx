@@ -85,9 +85,11 @@ export default function MarketplaceExposure({
       ];
     }
     setAllocations(
-      protocolAllocations1.sort((a, b) =>
-        a.allocation >= b.allocation ? -1 : 1
-      )
+      protocolAllocations1
+        .map((row, id) => {
+          return { ...row, color: VAULT_COLLECTION_COLORS[id % 4] };
+        })
+        .sort((a, b) => (a.allocation >= b.allocation ? -1 : 1))
     );
   };
 
@@ -148,7 +150,7 @@ export default function MarketplaceExposure({
         noSort: true,
         itemPrefix: (item) => (
           <div
-            className="rounded w-3 h-3 mr-2"
+            className="rounded w-3 h-3 mr-2 min-w-[12px] min-h-[12px]"
             style={{
               backgroundColor: item.color,
             }}
