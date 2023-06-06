@@ -9,16 +9,10 @@ import { VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
 
 const VaultSearch = () => {
-  const router = useRouter();
-
   const [opened, setOpened] = useState(false);
-
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredVipVaults, setFilteredVipVaults] = useState<VaultInfo[]>([]);
-  const [filteredVaults, setFilteredVaults] = useState<VaultInfo[]>([]);
 
-  const [filteredNfts, setFilteredNfts] = useState<PrologueNftInfo[]>([]);
-
+  const router = useRouter();
   const { vaults } = useAppSelector((state) => state.vault);
   const { allNfts: spiceNfts } = useAppSelector((state) => state.nft);
 
@@ -30,56 +24,48 @@ const VaultSearch = () => {
     if (!opened) setSearchQuery("");
   }, [opened]);
 
-  useEffect(() => {
-    setFilteredVipVaults(
-      vaults
-        .filter(
-          (vault) =>
-            vault.category === VaultFilter.VIP &&
-            (vault?.readable || "")
-              .toLowerCase()
-              .trim()
-              .includes(searchQuery.toLowerCase().trim())
-        )
-        .sort((a, b) => {
-          if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
-          return -1;
-        })
-        .slice(0, 5)
-    );
+  const filteredVipVaults: VaultInfo[] = vaults
+    .filter(
+      (vault) =>
+        vault.category === VaultFilter.VIP &&
+        (vault?.readable || "")
+          .toLowerCase()
+          .trim()
+          .includes(searchQuery.toLowerCase().trim())
+    )
+    .sort((a, b) => {
+      if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
+      return -1;
+    })
+    .slice(0, 5);
 
-    setFilteredVaults(
-      vaults
-        .filter(
-          (vault) =>
-            vault.category === VaultFilter.Public &&
-            (vault?.readable || "")
-              .toLowerCase()
-              .trim()
-              .includes(searchQuery.toLowerCase().trim())
-        )
-        .sort((a, b) => {
-          if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
-          return -1;
-        })
-        .slice(0, 5)
-    );
+  const filteredVaults: VaultInfo[] = vaults
+    .filter(
+      (vault) =>
+        vault.category === VaultFilter.Public &&
+        (vault?.readable || "")
+          .toLowerCase()
+          .trim()
+          .includes(searchQuery.toLowerCase().trim())
+    )
+    .sort((a, b) => {
+      if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
+      return -1;
+    })
+    .slice(0, 5);
 
-    setFilteredNfts(
-      nfts
-        .filter((nft) =>
-          (nft.name || "")
-            .toLowerCase()
-            .trim()
-            .includes(searchQuery.toLowerCase().trim())
-        )
-        .sort((a, b) => {
-          if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
-          return -1;
-        })
-        .slice(0, 5)
-    );
-  }, [searchQuery]);
+  const filteredNfts: PrologueNftInfo[] = nfts
+    .filter((nft) =>
+      (nft.name || "")
+        .toLowerCase()
+        .trim()
+        .includes(searchQuery.toLowerCase().trim())
+    )
+    .sort((a, b) => {
+      if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
+      return -1;
+    })
+    .slice(0, 5);
 
   return (
     <Dropdown opened={opened} onClose={() => setOpened(false)}>
