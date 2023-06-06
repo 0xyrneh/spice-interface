@@ -17,6 +17,7 @@ import { useAppSelector } from "@/state/hooks";
 import { useUI } from "@/hooks";
 import { ConnectorNames } from "@/types/wallet";
 import useAuth from "@/hooks/useAuth";
+import { getVaultUpTime } from "@/utils/vault";
 
 type Props = {
   vault: VaultInfo;
@@ -170,7 +171,11 @@ export default function VaultDetails({ vault }: Props) {
               title="Historical APY"
               value={`${getVaultHistoricalApy().toFixed(2)}%`}
             />
-            <Stats className="hidden xl:flex" title="Up Time" value="100d" />
+            <Stats
+              className="hidden xl:flex"
+              title="Up Time"
+              value={`${getVaultUpTime(vault?.address)}d`}
+            />
           </div>
         </Card>
         {vault.receiptToken === ReceiptToken.NFT && (
