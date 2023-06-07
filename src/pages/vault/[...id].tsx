@@ -66,7 +66,14 @@ export default function VaultDetailsPage() {
   }, [id, router, vaults.length]);
 
   if (vault) {
-    return <VaultDetails vault={vault} />;
+    return (
+      <VaultDetails
+        vault={{
+          ...vault,
+          isBlur: true,
+        }}
+      />
+    );
   } else {
     return <div></div>;
   }

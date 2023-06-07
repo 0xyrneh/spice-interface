@@ -5,7 +5,11 @@ import { LineChart } from "@/components/portfolio";
 import { PeriodFilter } from "@/types/common";
 import TvlSVG from "@/assets/icons/tvl.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
-import { MarketplaceExposure, CollectionExposure } from "@/components/vaults";
+import {
+  MarketplaceExposure,
+  CollectionExposure,
+  LoanAndBidExposure,
+} from "@/components/vaults";
 import { VaultInfo } from "@/types/vault";
 import { ExampleShare, ExampleTotalTvl } from "@/constants";
 
@@ -23,7 +27,11 @@ export default function DetailChart({ vault }: Props) {
         <div className="flex items-center gap-2.5">
           <TvlSVG />
           <h2 className="font-bold text-white font-sm">
-            {showPerformance ? "ASSETS PER VAULT SHARE" : "TOTAL VALUE LOCKED"}
+            {showPerformance
+              ? vault.isBlur
+                ? "SP-BLUR ACCUMULATED"
+                : "ASSETS PER VAULT SHARE"
+              : "TOTAL VALUE LOCKED"}
           </h2>
           <button onClick={() => setShowPerformance(!showPerformance)}>
             <SortUpSVG
@@ -35,8 +43,14 @@ export default function DetailChart({ vault }: Props) {
         </div>
         <div className="flex items-end justify-between text-gray-200 px-12">
           <div className="flex gap-4 items-center">
-            <Stats title="Vault TVL" value="Ξ30.0" />
-            <Stats title="Vault APY" value="16.0%" />
+            {showPerformance && vault.isBlur ? (
+              <Stats title="SP-BLUR" value="1500" />
+            ) : (
+              <>
+                <Stats title="Vault TVL" value="Ξ30.0" />
+                <Stats title="Vault APY" value="16.0%" />
+              </>
+            )}
           </div>
           <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
             <div className="hidden 2xl:flex items-center gap-1">
@@ -93,16 +107,22 @@ export default function DetailChart({ vault }: Props) {
         </div>
       </Card>
       <div className="flex gap-5 h-[37%]  overflow-hidden p-1 -m-1">
-        <MarketplaceExposure
-          className="flex-1"
-          vault={vault}
-          walletConnectRequired={false}
-        />
-        <CollectionExposure
-          className="flex-1"
-          vault={vault}
-          walletConnectRequired={false}
-        />
+        {vault.isBlur ? (
+          <LoanAndBidExposure className="flex-1" small showIcon vault={vault} />
+        ) : (
+          <>
+            <MarketplaceExposure
+              className="flex-1"
+              vault={vault}
+              walletConnectRequired={false}
+            />
+            <CollectionExposure
+              className="flex-1"
+              vault={vault}
+              walletConnectRequired={false}
+            />
+          </>
+        )}
       </div>
     </div>
   );

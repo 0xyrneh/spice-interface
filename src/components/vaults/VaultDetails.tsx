@@ -3,7 +3,12 @@ import { BigNumber } from "ethers";
 import { useRouter } from "next/router";
 
 import { Button, Card, Stats } from "@/components/common";
-import { DetailChart, LoanBreakdown, PrologueNfts } from "@/components/vaults";
+import {
+  BlurLeaderboard,
+  DetailChart,
+  LoanBreakdown,
+  PrologueNfts,
+} from "@/components/vaults";
 import CircleDotSvg from "@/assets/icons/circle-dot.svg";
 import ChartSVG from "@/assets/icons/chart.svg";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
@@ -178,18 +183,30 @@ export default function VaultDetails({ vault }: Props) {
             />
           </div>
         </Card>
-        {vault.receiptToken === ReceiptToken.NFT && (
+        {!vault.isBlur && vault.receiptToken === ReceiptToken.NFT && (
           <PrologueNfts
             vault={vault}
             walletConnectRequired={false}
             className="h-[30%]"
           />
         )}
-        <LoanBreakdown
-          vault={vault}
-          walletConnectRequired={false}
-          className="flex-1 h-[34%]"
-        />
+
+        {vault.isBlur ? (
+          <div className="flex flex-col h-full gap-5">
+            <BlurLeaderboard vault={vault} showIcon onlyPts />
+            <BlurLeaderboard
+              vault={vault}
+              showIcon
+              nonExpandedClassName="flex-1"
+            />
+          </div>
+        ) : (
+          <LoanBreakdown
+            vault={vault}
+            walletConnectRequired={false}
+            className="flex-1 h-[34%]"
+          />
+        )}
       </div>
 
       <DetailChart vault={vault} />

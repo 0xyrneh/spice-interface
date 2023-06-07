@@ -42,6 +42,8 @@ export default function DepositModal({
   const [focused, setFocused] = useState(false);
   const [closed, setClosed] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [leverageHover, setLeverageHover] = useState(false);
+  const [tooltipHover, setTooltipHover] = useState(false);
   const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
 
   const { account } = useWeb3React();
@@ -50,6 +52,10 @@ export default function DepositModal({
 
   const loans = accLoans(lendData);
   const userNftIds = loans.map((row: any) => row.tokenId);
+
+  useEffect(() => {
+    setTooltipVisible(leverageHover || tooltipHover);
+  }, [leverageHover, tooltipHover]);
 
   // fetch nft information from backend
   const fetchData = async () => {
@@ -230,6 +236,12 @@ export default function DepositModal({
               }`}
               disabled={positionSelected}
               onClick={() => setPositionSelected(true)}
+              onMouseEnter={() => {
+                console.log("XXX");
+              }}
+              onMouseLeave={() => {
+                console.log("ZZZ");
+              }}
             >
               POSITION
             </button>
@@ -245,9 +257,14 @@ export default function DepositModal({
                   setPositionSelected(false);
                 }
               }}
-              onMouseEnter={() => {
+              onMouseOver={() => {
                 if (vault.receiptToken === ReceiptToken.ERC20) {
-                  setTooltipVisible(true);
+                  setLeverageHover(true);
+                }
+              }}
+              onMouseLeave={() => {
+                if (vault.receiptToken === ReceiptToken.ERC20) {
+                  setLeverageHover(false);
                 }
               }}
             >
@@ -280,15 +297,19 @@ export default function DepositModal({
                   </Button>
                 </div>
                 {tooltipVisible && (
-                  <Button
-                    type="secondary"
-                    className="flex-1 h-6 w-[78px] flex items-center justify-center !border-0 shadow-transparent text-xs gap-1"
-                    disabled
+                  <div
+                    className="flex flex-1 -mt-6"
+                    onMouseEnter={() => setTooltipHover(true)}
+                    onMouseLeave={() => setTooltipHover(false)}
                   >
-                    <a className="underline">Prologue NFT</a>
-                    <span className="lg:hidden">only.</span>
-                    <span className="hidden lg:block">exclusive feature.</span>
-                  </Button>
+                    <div className="text-gray-200 rounded bg-gray-200 bg-opacity-10 shadow-card flex-1 mt-6 h-6 w-[78px] flex items-center justify-center !border-0 shadow-transparent text-xs gap-1 cursor-pointer">
+                      <a className="underline">Prologue NFT</a>
+                      <span className="lg:hidden">only.</span>
+                      <span className="hidden lg:block">
+                        exclusive feature.
+                      </span>
+                    </div>
+                  </div>
                 )}
               </div>
               <PositionInput
