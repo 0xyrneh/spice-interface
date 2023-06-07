@@ -236,12 +236,6 @@ export default function DepositModal({
               }`}
               disabled={positionSelected}
               onClick={() => setPositionSelected(true)}
-              onMouseEnter={() => {
-                console.log("XXX");
-              }}
-              onMouseLeave={() => {
-                console.log("ZZZ");
-              }}
             >
               POSITION
             </button>
