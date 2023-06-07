@@ -5,16 +5,21 @@ import { useEffect, useState } from "react";
 interface Props {
   isDeposit: boolean;
   txStatus: TxStatus;
+  hiding?: boolean;
   onConfirm: () => void;
 }
 
-export default function PositionConfirm({
-  isDeposit,
-  txStatus,
-  onConfirm,
-}: Props) {
+export default function PositionConfirm(props: Props) {
   const [dots, setDots] = useState("");
   const [dotsTimer, setDotsTimer] = useState<NodeJS.Timer>();
+  const [isDeposit, setIsDeposit] = useState(false);
+  const { txStatus, onConfirm } = props;
+
+  useEffect(() => {
+    if (!props.hiding) {
+      setIsDeposit(props.isDeposit);
+    }
+  }, [props.hiding, props.isDeposit]);
 
   useEffect(() => {
     if (dotsTimer) {

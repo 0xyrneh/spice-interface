@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 
@@ -13,6 +13,7 @@ import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import PositionConfirm from "./PositionConfirm";
 import LeverageConfirm from "./LeverageConfirm";
+import ConfirmPopup from "./ConfirmPopup";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../common";
 import PositionInput from "./PositionInput";
 
@@ -45,6 +46,7 @@ export default function DepositModal({
   const [leverageHover, setLeverageHover] = useState(false);
   const [tooltipHover, setTooltipHover] = useState(false);
   const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
+  const [hiding, setHiding] = useState(false);
 
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
@@ -52,6 +54,13 @@ export default function DepositModal({
 
   const loans = accLoans(lendData);
   const userNftIds = loans.map((row: any) => row.tokenId);
+
+  const handleHidePopup = () => {
+    setHiding(true);
+    setTimeout(() => {
+      setHiding(false);
+    }, 700);
+  };
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
@@ -91,6 +100,7 @@ export default function DepositModal({
     setPositionSelected(isLeverageModal ? false : true);
     setIsDeposit(true);
     setLeverageTab(LeverageTab.Increase);
+    setFocused(false);
   }, [open, isLeverageModal, vault, onClose]);
 
   useEffect(() => {
@@ -136,7 +146,7 @@ export default function DepositModal({
     }
   };
 
-  const showRightModal = () => {
+  const showRightModal = useCallback(() => {
     if (closed) return false;
     if (focused) return true;
     if (positionSelected) {
@@ -150,7 +160,22 @@ export default function DepositModal({
         targetLeverage !== ""
       );
     }
-  };
+  }, [
+    closed,
+    focused,
+    positionSelected,
+    positionAmount,
+    leverageTab,
+    leverage,
+    targetLeverage,
+  ]);
+
+  useEffect(() => {
+    if (showRightModal()) {
+      console.log("yyy", showRightModal());
+      // setHiding(false);
+    }
+  }, [showRightModal]);
 
   const processing = () => {
     if (positionSelected) {
@@ -235,7 +260,10 @@ export default function DepositModal({
                   : "text-gray-200 hover:text-gray-300"
               }`}
               disabled={positionSelected}
-              onClick={() => setPositionSelected(true)}
+              onClick={() => {
+                handleHidePopup();
+                setPositionSelected(true);
+              }}
             >
               POSITION
             </button>
@@ -252,6 +280,7 @@ export default function DepositModal({
               disabled={!positionSelected}
               onClick={() => {
                 if (vault.receiptToken === ReceiptToken.NFT) {
+                  handleHidePopup();
                   setPositionSelected(false);
                 }
               }}
@@ -279,7 +308,10 @@ export default function DepositModal({
                       isDeposit ? "" : "shadow-transparent"
                     }`}
                     disabled={isDeposit}
-                    onClick={() => setIsDeposit(true)}
+                    onClick={() => {
+                      handleHidePopup();
+                      setIsDeposit(true);
+                    }}
                   >
                     <span className="text-xs">DEPOSIT</span>
                   </Button>
@@ -289,7 +321,10 @@ export default function DepositModal({
                       !isDeposit ? "" : "shadow-transparent"
                     }`}
                     disabled={!isDeposit}
-                    onClick={() => setIsDeposit(false)}
+                    onClick={() => {
+                      handleHidePopup();
+                      setIsDeposit(false);
+                    }}
                   >
                     <span className="text-xs">WITHDRAW</span>
                   </Button>
@@ -338,7 +373,10 @@ export default function DepositModal({
                         : "shadow-transparent"
                     }`}
                     disabled={leverageTab === LeverageTab.Increase}
-                    onClick={() => setLeverageTab(LeverageTab.Increase)}
+                    onClick={() => {
+                      handleHidePopup();
+                      setLeverageTab(LeverageTab.Increase);
+                    }}
                   >
                     <span className="text-xs">INCREASE</span>
                   </Button>
@@ -354,7 +392,10 @@ export default function DepositModal({
                         : "shadow-transparent"
                     }`}
                     disabled={leverageTab === LeverageTab.Decrease}
-                    onClick={() => setLeverageTab(LeverageTab.Decrease)}
+                    onClick={() => {
+                      handleHidePopup();
+                      setLeverageTab(LeverageTab.Decrease);
+                    }}
                   >
                     <span className="text-xs">DECREASE</span>
                   </Button>
@@ -370,7 +411,10 @@ export default function DepositModal({
                         : "shadow-transparent"
                     }`}
                     disabled={leverageTab === LeverageTab.Refinance}
-                    onClick={() => setLeverageTab(LeverageTab.Refinance)}
+                    onClick={() => {
+                      handleHidePopup();
+                      setLeverageTab(LeverageTab.Refinance);
+                    }}
                   >
                     <span className="text-xs">REFINANCE</span>
                   </Button>
@@ -390,7 +434,25 @@ export default function DepositModal({
           )}
         </Card>
 
-        <div
+        <ConfirmPopup
+          vault={vault}
+          positionSelected={positionSelected}
+          isDeposit={isDeposit}
+          positionStatus={positionStatus}
+          leverageTab={leverageTab}
+          leverageStatus={leverageStatus}
+          onLeverageMaxClicked={() => {
+            setLeverage(150);
+            setTargetLeverage("4");
+          }}
+          show={showRightModal()}
+          hiding={hiding}
+          onConfirm={() =>
+            positionSelected ? onConfirmPosition() : onConfirmLeverage()
+          }
+          onClose={() => setClosed(true)}
+        />
+        {/* <div
           className={`flex pt-10 h-full ${
             showRightModal()
               ? "max-w-[1000px] opacity-100"
@@ -415,6 +477,7 @@ export default function DepositModal({
                 isDeposit={isDeposit}
                 txStatus={positionStatus}
                 onConfirm={onConfirmPosition}
+                hiding={hiding}
               />
             ) : (
               <LeverageConfirm
@@ -425,10 +488,11 @@ export default function DepositModal({
                   setLeverage(150);
                   setTargetLeverage("4");
                 }}
+                hiding={hiding}
               />
             )}
           </Card>
-        </div>
+        </div> */}
       </div>
     </Modal>
   );

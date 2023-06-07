@@ -6,18 +6,22 @@ import { useEffect, useState } from "react";
 interface Props {
   txStatus: TxStatus;
   tab: LeverageTab;
+  hiding?: boolean;
   onConfirm: () => void;
   onMaxClicked?: () => void;
 }
 
-export default function LeverageConfirm({
-  txStatus,
-  onConfirm,
-  onMaxClicked,
-  tab,
-}: Props) {
+export default function LeverageConfirm(props: Props) {
   const [dots, setDots] = useState("");
   const [dotsTimer, setDotsTimer] = useState<NodeJS.Timer>();
+  const [tab, setTab] = useState(LeverageTab.Increase);
+  const { txStatus, onConfirm, onMaxClicked } = props;
+
+  useEffect(() => {
+    if (!props.hiding) {
+      setTab(props.tab);
+    }
+  }, [props.hiding, props.tab]);
 
   useEffect(() => {
     if (dotsTimer) {
