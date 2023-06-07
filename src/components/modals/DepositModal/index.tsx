@@ -16,11 +16,13 @@ import PositionInput from "./PositionInput";
 
 interface Props extends ModalProps {
   vault: VaultInfo;
+  defaultNftId?: number;
   isLeverageModal?: boolean;
 }
 
 export default function DepositModal({
   open,
+  defaultNftId,
   isLeverageModal,
   vault,
   onClose,
@@ -36,7 +38,7 @@ export default function DepositModal({
   const [positionStatus, setPositionStatus] = useState(TxStatus.None);
   const [leverageTxHash, setLeverageTxHash] = useState<string>();
   const [leverageStatus, setLeverageStatus] = useState(TxStatus.None);
-  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [selectedNftId, setSelectedNftId] = useState<number | undefined>();
   const [focused, setFocused] = useState(false);
   const [closed, setClosed] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
@@ -92,6 +94,12 @@ export default function DepositModal({
 
     setNfts([...nfts1]);
   };
+
+  useEffect(() => {
+    if (defaultNftId) {
+      setSelectedNftId(defaultNftId);
+    }
+  }, [defaultNftId]);
 
   useEffect(() => {
     setTooltipVisible(false);
@@ -213,8 +221,8 @@ export default function DepositModal({
             <PrologueNftCard
               containerClassName="w-[176px] lg:w-[198px]"
               nfts={userNfts}
-              selectedIdx={selectedIdx}
-              onItemChanged={(_: any, idx: number) => setSelectedIdx(idx)}
+              selectedNftId={selectedNftId}
+              onItemChanged={(_: any, idx: number) => setSelectedNftId(idx)}
               footerClassName="!h-10"
               expanded
               showBorder

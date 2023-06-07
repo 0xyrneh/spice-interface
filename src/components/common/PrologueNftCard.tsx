@@ -15,7 +15,7 @@ type Props = {
   active?: boolean;
   showBorder?: boolean;
   nfts: PrologueNftInfo[];
-  selectedIdx?: number;
+  selectedNftId?: number;
   expanded?: boolean;
   side?: ("left" | "top" | "right" | "bottom")[];
   parent?: any;
@@ -25,7 +25,7 @@ type Props = {
 
 export default function PrologueNftCard({
   nfts,
-  selectedIdx,
+  selectedNftId,
   containerClassName,
   className,
   footerClassName,
@@ -38,11 +38,13 @@ export default function PrologueNftCard({
   onItemChanged,
   onClick,
 }: Props) {
+  const [dropdownOpened, setDropdownOpened] = useState(false);
+
   const comp = useRef();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
 
-  const [dropdownOpened, setDropdownOpened] = useState(false);
-  const activeNft = nfts[selectedIdx ?? 0];
+  const activeNft =
+    nfts.find((nft) => nft.tokenId === selectedNftId) || nfts[0];
 
   useEffect(() => {
     let currentComp = comp.current as any;
@@ -201,7 +203,7 @@ export default function PrologueNftCard({
                     activeNft?.isEscrowed ? "text-shadow-orange-900" : ""
                   }
                 >
-                  {`#${activeNft.tokenId}`}
+                  {`#${activeNft?.tokenId}`}
                 </span>
                 <FaChevronDown className="text-gray-200" />
               </button>
@@ -213,7 +215,7 @@ export default function PrologueNftCard({
                       nft.isEscrowed
                         ? "text-orange-200 text-shadow-orange-900"
                         : "text-gray-200"
-                    } ${idx === (selectedIdx ?? 0) ? "hidden" : ""}`}
+                    } ${nft.tokenId === selectedNftId ? "hidden" : ""}`}
                     onClick={() => {
                       if (onItemChanged) onItemChanged(nft, idx);
                       setDropdownOpened(false);
