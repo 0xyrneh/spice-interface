@@ -249,7 +249,11 @@ export default function DepositModal({
               className={`flex-1 h-full transition-all ${
                 !positionSelected
                   ? "bg-orange-200 bg-opacity-10 rounded-r text-orange-200 text-shadow-orange-200"
-                  : "text-gray-200 hover:text-gray-300"
+                  : "text-gray-200"
+              } ${
+                vault.receiptToken !== ReceiptToken.ERC20
+                  ? "hover:text-gray-300"
+                  : ""
               }`}
               disabled={!positionSelected}
               onClick={() => {
