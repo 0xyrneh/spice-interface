@@ -4,15 +4,12 @@ import { useWeb3React } from "@web3-react/core";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "./Modal";
-import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
 import { TxStatus } from "@/types/common";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
 import { useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
-import PositionConfirm from "./PositionConfirm";
-import LeverageConfirm from "./LeverageConfirm";
 import ConfirmPopup from "./ConfirmPopup";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../common";
 import PositionInput from "./PositionInput";

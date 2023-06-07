@@ -1,22 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
-import { BigNumber } from "ethers";
-import { useWeb3React } from "@web3-react/core";
-
-import LeverageInput, { LeverageTab } from "./LeverageInput";
-import Modal, { ModalProps } from "./Modal";
+import { useEffect, useState } from "react";
+import { LeverageTab } from "./LeverageInput";
 import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
 import { TxStatus } from "@/types/common";
-import { ReceiptToken, VaultInfo } from "@/types/vault";
-import { PrologueNftInfo } from "@/types/nft";
-import { useAppSelector } from "@/state/hooks";
-import { accLoans } from "@/utils/lend";
-import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
+import { VaultInfo } from "@/types/vault";
 import PositionConfirm from "./PositionConfirm";
 import LeverageConfirm from "./LeverageConfirm";
-import { Button, Card, Erc20Card, PrologueNftCard } from "../common";
-import PositionInput from "./PositionInput";
+import { Card } from "../common";
 
-interface Props extends ModalProps {
+interface Props {
   vault: VaultInfo;
   positionSelected: boolean;
   isDeposit: boolean;
