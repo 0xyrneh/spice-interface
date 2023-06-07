@@ -114,7 +114,7 @@ export default function PrologueNftCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
-  const ownerAddr = activeNft.owner;
+  const ownerAddr = activeNft?.owner || "";
 
   return (
     <div className={`rounded ${containerClassName} cursor-pointer`}>
@@ -221,7 +221,7 @@ export default function PrologueNftCard({
                         : "text-gray-200"
                     } ${nft.tokenId === selectedNftId ? "hidden" : ""}`}
                     onClick={() => {
-                      if (onItemChanged) onItemChanged(nft, idx);
+                      if (onItemChanged) onItemChanged(nft, nft.tokenId);
                       setDropdownOpened(false);
                     }}
                   >
