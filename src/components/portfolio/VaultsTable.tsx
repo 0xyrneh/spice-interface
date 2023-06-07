@@ -55,6 +55,11 @@ export default function VaultsTable({
             alt=""
           />
         ),
+        format: (item) => {
+          return `${item?.readable || ""} ${
+            item?.deprecated ? "[WITHDRAW ONLY]" : ""
+          }`;
+        },
       },
       {
         title: "POSITION",
