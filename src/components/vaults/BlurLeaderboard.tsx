@@ -16,6 +16,7 @@ type Props = {
   nonExpandedClassName?: string;
   className?: string;
   onlyPts?: boolean;
+  showAccumulated?: boolean;
 };
 
 const BlurCards = [
@@ -49,6 +50,7 @@ export default function BlurPts({
   className,
   nonExpandedClassName,
   onlyPts,
+  showAccumulated,
 }: Props) {
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
   const [expanded, setExpanded] = useState(false);
@@ -209,7 +211,12 @@ export default function BlurPts({
         >
           {expanded && (
             <div className="flex justify-between">
-              <Stats title="RANK" value="56" valueSize="sm" className="w-[60px]" />
+              <Stats
+                title="RANK"
+                value="56"
+                valueSize="sm"
+                className="w-[60px]"
+              />
               <div className="flex flex-col tracking-normal flex-1">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-200">
@@ -232,9 +239,24 @@ export default function BlurPts({
                   YOU
                 </div>
               </div>
-              <Stats title="1D" value="1,500" valueSize="sm" className="w-[16%] items-end" />
-              <Stats title="1W" value="1,500" valueSize="sm" className="w-[16%] items-end" />
-              <Stats title="TOTAL SPB" value="15,000" valueSize="sm" className="w-[16%] items-end" />
+              <Stats
+                title="1D"
+                value="1,500"
+                valueSize="sm"
+                className="w-[16%] items-end"
+              />
+              <Stats
+                title="1W"
+                value="1,500"
+                valueSize="sm"
+                className="w-[16%] items-end"
+              />
+              <Stats
+                title="TOTAL SPB"
+                value="15,000"
+                valueSize="sm"
+                className="w-[16%] items-end"
+              />
             </div>
           )}
           <div
@@ -310,17 +332,28 @@ export default function BlurPts({
         </div>
       )}
       {(!onlyPts || expanded) && (
-        <Table
-          containerClassName="flex-1"
-          className="block h-full"
-          rowInfos={getRowInfos()}
-          items={ranks}
-          trStyle="h-10"
-          rowStyle="h-8"
-          defaultSortKey="apy"
-          bodyClass="h-[calc(100%-40px)]"
-          isLoading={isFetching}
-        />
+        <>
+          {showAccumulated && (
+            <div className="flex justify-center py-2 items-center text-gray-100 text-sm drop-shadow-sm">
+              <span className="tracking-normal text-center px-4">150,000</span>
+              <span className="border-l-[1.5px] px-4 tracking-normal">
+                Total SPB accumulated
+              </span>
+            </div>
+          )}
+
+          <Table
+            containerClassName="flex-1"
+            className="block h-full"
+            rowInfos={getRowInfos()}
+            items={ranks}
+            trStyle="h-10"
+            rowStyle="h-8"
+            defaultSortKey="apy"
+            bodyClass="h-[calc(100%-40px)]"
+            isLoading={isFetching}
+          />
+        </>
       )}
     </Card>
   );

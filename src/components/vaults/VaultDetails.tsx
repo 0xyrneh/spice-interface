@@ -198,6 +198,7 @@ export default function VaultDetails({ vault }: Props) {
               vault={vault}
               showIcon
               nonExpandedClassName="flex-1"
+              showAccumulated
             />
           </div>
         ) : (
