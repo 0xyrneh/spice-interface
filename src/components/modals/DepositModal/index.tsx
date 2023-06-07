@@ -339,7 +339,7 @@ export default function DepositModal({
                 </div>
                 {tooltipVisible && (
                   <div
-                    className="flex flex-1 -mt-6"
+                    className="flex flex-1 -mt-6 ml-2"
                     onMouseEnter={() => setTooltipHover(true)}
                     onMouseLeave={() => setTooltipHover(false)}
                   >
