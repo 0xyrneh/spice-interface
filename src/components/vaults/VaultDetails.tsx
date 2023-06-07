@@ -94,25 +94,25 @@ export default function VaultDetails({ vault }: Props) {
               </h2>
             </div>
             <div className="hidden xl:flex items-center justify-end gap-5 flex-1">
-              {!isWithdrawOnly && (
-                <Button
-                  type="primary"
-                  className="h-9 flex-1 max-w-[148px]"
-                  onClick={() => {
-                    if (account) {
-                      showDepositModal(vault);
-                    } else {
-                      showConnectModal();
-                    }
-                  }}
-                >
-                  <span className="text-base">DEPOSIT</span>
-                </Button>
-              )}
+              <Button
+                type="primary"
+                className="h-9 flex-1 max-w-[148px] px-2"
+                onClick={() => {
+                  if (account) {
+                    showDepositModal(vault);
+                  } else {
+                    handleConnect();
+                  }
+                }}
+              >
+                <span className="text-base">
+                  {isWithdrawOnly ? "WITHDRAW" : "DEPOSIT"}
+                </span>
+              </Button>
               {userPosition > 0 && (
                 <Button
                   type="secondary"
-                  className="h-9 flex-1 max-w-[148px]"
+                  className="h-9 flex-1 max-w-[148px] px-2"
                   onClick={() => {
                     router.push(`/portfolio`);
                   }}
