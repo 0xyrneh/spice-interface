@@ -118,7 +118,7 @@ export default function PrologueNfts({
       };
     });
 
-    return [...allNfts, ...myNfts];
+    return [...allNfts1, ...myNfts];
   };
 
   const sortNfts = (): PrologueNftInfo[] => {
