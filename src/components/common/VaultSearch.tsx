@@ -14,7 +14,7 @@ const VaultSearch = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const router = useRouter();
-  const { vaults } = useAppSelector((state) => state.vault);
+  const { vaults, defaultVault } = useAppSelector((state) => state.vault);
   const { allNfts: spiceNfts } = useAppSelector((state) => state.nft);
 
   const nfts = spiceNfts.map((row) => {
@@ -125,6 +125,7 @@ const VaultSearch = () => {
                 key={`vault-${index}`}
                 className="flex justify-between items-center text-xs rounded p-[5px] hover:bg-gray-300 hover:bg-opacity-10 hover:text-white"
                 onClick={() => {
+                  setOpened(false);
                   router.push(`/vault/${vault.id}`);
                 }}
               >
@@ -156,6 +157,12 @@ const VaultSearch = () => {
               <button
                 key={`vault-${index}`}
                 className="flex justify-between items-center text-xs rounded p-[5px] hover:bg-gray-300 hover:bg-opacity-10"
+                onClick={() => {
+                  setOpened(false);
+                  if (defaultVault?.id) {
+                    router.push(`/vault/${defaultVault?.id}`);
+                  }
+                }}
               >
                 <div className="flex items-center gap-3 text-left">
                   <Image
