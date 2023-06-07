@@ -51,6 +51,7 @@ export default function DepositModal({
 
   const loans = accLoans(lendData);
   const userNftIds = loans.map((row: any) => row.tokenId);
+  const isDeprecatedVault = vault?.deprecated;
 
   const handleHidePopup = () => {
     setHiding(true);
@@ -285,10 +286,26 @@ export default function DepositModal({
             <>
               <div className="flex items-center px-2 py-3">
                 <div className="flex items-center gap-2 w-1/2 pr-2">
+                  {!isDeprecatedVault && (
+                    <Button
+                      type={isDeposit ? "third" : "secondary"}
+                      className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
+                        isDeposit ? "" : "shadow-transparent"
+                      }`}
+                      disabled={isDeposit}
+                      onClick={() => setIsDeposit(true)}
+                    >
+                      <span className="text-xs">DEPOSIT</span>
+                    </Button>
+                  )}
                   <Button
-                    type={isDeposit ? "third" : "secondary"}
+                    type={
+                      !isDeposit || isDeprecatedVault ? "third" : "secondary"
+                    }
                     className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
-                      isDeposit ? "" : "shadow-transparent"
+                      !isDeposit || isDeprecatedVault
+                        ? ""
+                        : "shadow-transparent"
                     }`}
                     disabled={isDeposit}
                     onClick={() => {
