@@ -1,11 +1,14 @@
 import Image from "next/image";
-import { PrologueNftInfo } from "@/types/nft";
-import Dropdown from "./Dropdown";
+
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { BREAKPOINTS } from "@/constants";
 import useBreakpoint from "use-breakpoint";
+
+import { PrologueNftInfo } from "@/types/nft";
+import Dropdown from "./Dropdown";
+import { BREAKPOINTS } from "@/constants";
+import { CopyClipboard } from "@/components/common";
 
 type Props = {
   containerClassName?: string;
@@ -111,6 +114,8 @@ export default function PrologueNftCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
+  const ownerAddr = activeNft.owner;
+
   return (
     <div className={`rounded ${containerClassName} cursor-pointer`}>
       <motion.div
@@ -137,14 +142,13 @@ export default function PrologueNftCard({
             }`}
           >
             <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-              0xb7abacacdcdsf
+              {ownerAddr}
             </span>
-            <Image
-              src="/assets/icons/copy.svg"
+            <CopyClipboard
+              text={ownerAddr}
               width={14}
               height={14}
-              alt=""
-              className="cursor-pointer"
+              className="min-w-[14px] min-h-[14px]"
             />
           </div>
         )}

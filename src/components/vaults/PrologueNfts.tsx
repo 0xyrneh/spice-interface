@@ -59,7 +59,7 @@ export default function PrologueNfts({
   const getNftPortolios = () => {
     const allNfts1 = allNfts.map((row) => {
       return {
-        owner: account,
+        owner: row.owner.address,
         amount: getBalanceInEther(row.shares),
         tokenId: row.tokenId,
         tokenImg: row.tokenImg,
