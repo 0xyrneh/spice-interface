@@ -99,7 +99,7 @@ export default function VaultDetails({ vault }: Props) {
                 className="h-9 flex-1 max-w-[148px] px-2"
                 onClick={() => {
                   if (account) {
-                    showDepositModal(vault);
+                    showDepositModal({ vault: vault });
                   } else {
                     handleConnect();
                   }

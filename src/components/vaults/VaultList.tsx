@@ -156,7 +156,7 @@ const VaultList = ({ onClickVault }: Props) => {
             onClick={(e) => {
               e.stopPropagation();
               if (account) {
-                showDepositModal(item);
+                showDepositModal({ vault: item });
               } else {
                 showConnectModal();
               }

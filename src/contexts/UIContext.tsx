@@ -10,11 +10,17 @@ import { createContext, ReactNode, useState } from "react";
 interface UIContextType {
   blur: boolean;
   setBlur: (val: boolean) => void;
-  showDepositModal: (vault: VaultInfo, isLeverageModal?: boolean) => void;
   showConnectModal: () => void;
   showDisconnectModal: () => void;
   showTosModal: () => void;
   hideTosModal: () => void;
+  showDepositModal: ({
+    vault,
+    isLeverageModal,
+  }: {
+    vault: VaultInfo;
+    isLeverageModal?: boolean;
+  }) => void;
 }
 
 export const UIContext = createContext<UIContextType>({} as UIContextType);
@@ -32,7 +38,13 @@ const UIProvider = ({ children }: Props) => {
   const [depositModalProps, setDepositModalProps] = useState<any>();
   const [isLeverageModalOpened, setIsLeverageModalOpened] = useState(false);
 
-  const showDepositModal = (vault: VaultInfo, isLeverageModal?: boolean) => {
+  const showDepositModal = ({
+    vault,
+    isLeverageModal,
+  }: {
+    vault: VaultInfo;
+    isLeverageModal?: boolean;
+  }) => {
     setIsLeverageModalOpened(!!isLeverageModal);
     setDepositModalVisible(true);
     setDepositModalProps({

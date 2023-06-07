@@ -118,7 +118,7 @@ export default function VaultsTable({
             onClick={(e) => {
               e.stopPropagation();
               if (account) {
-                showDepositModal(item);
+                showDepositModal({ vault: item });
               } else {
                 showConnectModal();
               }

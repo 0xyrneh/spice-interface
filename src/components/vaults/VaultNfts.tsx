@@ -48,9 +48,9 @@ export default function VaultNfts({ vault, className }: Props) {
     if (!defaultVault) return;
     if (item.isEscrowed) {
       // show increase leverage modal
-      showDepositModal(defaultVault, true);
+      showDepositModal({ vault: defaultVault, isLeverageModal: true });
     } else {
-      showDepositModal(defaultVault);
+      showDepositModal({ vault: defaultVault });
     }
   };
 
