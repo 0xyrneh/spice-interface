@@ -13,6 +13,10 @@ import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import ConfirmPopup from "./ConfirmPopup";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../../common";
 import PositionInput from "./PositionInput";
+import { YEAR_IN_SECONDS } from "@/config/constants/time";
+import { getNetApy } from "@/utils/apy";
+import { getTokenImageFromReservoir } from "@/utils/nft";
+import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 
 interface Props extends ModalProps {
   vault: VaultInfo;
@@ -44,15 +48,13 @@ export default function DepositModal({
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [leverageHover, setLeverageHover] = useState(false);
   const [tooltipHover, setTooltipHover] = useState(false);
-  const [nfts, setNfts] = useState<PrologueNftInfo[]>([]);
-  const [hiding, setHiding] = useState(false);
+  const [myNfts, setMyNfts] = useState<PrologueNftInfo[]>([]);
 
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
-  const { allNfts } = useAppSelector((state) => state.nft);
 
   const loans = accLoans(lendData);
-  const userNftIds = loans.map((row: any) => row.tokenId);
+  const userNfts = vault?.userInfo?.nftsRaw || [];
   const isDeprecatedVault = vault?.deprecated;
 
   const handleHidePopup = () => {
@@ -68,31 +70,58 @@ export default function DepositModal({
 
   // fetch nft information from backend
   const fetchData = async () => {
-    const vaultTvl = vault?.tvl || 0;
-    const vaultTotalShares = vault?.totalShares || 0;
+    if (!account) {
+      return;
+    }
 
-    const nfts1 = allNfts.map((row: any) => {
-      const tokenId = Number(row.tokenId);
-      const isEscrowed = userNftIds.includes(tokenId);
+    const myNfts = loans.map((row: any) => {
+      const userNft = userNfts.find(
+        (row1: any) => row1.tokenId === row.tokenId
+      );
+
+      const value =
+        row?.loan?.tokenAmntInVault ||
+        userNft?.depositAmnt ||
+        BigNumber.from(0);
+
+      const debtOwed = row?.loan?.repayAmount || BigNumber.from(0);
+
+      const borrowApr = row.loan?.terms?.interestRate
+        ? row.loan?.terms?.interestRate.toNumber() / 10000
+        : 0;
+      const loanDuration = row.loan?.terms?.duration || 0;
+
+      // calculate net APY
+      let netApy = 0;
+      let borrowApy = 0;
+      if (loanDuration > 0) {
+        const m = YEAR_IN_SECONDS / loanDuration;
+        // eslint-disable-next-line no-restricted-properties
+        borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
+        const vaultApy = (vault?.apr || 0) / 100;
+
+        netApy = getNetApy(
+          getBalanceInEther(value),
+          vaultApy,
+          getBalanceInEther(debtOwed),
+          borrowApy
+        );
+      }
+
       return {
-        owner: row.owner.address,
-        amount: getBalanceInEther(
-          vaultTotalShares === 0
-            ? BigNumber.from(row.shares)
-            : BigNumber.from(row.shares)
-                .mul(BigNumber.from(getBalanceInWei(vaultTvl.toString())))
-                .div(
-                  BigNumber.from(getBalanceInWei(vaultTotalShares.toString()))
-                )
+        owner: account,
+        amount: getBalanceInEther(value),
+        tokenId: row.tokenId,
+        tokenImg: getTokenImageFromReservoir(
+          PROLOGUE_NFT_ADDRESS,
+          Number(row.tokenId)
         ),
-        tokenImg: row.tokenImg,
-        tokenId,
-        isEscrowed,
-        apy: isEscrowed ? 45.24 : 0,
+        isEscrowed: !!row?.loan?.loanId,
+        apy: netApy,
       };
     });
 
-    setNfts([...nfts1]);
+    setMyNfts([...myNfts]);
   };
 
   useEffect(() => {
@@ -114,7 +143,7 @@ export default function DepositModal({
       fetchData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address, userNftIds.length]);
+  }, [vault?.address, account]);
 
   const reset = () => {
     setPositionAmount("");
@@ -189,12 +218,6 @@ export default function DepositModal({
     reset();
   }, [isDeposit, positionSelected, leverageTab]);
 
-  const userNfts = nfts.filter(
-    (row) =>
-      row.owner.toLowerCase() === account?.toLowerCase() ||
-      userNftIds.includes(row.tokenId)
-  );
-
   return (
     <Modal open={open} onClose={onClose}>
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
@@ -220,7 +243,7 @@ export default function DepositModal({
           {vault.receiptToken === ReceiptToken.NFT ? (
             <PrologueNftCard
               containerClassName="w-[176px] lg:w-[198px]"
-              nfts={userNfts}
+              nfts={myNfts}
               selectedNftId={selectedNftId}
               onItemChanged={(_: any, idx: number) => setSelectedNftId(idx)}
               footerClassName="!h-10"
