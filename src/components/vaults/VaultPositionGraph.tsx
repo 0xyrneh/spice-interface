@@ -16,6 +16,19 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
   const [showPosition, setShowPosition] = useState(true);
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
 
+  const calculateYields = () => {
+    let annualYield = 0;
+
+    if (vault) {
+      const { userPosition, apr } = vault;
+      annualYield = ((userPosition || 0) * (apr || 0)) / 100;
+    }
+
+    return annualYield;
+  };
+
+  const annualEstYield = calculateYields();
+
   return (
     <Card className="gap-3 flex-1 overflow-hidden min-h-[323px] h-[50%]">
       {/* vault header */}
@@ -78,15 +91,21 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
         <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
           <div className="hidden 2xl:flex items-center gap-1">
             <span>1W Est. Yield:</span>
-            <span className="text-white">Ξ25.60</span>
+            <span className="text-white">
+              {`Ξ${(annualEstYield / 52).toFixed(2)}`}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <span>1M Est. Yield:</span>
-            <span className="text-white">Ξ25.60</span>
+            <span className="text-white">
+              {`Ξ${(annualEstYield / 12).toFixed(2)}`}
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <span>1Y Est. Yield:</span>
-            <span className="text-white">Ξ25.60</span>
+            <span className="text-white">
+              {`Ξ${annualEstYield.toFixed(2)}`}
+            </span>
           </div>
         </div>
       </div>
