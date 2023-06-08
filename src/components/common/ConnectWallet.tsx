@@ -13,7 +13,7 @@ type Props = {
 const ConnectWallet = ({ isHeader }: Props) => {
   const [blockedRegion, setBlockedRegion] = useState<string>();
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
-  const { showConnectModal } = useUI();
+  const { showConnectModal, showDisconnectModal } = useUI();
 
   const { account } = useWeb3React();
 
@@ -44,7 +44,10 @@ const ConnectWallet = ({ isHeader }: Props) => {
   return (
     <div>
       {account ? (
-        <div className="flex items-center gap-3">
+        <button
+          className="flex items-center gap-3"
+          onClick={showDisconnectModal}
+        >
           <Image
             className="border-1 border-orange-200 rounded-full drop-shadow-orange-200"
             src="/assets/images/vaultIcon.svg"
@@ -55,7 +58,7 @@ const ConnectWallet = ({ isHeader }: Props) => {
           <span className="text-xs text-bold text-orange-200 text-shadow-orange-200">
             {account.slice(0, 8)}
           </span>
-        </div>
+        </button>
       ) : (
         <div className="relative">
           <Button
