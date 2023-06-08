@@ -4,19 +4,22 @@ import { useWeb3React } from "@web3-react/core";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "../Modal";
+import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
 import { TxStatus } from "@/types/common";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
 import { useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
-import ConfirmPopup from "./ConfirmPopup";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../../common";
+import PositionConfirm from "./PositionConfirm";
+import LeverageConfirm from "./LeverageConfirm";
 import PositionInput from "./PositionInput";
 import { YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getNetApy } from "@/utils/apy";
 import { getTokenImageFromReservoir } from "@/utils/nft";
 import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
+import ConfirmPopup from "./ConfirmPopup";
 
 interface Props extends ModalProps {
   vault: VaultInfo;
@@ -49,6 +52,7 @@ export default function DepositModal({
   const [leverageHover, setLeverageHover] = useState(false);
   const [tooltipHover, setTooltipHover] = useState(false);
   const [myNfts, setMyNfts] = useState<PrologueNftInfo[]>([]);
+  const [hiding, setHiding] = useState(false);
 
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
@@ -58,30 +62,16 @@ export default function DepositModal({
   const isDeprecatedVault = vault?.deprecated;
   const selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
 
-  useEffect(() => {
-    if (selectedNft && !selectedNft.isEscrowed) {
-      if (leverageTab == LeverageTab.LeverUp) return;
-      setLeverageTab(LeverageTab.LeverUp);
-    } else {
-      if (
-        [
-          LeverageTab.Increase,
-          LeverageTab.Decrease,
-          LeverageTab.Refinance,
-        ].includes(leverageTab)
-      )
-        return;
-
-      setLeverageTab(LeverageTab.Increase);
-    }
-  }, [selectedNft]);
-
   const handleHidePopup = () => {
     setHiding(true);
     setTimeout(() => {
       setHiding(false);
     }, 700);
   };
+
+  useEffect(() => {
+    setTooltipVisible(leverageHover || tooltipHover);
+  }, [selectedNft]);
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
@@ -154,7 +144,6 @@ export default function DepositModal({
     setPositionSelected(isLeverageModal ? false : true);
     setIsDeposit(true);
     setLeverageTab(LeverageTab.Increase);
-    setFocused(false);
   }, [open, isLeverageModal, vault, onClose]);
 
   useEffect(() => {
@@ -348,7 +337,10 @@ export default function DepositModal({
                         isDeposit ? "" : "shadow-transparent"
                       }`}
                       disabled={isDeposit}
-                      onClick={() => setIsDeposit(true)}
+                      onClick={() => {
+                        handleHidePopup();
+                        setIsDeposit(true);
+                      }}
                     >
                       <span className="text-xs">DEPOSIT</span>
                     </Button>
@@ -362,23 +354,12 @@ export default function DepositModal({
                         ? ""
                         : "shadow-transparent"
                     }`}
-                    disabled={isDeposit}
+                    disabled={!isDeposit || isDeprecatedVault}
                     onClick={() => {
                       handleHidePopup();
-                      setIsDeposit(true);
-                    }}
-                  >
-                    <span className="text-xs">DEPOSIT</span>
-                  </Button>
-                  <Button
-                    type={!isDeposit ? "third" : "secondary"}
-                    className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
-                      !isDeposit ? "" : "shadow-transparent"
-                    }`}
-                    disabled={!isDeposit}
-                    onClick={() => {
-                      handleHidePopup();
-                      setIsDeposit(false);
+                      if (!isDeprecatedVault) {
+                        setIsDeposit(false);
+                      }
                     }}
                   >
                     <span className="text-xs">WITHDRAW</span>
@@ -429,7 +410,10 @@ export default function DepositModal({
                           : "shadow-transparent"
                       }`}
                       disabled={leverageTab === LeverageTab.Increase}
-                      onClick={() => setLeverageTab(LeverageTab.Increase)}
+                      onClick={() => {
+                        handleHidePopup();
+                        setLeverageTab(LeverageTab.Increase);
+                      }}
                     >
                       <span className="text-xs">INCREASE</span>
                     </Button>
@@ -445,7 +429,10 @@ export default function DepositModal({
                           : "shadow-transparent"
                       }`}
                       disabled={leverageTab === LeverageTab.Decrease}
-                      onClick={() => setLeverageTab(LeverageTab.Decrease)}
+                      onClick={() => {
+                        handleHidePopup();
+                        setLeverageTab(LeverageTab.Decrease);
+                      }}
                     >
                       <span className="text-xs">DECREASE</span>
                     </Button>
@@ -461,7 +448,10 @@ export default function DepositModal({
                           : "shadow-transparent"
                       }`}
                       disabled={leverageTab === LeverageTab.Refinance}
-                      onClick={() => setLeverageTab(LeverageTab.Refinance)}
+                      onClick={() => {
+                        handleHidePopup();
+                        setLeverageTab(LeverageTab.Refinance);
+                      }}
                     >
                       <span className="text-xs">REFINANCE</span>
                     </Button>
