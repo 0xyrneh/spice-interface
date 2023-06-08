@@ -4,7 +4,6 @@ import { useWeb3React } from "@web3-react/core";
 
 import { checkIfBlocked } from "@/utils";
 import { Button } from "@/components/common";
-import useAuth from "@/hooks/useAuth";
 import { useUI } from "@/hooks";
 
 type Props = {
@@ -17,7 +16,6 @@ const ConnectWallet = ({ isHeader }: Props) => {
   const { showConnectModal } = useUI();
 
   const { account } = useWeb3React();
-  const { login } = useAuth();
 
   useEffect(() => {
     checkIfBlocked().then(setBlockedRegion);
