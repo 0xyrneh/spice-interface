@@ -29,7 +29,7 @@ const Header = () => {
   const { account } = useWeb3React();
   const { vaults, defaultVault } = useAppSelector((state) => state.vault);
   const router = useRouter();
-  const { blur } = useUI();
+  const { blur, showTosModal } = useUI();
   const lendAddrs = getSpiceFiLendingAddresses();
   const userNfts = defaultVault?.userInfo?.nftsRaw || [];
 
@@ -51,6 +51,10 @@ const Header = () => {
   };
 
   useEffect(() => {
+    if (!window.localStorage.getItem("tos")) {
+      showTosModal();
+    }
+
     fetchData();
     setInterval(() => {
       fetchData();

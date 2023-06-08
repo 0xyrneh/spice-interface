@@ -1,4 +1,9 @@
-import { ConnectModal, DepositModal, TosModal } from "@/components/modals";
+import {
+  ConnectModal,
+  DisconnectModal,
+  DepositModal,
+  TosModal,
+} from "@/components/modals";
 import { VaultInfo } from "@/types/vault";
 import { createContext, ReactNode, useState } from "react";
 
@@ -7,6 +12,7 @@ interface UIContextType {
   setBlur: (val: boolean) => void;
   showDepositModal: (vault: VaultInfo, isLeverageModal?: boolean) => void;
   showConnectModal: () => void;
+  showDisconnectModal: () => void;
   showTosModal: () => void;
 }
 
@@ -19,6 +25,7 @@ type Props = {
 const UIProvider = ({ children }: Props) => {
   const [blur, setBlur] = useState(false);
   const [connectModalVisible, setConnectModalVisible] = useState(false);
+  const [disconnectModalVisible, setDisconnectModalVisible] = useState(false);
   const [tosModalVisible, setTosModalVisible] = useState(false);
   const [depositModalVisible, setDepositModalVisible] = useState(false);
   const [depositModalProps, setDepositModalProps] = useState<any>();
@@ -36,6 +43,10 @@ const UIProvider = ({ children }: Props) => {
     setConnectModalVisible(true);
   };
 
+  const showDisconnectModal = () => {
+    setDisconnectModalVisible(true);
+  };
+
   const showTosModal = () => {
     setTosModalVisible(true);
   };
@@ -47,6 +58,7 @@ const UIProvider = ({ children }: Props) => {
         setBlur,
         showDepositModal,
         showConnectModal,
+        showDisconnectModal,
         showTosModal,
       }}
     >
@@ -62,6 +74,10 @@ const UIProvider = ({ children }: Props) => {
       <ConnectModal
         open={connectModalVisible}
         onClose={() => setConnectModalVisible(false)}
+      />
+      <DisconnectModal
+        open={disconnectModalVisible}
+        onClose={() => setDisconnectModalVisible(false)}
       />
       <TosModal
         open={tosModalVisible}
