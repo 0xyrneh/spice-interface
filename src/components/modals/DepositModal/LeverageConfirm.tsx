@@ -1,5 +1,5 @@
 import { TxStatus } from "@/types/common";
-import { Button, Stats } from "../common";
+import { Button, Stats } from "../../common";
 import { LeverageTab } from "./LeverageInput";
 import { useEffect, useState } from "react";
 

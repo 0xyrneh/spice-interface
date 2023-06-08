@@ -1,5 +1,5 @@
 import { TxStatus } from "@/types/common";
-import { Button, Stats } from "../common";
+import { Button, Stats } from "../../common";
 import { useEffect, useState } from "react";
 
 interface Props {

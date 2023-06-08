@@ -5,7 +5,7 @@ import { TxStatus } from "@/types/common";
 import { VaultInfo } from "@/types/vault";
 import PositionConfirm from "./PositionConfirm";
 import LeverageConfirm from "./LeverageConfirm";
-import { Card } from "../common";
+import { Card } from "../../common";
 
 interface Props {
   vault: VaultInfo;

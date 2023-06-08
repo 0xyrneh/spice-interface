@@ -3,7 +3,7 @@ import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
-import Modal, { ModalProps } from "./Modal";
+import Modal, { ModalProps } from "../Modal";
 import { TxStatus } from "@/types/common";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
@@ -11,7 +11,7 @@ import { useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import ConfirmPopup from "./ConfirmPopup";
-import { Button, Card, Erc20Card, PrologueNftCard } from "../common";
+import { Button, Card, Erc20Card, PrologueNftCard } from "../../common";
 import PositionInput from "./PositionInput";
 
 interface Props extends ModalProps {
@@ -228,7 +228,7 @@ export default function DepositModal({
               containerClassName="w-[176px] lg:w-[198px]"
               nfts={userNfts}
               selectedIdx={selectedIdx}
-              onItemChanged={(_, idx) => setSelectedIdx(idx)}
+              onItemChanged={(_: any, idx: number) => setSelectedIdx(idx)}
               footerClassName="!h-10"
               expanded
             />
@@ -409,7 +409,6 @@ export default function DepositModal({
                     }`}
                     disabled={leverageTab === LeverageTab.Refinance}
                     onClick={() => {
-                      handleHidePopup();
                       setLeverageTab(LeverageTab.Refinance);
                     }}
                   >

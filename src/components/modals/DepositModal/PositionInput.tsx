@@ -1,4 +1,4 @@
-import { Button, Card } from "../common";
+import { Button, Card } from "../../common";
 import WethSVG from "@/assets/icons/weth.svg";
 import EthSVG from "@/assets/icons/eth.svg";
 import TriangleSVG from "@/assets/icons/triangle.svg";

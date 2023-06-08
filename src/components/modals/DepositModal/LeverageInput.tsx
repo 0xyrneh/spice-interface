@@ -1,5 +1,5 @@
 import { TxStatus } from "@/types/common";
-import { Slider } from "../common";
+import { Slider } from "../../common";
 import LeverageSVG from "@/assets/icons/leverage.svg";
 
 export enum LeverageTab {
