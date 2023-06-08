@@ -56,6 +56,25 @@ export default function DepositModal({
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
   const isDeprecatedVault = vault?.deprecated;
+  const selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
+
+  useEffect(() => {
+    if (selectedNft && !selectedNft.isEscrowed) {
+      if (leverageTab == LeverageTab.LeverUp) return;
+      setLeverageTab(LeverageTab.LeverUp);
+    } else {
+      if (
+        [
+          LeverageTab.Increase,
+          LeverageTab.Decrease,
+          LeverageTab.Refinance,
+        ].includes(leverageTab)
+      )
+        return;
+
+      setLeverageTab(LeverageTab.Increase);
+    }
+  }, [selectedNft]);
 
   const handleHidePopup = () => {
     setHiding(true);
@@ -297,6 +316,11 @@ export default function DepositModal({
                 if (vault.receiptToken === ReceiptToken.NFT) {
                   handleHidePopup();
                   setPositionSelected(false);
+                  if (selectedNft && !selectedNft.isEscrowed) {
+                    setLeverageTab(LeverageTab.LeverUp);
+                  } else {
+                    setLeverageTab(LeverageTab.Increase);
+                  }
                 }
               }}
               onMouseOver={() => {
@@ -391,64 +415,78 @@ export default function DepositModal({
           ) : (
             <>
               <div className="flex flex-row-reverse px-2 py-3">
-                <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
-                  <Button
-                    type={
-                      leverageTab === LeverageTab.Increase
-                        ? "third"
-                        : "secondary"
-                    }
-                    className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-                      leverageTab === LeverageTab.Increase
-                        ? ""
-                        : "shadow-transparent"
-                    }`}
-                    disabled={leverageTab === LeverageTab.Increase}
-                    onClick={() => {
-                      handleHidePopup();
-                      setLeverageTab(LeverageTab.Increase);
-                    }}
-                  >
-                    <span className="text-xs">INCREASE</span>
-                  </Button>
-                  <Button
-                    type={
-                      leverageTab === LeverageTab.Decrease
-                        ? "third"
-                        : "secondary"
-                    }
-                    className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-                      leverageTab === LeverageTab.Decrease
-                        ? ""
-                        : "shadow-transparent"
-                    }`}
-                    disabled={leverageTab === LeverageTab.Decrease}
-                    onClick={() => {
-                      handleHidePopup();
-                      setLeverageTab(LeverageTab.Decrease);
-                    }}
-                  >
-                    <span className="text-xs">DECREASE</span>
-                  </Button>
-                  <Button
-                    type={
-                      leverageTab === LeverageTab.Refinance
-                        ? "third"
-                        : "secondary"
-                    }
-                    className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-                      leverageTab === LeverageTab.Refinance
-                        ? ""
-                        : "shadow-transparent"
-                    }`}
-                    disabled={leverageTab === LeverageTab.Refinance}
-                    onClick={() => {
-                      setLeverageTab(LeverageTab.Refinance);
-                    }}
-                  >
-                    <span className="text-xs">REFINANCE</span>
-                  </Button>
-                </div>
+                {selectedNft && selectedNft.isEscrowed && (
+                  <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
+                    <Button
+                      type={
+                        leverageTab === LeverageTab.Increase
+                          ? "third"
+                          : "secondary"
+                      }
+                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                        leverageTab === LeverageTab.Increase
+                          ? ""
+                          : "shadow-transparent"
+                      }`}
+                      disabled={leverageTab === LeverageTab.Increase}
+                      onClick={() => setLeverageTab(LeverageTab.Increase)}
+                    >
+                      <span className="text-xs">INCREASE</span>
+                    </Button>
+                    <Button
+                      type={
+                        leverageTab === LeverageTab.Decrease
+                          ? "third"
+                          : "secondary"
+                      }
+                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                        leverageTab === LeverageTab.Decrease
+                          ? ""
+                          : "shadow-transparent"
+                      }`}
+                      disabled={leverageTab === LeverageTab.Decrease}
+                      onClick={() => setLeverageTab(LeverageTab.Decrease)}
+                    >
+                      <span className="text-xs">DECREASE</span>
+                    </Button>
+                    <Button
+                      type={
+                        leverageTab === LeverageTab.Refinance
+                          ? "third"
+                          : "secondary"
+                      }
+                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                        leverageTab === LeverageTab.Refinance
+                          ? ""
+                          : "shadow-transparent"
+                      }`}
+                      disabled={leverageTab === LeverageTab.Refinance}
+                      onClick={() => setLeverageTab(LeverageTab.Refinance)}
+                    >
+                      <span className="text-xs">REFINANCE</span>
+                    </Button>
+                  </div>
+                )}
+                {selectedNft && !selectedNft.isEscrowed && (
+                  <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
+                    <Button
+                      type={
+                        leverageTab === LeverageTab.LeverUp
+                          ? "third"
+                          : "secondary"
+                      }
+                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                        leverageTab === LeverageTab.LeverUp
+                          ? ""
+                          : "shadow-transparent"
+                      }`}
+                      disabled={leverageTab === LeverageTab.LeverUp}
+                      onClick={() => setLeverageTab(LeverageTab.LeverUp)}
+                    >
+                      <span className="text-xs">LEVER UP</span>
+                    </Button>
+                  </div>
+                )}
               </div>
               <LeverageInput
                 tab={leverageTab}
