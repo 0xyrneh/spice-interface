@@ -32,7 +32,9 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
         <PositionSVG />
         <h2 className="font-bold text-white font-sm">
           {vault
-            ? `YOUR ${(vault?.readable || "").toUpperCase()} POSITION`
+            ? `YOUR ${(vault?.readable || "").toUpperCase()} ${
+                vault?.deprecated ? "[WITHDRAW ONLY]" : ""
+              } POSITION`
             : "TOTAL SPICE POSITION"}
         </h2>
         {vault && vault.isBlur && (
