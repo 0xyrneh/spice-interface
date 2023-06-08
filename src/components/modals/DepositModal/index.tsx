@@ -71,6 +71,22 @@ export default function DepositModal({
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
+
+    if (selectedNft && !selectedNft.isEscrowed) {
+      if (leverageTab == LeverageTab.LeverUp) return;
+      setLeverageTab(LeverageTab.LeverUp);
+    } else {
+      if (
+        [
+          LeverageTab.Increase,
+          LeverageTab.Decrease,
+          LeverageTab.Refinance,
+        ].includes(leverageTab)
+      )
+        return;
+
+      setLeverageTab(LeverageTab.Increase);
+    }
   }, [selectedNft]);
 
   useEffect(() => {
