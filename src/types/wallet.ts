@@ -11,3 +11,9 @@ export interface Config {
   icon: string;
   connectorId: ConnectorNames;
 }
+
+export type Connector = {
+  name: string;
+  icon: string;
+  connector: ConnectorNames;
+};

@@ -20,8 +20,6 @@ import { accLoans } from "@/utils/lend";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { useAppSelector } from "@/state/hooks";
 import { useUI } from "@/hooks";
-import { ConnectorNames } from "@/types/wallet";
-import useAuth from "@/hooks/useAuth";
 import { getVaultUpTime } from "@/utils/vault";
 
 type Props = {
@@ -33,14 +31,7 @@ export default function VaultDetails({ vault }: Props) {
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
   const router = useRouter();
-  const { showDepositModal } = useUI();
-  const { login } = useAuth();
-
-  const handleConnect = async () => {
-    // TODO: should be changed automatically later once wallet modal is prepared
-    const defaultConnectName = ConnectorNames.Injected;
-    await login(defaultConnectName);
-  };
+  const { showDepositModal, showConnectModal } = useUI();
 
   const getVaultWithPosition = () => {
     let userPositionRaw = BigNumber.from(0);
@@ -111,7 +102,7 @@ export default function VaultDetails({ vault }: Props) {
                     if (account) {
                       showDepositModal(vault);
                     } else {
-                      handleConnect();
+                      showConnectModal();
                     }
                   }}
                 >

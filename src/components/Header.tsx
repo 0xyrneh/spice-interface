@@ -40,14 +40,14 @@ const Header = () => {
 
   const dispatch = useAppDispatch();
 
-  const persistConnect = () => {
-    const connectorId = window.localStorage.getItem(
-      connectorLocalStorageKey
-    ) as ConnectorNames;
-    if (connectorId) {
-      login(connectorId);
-    }
-  };
+  // const persistConnect = () => {
+  //   const connectorId = window.localStorage.getItem(
+  //     connectorLocalStorageKey
+  //   ) as ConnectorNames;
+  //   if (connectorId) {
+  //     login(connectorId);
+  //   }
+  // };
 
   const fetchData = async () => {
     dispatch(fetchVaultGlobalDataAsync());
@@ -64,7 +64,7 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    persistConnect();
+    // persistConnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

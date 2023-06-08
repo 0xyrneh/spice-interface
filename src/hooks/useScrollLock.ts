@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 const useScrollLock = () => {
-  const html: any = document.querySelector("html");
+  // const html: any = document?.querySelector("html");
   const [lastY, setLastY] = useState(-1);
 
   const scrollListener = useCallback(() => {
@@ -21,13 +21,19 @@ const useScrollLock = () => {
   }, [lastY, scrollListener]);
 
   const lockScroll = useCallback(() => {
-    html.style.overflow = "scroll";
-    setLastY(window.scrollY);
+    const html = document.querySelector("html");
+    if (html) {
+      html.style.overflow = "scroll";
+      setLastY(window.scrollY);
+    }
   }, []);
 
   const unlockScroll = useCallback(() => {
-    html.style.overflow = "";
-    setLastY(-1);
+    const html = document.querySelector("html");
+    if (html) {
+      html.style.overflow = "";
+      setLastY(-1);
+    }
     // setLocked(false);
   }, []);
 

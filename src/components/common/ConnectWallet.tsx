@@ -5,7 +5,7 @@ import { useWeb3React } from "@web3-react/core";
 import { checkIfBlocked } from "@/utils";
 import { Button } from "@/components/common";
 import useAuth from "@/hooks/useAuth";
-import { ConnectorNames } from "@/types/wallet";
+import { useUI } from "@/hooks";
 
 type Props = {
   isHeader?: boolean;
@@ -14,6 +14,7 @@ type Props = {
 const ConnectWallet = ({ isHeader }: Props) => {
   const [blockedRegion, setBlockedRegion] = useState<string>();
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
+  const { showConnectModal } = useUI();
 
   const { account } = useWeb3React();
   const { login } = useAuth();
@@ -38,9 +39,7 @@ const ConnectWallet = ({ isHeader }: Props) => {
 
   const handleConnect = async () => {
     if (!blockedRegion) {
-      // TODO: should be changed automatically later once wallet modal is prepared
-      const defaultConnectName = ConnectorNames.Injected;
-      await login(defaultConnectName);
+      showConnectModal();
     }
   };
 

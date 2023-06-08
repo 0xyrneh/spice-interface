@@ -18,8 +18,6 @@ import {
 } from "@/constants";
 import { useUI } from "@/hooks";
 import { TableRowInfo } from "../common/Table";
-import { ConnectorNames } from "@/types/wallet";
-import useAuth from "@/hooks/useAuth";
 import { useWeb3React } from "@web3-react/core";
 
 type Props = {
@@ -34,10 +32,9 @@ const VaultList = ({ onClickVault }: Props) => {
   const [filterQuery, setFilterQuery] = useState("");
   const [isFetching, setIsFetching] = useState<boolean>(true);
 
-  const { showDepositModal } = useUI();
+  const { showDepositModal, showConnectModal } = useUI();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
   const { account } = useWeb3React();
-  const { login } = useAuth();
 
   useEffect(() => {
     setTimeout(() => {
@@ -73,12 +70,6 @@ const VaultList = ({ onClickVault }: Props) => {
   const getFilteredVaults = () => {
     if (vaultFilter === VaultFilter.All) return vaults;
     return vaults.filter((vault) => vault.category === vaultFilter);
-  };
-
-  const handleConnect = async () => {
-    // TODO: should be changed automatically later once wallet modal is prepared
-    const defaultConnectName = ConnectorNames.Injected;
-    await login(defaultConnectName);
   };
 
   const getRowInfos = (): TableRowInfo[] => {
@@ -167,7 +158,7 @@ const VaultList = ({ onClickVault }: Props) => {
               if (account) {
                 showDepositModal(item);
               } else {
-                handleConnect();
+                showConnectModal();
               }
             }}
           >

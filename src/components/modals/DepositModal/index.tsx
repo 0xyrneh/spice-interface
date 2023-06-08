@@ -448,47 +448,6 @@ export default function DepositModal({
           }
           onClose={() => setClosed(true)}
         />
-        {/* <div
-          className={`flex pt-10 h-full ${
-            showRightModal()
-              ? "max-w-[1000px] opacity-100"
-              : "max-w-[0] opacity-0"
-          } transition-all duration-[700ms]`}
-        >
-          <Card
-            className="flex flex-col border-1 border-gray-200 gap-2 !px-3 h-full justify-between !bg-gray-700 !bg-opacity-95"
-            notBlur
-          >
-            <button
-              className={`${
-                processing() ? "text-gray-200" : "text-orange-900"
-              } flex items-center font-medium gap-2 text-xs leading-[15.31px]`}
-              onClick={() => setClosed(true)}
-            >
-              <ArrowLeftSVG />
-              Back
-            </button>
-            {positionSelected ? (
-              <PositionConfirm
-                isDeposit={isDeposit}
-                txStatus={positionStatus}
-                onConfirm={onConfirmPosition}
-                hiding={hiding}
-              />
-            ) : (
-              <LeverageConfirm
-                txStatus={leverageStatus}
-                onConfirm={onConfirmLeverage}
-                tab={leverageTab}
-                onMaxClicked={() => {
-                  setLeverage(150);
-                  setTargetLeverage("4");
-                }}
-                hiding={hiding}
-              />
-            )}
-          </Card>
-        </div> */}
       </div>
     </Modal>
   );
