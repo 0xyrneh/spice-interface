@@ -15,6 +15,7 @@ export default function DepositModal({ open, onClose }: ModalProps) {
   useEffect(() => {
     if (account && onClose) onClose();
   }, [account, onClose]);
+
   const handleLogin = async (connector: Connector) => {
     await login(connector.connector);
   };

@@ -13,7 +13,7 @@ type Props = {
 const ConnectWallet = ({ isHeader }: Props) => {
   const [blockedRegion, setBlockedRegion] = useState<string>();
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
-  const { showConnectModal } = useUI();
+  const { showConnectModal, showTosModal } = useUI();
 
   const { account } = useWeb3React();
 
@@ -37,6 +37,7 @@ const ConnectWallet = ({ isHeader }: Props) => {
 
   const handleConnect = async () => {
     if (!blockedRegion) {
+      // showTosModal();
       showConnectModal();
     }
   };

@@ -8,7 +8,6 @@ import { NavOption } from "@/types/common";
 import { VaultSearch, ConnectWallet } from "@/components/common";
 import { NAV_OPTIONS } from "@/constants";
 import { useUI } from "@/hooks";
-import useAuth from "@/hooks/useAuth";
 import {
   fetchVaultGlobalDataAsync,
   fetchLendGlobalDataAsync,
@@ -22,19 +21,15 @@ import {
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { VaultInfo } from "@/types/vault";
 import { getSpiceFiLendingAddresses } from "@/utils/addressHelpers";
-import { connectorLocalStorageKey } from "@/config/constants/wallet";
-import { ConnectorNames } from "@/types/wallet";
 
 const Header = () => {
   const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  // const { account } = useWeb3React();
-  const account = "0x013823485705f0773Ba8230D6Ed0B06a3d95C706";
+  const { account } = useWeb3React();
   const { vaults, defaultVault } = useAppSelector((state) => state.vault);
   const router = useRouter();
   const { blur } = useUI();
-  const { login } = useAuth();
   const lendAddrs = getSpiceFiLendingAddresses();
   const userNfts = defaultVault?.userInfo?.nftsRaw || [];
 
