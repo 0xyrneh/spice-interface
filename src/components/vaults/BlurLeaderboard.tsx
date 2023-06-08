@@ -171,6 +171,7 @@ export default function BlurPts({
       className={`gap-3 overflow-hidden ${className} ${
         nonExpandedClassName && !expanded ? nonExpandedClassName : ""
       }`}
+      animate
       expanded={expanded}
       onCollapse={() => setExpanded(false)}
     >

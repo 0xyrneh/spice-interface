@@ -168,21 +168,6 @@ export default function DepositModal({
   ]);
 
   useEffect(() => {
-    if (showRightModal()) {
-      console.log("yyy", showRightModal());
-      // setHiding(false);
-    }
-  }, [showRightModal]);
-
-  const processing = () => {
-    if (positionSelected) {
-      return positionStatus === TxStatus.Pending;
-    } else {
-      return leverageStatus === TxStatus.Pending;
-    }
-  };
-
-  useEffect(() => {
     setClosed(false);
     setFocused(false);
   }, [positionAmount, leverage, targetLeverage]);
