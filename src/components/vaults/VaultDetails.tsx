@@ -31,7 +31,7 @@ export default function VaultDetails({ vault }: Props) {
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
   const router = useRouter();
-  const { showDepositModal, showConnectModal } = useUI();
+  const { showDepositModal } = useUI();
 
   const getVaultWithPosition = () => {
     let userPositionRaw = BigNumber.from(0);
@@ -94,21 +94,20 @@ export default function VaultDetails({ vault }: Props) {
               </h2>
             </div>
             <div className="hidden xl:flex items-center justify-end gap-5 flex-1">
-              <Button
-                type="primary"
-                className="h-9 flex-1 max-w-[148px] px-2"
-                onClick={() => {
-                  if (account) {
+              {account && (
+                <Button
+                  type="primary"
+                  className="h-9 flex-1 max-w-[148px] px-2"
+                  onClick={() => {
                     showDepositModal({ vault: vault });
-                  } else {
-                    handleConnect();
-                  }
-                }}
-              >
-                <span className="text-base">
-                  {isWithdrawOnly ? "WITHDRAW" : "DEPOSIT"}
-                </span>
-              </Button>
+                  }}
+                >
+                  <span className="text-base">
+                    {isWithdrawOnly ? "WITHDRAW" : "DEPOSIT"}
+                  </span>
+                </Button>
+              )}
+
               {userPosition > 0 && (
                 <Button
                   type="secondary"
