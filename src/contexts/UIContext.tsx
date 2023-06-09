@@ -14,6 +14,7 @@ interface UIContextType {
   showConnectModal: () => void;
   showDisconnectModal: () => void;
   showTosModal: () => void;
+  hideTosModal: () => void;
 }
 
 export const UIContext = createContext<UIContextType>({} as UIContextType);
@@ -51,6 +52,10 @@ const UIProvider = ({ children }: Props) => {
     setTosModalVisible(true);
   };
 
+  const hideTosModal = () => {
+    setTosModalVisible(false);
+  };
+
   return (
     <UIContext.Provider
       value={{
@@ -60,6 +65,7 @@ const UIProvider = ({ children }: Props) => {
         showConnectModal,
         showDisconnectModal,
         showTosModal,
+        hideTosModal,
       }}
     >
       {children}
@@ -79,10 +85,7 @@ const UIProvider = ({ children }: Props) => {
         open={disconnectModalVisible}
         onClose={() => setDisconnectModalVisible(false)}
       />
-      <TosModal
-        open={tosModalVisible}
-        onClose={() => setTosModalVisible(false)}
-      />
+      <TosModal open={tosModalVisible} />
     </UIContext.Provider>
   );
 };

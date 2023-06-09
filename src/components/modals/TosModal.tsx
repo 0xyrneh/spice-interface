@@ -4,10 +4,12 @@ import TosDocsSVG from "@/assets/icons/tos-docs.svg";
 import Modal, { ModalProps } from "./Modal";
 import { Button, Card } from "../common";
 import Image from "next/image";
+import { useUI } from "@/hooks";
 
 export default function DepositModal({ open, onClose }: ModalProps) {
   const { account } = useWeb3React();
   const [agreed, setAgreed] = useState(false);
+  const { hideTosModal } = useUI();
 
   useEffect(() => {
     if (account && onClose) onClose();
@@ -15,11 +17,11 @@ export default function DepositModal({ open, onClose }: ModalProps) {
 
   const handleConsent = () => {
     window.localStorage.setItem("tos", "true");
-    if (onClose) onClose();
+    hideTosModal();
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open}>
       <Card
         className="!py-7 !px-6 gap-6 leading-5 border-1 border-gray-200 !bg-gray-700 !bg-opacity-95 w-[432px]"
         notBlur
