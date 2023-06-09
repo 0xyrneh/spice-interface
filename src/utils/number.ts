@@ -13,3 +13,7 @@ export const generateRandomNumbers = (
   }
   return rdmNumbers;
 };
+
+export const generateRandomNumber = (min: number, max: number): number => {
+  return random(min, max);
+};

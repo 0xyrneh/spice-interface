@@ -11,3 +11,4 @@ export { default as LoanExposure } from "./LoanExposure";
 export { default as PrologueNfts } from "./PrologueNfts";
 export { default as BlurLeaderboard } from "./BlurLeaderboard";
 export { default as LoanAndBidExposure } from "./LoanAndBidExposure";
+export { default as VaultPositionGraph } from "./VaultPositionGraph";

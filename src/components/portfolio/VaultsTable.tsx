@@ -55,6 +55,11 @@ export default function VaultsTable({
             alt=""
           />
         ),
+        format: (item) => {
+          return `${item?.readable || ""} ${
+            item?.deprecated ? "[WITHDRAW ONLY]" : ""
+          }`;
+        },
       },
       {
         title: "POSITION",
@@ -105,7 +110,7 @@ export default function VaultsTable({
       {
         title: "DEPOSIT",
         noSort: true,
-        rowClass: () => "w-[70px]",
+        rowClass: () => "w-[75px]",
         component: (item) => (
           <Button
             type="primary"
@@ -113,15 +118,15 @@ export default function VaultsTable({
             onClick={(e) => {
               e.stopPropagation();
               if (account) {
-                showDepositModal(item);
+                showDepositModal({ vault: item });
               } else {
                 showConnectModal();
               }
             }}
           >
             <span className="text-xs font-bold">
-              {account ? "DEPOSIT" : "CONNECT"}
-            </span>{" "}
+              {account ? (item.deprecated ? "WITHDR." : "DEPOSIT") : "CONNECT"}
+            </span>
           </Button>
         ),
       },

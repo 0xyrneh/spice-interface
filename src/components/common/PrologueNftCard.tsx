@@ -1,11 +1,14 @@
 import Image from "next/image";
-import { PrologueNftInfo } from "@/types/nft";
-import Dropdown from "./Dropdown";
+
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { BREAKPOINTS } from "@/constants";
 import useBreakpoint from "use-breakpoint";
+
+import { PrologueNftInfo } from "@/types/nft";
+import Dropdown from "./Dropdown";
+import { BREAKPOINTS } from "@/constants";
+import { CopyClipboard } from "@/components/common";
 
 type Props = {
   containerClassName?: string;
@@ -15,7 +18,7 @@ type Props = {
   active?: boolean;
   showBorder?: boolean;
   nfts: PrologueNftInfo[];
-  selectedIdx?: number;
+  selectedNftId?: number;
   expanded?: boolean;
   side?: ("left" | "top" | "right" | "bottom")[];
   parent?: any;
@@ -25,7 +28,7 @@ type Props = {
 
 export default function PrologueNftCard({
   nfts,
-  selectedIdx,
+  selectedNftId,
   containerClassName,
   className,
   footerClassName,
@@ -38,11 +41,13 @@ export default function PrologueNftCard({
   onItemChanged,
   onClick,
 }: Props) {
+  const [dropdownOpened, setDropdownOpened] = useState(false);
+
   const comp = useRef();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
 
-  const [dropdownOpened, setDropdownOpened] = useState(false);
-  const activeNft = nfts[selectedIdx ?? 0];
+  const activeNft =
+    nfts.find((nft) => nft.tokenId === selectedNftId) || nfts[0];
 
   useEffect(() => {
     let currentComp = comp.current as any;
@@ -109,6 +114,8 @@ export default function PrologueNftCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active]);
 
+  const ownerAddr = activeNft?.owner || "";
+
   return (
     <div className={`rounded ${containerClassName} cursor-pointer`}>
       <motion.div
@@ -135,14 +142,13 @@ export default function PrologueNftCard({
             }`}
           >
             <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-              0xb7abacacdcdsf
+              {ownerAddr}
             </span>
-            <Image
-              src="/assets/icons/copy.svg"
+            <CopyClipboard
+              text={ownerAddr}
               width={14}
               height={14}
-              alt=""
-              className="cursor-pointer"
+              className="min-w-[14px] min-h-[14px]"
             />
           </div>
         )}
@@ -201,7 +207,7 @@ export default function PrologueNftCard({
                     activeNft?.isEscrowed ? "text-shadow-orange-900" : ""
                   }
                 >
-                  {`#${activeNft.tokenId}`}
+                  {`#${activeNft?.tokenId}`}
                 </span>
                 <FaChevronDown className="text-gray-200" />
               </button>
@@ -213,9 +219,9 @@ export default function PrologueNftCard({
                       nft.isEscrowed
                         ? "text-orange-200 text-shadow-orange-900"
                         : "text-gray-200"
-                    } ${idx === (selectedIdx ?? 0) ? "hidden" : ""}`}
+                    } ${nft.tokenId === selectedNftId ? "hidden" : ""}`}
                     onClick={() => {
-                      if (onItemChanged) onItemChanged(nft, idx);
+                      if (onItemChanged) onItemChanged(nft, nft.tokenId);
                       setDropdownOpened(false);
                     }}
                   >

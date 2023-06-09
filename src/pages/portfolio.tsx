@@ -2,15 +2,9 @@ import { useState } from "react";
 import Image from "next/image";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 
-import PositionSVG from "@/assets/icons/position.svg";
-import CopyIconSVG from "@/assets/icons/copy.svg";
-import CheckIconSVG from "@/assets/icons/check.svg";
-import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { shortAddress } from "@/utils";
-import { Card, Stats } from "@/components/common";
-import { LineChart } from "@/components/portfolio";
+import { Card, CopyClipboard } from "@/components/common";
 import {
   LoanAndBidExposure,
   MarketplaceExposure,
@@ -22,20 +16,15 @@ import { VaultsTable } from "@/components/portfolio";
 import VaultNfts from "@/components/vaults/VaultNfts";
 import { useAppSelector } from "@/state/hooks";
 import { VaultInfo, ReceiptToken } from "@/types/vault";
-import { PeriodFilter } from "@/types/common";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { activeChainId } from "@/utils/web3";
 import { getNftPortfolios } from "@/utils/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { accLoans } from "@/utils/lend";
-import { ExampleTotalTvl } from "@/constants";
+import { VaultPositionGraph } from "@/components/vaults";
 
 export default function Portfolio() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
-  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
-  const [isCopied, setCopied] = useState(false);
-  const [showPosition, setShowPosition] = useState(true);
-
   const { account } = useWeb3React();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
   const { data: lendData } = useAppSelector((state) => state.lend);
@@ -67,7 +56,7 @@ export default function Portfolio() {
         userNftPortfolios,
 
         // TODO: remove later
-        isBlur: true,
+        // isBlur: true,
       };
     })
     .filter((row1: VaultInfo) => row1.userPosition && row1.userPosition > 0);
@@ -87,13 +76,6 @@ export default function Portfolio() {
       userTotalPosition += vault?.userPosition || 0;
     });
     return userTotalPosition;
-  };
-
-  const onCopyWallet = () => {
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-    }, 3000);
   };
 
   return (
@@ -120,11 +102,10 @@ export default function Portfolio() {
                 {shortAddress(account, 10, account.length)}
               </span>
             </div>
-            <CopyToClipboard onCopy={onCopyWallet} text={account}>
-              <button className="min-w-[24px] min-w-[24px]">
-                {!isCopied ? <CopyIconSVG /> : <CheckIconSVG />}
-              </button>
-            </CopyToClipboard>
+            <CopyClipboard
+              text={account}
+              className="min-w-[24px] min-w-[24px]"
+            />
           </Card>
         )}
 
@@ -163,110 +144,10 @@ export default function Portfolio() {
 
       <div className="flex flex-col flex-1 gap-5 pt-1">
         {/* vault chart graph */}
-        <Card className="gap-3 flex-1 overflow-hidden min-h-[323px] h-[50%]">
-          <div className="flex items-center gap-2.5">
-            {selectedVault && (
-              <Image
-                className="border-1 border-gray-200 rounded-full"
-                src={selectedVault.logo}
-                width={16}
-                height={16}
-                alt=""
-              />
-            )}
-            <PositionSVG />
-            <h2 className="font-bold text-white font-sm">
-              {selectedVault
-                ? `YOUR ${(
-                    selectedVault?.readable || ""
-                  ).toUpperCase()} POSITION`
-                : "TOTAL SPICE POSITION"}
-            </h2>
-            {selectedVault && selectedVault.isBlur && (
-              <button onClick={() => setShowPosition(!showPosition)}>
-                <SortUpSVG
-                  className={`text-gray-100 hover:text-white ${
-                    showPosition ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-            )}
-          </div>
-          <div className="flex items-end justify-between text-gray-200 px-12">
-            <div className="flex gap-4 items-center">
-              {!selectedVault && (
-                <Stats
-                  title="Your Spice TVL"
-                  value={`Ξ${getUserTotalPosition().toFixed(2)}`}
-                />
-              )}
-              {selectedVault && selectedVault.isBlur && !showPosition && (
-                <Stats title="SP-BLUR" value={"1500"} />
-              )}
-              {selectedVault && (!selectedVault.isBlur || showPosition) && (
-                <Stats
-                  title="Position"
-                  value={`Ξ${(selectedVault?.userPosition || 0).toFixed(2)}`}
-                />
-              )}
-              {selectedVault && (!selectedVault.isBlur || showPosition) && (
-                <Stats
-                  title={
-                    selectedVault?.receiptToken === ReceiptToken.NFT
-                      ? "Net APY"
-                      : "APY"
-                  }
-                  value={`${(selectedVault?.apy || 0).toFixed(2)}%`}
-                />
-              )}
-            </div>
-            <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
-              <div className="hidden 2xl:flex items-center gap-1">
-                <span>1W Est. Yield:</span>
-                <span className="text-white">Ξ25.60</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>1M Est. Yield:</span>
-                <span className="text-white">Ξ25.60</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span>1Y Est. Yield:</span>
-                <span className="text-white">Ξ25.60</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)]">
-            <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)]  max-h-[calc(100%-18px)] lg:max-h-[100%]">
-              <LineChart
-                data={ExampleTotalTvl[selectedPeriod]}
-                period={selectedPeriod}
-                yPrefix="Ξ"
-              />
-            </div>
-            <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
-              {[
-                PeriodFilter.Day,
-                PeriodFilter.Week,
-                PeriodFilter.Month,
-                PeriodFilter.Year,
-                PeriodFilter.All,
-              ].map((period) => (
-                <button
-                  key={period}
-                  className={`w-[34px] lg:w-full border-1 rounded text-xs bg-opacity-10 ${
-                    period === selectedPeriod
-                      ? "text-orange-200 border-orange-200 shadow-orange-200 bg-orange-200"
-                      : "text-gray-200 border-gray-200 bg-gray-200 hover:text-gray-300 hover:bg-gray-300 hover:bg-opacity-10 hover:border-gray-300"
-                  }`}
-                  disabled={period === selectedPeriod}
-                  onClick={() => setPeriod(period)}
-                >
-                  {period}
-                </button>
-              ))}
-            </div>
-          </div>
-        </Card>
+        <VaultPositionGraph
+          vault={selectedVault}
+          totalPosition={getUserTotalPosition()}
+        />
 
         {/* vault details info */}
         <div className="flex gap-5 h-[37%] overflow-hidden p-1 -m-1">

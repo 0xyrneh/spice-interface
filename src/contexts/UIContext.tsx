@@ -10,11 +10,19 @@ import { createContext, ReactNode, useState } from "react";
 interface UIContextType {
   blur: boolean;
   setBlur: (val: boolean) => void;
-  showDepositModal: (vault: VaultInfo, isLeverageModal?: boolean) => void;
   showConnectModal: () => void;
   showDisconnectModal: () => void;
   showTosModal: () => void;
   hideTosModal: () => void;
+  showDepositModal: ({
+    vault,
+    nftId,
+    isLeverageModal,
+  }: {
+    vault: VaultInfo;
+    nftId?: number;
+    isLeverageModal?: boolean;
+  }) => void;
 }
 
 export const UIContext = createContext<UIContextType>({} as UIContextType);
@@ -31,9 +39,21 @@ const UIProvider = ({ children }: Props) => {
   const [depositModalVisible, setDepositModalVisible] = useState(false);
   const [depositModalProps, setDepositModalProps] = useState<any>();
   const [isLeverageModalOpened, setIsLeverageModalOpened] = useState(false);
+  const [defaultNftId, setDefaultNftId] = useState<number | undefined>();
 
-  const showDepositModal = (vault: VaultInfo, isLeverageModal?: boolean) => {
+  const showDepositModal = ({
+    vault,
+    nftId,
+    isLeverageModal,
+  }: {
+    vault: VaultInfo;
+    nftId?: number;
+    isLeverageModal?: boolean;
+  }) => {
     setIsLeverageModalOpened(!!isLeverageModal);
+    if (nftId) {
+      setDefaultNftId(nftId);
+    }
     setDepositModalVisible(true);
     setDepositModalProps({
       vault: vault,
@@ -72,6 +92,7 @@ const UIProvider = ({ children }: Props) => {
       {depositModalProps && (
         <DepositModal
           open={depositModalVisible && !!depositModalProps}
+          defaultNftId={defaultNftId}
           isLeverageModal={isLeverageModalOpened}
           onClose={() => setDepositModalVisible(false)}
           {...depositModalProps}

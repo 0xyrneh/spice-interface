@@ -12,3 +12,4 @@ export { default as Search } from "./Search";
 export { default as Slider } from "./Slider";
 export { default as BlurStats } from "./BlurStats";
 export { default as Tooltip } from "./Tooltip";
+export { default as CopyClipboard } from "./CopyClipboard";

@@ -7,17 +7,18 @@ import Dropdown from "./Dropdown";
 import { useAppSelector } from "@/state/hooks";
 import { VaultInfo } from "@/types/vault";
 import { PrologueNftInfo } from "@/types/nft";
+import { generateRandomNumber } from "@/utils/number";
 
 const VaultSearch = () => {
   const [opened, setOpened] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const router = useRouter();
-  const { vaults } = useAppSelector((state) => state.vault);
+  const { vaults, defaultVault } = useAppSelector((state) => state.vault);
   const { allNfts: spiceNfts } = useAppSelector((state) => state.nft);
 
   const nfts = spiceNfts.map((row) => {
-    return { ...row, name: `Prologue NFT #${row.tokenId}` };
+    return { ...row, name: `Prologue NFT` };
   });
 
   useEffect(() => {
@@ -54,18 +55,15 @@ const VaultSearch = () => {
     })
     .slice(0, 5);
 
-  const filteredNfts: PrologueNftInfo[] = nfts
-    .filter((nft) =>
-      (nft.name || "")
-        .toLowerCase()
-        .trim()
-        .includes(searchQuery.toLowerCase().trim())
-    )
-    .sort((a, b) => {
-      if ((a?.tvl || 0) < (b?.tvl || 0)) return 1;
-      return -1;
-    })
-    .slice(0, 5);
+  const filteredNfts: PrologueNftInfo[] =
+    nfts.length > 0
+      ? [nfts[generateRandomNumber(0, nfts.length - 1)]].filter((nft) =>
+          (nft?.name || "")
+            .toLowerCase()
+            .trim()
+            .includes(searchQuery.toLowerCase().trim())
+        )
+      : [];
 
   return (
     <Dropdown opened={opened} onClose={() => setOpened(false)}>
@@ -127,6 +125,7 @@ const VaultSearch = () => {
                 key={`vault-${index}`}
                 className="flex justify-between items-center text-xs rounded p-[5px] hover:bg-gray-300 hover:bg-opacity-10 hover:text-white"
                 onClick={() => {
+                  setOpened(false);
                   router.push(`/vault/${vault.id}`);
                 }}
               >
@@ -158,6 +157,12 @@ const VaultSearch = () => {
               <button
                 key={`vault-${index}`}
                 className="flex justify-between items-center text-xs rounded p-[5px] hover:bg-gray-300 hover:bg-opacity-10"
+                onClick={() => {
+                  setOpened(false);
+                  if (defaultVault?.id) {
+                    router.push(`/vault/${defaultVault?.id}`);
+                  }
+                }}
               >
                 <div className="flex items-center gap-3 text-left">
                   <Image
