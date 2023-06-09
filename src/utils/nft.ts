@@ -1,6 +1,11 @@
 import { BigNumber, ethers } from "ethers";
 
-import { RESERVOIR_API_TOKENS_BASE } from "@/config/constants/backend";
+import {
+  RESERVOIR_API_BASE,
+  RESERVOIR_API_COLLECTIONS_BASE,
+  RESERVOIR_API_TOKENS_BASE,
+} from "@/config/constants/backend";
+import axios from "axios";
 
 export const getMarketplaceDisplayName = (name: string): string => {
   switch (name) {
@@ -148,6 +153,32 @@ export const getNftPortfolios = (loans: any[], nfts: any[]) =>
 
 export const getTokenImageFromReservoir = (
   collectionAddr: string,
-  tokenId: number
+  tokenId?: number
 ): string =>
-  `${RESERVOIR_API_TOKENS_BASE}/${collectionAddr}:${tokenId}/image/v1`;
+  tokenId === undefined
+    ? `${RESERVOIR_API_COLLECTIONS_BASE}/${collectionAddr}/image/v1`
+    : `${RESERVOIR_API_TOKENS_BASE}/${collectionAddr}:${tokenId}/image/v1`;
+
+export const getFloorPrice = async (
+  collectionAddr: string
+): Promise<number> => {
+  const floorPrice = (
+    await axios.get(
+      `${RESERVOIR_API_BASE}/oracle/collections/floor-ask/v5?collection=${collectionAddr}`
+    )
+  ).data.price;
+
+  return floorPrice;
+};
+
+export const getCollectionInfoByAddress = async (
+  collectionAddr: string
+): Promise<any> => {
+  const collections = (
+    await axios.get(
+      `${RESERVOIR_API_BASE}/collections/v5?contract=${collectionAddr}`
+    )
+  ).data.collections;
+
+  return collections[0];
+};

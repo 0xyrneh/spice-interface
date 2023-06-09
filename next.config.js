@@ -15,7 +15,7 @@ const nextConfig = {
         protocol: "https",
         hostname: "api.reservoir.tools",
         port: "",
-        pathname: "/redirect/tokens/**/image/v1",
+        pathname: "/redirect/**/**/image/v1",
       },
     ],
     domains: ["api.reservoir.tools"],

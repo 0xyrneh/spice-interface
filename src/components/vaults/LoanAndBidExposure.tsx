@@ -9,12 +9,12 @@ import ExposureSVG from "@/assets/icons/file.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import { VaultInfo } from "@/types/vault";
 import { useUI } from "@/hooks";
+import { BLUR_API_BASE } from "@/config/constants/backend";
 import {
-  BLUR_API_BASE,
-  RESERVOIR_API_BASE,
-  VAULT_LOANS,
-} from "@/config/constants/backend";
-import { getTokenImageFromReservoir } from "@/utils/nft";
+  getCollectionInfoByAddress,
+  getFloorPrice,
+  getTokenImageFromReservoir,
+} from "@/utils/nft";
 
 type Props = {
   vault: VaultInfo;
@@ -47,21 +47,22 @@ export default function LoanAndBidExposure({
     try {
       const loansRes = await axios.get(`${BLUR_API_BASE}/loans?env=${apiEnv}`);
 
+      let loansInfo = [];
       if (loansRes.status === 200) {
-        const loansInfo = await Promise.all(
+        loansInfo = await Promise.all(
           loansRes.data.data.map(async (row: any) => {
             const collectionAddr = row["NFT Contract"];
-            const floorPrice = (
-              await axios.get(
-                `${RESERVOIR_API_BASE}/oracle/collections/floor-ask/v5?collection=${collectionAddr}`
-              )
-            ).data.price;
+
+            const [floorPrice, info] = await Promise.all([
+              getFloorPrice(collectionAddr),
+              getCollectionInfoByAddress(collectionAddr),
+            ]);
             return {
               apy: Math.pow(row["Max Repay Amount"] / row.Principal, 292) - 1,
               matureDate: row["Start"] + 194400,
               principal: row.Principal,
               nftId: row["NFT ID"],
-              displayName: `${"XX"}#${row["NFT ID"]}`,
+              displayName: `${info.name}#${row["NFT ID"]}`,
               tokenImg: getTokenImageFromReservoir(
                 collectionAddr,
                 row["NFT ID"]
@@ -71,9 +72,36 @@ export default function LoanAndBidExposure({
             };
           })
         );
-
-        setLoans([...loansInfo]);
       }
+
+      const bidRes = await axios.get(`${BLUR_API_BASE}/bids?env=${apiEnv}`);
+
+      let bidsInfo = [];
+      if (bidRes.status === 200) {
+        bidsInfo = await Promise.all(
+          bidRes.data.data.bids.map(async (row: any) => {
+            const collectionAddr = row.contractAddress;
+            const [floorPrice, info] = await Promise.all([
+              getFloorPrice(collectionAddr),
+              getCollectionInfoByAddress(collectionAddr),
+            ]);
+
+            const principal = Number(row.maxAmount);
+            return {
+              apy: Math.exp(row.interestRate / 10000) - 1,
+              matureDate: undefined,
+              principal: principal,
+              displayName: `${info.name}`,
+              tokenImg: getTokenImageFromReservoir(collectionAddr),
+              ltv: principal / floorPrice,
+              type: "BID",
+            };
+          })
+        );
+      }
+
+      console.log(bidsInfo);
+      setLoans([...loansInfo, ...bidsInfo]);
     } catch {
       console.log("loans fetching error");
     }
@@ -81,7 +109,7 @@ export default function LoanAndBidExposure({
   };
 
   const formatMaturity = (date: number) => {
-    if (!date) return "";
+    if (!date) return "n/a";
     const now = moment();
     const matureDate = moment(date);
     const timeLeft = moment.duration(matureDate.diff(now));

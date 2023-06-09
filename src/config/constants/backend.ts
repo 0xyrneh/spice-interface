@@ -22,6 +22,7 @@ export const COLLECTION_API_BASE = `${BACKEND_SERVER_URL}/api/collections`;
 // reservoir API
 export const RESERVOIR_API_BASE = "https://api.reservoir.tools";
 export const RESERVOIR_API_TOKENS_BASE = `${RESERVOIR_API_BASE}/redirect/tokens`;
+export const RESERVOIR_API_COLLECTIONS_BASE = `${RESERVOIR_API_BASE}/redirect/collections`;
 
 // blur API
 export const BLUR_API_BASE = `${BACKEND_V2_SERVER_URL}/api/blur`;
