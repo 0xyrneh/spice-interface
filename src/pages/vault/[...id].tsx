@@ -70,7 +70,7 @@ export default function VaultDetailsPage() {
       <VaultDetails
         vault={{
           ...vault,
-          // isBlur: true,
+          isBlur: true,
         }}
       />
     );
