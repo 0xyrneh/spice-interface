@@ -13,6 +13,7 @@ type Props = {
   footerClassName?: string;
   selectable?: boolean;
   active?: boolean;
+  showBorder?: boolean;
   nfts: PrologueNftInfo[];
   selectedIdx?: number;
   expanded?: boolean;
@@ -31,6 +32,7 @@ export default function PrologueNftCard({
   selectable,
   expanded,
   active,
+  showBorder,
   side,
   parent,
   onItemChanged,
@@ -117,6 +119,8 @@ export default function PrologueNftCard({
         className={`relative rounded flex flex-col font-bold ${className} border-1 ${
           activeNft?.isEscrowed
             ? "border-orange-200 drop-shadow-orange-200 text-shadow-orange-200 text-orange-200"
+            : showBorder
+            ? "border-gray-200 text-white drop-shadow-sm"
             : "border-transparent text-white"
         }`}
         onClick={() => {
