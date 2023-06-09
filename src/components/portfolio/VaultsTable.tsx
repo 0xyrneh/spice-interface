@@ -110,7 +110,7 @@ export default function VaultsTable({
       {
         title: "DEPOSIT",
         noSort: true,
-        rowClass: () => "w-[90px]",
+        rowClass: () => "w-[75px]",
         component: (item) => (
           <Button
             type="primary"
@@ -125,7 +125,7 @@ export default function VaultsTable({
             }}
           >
             <span className="text-xs font-bold">
-              {account ? (item.deprecated ? "WITHDRAW" : "DEPOSIT") : "CONNECT"}
+              {account ? (item.deprecated ? "WITHDR." : "DEPOSIT") : "CONNECT"}
             </span>
           </Button>
         ),
