@@ -23,7 +23,7 @@ const useScrollLock = () => {
   const lockScroll = useCallback(() => {
     const html = document.querySelector("html");
     if (html) {
-      html.style.overflow = "scroll";
+      html.style.overflow = "auto";
       setLastY(window.scrollY);
     }
   }, []);

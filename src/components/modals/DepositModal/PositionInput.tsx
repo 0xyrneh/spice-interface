@@ -3,6 +3,7 @@ import WethSVG from "@/assets/icons/weth.svg";
 import EthSVG from "@/assets/icons/eth.svg";
 import TriangleSVG from "@/assets/icons/triangle.svg";
 import { TxStatus } from "@/types/common";
+import { getExpolorerUrl } from "@/utils/string";
 
 type Props = {
   isDeposit: boolean;
@@ -11,7 +12,10 @@ type Props = {
   txStatus: TxStatus;
   txHash?: string;
   showTooltip?: boolean;
+  balance: string;
+  usdVal: string;
   setValue: (value: string) => void;
+  onMax?: () => void;
   toggleEth: () => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -23,11 +27,14 @@ export default function PositionInput({
   toggleEth,
   value,
   setValue,
+  onMax,
   txHash,
   txStatus,
   onFocus,
   onBlur,
   showTooltip,
+  balance,
+  usdVal,
 }: Props) {
   const processing = () => txStatus === TxStatus.Pending;
 
@@ -60,13 +67,14 @@ export default function PositionInput({
             </button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-xs">$0.00</span>
+            <span className="text-xs">${usdVal}</span>
             <div className="flex items-center gap-2">
-              <span className="">Balance: 1.245</span>
+              <span className="">Balance: {balance}</span>
               <Button
                 className={
                   processing() ? "" : "text-orange-900 text-shadow-orange-900"
                 }
+                onClick={onMax}
               >
                 MAX
               </Button>
@@ -80,7 +88,7 @@ export default function PositionInput({
           {txHash && (
             <a
               className="underline"
-              href="https://etherscan.io"
+              href={getExpolorerUrl(txHash)}
               target="__blank"
             >
               {txHash}

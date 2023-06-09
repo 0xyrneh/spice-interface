@@ -5,6 +5,7 @@ type Props = {
   footerClassName?: string;
   bgImg: string;
   expanded?: boolean;
+  position?: string;
 };
 
 export default function Erc20Card({
@@ -12,6 +13,7 @@ export default function Erc20Card({
   className,
   footerClassName,
   expanded,
+  position,
 }: Props) {
   return (
     <div
@@ -29,7 +31,7 @@ export default function Erc20Card({
           expanded ? "h-7 xl:h-8" : "h-6 xl:h-7 2xl:h-8"
         } ${footerClassName}`}
       >
-        <span className="text-white font-bold">Your Position: Ξ30</span>
+        <span className="text-white font-bold">Your Position: Ξ{position}</span>
       </div>
     </div>
   );

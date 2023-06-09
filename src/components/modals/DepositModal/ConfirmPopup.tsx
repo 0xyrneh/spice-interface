@@ -22,6 +22,7 @@ interface Props {
   targetAmount: string;
   positionSelected: boolean;
   isDeposit: boolean;
+  isApprove: boolean;
   positionStatus: TxStatus;
 
   leverageTab: LeverageTab;
@@ -38,6 +39,7 @@ export default function ConfirmPopup(props: Props) {
     vault,
     targetAmount,
     isDeposit,
+    isApprove,
     positionStatus,
     leverageTab,
     onLeverageMaxClicked,
@@ -93,6 +95,7 @@ export default function ConfirmPopup(props: Props) {
         {positionSelected && nft.isApproved ? (
           <PositionConfirm
             isDeposit={isDeposit}
+            isApprove={isApprove}
             txStatus={positionStatus}
             onConfirm={onConfirm}
             hiding={props.hiding}

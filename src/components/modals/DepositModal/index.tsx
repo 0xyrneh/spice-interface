@@ -2,16 +2,18 @@ import { useCallback, useEffect, useState } from "react";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 import moment from "moment-timezone";
-import { useDispatch } from "react-redux";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "../Modal";
+import { useVault } from "@/hooks/useVault";
+import { useEthBalance } from "@/hooks/useEthBalance";
 import { TxStatus, ActionStatus } from "@/types/common";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
-import { PrologueNftInfo, PrologueNftPortofolioInfo } from "@/types/nft";
-import { useAppSelector } from "@/state/hooks";
+import { fetchVaultUserTokenDataAsync } from "@/state/vault/vaultSlice";
+import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
+import { isValidNumber } from "@/utils/regex";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../../common";
 import PositionInput from "./PositionInput";
 import { YEAR_IN_SECONDS } from "@/config/constants/time";
@@ -42,11 +44,11 @@ export default function DepositModal({
   const [positionSelected, setPositionSelected] = useState(true);
   const [leverageTab, setLeverageTab] = useState(LeverageTab.Increase);
   const [positionAmount, setPositionAmount] = useState("");
+  const [amountInWei, setAmountInWei] = useState<BigNumber>(BigNumber.from(0));
   const [isDeposit, setIsDeposit] = useState(false);
   const [leverage, setLeverage] = useState(0);
   const [targetLeverage, setTargetLeverage] = useState("");
   const [useWeth, setUseWeth] = useState(true);
-  const [positionTxHash, setPositionTxHash] = useState<string>();
   const [positionStatus, setPositionStatus] = useState(TxStatus.None);
   const [selectedNftId, setSelectedNftId] = useState<number | undefined>();
   const [focused, setFocused] = useState(false);
@@ -60,11 +62,22 @@ export default function DepositModal({
   const [sliderStep, setSliderStep] = useState<number>(0);
   const [targetAmount, setTargetAmount] = useState<string>("");
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { account } = useWeb3React();
+  const userEthBalance = useEthBalance();
+  const userWethBalance = vault?.userInfo?.tokenBalance;
+  const isFungible = vault?.fungible;
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { pendingTxHash } = useAppSelector((state) => state.modal);
   const { vaults } = useAppSelector((state) => state.vault);
+
+  const {
+    onApprove: onVaultApprove,
+    onDeposit: onVaultDeposit,
+    onDepositETH: onVaultDepositETH,
+    onWithdraw: onVaultWithdraw,
+    onWithdrawETH: onVaultWithdrawETH,
+  } = useVault(vault.address);
 
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
@@ -199,7 +212,6 @@ export default function DepositModal({
     setPositionAmount("");
     setLeverage(leverageTab === LeverageTab.Decrease ? 150 : 0);
     setTargetLeverage("");
-    setPositionTxHash(undefined);
     setPositionStatus(TxStatus.None);
     setClosed(false);
     setFocused(false);
@@ -259,13 +271,31 @@ export default function DepositModal({
     reset();
   }, [isDeposit, positionSelected, leverageTab]);
 
-  const onConfirmPosition = () => {
+  const onConfirmPosition = async () => {
     if (positionStatus === TxStatus.None) {
       setPositionStatus(TxStatus.Pending);
-      setPositionTxHash("0xabcdef");
-      setTimeout(() => {
-        setPositionStatus(TxStatus.Finish);
-      }, 5000);
+      try {
+        if (isDeposit) {
+          if (useWeth) {
+            if (isApprove()) {
+              await onVaultApprove();
+              await dispatch(fetchVaultUserTokenDataAsync(account, vault));
+              setPositionStatus(TxStatus.None);
+            } else {
+              await onVaultDeposit(amountInWei);
+              setPositionStatus(TxStatus.Finish);
+            }
+          } else {
+            await onVaultDepositETH(amountInWei);
+            setPositionStatus(TxStatus.Finish);
+          }
+        } else {
+          await (useWeth ? onVaultWithdraw : onVaultWithdrawETH)(amountInWei);
+        }
+        dispatch(setPendingTxHash(""));
+      } catch (err) {
+        setPositionStatus(TxStatus.None);
+      }
     } else if (positionStatus === TxStatus.Finish) {
       reset();
     }
@@ -347,6 +377,31 @@ export default function DepositModal({
     targetAmount,
   ]);
 
+  const isApprove = () => {
+    if (!isDeposit) return false;
+    if (!useWeth) return false;
+    return amountInWei > vault.userInfo.allowance;
+  };
+
+  const getPositionBalance = () => {
+    return isDeposit
+      ? useWeth
+        ? userWethBalance
+        : userEthBalance
+      : vault.userInfo.depositAmnt;
+  };
+
+  const onChangeAmount = (newAmount: string) => {
+    if (!isValidNumber(newAmount)) return;
+    setPositionAmount(newAmount);
+    setAmountInWei(getBalanceInWei(Number(newAmount).toString() || "0"));
+  };
+
+  const onClickMax = () => {
+    setPositionAmount(getBalanceInEther(getPositionBalance()).toString());
+    setAmountInWei(getPositionBalance());
+  };
+
   return (
     <Modal open={open} onClose={onCloseModal}>
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
@@ -390,6 +445,9 @@ export default function DepositModal({
                 bgImg={vault.logo}
                 footerClassName="!h-10"
                 expanded
+                position={getBalanceInEther(vault.userInfo.depositAmnt).toFixed(
+                  2
+                )}
               />
             </>
           )}
@@ -511,11 +569,14 @@ export default function DepositModal({
                 useWeth={useWeth}
                 toggleEth={() => setUseWeth(!useWeth)}
                 value={positionAmount}
-                setValue={setPositionAmount}
+                setValue={onChangeAmount}
+                onMax={onClickMax}
                 txStatus={positionStatus}
-                txHash={positionTxHash}
+                txHash={pendingTxHash}
                 showTooltip={tooltipVisible}
                 onFocus={() => setFocused(true)}
+                balance={getBalanceInEther(getPositionBalance()).toFixed(5)}
+                usdVal={"N/A"}
               />
             </>
           ) : (
@@ -633,6 +694,7 @@ export default function DepositModal({
             targetAmount={targetAmount}
             positionSelected={positionSelected}
             isDeposit={isDeposit}
+            isApprove={isApprove()}
             positionStatus={positionStatus}
             leverageTab={leverageTab}
             onLeverageMaxClicked={() => {

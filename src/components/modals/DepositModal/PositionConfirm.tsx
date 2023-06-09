@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 interface Props {
   isDeposit: boolean;
+  isApprove: boolean;
   txStatus: TxStatus;
   hiding?: boolean;
   onConfirm: () => void;
@@ -51,7 +52,7 @@ export default function PositionConfirm(props: Props) {
     } else if (txStatus === TxStatus.Finish) {
       return "Finish";
     } else {
-      return isDeposit ? "DEPOSIT" : "WITHDRAW";
+      return isDeposit ? (props.isApprove ? "APPROVE" : "DEPOSIT") : "WITHDRAW";
     }
   };
 
