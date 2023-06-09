@@ -39,9 +39,7 @@ export default function DepositModal({ open, onClose }: ModalProps) {
           <a
             href="https://docs.spicefi.xyz/info/terms-of-service"
             target="__blank"
-            className={`text-orange-200 ${
-              agreed ? "" : "hover:text-white hover:text-shadow-white"
-            } text-shadow-orange-900 flex items-center gap-1 underline`}
+            className="text-orange-200 hover:text-white hover:text-shadow-white text-shadow-orange-900 flex items-center gap-1 underline"
           >
             Terms of Service <TosDocsSVG />
           </a>
