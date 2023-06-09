@@ -9,15 +9,12 @@ import ExposureSVG from "@/assets/icons/file.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import { VaultInfo } from "@/types/vault";
 import { useUI } from "@/hooks";
-import { VAULT_LOANS } from "@/config/constants/backend";
 import {
-  getNFTCollectionAddressConvert,
-  getNFTCollectionAddressFromSlug,
-  getTokenImageFromReservoir,
-} from "@/utils/nft";
-import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
-import { getSpiceFiLendingAddress } from "@/utils/addressHelpers";
-import { getLoanData } from "@/state/lend/fetchGlobalLend";
+  BLUR_API_BASE,
+  RESERVOIR_API_BASE,
+  VAULT_LOANS,
+} from "@/config/constants/backend";
+import { getTokenImageFromReservoir } from "@/utils/nft";
 
 type Props = {
   vault: VaultInfo;
@@ -40,8 +37,6 @@ export default function LoanAndBidExposure({
 
   const { setBlur } = useUI();
 
-  const isLeverageVault = !!vault?.leverage;
-
   const fetchLoans = async () => {
     setIsFetching(true);
 
@@ -50,53 +45,34 @@ export default function LoanAndBidExposure({
 
     if (!vault?.address) return;
     try {
-      const res = await axios.get(
-        `${VAULT_LOANS}/${vault?.address}?env=${apiEnv}`
-      );
-      if (res.status === 200) {
-        const loansOrigin = await Promise.all(
-          res.data.data.loans.map(async (row: any) => {
-            // get onchain loan data
-            const lendAddr = getSpiceFiLendingAddress();
-            const loanData = await getLoanData(lendAddr, row.loanid);
+      const loansRes = await axios.get(`${BLUR_API_BASE}/loans?env=${apiEnv}`);
 
-            let apy = 0;
-            if (isLeverageVault) {
-              const m = YEAR_IN_SECONDS / loanData.duration;
-              // eslint-disable-next-line no-restricted-properties
-              apy = 100 * (Math.pow(1 + loanData.interestRate / m, m) - 1);
-            } else {
-              const m = YEAR_IN_SECONDS / row.duration;
-              // eslint-disable-next-line no-restricted-properties
-              apy =
-                100 *
-                (Math.pow(
-                  1 + (row.max_loan_size - row.outstanding) / row.outstanding,
-                  m
-                ) -
-                  1);
-            }
-
-            const collectionAddr =
-              getNFTCollectionAddressConvert(row.collectionAddress) ||
-              getNFTCollectionAddressFromSlug(row.slug);
-
+      if (loansRes.status === 200) {
+        const loansInfo = await Promise.all(
+          loansRes.data.data.map(async (row: any) => {
+            const collectionAddr = row["NFT Contract"];
+            const floorPrice = (
+              await axios.get(
+                `${RESERVOIR_API_BASE}/oracle/collections/floor-ask/v5?collection=${collectionAddr}`
+              )
+            ).data.price;
             return {
-              name: row.collectionName,
-              slug: row.slug,
-              collectionAddr: collectionAddr,
-              displayName: `${row.collectionName}#${row.nftid}`,
-              principal: row.outstanding,
-              matureDate: !isLeverageVault
-                ? row.start + row.duration
-                : loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS,
-              nftId: row.nftid,
-              apy,
-              tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
+              apy: Math.pow(row["Max Repay Amount"] / row.Principal, 292) - 1,
+              matureDate: row["Start"] + 194400,
+              principal: row.Principal,
+              nftId: row["NFT ID"],
+              displayName: `${"XX"}#${row["NFT ID"]}`,
+              tokenImg: getTokenImageFromReservoir(
+                collectionAddr,
+                row["NFT ID"]
+              ),
+              ltv: row.Principal / floorPrice,
+              type: "LOAN",
             };
           })
         );
-        setLoans([...loansOrigin]);
+
+        setLoans([...loansInfo]);
       }
     } catch {
       console.log("loans fetching error");
@@ -242,10 +218,7 @@ export default function LoanAndBidExposure({
         containerClassName="flex-1"
         className="block h-full"
         rowInfos={getRowInfos()}
-        items={loans.map((loan) => ({
-          ...loan,
-          type: "LOAN",
-        }))}
+        items={loans}
         trStyle="h-10"
         rowStyle="h-8"
         defaultSortKey="apy"

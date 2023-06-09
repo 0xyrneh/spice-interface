@@ -18,6 +18,7 @@ const nextConfig = {
         pathname: "/redirect/tokens/**/image/v1",
       },
     ],
+    domains: ["api.reservoir.tools"],
   },
 };
 
