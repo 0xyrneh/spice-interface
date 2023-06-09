@@ -1,9 +1,11 @@
+import { BigNumber } from "ethers";
 import Image from "next/image";
 
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { motion } from "framer-motion";
 import useBreakpoint from "use-breakpoint";
+import { getBalanceInEther } from "@/utils/formatBalance";
 
 import { PrologueNftInfo } from "@/types/nft";
 import Dropdown from "./Dropdown";
@@ -231,7 +233,9 @@ export default function PrologueNftCard({
               </div>
             </Dropdown>
           )}
-          <span>{`Ξ${(activeNft?.amount || 0).toFixed(2)}`}</span>
+          <span>{`Ξ${getBalanceInEther(
+            activeNft?.amount || BigNumber.from("0")
+          ).toFixed(2)}`}</span>
         </div>
         {selectable && !active && (
           <div className="absolute top-0 left-0 right-0 bottom-0 hover:shadow-nft z-50 rounded" />

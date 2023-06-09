@@ -4,6 +4,8 @@ import {
   DepositModal,
   TosModal,
 } from "@/components/modals";
+import { useAppDispatch, useAppSelector } from "@/state/hooks";
+import { updateActiveVault } from "@/state/vault/vaultSlice";
 import { VaultInfo } from "@/types/vault";
 import { createContext, ReactNode, useState } from "react";
 
@@ -32,14 +34,16 @@ type Props = {
 };
 
 const UIProvider = ({ children }: Props) => {
+  const dispatch = useAppDispatch();
   const [blur, setBlur] = useState(false);
   const [connectModalVisible, setConnectModalVisible] = useState(false);
   const [disconnectModalVisible, setDisconnectModalVisible] = useState(false);
   const [tosModalVisible, setTosModalVisible] = useState(false);
   const [depositModalVisible, setDepositModalVisible] = useState(false);
-  const [depositModalProps, setDepositModalProps] = useState<any>();
   const [isLeverageModalOpened, setIsLeverageModalOpened] = useState(false);
   const [defaultNftId, setDefaultNftId] = useState<number | undefined>();
+
+  const { activeVault } = useAppSelector((state) => state.vault);
 
   const showDepositModal = ({
     vault,
@@ -55,9 +59,13 @@ const UIProvider = ({ children }: Props) => {
       setDefaultNftId(nftId);
     }
     setDepositModalVisible(true);
-    setDepositModalProps({
-      vault: vault,
-    });
+  };
+
+  const closeDepositModal = () => {
+    setDepositModalVisible(false);
+    setTimeout(() => {
+      dispatch(updateActiveVault(null));
+    }, 0);
   };
 
   const showConnectModal = () => {
@@ -89,13 +97,13 @@ const UIProvider = ({ children }: Props) => {
       }}
     >
       {children}
-      {depositModalProps && (
+      {activeVault && (
         <DepositModal
-          open={depositModalVisible && !!depositModalProps}
+          open={depositModalVisible}
           defaultNftId={defaultNftId}
           isLeverageModal={isLeverageModalOpened}
-          onClose={() => setDepositModalVisible(false)}
-          {...depositModalProps}
+          onClose={closeDepositModal}
+          vault={activeVault}
         />
       )}
       <ConnectModal

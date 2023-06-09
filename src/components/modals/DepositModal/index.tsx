@@ -6,10 +6,10 @@ import moment from "moment-timezone";
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "../Modal";
 import { useVault } from "@/hooks/useVault";
+import { useNftVault } from "@/hooks/useNftVault";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { TxStatus, ActionStatus } from "@/types/common";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
-import { fetchVaultUserTokenDataAsync } from "@/state/vault/vaultSlice";
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
@@ -78,6 +78,13 @@ export default function DepositModal({
     onWithdraw: onVaultWithdraw,
     onWithdrawETH: onVaultWithdrawETH,
   } = useVault(vault.address);
+  const {
+    onApprove: onNftVaultApprove,
+    onDeposit: onNftVaultDeposit,
+    onDepositETH: onNftVaultDepositETH,
+    onWithdraw: onNftVaultWithdraw,
+    onWithdrawETH: onNftVaultWithdrawETH,
+  } = useNftVault(vault.address);
 
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
@@ -155,7 +162,7 @@ export default function DepositModal({
         loan: row.loan,
 
         owner: account,
-        amount: getBalanceInEther(value),
+        amount: value,
         tokenId: row.tokenId,
         tokenImg: getTokenImageFromReservoir(
           PROLOGUE_NFT_ADDRESS,
@@ -278,20 +285,35 @@ export default function DepositModal({
         if (isDeposit) {
           if (useWeth) {
             if (isApprove()) {
-              await onVaultApprove();
-              await dispatch(fetchVaultUserTokenDataAsync(account, vault));
+              await (isFungible ? onVaultApprove : onNftVaultApprove)();
               setPositionStatus(TxStatus.None);
             } else {
-              await onVaultDeposit(amountInWei);
+              if (isFungible) await onVaultDeposit(amountInWei);
+              else if (selectedNft) {
+                await onNftVaultDeposit(selectedNft.tokenId, amountInWei);
+              }
               setPositionStatus(TxStatus.Finish);
             }
           } else {
-            await onVaultDepositETH(amountInWei);
+            if (isFungible) await onVaultDepositETH(amountInWei);
+            else if (selectedNft) {
+              await onNftVaultDepositETH(selectedNft.tokenId, amountInWei);
+            }
             setPositionStatus(TxStatus.Finish);
           }
         } else {
-          await (useWeth ? onVaultWithdraw : onVaultWithdrawETH)(amountInWei);
+          if (isFungible) {
+            await (useWeth ? onVaultWithdraw : onVaultWithdrawETH)(amountInWei);
+          } else if (selectedNft) {
+            await (useWeth ? onNftVaultWithdraw : onNftVaultWithdrawETH)(
+              selectedNft.tokenId,
+              amountInWei
+            );
+          }
+          setPositionStatus(TxStatus.Finish);
         }
+        setPositionAmount("");
+        setAmountInWei(BigNumber.from("0"));
         dispatch(setPendingTxHash(""));
       } catch (err) {
         setPositionStatus(TxStatus.None);
@@ -380,15 +402,21 @@ export default function DepositModal({
   const isApprove = () => {
     if (!isDeposit) return false;
     if (!useWeth) return false;
-    return amountInWei > vault.userInfo.allowance;
+    return amountInWei.gt(vault.userInfo.allowance);
   };
 
   const getPositionBalance = () => {
+    return isFungible
+      ? vault.userInfo.depositAmnt
+      : selectedNft?.amount || BigNumber.from("0");
+  };
+
+  const getBalance = () => {
     return isDeposit
       ? useWeth
         ? userWethBalance
         : userEthBalance
-      : vault.userInfo.depositAmnt;
+      : getPositionBalance();
   };
 
   const onChangeAmount = (newAmount: string) => {
@@ -398,8 +426,8 @@ export default function DepositModal({
   };
 
   const onClickMax = () => {
-    setPositionAmount(getBalanceInEther(getPositionBalance()).toString());
-    setAmountInWei(getPositionBalance());
+    setPositionAmount(getBalanceInEther(getBalance()).toString());
+    setAmountInWei(getBalance());
   };
 
   return (
@@ -575,8 +603,11 @@ export default function DepositModal({
                 txHash={pendingTxHash}
                 showTooltip={tooltipVisible}
                 onFocus={() => setFocused(true)}
-                balance={getBalanceInEther(getPositionBalance()).toFixed(5)}
+                balance={getBalanceInEther(getBalance()).toFixed(5)}
                 usdVal={"N/A"}
+                vaultBalance={getBalanceInEther(
+                  vault.wethBalance || BigNumber.from(0)
+                ).toFixed(2)}
               />
             </>
           ) : (
@@ -692,6 +723,13 @@ export default function DepositModal({
             nft={selectedNft}
             vault={vault}
             targetAmount={targetAmount}
+            oldPosition={getBalanceInEther(getPositionBalance()).toFixed(2)}
+            positionChange={getBalanceInEther(amountInWei).toFixed(2)}
+            newPosition={getBalanceInEther(
+              isDeposit
+                ? getPositionBalance().add(amountInWei)
+                : getPositionBalance().sub(amountInWei)
+            ).toFixed(2)}
             positionSelected={positionSelected}
             isDeposit={isDeposit}
             isApprove={isApprove()}

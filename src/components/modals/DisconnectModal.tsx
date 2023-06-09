@@ -10,7 +10,7 @@ import { Connector } from "@/types/wallet";
 import { connectorLocalStorageKey } from "@/config/constants/wallet";
 import { shortAddress } from "@/utils";
 
-export default function DepositModal({ open, onClose }: ModalProps) {
+export default function DisconnectModal({ open, onClose }: ModalProps) {
   const { account } = useWeb3React();
   const { logout } = useAuth();
   const [connector, setConnector] = useState<Connector>();

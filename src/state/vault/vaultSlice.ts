@@ -26,6 +26,7 @@ export const vaultSlice = createSlice({
     reset: (state) => {
       state.leverageVaults = [];
       state.vaults = [];
+      state.activeVault = null;
     },
     setVaultGlobalData: (state, action) => {
       state.defaultVault = {
@@ -46,7 +47,7 @@ export const vaultSlice = createSlice({
       // update vaults
       state.vaults = state.vaults.map((row: VaultInfo) => {
         if (row.address === vault.address) {
-          return {
+          const updatedVault = {
             ...row,
             userInfo: {
               ...row.userInfo,
@@ -55,6 +56,10 @@ export const vaultSlice = createSlice({
                 action.payload.userTokenBalance || BigNumber.from(0),
             },
           };
+          if (state.activeVault?.address === vault.address) {
+            state.activeVault = updatedVault;
+          }
+          return updatedVault;
         }
         return row;
       });
@@ -89,7 +94,7 @@ export const vaultSlice = createSlice({
       // update vaults
       state.vaults = state.vaults.map((row: VaultInfo) => {
         if (row.address === action.payload.vault.address) {
-          return {
+          const updatedVault = {
             ...row,
             userInfo: {
               ...row.userInfo,
@@ -100,6 +105,10 @@ export const vaultSlice = createSlice({
                 action.payload.userMaxRedeemable || BigNumber.from(0),
             },
           };
+          if (state.activeVault?.address === vault.address) {
+            state.activeVault = updatedVault;
+          }
+          return updatedVault;
         }
         return row;
       });

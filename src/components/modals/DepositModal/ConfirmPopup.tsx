@@ -20,6 +20,9 @@ interface Props {
   nft: PrologueNftPortofolioInfo;
   vault: VaultInfo;
   targetAmount: string;
+  oldPosition: string;
+  positionChange: string;
+  newPosition: string;
   positionSelected: boolean;
   isDeposit: boolean;
   isApprove: boolean;
@@ -38,6 +41,9 @@ export default function ConfirmPopup(props: Props) {
     nft,
     vault,
     targetAmount,
+    oldPosition,
+    positionChange,
+    newPosition,
     isDeposit,
     isApprove,
     positionStatus,
@@ -94,6 +100,9 @@ export default function ConfirmPopup(props: Props) {
         </button>
         {positionSelected && nft.isApproved ? (
           <PositionConfirm
+            oldPosition={oldPosition}
+            positionChange={positionChange}
+            newPosition={newPosition}
             isDeposit={isDeposit}
             isApprove={isApprove}
             txStatus={positionStatus}

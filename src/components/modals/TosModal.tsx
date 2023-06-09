@@ -7,7 +7,7 @@ import { Button, Card } from "../common";
 import Image from "next/image";
 import { useUI } from "@/hooks";
 
-export default function DepositModal({ open, onClose }: ModalProps) {
+export default function TosModal({ open, onClose }: ModalProps) {
   const { account } = useWeb3React();
   const [agreed, setAgreed] = useState(false);
   const { hideTosModal } = useUI();

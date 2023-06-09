@@ -3,7 +3,7 @@ import WethSVG from "@/assets/icons/weth.svg";
 import EthSVG from "@/assets/icons/eth.svg";
 import TriangleSVG from "@/assets/icons/triangle.svg";
 import { TxStatus } from "@/types/common";
-import { getExpolorerUrl } from "@/utils/string";
+import { getExpolorerUrl, shortenTxHash } from "@/utils/string";
 
 type Props = {
   isDeposit: boolean;
@@ -14,6 +14,7 @@ type Props = {
   showTooltip?: boolean;
   balance: string;
   usdVal: string;
+  vaultBalance: string;
   setValue: (value: string) => void;
   onMax?: () => void;
   toggleEth: () => void;
@@ -35,6 +36,7 @@ export default function PositionInput({
   showTooltip,
   balance,
   usdVal,
+  vaultBalance,
 }: Props) {
   const processing = () => txStatus === TxStatus.Pending;
 
@@ -91,11 +93,11 @@ export default function PositionInput({
               href={getExpolorerUrl(txHash)}
               target="__blank"
             >
-              {txHash}
+              {shortenTxHash(txHash, 8)}
             </a>
           )}
         </span>
-        {!isDeposit && <span>Vault Liquid Balance: Ξ300</span>}
+        {!isDeposit && <span>Vault Liquid Balance: Ξ{vaultBalance}</span>}
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ export type Loan = {
 
 export interface PrologueNftInfo {
   owner: string;
-  amount: number;
+  amount: BigNumber;
   tokenId: number;
   tokenImg: string;
   isEscrowed?: boolean;

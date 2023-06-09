@@ -3,6 +3,9 @@ import { Button, Stats } from "../../common";
 import { useEffect, useState } from "react";
 
 interface Props {
+  oldPosition: string;
+  positionChange: string;
+  newPosition: string;
   isDeposit: boolean;
   isApprove: boolean;
   txStatus: TxStatus;
@@ -67,19 +70,19 @@ export default function PositionConfirm(props: Props) {
       </h2>
       <Stats
         title="Old Position"
-        value="Ξ30.00"
+        value={`Ξ${props.oldPosition}`}
         type={processing() ? "gray" : undefined}
         size="xs"
       />
       <Stats
         title={isDeposit ? "Deposit" : "Withdraw"}
-        value="Ξ30.00"
+        value={`Ξ${props.positionChange}`}
         type={processing() ? "gray" : undefined}
         size="xs"
       />
       <Stats
         title="New Position"
-        value="Ξ30.00"
+        value={`Ξ${props.newPosition}`}
         type={processing() ? "gray" : undefined}
         size="xs"
       />
