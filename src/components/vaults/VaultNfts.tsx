@@ -38,6 +38,7 @@ export default function VaultNfts({ vault, className }: Props) {
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { defaultVault } = useAppSelector((state) => state.vault);
   const { showDepositModal } = useUI();
+  const [hoverNftList, setHoverNftList] = useState(false);
 
   const loans = accLoans(lendData);
   const activeVault = vault || defaultVault;
@@ -179,9 +180,17 @@ export default function VaultNfts({ vault, className }: Props) {
           />
         </div>
       </div>
-      <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 overflow-y-hidden h-full">
-        <span className="font-medium text-white text-xs">Prologue NFT</span>
-        <div className="flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto no-scroll h-full">
+      <div className="table flex flex-col border-y-1 border-y-gray-200 px-1 py-2 overflow-y-hidden h-full">
+        <div className="pb-4">
+          <span className="font-medium text-white text-xs">Prologue NFT</span>
+        </div>
+        <div
+          className={`h-[calc(100%-38px)] flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto h-full ${
+            account ? "-mr-2.5 pr-2" : ""
+          } ${hoverNftList ? "custom-scroll" : "custom-scroll-transparent"}`}
+          onMouseEnter={() => setHoverNftList(true)}
+          onMouseLeave={() => setHoverNftList(false)}
+        >
           {!account && (
             <div className="flex mx-auto items-center">
               <ConnectWallet />

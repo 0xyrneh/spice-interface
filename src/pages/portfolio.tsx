@@ -34,7 +34,7 @@ export default function Portfolio() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
   const [isCopied, setCopied] = useState(false);
-  const [showPosition, setShowPosition] = useState(true)
+  const [showPosition, setShowPosition] = useState(true);
 
   const { account } = useWeb3React();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
@@ -182,13 +182,15 @@ export default function Portfolio() {
                   ).toUpperCase()} POSITION`
                 : "TOTAL SPICE POSITION"}
             </h2>
-            {selectedVault && selectedVault.isBlur && <button onClick={() => setShowPosition(!showPosition)} >
-            <SortUpSVG
-              className={`text-gray-100 hover:text-white ${
-                showPosition ? "rotate-180" : ""
-              }`}
-            />
-          </button>}
+            {selectedVault && selectedVault.isBlur && (
+              <button onClick={() => setShowPosition(!showPosition)}>
+                <SortUpSVG
+                  className={`text-gray-100 hover:text-white ${
+                    showPosition ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+            )}
           </div>
           <div className="flex items-end justify-between text-gray-200 px-12">
             <div className="flex gap-4 items-center">
