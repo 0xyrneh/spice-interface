@@ -9,8 +9,12 @@ import ExposureSVG from "@/assets/icons/file.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import { VaultInfo } from "@/types/vault";
 import { useUI } from "@/hooks";
-import { BLUR_API_BASE, RESERVOIR_API_BASE } from "@/config/constants/backend";
-import { getTokenImageFromReservoir } from "@/utils/nft";
+import { BLUR_API_BASE } from "@/config/constants/backend";
+import {
+  getCollectionInfoByAddress,
+  getFloorPrice,
+  getTokenImageFromReservoir,
+} from "@/utils/nft";
 
 type Props = {
   vault: VaultInfo;
@@ -48,17 +52,17 @@ export default function LoanAndBidExposure({
         loansInfo = await Promise.all(
           loansRes.data.data.map(async (row: any) => {
             const collectionAddr = row["NFT Contract"];
-            const floorPrice = (
-              await axios.get(
-                `${RESERVOIR_API_BASE}/oracle/collections/floor-ask/v5?collection=${collectionAddr}`
-              )
-            ).data.price;
+
+            const [floorPrice, info] = await Promise.all([
+              getFloorPrice(collectionAddr),
+              getCollectionInfoByAddress(collectionAddr),
+            ]);
             return {
               apy: Math.pow(row["Max Repay Amount"] / row.Principal, 292) - 1,
               matureDate: row["Start"] + 194400,
               principal: row.Principal,
               nftId: row["NFT ID"],
-              displayName: `${"XX"}#${row["NFT ID"]}`,
+              displayName: `${info.name}#${row["NFT ID"]}`,
               tokenImg: getTokenImageFromReservoir(
                 collectionAddr,
                 row["NFT ID"]
@@ -77,18 +81,17 @@ export default function LoanAndBidExposure({
         bidsInfo = await Promise.all(
           bidRes.data.data.bids.map(async (row: any) => {
             const collectionAddr = row.contractAddress;
-            const floorPrice = (
-              await axios.get(
-                `${RESERVOIR_API_BASE}/oracle/collections/floor-ask/v5?collection=${collectionAddr}`
-              )
-            ).data.price;
+            const [floorPrice, info] = await Promise.all([
+              getFloorPrice(collectionAddr),
+              getCollectionInfoByAddress(collectionAddr),
+            ]);
 
             const principal = Number(row.maxAmount);
             return {
               apy: Math.exp(row.interestRate / 10000) - 1,
               matureDate: undefined,
               principal: principal,
-              displayName: `${"YY"}`,
+              displayName: `${info.name}`,
               tokenImg: getTokenImageFromReservoir(collectionAddr),
               ltv: principal / floorPrice,
               type: "BID",
