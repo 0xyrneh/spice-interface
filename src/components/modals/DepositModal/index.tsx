@@ -216,6 +216,7 @@ export default function DepositModal({
               onItemChanged={(_: any, idx: number) => setSelectedIdx(idx)}
               footerClassName="!h-10"
               expanded
+              showBorder
             />
           ) : (
             <>
