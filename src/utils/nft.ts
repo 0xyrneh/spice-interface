@@ -1,6 +1,9 @@
 import { BigNumber, ethers } from "ethers";
 
-import { RESERVOIR_API_TOKENS_BASE } from "@/config/constants/backend";
+import {
+  RESERVOIR_API_COLLECTIONS_BASE,
+  RESERVOIR_API_TOKENS_BASE,
+} from "@/config/constants/backend";
 
 export const getMarketplaceDisplayName = (name: string): string => {
   switch (name) {
@@ -148,6 +151,8 @@ export const getNftPortfolios = (loans: any[], nfts: any[]) =>
 
 export const getTokenImageFromReservoir = (
   collectionAddr: string,
-  tokenId: number
+  tokenId?: number
 ): string =>
-  `${RESERVOIR_API_TOKENS_BASE}/${collectionAddr}:${tokenId}/image/v1`;
+  tokenId === undefined
+    ? `${RESERVOIR_API_COLLECTIONS_BASE}/${collectionAddr}/image/v1`
+    : `${RESERVOIR_API_TOKENS_BASE}/${collectionAddr}:${tokenId}/image/v1`;
