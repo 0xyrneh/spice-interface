@@ -36,6 +36,7 @@ export default function PrologueNfts({
   );
   const [selectedIdx, setSelectedIdx] = useState<number>();
   const [searchQuery, setSearchQuery] = useState("");
+  const [hoverBody, setHoverBody] = useState(false);
 
   const { setBlur } = useUI();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
@@ -250,13 +251,16 @@ export default function PrologueNfts({
           />
         </div>
       </div>
-      <div className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 h-full overflow-y-auto">
+      <div
+        className="flex flex-col border-y-1 border-y-gray-200 px-1 gap-4 py-2 h-full overflow-y-auto overflow-x-auto table"
+        onMouseEnter={() => setHoverBody(true)}
+        onMouseLeave={() => setHoverBody(false)}
+      >
         <div
           ref={container as any}
-          className={`flex gap-y-3 gap-px custom-scroll ${
-            // !expanded ? "overflow-y-auto flex-wrap" : "overflow-hidden"
-            "overflow-y-auto flex-wrap"
-          }`}
+          className={`h-full block flex gap-y-3 gap-px -mr-2.5 pr-2 ${
+            hoverBody ? "custom-scroll" : "custom-scroll-transparent"
+          } overflow-y-auto flex-wrap`}
         >
           {nfts.map((nft, idx) => (
             <PrologueNftCard
