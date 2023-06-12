@@ -265,7 +265,7 @@ export default function DepositModal({
     setPositionSelected(isLeverageModal ? false : true);
     setIsDeposit(!isLeverageModal ? !isDeprecatedVault : false);
     // setLeverageTab(LeverageTab.Increase);
-  }, [open, isLeverageModal, vault, onClose]);
+  }, [open, isLeverageModal, vault.address]);
 
   useEffect(() => {
     setClosed(false);
