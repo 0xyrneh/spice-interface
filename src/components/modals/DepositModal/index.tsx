@@ -64,7 +64,7 @@ export default function DepositModal({
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { pendingTxHash } = useAppSelector((state) => state.modal);
-  const { vaults } = useAppSelector((state) => state.vault);
+  const { vaults, leverageVaults } = useAppSelector((state) => state.vault);
 
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
@@ -163,9 +163,10 @@ export default function DepositModal({
 
   const getAmountFromSliderStep = (step: number): number => {
     if (!selectedNft) return 0;
-    const loanLenderVault = vaults.find(
-      (row: any) => row.address === loanLender
-    );
+    const loanLenderVault =
+      leverageTab === LeverageTab.LeverUp
+        ? leverageVaults.find((row: any) => !row.deprecated)
+        : vaults.find((row: any) => row.address === loanLender);
     const { repayAmount, balance } = selectedNft?.loan;
 
     const collateralValue = getBalanceInEther(selectedNft.value);
@@ -189,6 +190,11 @@ export default function DepositModal({
         : originMaxLtv * (collateralValue - loanValue - interesteAccrued * 2)
     );
     const maxLeverage = Math.min(leverageAvailable, lenderWethAvailable);
+
+    if (leverageTab === LeverageTab.LeverUp) {
+      return (step / 100) * maxLeverage;
+    }
+
     if (leverageTab === LeverageTab.Increase) {
       return loanValue + (step / 100) * Math.max(0, maxLeverage - loanValue);
     }
@@ -292,12 +298,12 @@ export default function DepositModal({
   };
 
   // slider input handling
-  const onSetSliderStep = (val: any) => {
+  const onSetSliderStep = (val: number) => {
     setSliderStep(val);
   };
 
-  //  input handling
-  const onSetTargetAmount = (val: any) => {
+  // input handling
+  const onSetTargetAmount = (val: string) => {
     setTargetAmount(val);
   };
 
@@ -620,6 +626,7 @@ export default function DepositModal({
                   updateLoanLender={updateLoanLender}
                   onSetSliderStep={onSetSliderStep}
                   onSetTargetAmount={onSetTargetAmount}
+                  getAmountFromSliderStep={getAmountFromSliderStep}
                 />
               )}
             </>
@@ -630,7 +637,7 @@ export default function DepositModal({
           <ConfirmPopup
             nft={selectedNft}
             vault={vault}
-            targetAmount={targetAmount}
+            targetAmount={getAmountFromSliderStep(sliderStep).toString()}
             positionSelected={positionSelected}
             isDeposit={isDeposit}
             positionStatus={positionStatus}
