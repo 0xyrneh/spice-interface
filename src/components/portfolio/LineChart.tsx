@@ -27,7 +27,11 @@ ChartJS.register(
   TimeScale
 );
 
-const getOptions = (period: PeriodFilter, yPrefix?: string) => ({
+const getOptions = (
+  data: ChartValue[],
+  period: PeriodFilter,
+  yPrefix?: string
+) => ({
   animation: {
     duration: 0,
   },
@@ -72,11 +76,14 @@ const getOptions = (period: PeriodFilter, yPrefix?: string) => ({
         minTicksLimit: 7,
         padding: 10,
         callback: function (value: any, index: number, ticks: any) {
+          console.log(value);
+          console.log(moment(data[0].x).unix());
+          if (index === 0 && value === moment(data[0].x).unix() * 1000) {
+            return "";
+          }
           if (
-            index === 0 ||
-            (period !== PeriodFilter.Year &&
-              period !== PeriodFilter.All &&
-              index === ticks.length - 1)
+            index === ticks.length - 1 &&
+            value === moment(data[data.length - 1].x).unix() * 1000
           ) {
             return "";
           }
@@ -121,14 +128,14 @@ type Props = {
 
 export default function LineChart({ data, period, yPrefix }: Props) {
   const [chartData, setChartData] = useState(getChartData(data));
-  const [options, setOptions] = useState(getOptions(period, yPrefix));
+  const [options, setOptions] = useState(getOptions(data, period, yPrefix));
 
   useEffect(() => {
     setChartData(getChartData(data));
   }, [data]);
 
   useEffect(() => {
-    setOptions(getOptions(period, yPrefix));
+    setOptions(getOptions(data, period, yPrefix));
   }, [yPrefix, period]);
 
   return <Line options={options as any} data={chartData} />;
