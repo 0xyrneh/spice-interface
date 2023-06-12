@@ -24,6 +24,7 @@ export const formatBlurLoans = async (loansRes: any[]): Promise<any[]> => {
         tokenImg: getTokenImageFromReservoir(collectionAddr, row["NFT ID"]),
         ltv: (row.Principal / floorPrice) * 100,
         type: "LOAN",
+        status: row.Auction ? "Auction" : "Active",
       };
     })
   );
@@ -49,6 +50,7 @@ export const formatBlurBids = async (bidsRes: any[]): Promise<any[]> => {
         tokenImg: getTokenImageFromReservoir(collectionAddr),
         ltv: (principal / floorPrice) * 100,
         type: "BID",
+        status: "Active",
       };
     })
   );
