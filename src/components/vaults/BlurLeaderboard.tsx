@@ -179,18 +179,21 @@ export default function BlurPts({
           expanded
             ? "w-[16%]"
             : "hidden lg:table-cell w-[60px] lg:w-[16%] 2xl:w-1/5",
+        format: (item) => item.day.toFixed(2),
       },
       {
         title: "1W",
         key: "week",
         rowClass: () =>
           expanded ? "w-[16%]" : "w-[60px] lg:w-[16%] 2xl:w-1/5",
+        format: (item) => item.week.toFixed(2),
       },
       {
         title: "TOTAL",
         key: "total",
         rowClass: () =>
           expanded ? "w-[16%]" : "w-[60px] lg:w-[16%] 2xl:w-1/5",
+        format: (item) => item.total.toFixed(2),
       },
     ];
   };
