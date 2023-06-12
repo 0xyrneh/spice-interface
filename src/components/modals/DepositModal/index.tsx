@@ -132,6 +132,7 @@ export default function DepositModal({
         netApy,
         leveragedApy,
         borrowApy,
+        debtOwed,
 
         owner: account,
         amount: getBalanceInEther(value),

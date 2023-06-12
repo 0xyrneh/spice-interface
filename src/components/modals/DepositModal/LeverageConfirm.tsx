@@ -19,6 +19,8 @@ import { getTransactionByHash } from "@/utils/tenderly";
 import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getWethAddress } from "@/utils/addressHelpers";
 import { getLoanTerms } from "@/utils/lend";
+import { getBalanceInEther } from "@/utils/formatBalance";
+import { formatLeverageMaturity } from "@/utils/time";
 
 interface Props {
   isOpen: boolean;
@@ -282,6 +284,13 @@ export default function LeverageConfirm(props: Props) {
     }
   };
 
+  const nftValue = nft?.amount || 0;
+  const netApy = nft?.netApy || 0;
+  const debtOwed = getBalanceInEther(nft?.debtOwed || BigNumber.from(0));
+  const borrowApy = nft?.borrowApy || 0;
+  const healthFactor = nft?.healthFactor || 0;
+  const autoRenew = nft?.autoRenew || 0;
+
   return (
     <div className="flex flex-col flex-1 justify-between">
       <h2
@@ -296,16 +305,19 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="NFT Value"
-          value="Ξ30.00"
+          value={`Ξ${nftValue.toFixed(2)}`}
           size="xs"
         />
         <Stats
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="Net APY"
-          value="23.56%"
+          value={`${netApy ? `${(100 * netApy).toFixed(2)}%` : "--"}`}
           size="xs"
-          showMax={tab === LeverageTab.LeverUp || tab === LeverageTab.Increase}
+          showMax={
+            nft.isApproved &&
+            (tab === LeverageTab.LeverUp || tab === LeverageTab.Increase)
+          }
           onMaxClicked={onMaxClicked}
         />
       </div>
@@ -314,14 +326,14 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="Debt Owed"
-          value="Ξ30.00"
+          value={debtOwed > 0 ? `Ξ${debtOwed.toFixed(2)}` : "--"}
           size="xs"
         />
         <Stats
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="Borrow APY"
-          value="5.09%"
+          value={`${borrowApy > 0 ? `${(100 * borrowApy).toFixed(2)}%` : "--"}`}
           size="xs"
         />
       </div>
@@ -330,14 +342,14 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : "green"}
           className="flex-1"
           title="HF"
-          value="1.76"
+          value={`${healthFactor > 0 ? `${healthFactor.toFixed(2)}` : "--"}`}
           size="xs"
         />
         <Stats
           type={processing() ? "gray" : undefined}
           className="flex-1"
-          title="Auto Reneu"
-          value="7d"
+          title="Auto Renew"
+          value={autoRenew > 0 ? `${formatLeverageMaturity(autoRenew)}` : "--"}
           size="xs"
         />
       </div>
