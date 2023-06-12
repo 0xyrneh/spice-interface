@@ -419,6 +419,14 @@ export default function LeverageInput({
             )}
           </>
         )}
+
+        {tab === LeverageTab.Refinance && (
+          <>
+            {actionError && (
+              <span className="text-red">{`ERROR: ${actionError}`}</span>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
