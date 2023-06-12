@@ -431,11 +431,15 @@ export default function DepositModal({
                   ? "hover:text-gray-300"
                   : ""
               }`}
-              disabled={!positionSelected}
+              disabled={
+                !positionSelected ||
+                (selectedNft && getBalanceInEther(selectedNft.value) === 0)
+              }
               onClick={() => {
                 if (vault.receiptToken === ReceiptToken.NFT) {
                   handleHidePopup();
                   setPositionSelected(false);
+
                   if (selectedNft && !selectedNft.isEscrowed) {
                     setLeverageTab(LeverageTab.LeverUp);
                   } else {
