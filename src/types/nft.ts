@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+
 export type PrologueNft = {
   featured?: boolean;
   apy: number;
@@ -46,4 +48,10 @@ export interface PrologueNftPortofolioInfo {
   name?: string;
   isApproved: boolean;
   lendAddr?: string;
+  borrowApr?: number;
+  borrowApy?: number;
+  netApy?: number;
+  healthFactor?: number;
+  debtOwed?: BigNumber;
+  autoRenew?: number;
 }
