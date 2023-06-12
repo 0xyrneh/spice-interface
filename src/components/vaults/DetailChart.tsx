@@ -160,15 +160,15 @@ export default function DetailChart({ vault }: Props) {
             <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
               <div className="hidden 2xl:flex items-center gap-1">
                 <span>1W Est. Points:</span>
-                <span className="text-white">25.60</span>
+                <span className="text-white">25.60 SPB</span>
               </div>
               <div className="flex items-center gap-1">
                 <span>1M Est. Points:</span>
-                <span className="text-white">25.60</span>
+                <span className="text-white">25.60 SPB</span>
               </div>
               <div className="flex items-center gap-1">
                 <span>1Y Est. Points:</span>
-                <span className="text-white">25.60</span>
+                <span className="text-white">25.60 SPB</span>
               </div>
             </div>
           ) : (
