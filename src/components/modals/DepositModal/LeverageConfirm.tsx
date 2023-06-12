@@ -436,9 +436,9 @@ export default function LeverageConfirm(props: Props) {
       // 1. show "APPROVE" when nft is not approved
       if (!isApproved) {
         return "APPROVE";
-      } else if (!termsParam && !signatureParam) {
+      } else if (termsParam && signatureParam) {
         // 2. show "ACCEPT" when nft is approved but we don't have terms and signature params
-        return "ACCEPT";
+        return "CONFIRM";
       } else {
         // 3. show "LEVER UP" when nft is approved and we have terms and signature params
         return tab.toUpperCase();
