@@ -8,7 +8,7 @@ import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { Card } from "@/components/common";
 import { PieChart } from "@/components/portfolio";
 import { VaultInfo } from "@/types/vault";
-import { VAULT_RESULT_API } from "@/config/constants/backend";
+import { VAULT_API } from "@/config/constants/backend";
 import { VAULT_COLLECTION_COLORS } from "@/config/constants/vault";
 import { getNFTMarketplaceDisplayName } from "@/utils/nft";
 
@@ -51,7 +51,7 @@ export default function MarketplaceExposure({
     await Promise.all(
       protocolAllocations0.map(async (row) => {
         if (row?.name && row?.name.includes("spice-")) {
-          const res = await axios.get(`${VAULT_RESULT_API}/${row.name}`);
+          const res = await axios.get(`${VAULT_API}/result/${row.name}`);
           if (res.status === 200) {
             const bidderVaultProtocolAllocations =
               res.data?.data?.okrs?.protocol_allocations;
