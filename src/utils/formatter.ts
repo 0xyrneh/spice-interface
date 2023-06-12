@@ -1,10 +1,12 @@
-import { DAY_IN_SECONDS } from "@/config/constants/time";
+import { DAY_IN_SECONDS, MONTH_IN_SECONDS } from "@/config/constants/time";
 import {
   getCollectionInfoByAddress,
   getFloorPrice,
   getTokenImageFromReservoir,
 } from "./nft";
 import { WEEK_IN_SECONDS } from "@/config/constants/time";
+import moment from "moment";
+import { ChartValue } from "@/types/vault";
 
 export const formatBlurLoans = async (loansRes: any[]): Promise<any[]> => {
   const loansInfo = await Promise.all(
@@ -63,7 +65,6 @@ export const formatBlurRanking = async (
 ): Promise<any[]> => {
   if (historicalRecords.length === 0) return [];
   const lastestItem = historicalRecords[0];
-  const rankObj: any = {};
 
   const currentTime = Math.floor(Date.now() / 1000);
   const oneDayBefore = currentTime - DAY_IN_SECONDS;
@@ -104,4 +105,53 @@ export const formatBlurRanking = async (
   }));
 
   return ranking;
+};
+
+export const formatBlurChart = (historicalRecords: any[]): any => {
+  let totalSpPoints = 0;
+  let weekPoints = 0;
+  let monthPoints = 0;
+  if (historicalRecords.length > 0) {
+    totalSpPoints = historicalRecords[0].okrs.total_points;
+    weekPoints = totalSpPoints;
+    monthPoints = totalSpPoints;
+
+    const lastestTime = Number(historicalRecords[0].time);
+    const weekBefore = lastestTime - WEEK_IN_SECONDS;
+    const monthBefore = lastestTime - MONTH_IN_SECONDS;
+
+    const weekBeforeInfo = historicalRecords.find(
+      (item) => Number(item.time) < weekBefore
+    );
+    const monthBeforeInfo = historicalRecords.find(
+      (item) => Number(item.time) < monthBefore
+    );
+
+    if (weekBeforeInfo) {
+      weekPoints -= weekBeforeInfo.okrs.total_points;
+    }
+    if (monthBeforeInfo) {
+      monthPoints -= monthBeforeInfo.okrs.total_points;
+    }
+  }
+  const pointsChart: ChartValue[] = historicalRecords
+    .map((item: any) => ({
+      x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
+      y: item.okrs.total_points,
+    }))
+    .reverse();
+  const tvlChart: ChartValue[] = historicalRecords
+    .map((item: any) => ({
+      x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
+      y: item.okrs.total_eth,
+    }))
+    .reverse();
+
+  return {
+    totalSpPoints,
+    weekPoints,
+    monthPoints,
+    pointsChart,
+    tvlChart,
+  };
 };
