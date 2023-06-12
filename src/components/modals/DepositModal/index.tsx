@@ -70,6 +70,7 @@ export default function DepositModal({
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { pendingTxHash } = useAppSelector((state) => state.modal);
   const { vaults } = useAppSelector((state) => state.vault);
+  const { ethPrice } = useAppSelector((state) => state.oracle);
 
   const {
     onApprove: onVaultApprove,
@@ -604,7 +605,7 @@ export default function DepositModal({
                 showTooltip={tooltipVisible}
                 onFocus={() => setFocused(true)}
                 balance={getBalanceInEther(getBalance()).toFixed(5)}
-                usdVal={"N/A"}
+                usdVal={(parseFloat(positionAmount || '0') * ethPrice).toFixed(2)}
                 vaultBalance={getBalanceInEther(
                   vault.wethBalance || BigNumber.from(0)
                 ).toFixed(2)}
@@ -723,13 +724,13 @@ export default function DepositModal({
             nft={selectedNft}
             vault={vault}
             targetAmount={targetAmount}
-            oldPosition={getBalanceInEther(getPositionBalance()).toFixed(2)}
-            positionChange={getBalanceInEther(amountInWei).toFixed(2)}
+            oldPosition={getBalanceInEther(getPositionBalance()).toFixed(3)}
+            positionChange={getBalanceInEther(amountInWei).toFixed(3)}
             newPosition={getBalanceInEther(
               isDeposit
                 ? getPositionBalance().add(amountInWei)
                 : getPositionBalance().sub(amountInWei)
-            ).toFixed(2)}
+            ).toFixed(3)}
             positionSelected={positionSelected}
             isDeposit={isDeposit}
             isApprove={isApprove()}

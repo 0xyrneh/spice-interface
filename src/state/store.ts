@@ -5,6 +5,7 @@ import vault from "./vault/vaultSlice";
 import lend from "./lend/lendSlice";
 import nft from "./nft/nftSlice";
 import modal from "./modal/modalSlice";
+import oracle from "./oracle/oracleSlice";
 
 const customizedMiddleware = getDefaultMiddleware({
   serializableCheck: false,
@@ -16,6 +17,7 @@ export const store = configureStore({
     lend,
     nft,
     modal,
+    oracle,
   },
   middleware: customizedMiddleware,
   devTools: process.env.NODE_ENV !== "production",

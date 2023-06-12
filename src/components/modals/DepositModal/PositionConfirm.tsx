@@ -53,7 +53,7 @@ export default function PositionConfirm(props: Props) {
     if (txStatus === TxStatus.Pending) {
       return "WORKING";
     } else if (txStatus === TxStatus.Finish) {
-      return "Finish";
+      return "FINISH";
     } else {
       return isDeposit ? (props.isApprove ? "APPROVE" : "DEPOSIT") : "WITHDRAW";
     }

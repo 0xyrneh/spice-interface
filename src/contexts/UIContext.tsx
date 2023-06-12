@@ -5,6 +5,7 @@ import {
   TosModal,
 } from "@/components/modals";
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
+import { fetchETHPriceAsync } from "@/state/oracle/oracleSlice";
 import { updateActiveVault } from "@/state/vault/vaultSlice";
 import { VaultInfo } from "@/types/vault";
 import { createContext, ReactNode, useState } from "react";
@@ -55,6 +56,7 @@ const UIProvider = ({ children }: Props) => {
     isLeverageModal?: boolean;
   }) => {
     dispatch(updateActiveVault(vault));
+    dispatch(fetchETHPriceAsync());
     setIsLeverageModalOpened(!!isLeverageModal);
     if (nftId) {
       setDefaultNftId(nftId);
