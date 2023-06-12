@@ -24,6 +24,7 @@ import {
   setActionError,
   setPendingTxHash,
 } from "@/state/modal/modalSlice";
+import { getLenderByLoanId } from "@/state/lend/fetchGlobalLend";
 
 interface Props extends ModalProps {
   vault: VaultInfo;
@@ -54,8 +55,8 @@ export default function DepositModal({
   const [leverageHover, setLeverageHover] = useState(false);
   const [tooltipHover, setTooltipHover] = useState(false);
   const [hiding, setHiding] = useState(false);
-
-  // slider handling
+  // leverage handling
+  const [loanLender, setLoanLender] = useState<string>("");
   const [sliderStep, setSliderStep] = useState<number>(0);
   const [targetAmount, setTargetAmount] = useState<string>("");
 
@@ -63,6 +64,7 @@ export default function DepositModal({
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { pendingTxHash } = useAppSelector((state) => state.modal);
+  const { vaults } = useAppSelector((state) => state.vault);
 
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
@@ -155,6 +157,44 @@ export default function DepositModal({
   const myNfts = getNftPortfolios();
   const selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
 
+  const updateLoanLender = (val: string) => {
+    setLoanLender(val);
+  };
+
+  const getAmountFromSliderStep = (step: number): number => {
+    if (!selectedNft) return 0;
+    const loanLenderVault = vaults.find(
+      (row: any) => row.address === loanLender
+    );
+    const { repayAmount, balance } = selectedNft?.loan;
+
+    const collateralValue = getBalanceInEther(selectedNft.value);
+    const currentLend = lendData.find(
+      (row: any) => row.address === selectedNft?.lendAddr
+    );
+    const loanValue = getBalanceInEther(balance || BigNumber.from(0));
+    const repayValue = getBalanceInEther(repayAmount || BigNumber.from(0));
+    const originMaxLtv = currentLend?.loanRatio || 0;
+    const maxRepayment = getBalanceInEther(repayAmount || BigNumber.from(0));
+
+    // max leverage calculation to prevent utilization is greater than 1
+    const lenderWethAvailable = getBalanceInEther(
+      loanLenderVault?.wethBalance || BigNumber.from(0)
+    );
+    const interesteAccrued = repayValue - loanValue;
+    const leverageAvailable = Math.max(
+      0,
+      originMaxLtv < 0.9
+        ? originMaxLtv * (collateralValue - interesteAccrued * 2)
+        : originMaxLtv * (collateralValue - loanValue - interesteAccrued * 2)
+    );
+    const maxLeverage = Math.min(leverageAvailable, lenderWethAvailable);
+    if (leverageTab === LeverageTab.Increase) {
+      return loanValue + (step / 100) * Math.max(0, maxLeverage - loanValue);
+    }
+    return (step / 100) * maxRepayment;
+  };
+
   const reset = () => {
     setPositionAmount("");
     setLeverage(leverageTab === LeverageTab.Decrease ? 150 : 0);
@@ -163,6 +203,8 @@ export default function DepositModal({
     setPositionStatus(TxStatus.None);
     setClosed(false);
     setFocused(false);
+    setTargetAmount("");
+    setSliderStep(0);
   };
 
   useEffect(() => {
@@ -235,32 +277,6 @@ export default function DepositModal({
     setClosed(true);
   };
 
-  const showRightModal = useCallback(() => {
-    if (closed) return false;
-    if (focused) return true;
-    if (positionSelected) {
-      return positionAmount !== "";
-    } else {
-      if (selectedNft && !selectedNft.isApproved) return true;
-
-      return (
-        leverageTab === LeverageTab.Refinance ||
-        (leverageTab === LeverageTab.Decrease
-          ? sliderStep < 150
-          : sliderStep > 0) ||
-        targetAmount !== ""
-      );
-    }
-  }, [
-    closed,
-    focused,
-    positionSelected,
-    positionAmount,
-    leverageTab,
-    sliderStep,
-    targetAmount,
-  ]);
-
   const handleHidePopup = () => {
     setHiding(true);
     setTimeout(() => {
@@ -284,6 +300,52 @@ export default function DepositModal({
   const onSetTargetAmount = (val: any) => {
     setTargetAmount(val);
   };
+
+  const getAdditionalAmnout = () => {
+    if (leverageTab === "Refinance") return 0;
+    if (leverageTab === LeverageTab.Increase) {
+      if (!selectedNft) return 0;
+      const { balance } = selectedNft.loan;
+      const loanValue = getBalanceInEther(balance || BigNumber.from(0));
+      return getAmountFromSliderStep(sliderStep) - loanValue;
+    }
+    return getAmountFromSliderStep(sliderStep);
+  };
+
+  const showRightModal = useCallback(() => {
+    if (closed) return false;
+    if (focused) return true;
+    if (positionSelected) {
+      return positionAmount !== "";
+    } else {
+      if (selectedNft && !selectedNft.isApproved) return true;
+      if (leverageTab === LeverageTab.Refinance) return true;
+      if (leverageTab === LeverageTab.Increase) {
+        if (!selectedNft) return false;
+        const { balance } = selectedNft.loan;
+        const loanValue = getBalanceInEther(balance || BigNumber.from(0));
+
+        return (
+          getAmountFromSliderStep(sliderStep) > loanValue &&
+          getAdditionalAmnout() > 0
+        );
+      }
+
+      return (
+        (leverageTab === LeverageTab.Decrease
+          ? sliderStep < 150
+          : sliderStep > 0) || targetAmount !== ""
+      );
+    }
+  }, [
+    closed,
+    focused,
+    positionSelected,
+    positionAmount,
+    leverageTab,
+    sliderStep,
+    targetAmount,
+  ]);
 
   return (
     <Modal open={open} onClose={onCloseModal}>
@@ -554,6 +616,8 @@ export default function DepositModal({
                   onFocus={() => setFocused(true)}
                   sliderStep={sliderStep}
                   targetAmount={targetAmount}
+                  loanLender={loanLender}
+                  updateLoanLender={updateLoanLender}
                   onSetSliderStep={onSetSliderStep}
                   onSetTargetAmount={onSetTargetAmount}
                 />

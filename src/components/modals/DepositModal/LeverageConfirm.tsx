@@ -127,7 +127,6 @@ export default function LeverageConfirm(props: Props) {
     dispatch(setActionError(undefined));
     dispatch(setActionStatus(ActionStatus.Pending));
 
-    const targetAmount = 0.01;
     try {
       const terms = {
         loanAmount: utils.parseEther(targetAmount.toString()).toString(),
