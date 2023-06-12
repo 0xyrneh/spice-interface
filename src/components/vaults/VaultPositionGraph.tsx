@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Card, Stats } from "@/components/common";
 import PositionSVG from "@/assets/icons/position.svg";
 import SortUpSVG from "@/assets/icons/sort-up2.svg";
-import { VaultInfo, ReceiptToken } from "@/types/vault";
+import { VaultInfo, ReceiptToken, ChartValue } from "@/types/vault";
 import { LineChart } from "@/components/portfolio";
 import { PeriodFilter } from "@/types/common";
 import { ExampleTotalTvl } from "@/constants";
+import moment from "moment";
+import { BLUR_API_BASE } from "@/config/constants/backend";
+import axios from "axios";
+import {
+  DAY_IN_SECONDS,
+  MONTH_IN_SECONDS,
+  WEEK_IN_SECONDS,
+  YEAR_IN_SECONDS,
+} from "@/config/constants/time";
 
 type Props = {
   vault?: VaultInfo | undefined;
@@ -15,6 +24,65 @@ type Props = {
 export default function VaultPositionGraph({ vault, totalPosition }: Props) {
   const [showPosition, setShowPosition] = useState(true);
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
+  const [blurPointsChart, setBlurPointsChart] = useState<ChartValue[]>([]);
+  const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
+
+  const fetchBlurChart = async () => {
+    setIsFetching(true);
+
+    const apiEnv =
+      Number(process.env.REACT_APP_CHAIN_ID) === 1 ? "prod" : "goerli";
+
+    try {
+      const res = await axios.get(
+        `${BLUR_API_BASE}/historical-points?env=${apiEnv}`
+      );
+
+      if (res.status === 200) {
+        setBlurPointsChart(
+          res.data.data.historicalRecords
+            .map((item: any) => ({
+              x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
+              y: item.okrs.total_points,
+            }))
+            .reverse()
+        );
+      }
+    } catch (err) {
+      console.log("ranks fetching error");
+    }
+
+    setIsFetching(false);
+  };
+
+  const getChartData = () => {
+    if (vault) {
+      if (vault.isBlur) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (selectedPeriod === PeriodFilter.Day) {
+          return blurPointsChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Week) {
+          return blurPointsChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Month) {
+          return blurPointsChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Year) {
+          return blurPointsChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+          });
+        }
+        return blurPointsChart;
+      }
+      return ExampleTotalTvl[selectedPeriod];
+    } else {
+      return ExampleTotalTvl[selectedPeriod];
+    }
+  };
 
   const calculateYields = () => {
     let annualYield = 0;
@@ -28,6 +96,10 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
   };
 
   const annualEstYield = calculateYields();
+
+  useEffect(() => {
+    if (vault && vault.isBlur) fetchBlurChart();
+  }, [vault]);
 
   return (
     <Card className="gap-3 flex-1 overflow-hidden min-h-[323px] h-[50%]">
@@ -114,9 +186,9 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
       <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)]">
         <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)]  max-h-[calc(100%-18px)] lg:max-h-[100%]">
           <LineChart
-            data={ExampleTotalTvl[selectedPeriod]}
+            data={getChartData()}
             period={selectedPeriod}
-            yPrefix="Ξ"
+            yPrefix={vault && vault.isBlur ? "" : "Ξ"}
           />
         </div>
         <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
