@@ -16,6 +16,7 @@ import {
   WEEK_IN_SECONDS,
   YEAR_IN_SECONDS,
 } from "@/config/constants/time";
+import { formatBlurChart } from "@/utils/formatter";
 
 type Props = {
   vault?: VaultInfo | undefined;
@@ -24,7 +25,7 @@ type Props = {
 export default function VaultPositionGraph({ vault, totalPosition }: Props) {
   const [showPosition, setShowPosition] = useState(true);
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
-  const [blurPointsChart, setBlurPointsChart] = useState<ChartValue[]>([]);
+  const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
 
   const fetchBlurChart = async () => {
@@ -39,14 +40,7 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
       );
 
       if (res.status === 200) {
-        setBlurPointsChart(
-          res.data.data.historicalRecords
-            .map((item: any) => ({
-              x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
-              y: item.okrs.total_points,
-            }))
-            .reverse()
-        );
+        setBlurChartInfo(formatBlurChart(res.data.data.historicalRecords));
       }
     } catch (err) {
       console.log("ranks fetching error");
@@ -59,6 +53,8 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
     if (vault) {
       if (vault.isBlur) {
         const currentTime = Math.floor(Date.now() / 1000);
+        const blurPointsChart: ChartValue[] = blurChartInfo?.pointsChart ?? [];
+
         if (selectedPeriod === PeriodFilter.Day) {
           return blurPointsChart.filter((item) => {
             return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
@@ -143,7 +139,10 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
             />
           )}
           {vault && vault.isBlur && !showPosition && (
-            <Stats title="SP-BLUR" value={"1500"} />
+            <Stats
+              title="SP-BLUR"
+              value={(blurChartInfo?.totalSpPoints ?? 0).toFixed(2)}
+            />
           )}
           {vault && (!vault.isBlur || showPosition) && (
             <Stats
@@ -165,19 +164,28 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
             <div className="hidden 2xl:flex items-center gap-1">
               <span>1W Est. Points:</span>
               <span className="text-white">
-                {`${(annualEstYield / 52).toFixed(2)} `} SPB
+                {(blurChartInfo?.weekPoints
+                  ? blurChartInfo?.weekPoints.toFixed(2)
+                  : undefined) ?? "-"}{" "}
+                SPB
               </span>
             </div>
             <div className="flex items-center gap-1">
               <span>1M Est. Points:</span>
               <span className="text-white">
-                {`${(annualEstYield / 12).toFixed(2)} `} SPB
+                {(blurChartInfo?.monthPoints
+                  ? blurChartInfo?.monthPoints.toFixed(2)
+                  : undefined) ?? "-"}{" "}
+                SPB
               </span>
             </div>
             <div className="flex items-center gap-1">
               <span>1Y Est. Points:</span>
               <span className="text-white">
-                {`${annualEstYield.toFixed(2)} `} SPB
+                {(blurChartInfo?.monthPoints
+                  ? (blurChartInfo?.monthPoints * 12).toFixed(2)
+                  : undefined) ?? "-"}{" "}
+                SPB
               </span>
             </div>
           </div>

@@ -21,6 +21,7 @@ import {
   WEEK_IN_SECONDS,
   YEAR_IN_SECONDS,
 } from "@/config/constants/time";
+import { formatBlurChart } from "@/utils/formatter";
 
 type Props = {
   vault: VaultInfo;
@@ -30,8 +31,7 @@ export default function DetailChart({ vault }: Props) {
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
   const [showPerformance, setShowPerformance] = useState(false);
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
-  const [blurPointsChart, setBlurPointsChart] = useState<ChartValue[]>([]);
-  const [blurTvlChart, setBlurTvlChart] = useState<ChartValue[]>([]);
+  const [blurChartInfo, setBlurChartInfo] = useState<any>();
 
   const fetchBlurChart = async () => {
     setIsFetching(true);
@@ -45,22 +45,7 @@ export default function DetailChart({ vault }: Props) {
       );
 
       if (res.status === 200) {
-        setBlurPointsChart(
-          res.data.data.historicalRecords
-            .map((item: any) => ({
-              x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
-              y: item.okrs.total_points,
-            }))
-            .reverse()
-        );
-        setBlurTvlChart(
-          res.data.data.historicalRecords
-            .map((item: any) => ({
-              x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
-              y: item.okrs.total_eth,
-            }))
-            .reverse()
-        );
+        setBlurChartInfo(formatBlurChart(res.data.data.historicalRecords));
       }
     } catch (err) {
       console.log("ranks fetching error");
@@ -73,6 +58,8 @@ export default function DetailChart({ vault }: Props) {
     if (showPerformance) {
       if (vault.isBlur) {
         const currentTime = Math.floor(Date.now() / 1000);
+        const blurTvlChart: ChartValue[] = blurChartInfo?.tvlChart ?? [];
+
         if (selectedPeriod === PeriodFilter.Day) {
           return blurTvlChart.filter((item) => {
             return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
@@ -96,6 +83,8 @@ export default function DetailChart({ vault }: Props) {
     } else {
       if (vault.isBlur) {
         const currentTime = Math.floor(Date.now() / 1000);
+
+        const blurPointsChart: ChartValue[] = blurChartInfo?.pointsChart ?? [];
         if (selectedPeriod === PeriodFilter.Day) {
           return blurPointsChart.filter((item) => {
             return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
@@ -148,7 +137,10 @@ export default function DetailChart({ vault }: Props) {
         <div className="flex items-end justify-between text-gray-200 px-12">
           <div className="flex gap-4 items-center">
             {!showPerformance && vault.isBlur ? (
-              <Stats title="SP-BLUR" value="1500" />
+              <Stats
+                title="SP-BLUR"
+                value={(blurChartInfo?.totalSpPoints ?? 0).toFixed(2)}
+              />
             ) : (
               <>
                 <Stats title="Vault TVL" value="Ξ30.0" />
@@ -160,15 +152,30 @@ export default function DetailChart({ vault }: Props) {
             <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
               <div className="hidden 2xl:flex items-center gap-1">
                 <span>1W Est. Points:</span>
-                <span className="text-white">25.60 SPB</span>
+                <span className="text-white">
+                  {(blurChartInfo?.weekPoints
+                    ? blurChartInfo?.weekPoints.toFixed(2)
+                    : undefined) ?? "-"}{" "}
+                  SPB
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <span>1M Est. Points:</span>
-                <span className="text-white">25.60 SPB</span>
+                <span className="text-white">
+                  {(blurChartInfo?.monthPoints
+                    ? blurChartInfo?.monthPoints.toFixed(2)
+                    : undefined) ?? "-"}{" "}
+                  SPB
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <span>1Y Est. Points:</span>
-                <span className="text-white">25.60 SPB</span>
+                <span className="text-white">
+                  {(blurChartInfo?.monthPoints
+                    ? (blurChartInfo?.monthPoints * 12).toFixed(2)
+                    : undefined) ?? "-"}{" "}
+                  SPB
+                </span>
               </div>
             </div>
           ) : (
