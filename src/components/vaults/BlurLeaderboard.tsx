@@ -9,6 +9,10 @@ import { useUI } from "@/hooks";
 import { BREAKPOINTS } from "@/constants";
 import Table, { TableRowInfo } from "../common/Table";
 import { shortAddress } from "@/utils";
+import axios from "axios";
+import { BLUR_API_BASE } from "@/config/constants/backend";
+import { formatBlurRanking } from "@/utils/formatter";
+import { useWeb3React } from "@web3-react/core";
 
 type Props = {
   vault: VaultInfo;
@@ -58,7 +62,10 @@ export default function BlurPts({
   const [page, setPage] = useState(0);
   const [ranks, setRank] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
+  const [myRank, setMyRank] = useState<any>();
+  const [total, setTotal] = useState(0);
 
+  const { account } = useWeb3React();
   const { setBlur } = useUI();
 
   useEffect(() => {
@@ -74,6 +81,18 @@ export default function BlurPts({
   }, [breakpoint]);
 
   useEffect(() => {
+    if (account) {
+      setMyRank(
+        ranks.find(
+          (item) => item.wallet.toLowerCase() === account.toLowerCase()
+        )
+      );
+    } else {
+      setMyRank(undefined);
+    }
+  }, [ranks, account]);
+
+  useEffect(() => {
     const pageCount = Math.ceil(BlurCards.length / count) - 1;
     if (page > pageCount) setPage(pageCount);
   }, [count, page]);
@@ -83,25 +102,33 @@ export default function BlurPts({
   }, [expanded, setBlur]);
 
   const fetchData = async () => {
+    if (!vault?.address) return;
+
     setIsFetching(true);
 
-    if (!vault?.address) return;
-    setRank([
-      {
-        rank: 55,
-        wallet: "0xdac17f958d2ee523a2206206994597c13d831ec7",
-        day: 1500,
-        week: 1500,
-        total: 15000,
-      },
-      {
-        rank: 56,
-        wallet: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        day: 1500,
-        week: 1500,
-        total: 15000,
-      },
-    ]);
+    const apiEnv =
+      Number(process.env.REACT_APP_CHAIN_ID) === 1 ? "prod" : "goerli";
+
+    try {
+      const res = await axios.get(
+        `${BLUR_API_BASE}/historical-points?env=${apiEnv}`
+      );
+
+      if (res.status === 200) {
+        if (res.data.data.historicalRecords.length === 0) {
+          setTotal(0);
+        } else {
+          setTotal(res.data.data.historicalRecords[0].okrs.total_points);
+        }
+        const ranksInfo = await formatBlurRanking(
+          res.data.data.historicalRecords
+        );
+        setRank(ranksInfo);
+      }
+    } catch (err) {
+      console.log("ranks fetching error");
+    }
+
     setIsFetching(false);
   };
 
@@ -136,6 +163,8 @@ export default function BlurPts({
           );
         },
         format: (item) => {
+          if (account && account.toLowerCase() === item.wallet.toLowerCase())
+            return "YOU";
           if (expanded) return item.wallet;
           if (breakpoint === "md" || breakpoint === "sm")
             return item.wallet.slice(0, 7);
@@ -214,7 +243,7 @@ export default function BlurPts({
             <div className="flex justify-between">
               <Stats
                 title="RANK"
-                value="56"
+                value={myRank?.rank ?? "-"}
                 valueSize="sm"
                 className="w-[60px]"
               />
@@ -242,19 +271,19 @@ export default function BlurPts({
               </div>
               <Stats
                 title="1D"
-                value="1,500"
+                value={myRank?.day ?? "0"}
                 valueSize="sm"
                 className="w-[16%] items-end"
               />
               <Stats
                 title="1W"
-                value="1,500"
+                value={myRank?.week ?? "0"}
                 valueSize="sm"
                 className="w-[16%] items-end"
               />
               <Stats
                 title="TOTAL SPB"
-                value="15,000"
+                value={myRank?.total ?? "0"}
                 valueSize="sm"
                 className="w-[16%] items-end"
               />
@@ -325,7 +354,7 @@ export default function BlurPts({
             </Button>
           </div>
           <div className="flex h-[46px] py-2 items-center border-[1.5px] border-gray-100 rounded-lg text-gray-100 text-xs drop-shadow-sm">
-            <span className="tracking-normal text-center px-4">150,000</span>
+            <span className="tracking-normal text-center px-4">{total}</span>
             <span className="border-l-[1.5px] px-4 tracking-normal w-[95px]">
               Total SPB emitted
             </span>
@@ -336,7 +365,7 @@ export default function BlurPts({
         <>
           {showAccumulated && (
             <div className="flex justify-center py-2 items-center text-gray-100 text-sm drop-shadow-sm">
-              <span className="tracking-normal text-center px-4">150,000</span>
+              <span className="tracking-normal text-center px-4">{total}</span>
               <span className="border-l-[1.5px] px-4 tracking-normal">
                 Total SPB accumulated
               </span>

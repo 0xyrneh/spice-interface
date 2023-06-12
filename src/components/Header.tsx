@@ -26,7 +26,7 @@ const Header = () => {
   const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  const { account } = useWeb3React();
+  const account = "0x013823485705f0773Ba8230D6Ed0B06a3d95C706";
   const { vaults, defaultVault } = useAppSelector((state) => state.vault);
   const router = useRouter();
   const { blur, showTosModal } = useUI();
