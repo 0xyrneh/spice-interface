@@ -58,6 +58,10 @@ export default function DepositModal({
   const [leverageHover, setLeverageHover] = useState(false);
   const [tooltipHover, setTooltipHover] = useState(false);
   const [hiding, setHiding] = useState(false);
+  // position details
+  const [oldPosition, setOldPosition] = useState("");
+  const [positionChange, setPositionChange] = useState("");
+  const [newPosition, setNewPosition] = useState("");
   // leverage handling
   const [loanLender, setLoanLender] = useState<string>("");
   const [sliderStep, setSliderStep] = useState<number>(0);
@@ -222,6 +226,9 @@ export default function DepositModal({
     setLeverage(leverageTab === LeverageTab.Decrease ? 150 : 0);
     setTargetLeverage("");
     setPositionStatus(TxStatus.None);
+    setOldPosition("");
+    setPositionChange("");
+    setNewPosition("");
     setClosed(false);
     setFocused(false);
     setTargetAmount("");
@@ -283,6 +290,15 @@ export default function DepositModal({
   const onConfirmPosition = async () => {
     if (positionStatus === TxStatus.None) {
       setPositionStatus(TxStatus.Pending);
+      setOldPosition(getBalanceInEther(getPositionBalance()).toFixed(3));
+      setPositionChange(getBalanceInEther(amountInWei).toFixed(3));
+      setNewPosition(
+        getBalanceInEther(
+          isDeposit
+            ? getPositionBalance().add(amountInWei)
+            : getPositionBalance().sub(amountInWei)
+        ).toFixed(3)
+      );
       try {
         if (isDeposit) {
           if (useWeth) {
@@ -424,7 +440,7 @@ export default function DepositModal({
   };
 
   const onChangeAmount = (newAmount: string) => {
-    while (newAmount.split('.').length - 1 > 1 && newAmount.endsWith(".")) {
+    while (newAmount.split(".").length - 1 > 1 && newAmount.endsWith(".")) {
       newAmount = newAmount.slice(0, -1);
     }
     if (!isValidNumber(newAmount)) return;
@@ -434,9 +450,11 @@ export default function DepositModal({
     }
     if (newAmountInWei.gt(0)) {
       newAmount = utils.formatEther(newAmountInWei);
-      const decimalPart = newAmount.split('.')[1];
+      const decimalPart = newAmount.split(".")[1];
       if (decimalPart && decimalPart.length > 7) {
-        newAmount = (Math.floor(parseFloat(newAmount) * 10 ** 7) / 10 ** 7).toString() + "...";
+        newAmount =
+          (Math.floor(parseFloat(newAmount) * 10 ** 7) / 10 ** 7).toString() +
+          "...";
       }
     }
     setPositionAmount(newAmount);
@@ -740,13 +758,25 @@ export default function DepositModal({
         <ConfirmPopup
           nft={selectedNft}
           targetAmount={targetAmount}
-          oldPosition={getBalanceInEther(getPositionBalance()).toFixed(3)}
-          positionChange={getBalanceInEther(amountInWei).toFixed(3)}
-          newPosition={getBalanceInEther(
-            isDeposit
-              ? getPositionBalance().add(amountInWei)
-              : getPositionBalance().sub(amountInWei)
-          ).toFixed(3)}
+          oldPosition={
+            positionStatus === TxStatus.Finish
+              ? oldPosition
+              : getBalanceInEther(getPositionBalance()).toFixed(3)
+          }
+          positionChange={
+            positionStatus === TxStatus.Finish
+              ? positionChange
+              : getBalanceInEther(amountInWei).toFixed(3)
+          }
+          newPosition={
+            positionStatus === TxStatus.Finish
+              ? newPosition
+              : getBalanceInEther(
+                  isDeposit
+                    ? getPositionBalance().add(amountInWei)
+                    : getPositionBalance().sub(amountInWei)
+                ).toFixed(3)
+          }
           positionSelected={positionSelected}
           isDeposit={isDeposit}
           isApprove={isApprove()}
