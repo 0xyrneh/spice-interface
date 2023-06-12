@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
 import axios from "axios";
 
-import { OFFCHAIN_VAULT_API } from "@/config/constants/backend";
+import { VAULT_API } from "@/config/constants/backend";
 import {
   DEFAULT_AGGREGATOR_VAULT,
   VAULT_BLACKLISTED,
@@ -25,7 +25,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
   let vaultsWithDetails = (
     await Promise.all(
       vaults.map((row: VaultInfo) =>
-        axios.get(`${OFFCHAIN_VAULT_API}/${row.address}?env=${apiEnv}`)
+        axios.get(`${VAULT_API}/${row.address}?env=${apiEnv}`)
       )
     )
   )
@@ -200,7 +200,7 @@ export const fetchLeverageVaults = async (vaults: any[]) => {
 
 // fetch global data of vaults
 export const fetchGlobalData = async () => {
-  const res = await axios.get(`${OFFCHAIN_VAULT_API}?env=${apiEnv}`);
+  const res = await axios.get(`${VAULT_API}?env=${apiEnv}`);
   if (res.status === 200) {
     const vaults = res.data.data.filter(
       (row: VaultInfo) =>
@@ -305,7 +305,7 @@ export const getUnderlyingVaults = async (vault: VaultInfo) => {
     const offChainVaults = (
       await Promise.all(
         vaults.map((row: VaultInfo) =>
-          axios.get(`${OFFCHAIN_VAULT_API}/${row}?env=${apiEnv}`)
+          axios.get(`${VAULT_API}/${row}?env=${apiEnv}`)
         )
       )
     )

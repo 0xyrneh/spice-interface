@@ -74,7 +74,7 @@ export default function DepositModal({
   const isFungible = vault?.fungible;
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { pendingTxHash } = useAppSelector((state) => state.modal);
-  const { vaults } = useAppSelector((state) => state.vault);
+  const { vaults, leverageVaults } = useAppSelector((state) => state.vault);
   const { ethPrice } = useAppSelector((state) => state.oracle);
 
   const {
@@ -189,9 +189,10 @@ export default function DepositModal({
 
   const getAmountFromSliderStep = (step: number): number => {
     if (!selectedNft) return 0;
-    const loanLenderVault = vaults.find(
-      (row: any) => row.address === loanLender
-    );
+    const loanLenderVault =
+      leverageTab === LeverageTab.LeverUp
+        ? leverageVaults.find((row: any) => !row.deprecated)
+        : vaults.find((row: any) => row.address === loanLender);
     const { repayAmount, balance } = selectedNft?.loan;
 
     const collateralValue = getBalanceInEther(selectedNft.value);
@@ -215,6 +216,11 @@ export default function DepositModal({
         : originMaxLtv * (collateralValue - loanValue - interesteAccrued * 2)
     );
     const maxLeverage = Math.min(leverageAvailable, lenderWethAvailable);
+
+    if (leverageTab === LeverageTab.LeverUp) {
+      return (step / 100) * maxLeverage;
+    }
+
     if (leverageTab === LeverageTab.Increase) {
       return loanValue + (step / 100) * Math.max(0, maxLeverage - loanValue);
     }
@@ -363,12 +369,12 @@ export default function DepositModal({
   };
 
   // slider input handling
-  const onSetSliderStep = (val: any) => {
+  const onSetSliderStep = (val: number) => {
     setSliderStep(val);
   };
 
-  //  input handling
-  const onSetTargetAmount = (val: any) => {
+  // input handling
+  const onSetTargetAmount = (val: string) => {
     setTargetAmount(val);
   };
 
@@ -546,11 +552,15 @@ export default function DepositModal({
                   ? "hover:text-gray-300"
                   : ""
               }`}
-              disabled={!positionSelected}
+              disabled={
+                !positionSelected ||
+                (selectedNft && getBalanceInEther(selectedNft.value) === 0)
+              }
               onClick={() => {
                 if (vault.receiptToken === ReceiptToken.NFT) {
                   handleHidePopup();
                   setPositionSelected(false);
+
                   if (selectedNft && !selectedNft.isEscrowed) {
                     setLeverageTab(LeverageTab.LeverUp);
                   } else {
@@ -749,13 +759,15 @@ export default function DepositModal({
                   updateLoanLender={updateLoanLender}
                   onSetSliderStep={onSetSliderStep}
                   onSetTargetAmount={onSetTargetAmount}
+                  getAmountFromSliderStep={getAmountFromSliderStep}
                 />
               )}
             </>
           )}
         </Card>
-
-        <ConfirmPopup
+        
+        {selectedNft && (
+          <ConfirmPopup
           nft={selectedNft}
           targetAmount={targetAmount}
           oldPosition={
@@ -793,6 +805,7 @@ export default function DepositModal({
           }
           onClose={onCloseRightModal}
         />
+        )}
       </div>
     </Modal>
   );
