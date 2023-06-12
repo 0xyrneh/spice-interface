@@ -30,11 +30,13 @@ type Props = {
   // new
   sliderStep: number;
   targetAmount: string;
+  loanLender: string;
   onSetSliderStep: (leverage: number) => void;
   onSetTargetAmount: (value: string) => void;
 
   onFocus?: () => void;
   onBlur?: () => void;
+  updateLoanLender: (val: string) => void;
 };
 
 const leverages = [0, 30, 60, 90, 120, 150];
@@ -51,13 +53,13 @@ export default function LeverageInput({
   // new
   sliderStep,
   targetAmount,
+  loanLender,
   onSetSliderStep,
   onSetTargetAmount,
-
+  updateLoanLender,
   onFocus,
   onBlur,
 }: Props) {
-  const [loanLender, setLoanLender] = useState<string>("");
   const { pendingTxHash, actionStatus, actionError } = useAppSelector(
     (state) => state.modal
   );
@@ -99,7 +101,7 @@ export default function LeverageInput({
         currentLend.lenderNote,
         loanId
       );
-      setLoanLender(loanLenderAddr);
+      updateLoanLender(loanLenderAddr);
     }
   };
 
