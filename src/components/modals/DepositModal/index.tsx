@@ -396,6 +396,7 @@ export default function DepositModal({
     closed,
     focused,
     positionSelected,
+    positionStatus,
     positionAmount,
     leverageTab,
     sliderStep,
@@ -423,7 +424,7 @@ export default function DepositModal({
   };
 
   const onChangeAmount = (newAmount: string) => {
-    while (newAmount.endsWith(".")) {
+    while (newAmount.split('.').length - 1 > 1 && newAmount.endsWith(".")) {
       newAmount = newAmount.slice(0, -1);
     }
     if (!isValidNumber(newAmount)) return;

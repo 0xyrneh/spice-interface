@@ -49,22 +49,30 @@ export default function PositionInput({
         >
           <div className="flex items-center justify-between">
             <input
-              className="text-2xl w-[100px] flex-1 hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
+              className={`text-2xl w-[100px] flex-1 hover:placeholder:text-gray-300 placeholder:text-gray-200 ${
+                processing() ? "text-gray-200" : "text-white"
+              }`}
               placeholder="0.000"
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onFocus={onFocus}
               onBlur={onBlur}
+              disabled={processing()}
             />
             <button
               className="flex items-center gap-2 bg-gray-200 bg-opacity-20 h-7 rounded px-3"
+              disabled={processing()}
               onClick={toggleEth}
             >
               {useWeth ? <WethSVG /> : <EthSVG />}
-              <span className="text-white text-base text-left w-[47px]">
+              <span
+                className={`${
+                  processing() ? "text-gray-200" : "text-white"
+                } text-base text-left w-[47px]`}
+              >
                 {useWeth ? "WETH" : "ETH"}
               </span>
-              <TriangleSVG className={useWeth ? "" : "rotate-180"} />
+              <TriangleSVG className={`${useWeth ? "" : "rotate-180"} ${processing() ? "text-gray-200" : "text-white"}`} />
             </button>
           </div>
           <div className="flex items-center justify-between">

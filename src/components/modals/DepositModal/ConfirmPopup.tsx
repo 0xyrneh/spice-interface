@@ -70,7 +70,7 @@ export default function ConfirmPopup(props: Props) {
 
   const processing = () => {
     if (positionSelected) {
-      return actionStatus === ActionStatus.Pending;
+      return positionStatus === TxStatus.Pending;
     } else {
       return actionStatus === ActionStatus.Pending;
     }
@@ -90,6 +90,7 @@ export default function ConfirmPopup(props: Props) {
           className={`${
             processing() ? "text-gray-200" : "text-orange-900"
           } flex items-center font-medium gap-2 text-xs leading-[15.31px]`}
+          disabled={processing()}
           onClick={onClose}
         >
           <ArrowLeftSVG />
