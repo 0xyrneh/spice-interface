@@ -4,7 +4,6 @@ import { useDispatch } from "react-redux";
 import { LeverageTab } from "./LeverageInput";
 import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
 import { TxStatus, ActionStatus } from "@/types/common";
-import { VaultInfo } from "@/types/vault";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { useAppSelector } from "@/state/hooks";
 import PositionConfirm from "./PositionConfirm";
@@ -17,8 +16,7 @@ import {
 } from "@/state/modal/modalSlice";
 
 interface Props {
-  nft: PrologueNftPortofolioInfo;
-  vault: VaultInfo;
+  nft: PrologueNftPortofolioInfo | undefined;
   targetAmount: string;
   oldPosition: string;
   positionChange: string;
@@ -39,7 +37,6 @@ interface Props {
 export default function ConfirmPopup(props: Props) {
   const {
     nft,
-    vault,
     targetAmount,
     oldPosition,
     positionChange,
@@ -98,7 +95,7 @@ export default function ConfirmPopup(props: Props) {
           <ArrowLeftSVG />
           Back
         </button>
-        {positionSelected && nft.isApproved ? (
+        {positionSelected ? (
           <PositionConfirm
             oldPosition={oldPosition}
             positionChange={positionChange}
@@ -109,7 +106,7 @@ export default function ConfirmPopup(props: Props) {
             onConfirm={onConfirm}
             hiding={props.hiding}
           />
-        ) : (
+        ) : nft ? (
           <LeverageConfirm
             nft={nft}
             targetAmount={targetAmount}
@@ -119,7 +116,7 @@ export default function ConfirmPopup(props: Props) {
             hiding={props.hiding}
             onClose={onClose}
           />
-        )}
+        ) : false}
       </Card>
     </div>
   );

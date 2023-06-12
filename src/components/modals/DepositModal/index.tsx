@@ -371,7 +371,7 @@ export default function DepositModal({
     if (closed) return false;
     if (focused) return true;
     if (positionSelected) {
-      return positionAmount !== "";
+      return positionStatus === TxStatus.Finish || positionAmount !== "";
     } else {
       if (selectedNft && !selectedNft.isApproved) return true;
       if (leverageTab === LeverageTab.Refinance) return true;
@@ -723,35 +723,32 @@ export default function DepositModal({
           )}
         </Card>
 
-        {selectedNft && (
-          <ConfirmPopup
-            nft={selectedNft}
-            vault={vault}
-            targetAmount={targetAmount}
-            oldPosition={getBalanceInEther(getPositionBalance()).toFixed(3)}
-            positionChange={getBalanceInEther(amountInWei).toFixed(3)}
-            newPosition={getBalanceInEther(
-              isDeposit
-                ? getPositionBalance().add(amountInWei)
-                : getPositionBalance().sub(amountInWei)
-            ).toFixed(3)}
-            positionSelected={positionSelected}
-            isDeposit={isDeposit}
-            isApprove={isApprove()}
-            positionStatus={positionStatus}
-            leverageTab={leverageTab}
-            onLeverageMaxClicked={() => {
-              setLeverage(150);
-              setTargetLeverage("4");
-            }}
-            show={showRightModal()}
-            hiding={hiding}
-            onConfirm={() =>
-              positionSelected ? onConfirmPosition() : onConfirmLeverage()
-            }
-            onClose={onCloseRightModal}
-          />
-        )}
+        <ConfirmPopup
+          nft={selectedNft}
+          targetAmount={targetAmount}
+          oldPosition={getBalanceInEther(getPositionBalance()).toFixed(3)}
+          positionChange={getBalanceInEther(amountInWei).toFixed(3)}
+          newPosition={getBalanceInEther(
+            isDeposit
+              ? getPositionBalance().add(amountInWei)
+              : getPositionBalance().sub(amountInWei)
+          ).toFixed(3)}
+          positionSelected={positionSelected}
+          isDeposit={isDeposit}
+          isApprove={isApprove()}
+          positionStatus={positionStatus}
+          leverageTab={leverageTab}
+          onLeverageMaxClicked={() => {
+            setLeverage(150);
+            setTargetLeverage("4");
+          }}
+          show={showRightModal()}
+          hiding={hiding}
+          onConfirm={() =>
+            positionSelected ? onConfirmPosition() : onConfirmLeverage()
+          }
+          onClose={onCloseRightModal}
+        />
       </div>
     </Modal>
   );
