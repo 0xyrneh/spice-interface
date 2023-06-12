@@ -54,6 +54,7 @@ const UIProvider = ({ children }: Props) => {
     nftId?: number;
     isLeverageModal?: boolean;
   }) => {
+    dispatch(updateActiveVault(vault));
     setIsLeverageModalOpened(!!isLeverageModal);
     if (nftId) {
       setDefaultNftId(nftId);
