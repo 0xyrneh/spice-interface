@@ -140,12 +140,9 @@ export default function LoanAndBidExposure({
         },
       },
       {
-        title: "TIME LEFT",
-        key: "matureDate",
+        title: "STATUS",
+        key: "status",
         rowClass: () => "w-[90px] xl:w-[14%]",
-        format: (item) => {
-          return formatMaturity(item?.matureDate || 0);
-        },
       },
     ];
   };

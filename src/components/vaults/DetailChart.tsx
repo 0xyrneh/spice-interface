@@ -156,20 +156,37 @@ export default function DetailChart({ vault }: Props) {
               </>
             )}
           </div>
-          <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
-            <div className="hidden 2xl:flex items-center gap-1">
-              <span>1W Est. Yield:</span>
-              <span className="text-white">Ξ25.60</span>
+          {vault.isBlur ? (
+            <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
+              <div className="hidden 2xl:flex items-center gap-1">
+                <span>1W Est. Points:</span>
+                <span className="text-white">25.60</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>1M Est. Points:</span>
+                <span className="text-white">25.60</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>1Y Est. Points:</span>
+                <span className="text-white">25.60</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <span>1M Est. Yield:</span>
-              <span className="text-white">Ξ25.60</span>
+          ) : (
+            <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
+              <div className="hidden 2xl:flex items-center gap-1">
+                <span>1W Est. Yield:</span>
+                <span className="text-white">Ξ25.60</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>1M Est. Yield:</span>
+                <span className="text-white">Ξ25.60</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>1Y Est. Yield:</span>
+                <span className="text-white">Ξ25.60</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <span>1Y Est. Yield:</span>
-              <span className="text-white">Ξ25.60</span>
-            </div>
-          </div>
+          )}
         </div>
         <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)]">
           <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)] max-h-[calc(100%-18px)] lg:max-h-[100%]">
