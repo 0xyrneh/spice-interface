@@ -51,7 +51,6 @@ export default function PositionInput({
             <input
               className="text-2xl w-[100px] flex-1 hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
               placeholder="0.000"
-              type="number"
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onFocus={onFocus}
