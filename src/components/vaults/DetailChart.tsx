@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Card, Stats } from "@/components/common";
 import { LineChart } from "@/components/portfolio";
@@ -10,8 +10,17 @@ import {
   CollectionExposure,
   LoanAndBidExposure,
 } from "@/components/vaults";
-import { VaultInfo } from "@/types/vault";
+import { ChartValue, VaultInfo } from "@/types/vault";
 import { ExampleShare, ExampleTotalTvl } from "@/constants";
+import { BLUR_API_BASE } from "@/config/constants/backend";
+import axios from "axios";
+import moment from "moment";
+import {
+  DAY_IN_SECONDS,
+  MONTH_IN_SECONDS,
+  WEEK_IN_SECONDS,
+  YEAR_IN_SECONDS,
+} from "@/config/constants/time";
 
 type Props = {
   vault: VaultInfo;
@@ -20,6 +29,99 @@ type Props = {
 export default function DetailChart({ vault }: Props) {
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
   const [showPerformance, setShowPerformance] = useState(false);
+  const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
+  const [blurPointsChart, setBlurPointsChart] = useState<ChartValue[]>([]);
+  const [blurTvlChart, setBlurTvlChart] = useState<ChartValue[]>([]);
+
+  const fetchBlurChart = async () => {
+    setIsFetching(true);
+
+    const apiEnv =
+      Number(process.env.REACT_APP_CHAIN_ID) === 1 ? "prod" : "goerli";
+
+    try {
+      const res = await axios.get(
+        `${BLUR_API_BASE}/historical-points?env=${apiEnv}`
+      );
+
+      if (res.status === 200) {
+        setBlurPointsChart(
+          res.data.data.historicalRecords
+            .map((item: any) => ({
+              x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
+              y: item.okrs.total_points,
+            }))
+            .reverse()
+        );
+        setBlurTvlChart(
+          res.data.data.historicalRecords
+            .map((item: any) => ({
+              x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
+              y: item.okrs.total_eth,
+            }))
+            .reverse()
+        );
+      }
+    } catch (err) {
+      console.log("ranks fetching error");
+    }
+
+    setIsFetching(false);
+  };
+
+  const getChartData = () => {
+    if (showPerformance) {
+      if (vault.isBlur) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (selectedPeriod === PeriodFilter.Day) {
+          return blurTvlChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Week) {
+          return blurTvlChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Month) {
+          return blurTvlChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Year) {
+          return blurTvlChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+          });
+        }
+        return blurTvlChart;
+      }
+      return ExampleShare[selectedPeriod];
+    } else {
+      if (vault.isBlur) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        if (selectedPeriod === PeriodFilter.Day) {
+          return blurPointsChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Week) {
+          return blurPointsChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Month) {
+          return blurPointsChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Year) {
+          return blurPointsChart.filter((item) => {
+            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+          });
+        }
+        return blurPointsChart;
+      }
+      return ExampleTotalTvl[selectedPeriod];
+    }
+  };
+
+  useEffect(() => {
+    if (vault.isBlur) fetchBlurChart();
+  }, [vault]);
 
   return (
     <div className="flex flex-col flex-1 gap-5 pt-1">
@@ -29,8 +131,10 @@ export default function DetailChart({ vault }: Props) {
           <h2 className="font-bold text-white font-sm">
             {showPerformance
               ? vault.isBlur
-                ? "SP-BLUR ACCUMULATED"
+                ? "TOTAL VALUE LOCKED"
                 : "ASSETS PER VAULT SHARE"
+              : vault.isBlur
+              ? "SP-BLUR ACCUMULATED"
               : "TOTAL VALUE LOCKED"}
           </h2>
           <button onClick={() => setShowPerformance(!showPerformance)}>
@@ -43,7 +147,7 @@ export default function DetailChart({ vault }: Props) {
         </div>
         <div className="flex items-end justify-between text-gray-200 px-12">
           <div className="flex gap-4 items-center">
-            {showPerformance && vault.isBlur ? (
+            {!showPerformance && vault.isBlur ? (
               <Stats title="SP-BLUR" value="1500" />
             ) : (
               <>
@@ -69,16 +173,30 @@ export default function DetailChart({ vault }: Props) {
         </div>
         <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)]">
           <div className="flex-1 relative w-[calc(59vw-100px)] lg:w-[calc(59vw-146px)] max-h-[calc(100%-18px)] lg:max-h-[100%]">
+            <LineChart
+              data={getChartData()}
+              period={selectedPeriod}
+              yPrefix={
+                showPerformance
+                  ? !vault.isBlur
+                    ? ""
+                    : "Ξ"
+                  : vault.isBlur
+                  ? ""
+                  : "Ξ"
+              }
+            />
             {showPerformance ? (
               <LineChart
-                data={ExampleShare[selectedPeriod]}
+                data={getChartData()}
                 period={selectedPeriod}
+                yPrefix={vault.isBlur ? "Ξ" : ""}
               />
             ) : (
               <LineChart
-                data={ExampleTotalTvl[selectedPeriod]}
+                data={getChartData()}
                 period={selectedPeriod}
-                yPrefix="Ξ"
+                yPrefix={vault.isBlur ? "" : "Ξ"}
               />
             )}
           </div>

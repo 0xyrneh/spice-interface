@@ -53,7 +53,7 @@ const getOptions = (period: PeriodFilter, yPrefix?: string) => ({
           period === PeriodFilter.Day
             ? "hour"
             : period === PeriodFilter.Year || period === PeriodFilter.All
-            ? "month"
+            ? "day"
             : "day",
         displayFormats: {
           hour: "hh:mm a",
