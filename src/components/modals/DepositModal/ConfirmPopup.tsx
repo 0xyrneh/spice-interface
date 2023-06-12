@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-
 import { LeverageTab } from "./LeverageInput";
+import { VaultInfo } from "@/types/vault";
 import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
 import { TxStatus, ActionStatus } from "@/types/common";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
