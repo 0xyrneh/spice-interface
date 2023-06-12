@@ -26,6 +26,7 @@ interface Props {
   isOpen: boolean;
   nft: PrologueNftPortofolioInfo;
   targetAmount: string;
+  netApy: number;
   tab: LeverageTab;
   hiding?: boolean;
   onMaxClicked?: () => void;
@@ -41,7 +42,7 @@ export default function LeverageConfirm(props: Props) {
   const [termsParam, setTermsParam] = useState<any>();
   const [signatureParam, setSignatureParam] = useState<any>();
 
-  const { isOpen, nft, targetAmount, onMaxClicked, onClose } = props;
+  const { isOpen, nft, targetAmount, netApy, onMaxClicked, onClose } = props;
 
   const dispatch = useDispatch();
   const { account, library } = useWeb3React();
@@ -446,7 +447,7 @@ export default function LeverageConfirm(props: Props) {
   };
 
   const nftValue = nft?.amount || 0;
-  const netApy = nft?.netApy || 0;
+  // const netApy = nft?.netApy || 0;
   const debtOwed = getBalanceInEther(nft?.debtOwed || BigNumber.from(0));
   const borrowApy = nft?.borrowApy || 0;
   const healthFactor = nft?.healthFactor || 0;
@@ -473,7 +474,7 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="Net APY"
-          value={`${netApy ? `${(100 * netApy).toFixed(2)}%` : "--"}`}
+          value={`${netApy ? `${netApy.toFixed(2)}%` : "--"}`}
           size="xs"
           showMax={
             nft.isApproved &&

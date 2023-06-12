@@ -14,8 +14,7 @@ import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../../common";
 import PositionInput from "./PositionInput";
-import { YEAR_IN_SECONDS } from "@/config/constants/time";
-import { getNetApy } from "@/utils/apy";
+import { YEAR_IN_SECONDS, DAY_IN_SECONDS } from "@/config/constants/time";
 import { getTokenImageFromReservoir } from "@/utils/nft";
 import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 import ConfirmPopup from "./ConfirmPopup";
@@ -24,7 +23,7 @@ import {
   setActionError,
   setPendingTxHash,
 } from "@/state/modal/modalSlice";
-import { getLenderByLoanId } from "@/state/lend/fetchGlobalLend";
+import { calculateBorrowApr, getNetApy } from "@/utils/apy";
 
 interface Props extends ModalProps {
   vault: VaultInfo;
@@ -63,8 +62,9 @@ export default function DepositModal({
   const dispatch = useDispatch();
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
-  const { pendingTxHash } = useAppSelector((state) => state.modal);
-  const { vaults, leverageVaults } = useAppSelector((state) => state.vault);
+  const { defaultVault, vaults, leverageVaults } = useAppSelector(
+    (state) => state.vault
+  );
 
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
@@ -166,7 +166,7 @@ export default function DepositModal({
     const loanLenderVault =
       leverageTab === LeverageTab.LeverUp
         ? leverageVaults.find((row: any) => !row.deprecated)
-        : vaults.find((row: any) => row.address === loanLender);
+        : leverageVaults.find((row: any) => row.address === loanLender);
     const { repayAmount, balance } = selectedNft?.loan;
 
     const collateralValue = getBalanceInEther(selectedNft.value);
@@ -352,6 +352,82 @@ export default function DepositModal({
     sliderStep,
     targetAmount,
   ]);
+
+  const getRefinanceApr = () => {
+    if (!selectedNft) return 0;
+
+    const loanLenderVault =
+      leverageTab === LeverageTab.LeverUp
+        ? leverageVaults.find((row: any) => !row.deprecated)
+        : leverageVaults.find((row: any) => row.address === loanLender);
+
+    const currentLend = lendData.find(
+      (row: any) => row.address === selectedNft?.lendAddr
+    );
+
+    if (!loanLenderVault) return 0;
+
+    const { balance } = selectedNft.loan;
+    const collateralValue = getBalanceInEther(selectedNft.value);
+    const loanValue = getBalanceInEther(balance || BigNumber.from(0));
+    const originMaxLtv = currentLend?.loanRatio || 0;
+
+    const additionalDebt =
+      leverageTab === LeverageTab.Increase
+        ? getAmountFromSliderStep(sliderStep) - loanValue
+        : getAmountFromSliderStep(sliderStep);
+    const total = getBalanceInEther(
+      loanLenderVault?.totalAssets || BigNumber.from(0)
+    );
+    const available = getBalanceInEther(
+      loanLenderVault?.wethBalance || BigNumber.from(0)
+    );
+    const duration = (selectedNft?.loan?.terms.duration || 0) / DAY_IN_SECONDS;
+    const ltv =
+      originMaxLtv > 1
+        ? getAmountFromSliderStep(sliderStep) /
+          (collateralValue + additionalDebt)
+        : getAmountFromSliderStep(sliderStep) / collateralValue;
+
+    return (
+      100 * calculateBorrowApr(ltv, additionalDebt, total, available, duration)
+    );
+  };
+
+  const getBorrowApr = () => {
+    if (leverageTab === LeverageTab.Decrease)
+      return 100 * (selectedNft?.borrowApr || 0);
+    return getRefinanceApr();
+  };
+
+  const calculateNetApy = () => {
+    if (!selectedNft) return 0;
+    const loanDuration = 28 * DAY_IN_SECONDS;
+    const m = YEAR_IN_SECONDS / loanDuration;
+    const borrowApr = getBorrowApr() / 100;
+    const { repayAmount, balance } = selectedNft.loan;
+    const loanValue = getBalanceInEther(balance || BigNumber.from(0));
+    const repayValue = getBalanceInEther(repayAmount || BigNumber.from(0));
+
+    // eslint-disable-next-line no-restricted-properties
+    const borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
+    const vaultApy = (defaultVault?.apr || 0) / 100;
+    const { value } = selectedNft;
+    const additionalDebt =
+      leverageTab === LeverageTab.Increase
+        ? getAmountFromSliderStep(sliderStep) - loanValue
+        : getAmountFromSliderStep(sliderStep);
+
+    return (
+      100 *
+      getNetApy(
+        getBalanceInEther(value) + additionalDebt,
+        vaultApy,
+        repayValue + additionalDebt,
+        borrowApy
+      )
+    );
+  };
 
   return (
     <Modal open={open} onClose={onCloseModal}>
@@ -641,6 +717,7 @@ export default function DepositModal({
           <ConfirmPopup
             nft={selectedNft}
             vault={vault}
+            netApy={calculateNetApy()}
             targetAmount={getAmountFromSliderStep(sliderStep).toString()}
             positionSelected={positionSelected}
             isDeposit={isDeposit}
