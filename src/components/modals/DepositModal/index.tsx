@@ -11,6 +11,7 @@ import { useEthBalance } from "@/hooks/useEthBalance";
 import { TxStatus, ActionStatus } from "@/types/common";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
+import { fetchVaultUserDataAsync } from "@/state/actions";
 import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import { isValidNumber } from "@/utils/regex";
@@ -316,6 +317,7 @@ export default function DepositModal({
         setPositionAmount("");
         setAmountInWei(BigNumber.from("0"));
         dispatch(setPendingTxHash(""));
+        dispatch(fetchVaultUserDataAsync(account, vault));
       } catch (err) {
         setPositionStatus(TxStatus.None);
       }
@@ -605,7 +607,9 @@ export default function DepositModal({
                 showTooltip={tooltipVisible}
                 onFocus={() => setFocused(true)}
                 balance={getBalanceInEther(getBalance()).toFixed(5)}
-                usdVal={(parseFloat(positionAmount || '0') * ethPrice).toFixed(2)}
+                usdVal={(parseFloat(positionAmount || "0") * ethPrice).toFixed(
+                  2
+                )}
                 vaultBalance={getBalanceInEther(
                   vault.wethBalance || BigNumber.from(0)
                 ).toFixed(2)}
