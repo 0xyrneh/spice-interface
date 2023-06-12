@@ -1,8 +1,7 @@
 const DEFAULT_BACKEND_SERVER_URL = "https://testapi.spicefi.xyz/v1";
 const DEFAULT_V2_BACKEND_SERVER_URL = "https://testapi.spicefi.xyz/v2";
 
-export const BACKEND_SERVER_URL =
-  process.env.NEXT_PUBLIC_BACKEND_SERVER_URL || DEFAULT_BACKEND_SERVER_URL;
+export const BACKEND_SERVER_URL = DEFAULT_BACKEND_SERVER_URL;
 export const BACKEND_V2_SERVER_URL =
   process.env.NEXT_PUBLIC_V2_BACKEND_SERVER_URL ||
   DEFAULT_V2_BACKEND_SERVER_URL;
