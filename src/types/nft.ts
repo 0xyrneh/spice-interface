@@ -35,3 +35,15 @@ export interface PrologueNftInfo {
   apy: number;
   name?: string;
 }
+
+export interface PrologueNftPortofolioInfo {
+  owner: string;
+  amount: number;
+  tokenId: number;
+  tokenImg: string;
+  isEscrowed?: boolean;
+  apy: number;
+  name?: string;
+  isApproved: boolean;
+  lendAddr?: string;
+}

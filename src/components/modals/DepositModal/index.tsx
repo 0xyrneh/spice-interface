@@ -1,25 +1,29 @@
 import { useCallback, useEffect, useState } from "react";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
+import moment from "moment-timezone";
+import { useDispatch } from "react-redux";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "../Modal";
-import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
-import { TxStatus } from "@/types/common";
+import { TxStatus, ActionStatus } from "@/types/common";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
-import { PrologueNftInfo } from "@/types/nft";
+import { PrologueNftInfo, PrologueNftPortofolioInfo } from "@/types/nft";
 import { useAppSelector } from "@/state/hooks";
 import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../../common";
-import PositionConfirm from "./PositionConfirm";
-import LeverageConfirm from "./LeverageConfirm";
 import PositionInput from "./PositionInput";
 import { YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getNetApy } from "@/utils/apy";
 import { getTokenImageFromReservoir } from "@/utils/nft";
 import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 import ConfirmPopup from "./ConfirmPopup";
+import {
+  setActionStatus,
+  setActionError,
+  setPendingTxHash,
+} from "@/state/modal/modalSlice";
 
 interface Props extends ModalProps {
   vault: VaultInfo;
@@ -37,42 +41,128 @@ export default function DepositModal({
   const [positionSelected, setPositionSelected] = useState(true);
   const [leverageTab, setLeverageTab] = useState(LeverageTab.Increase);
   const [positionAmount, setPositionAmount] = useState("");
-  const [isDeposit, setIsDeposit] = useState(true);
+  const [isDeposit, setIsDeposit] = useState(false);
   const [leverage, setLeverage] = useState(0);
   const [targetLeverage, setTargetLeverage] = useState("");
   const [useWeth, setUseWeth] = useState(true);
   const [positionTxHash, setPositionTxHash] = useState<string>();
   const [positionStatus, setPositionStatus] = useState(TxStatus.None);
-  const [leverageTxHash, setLeverageTxHash] = useState<string>();
-  const [leverageStatus, setLeverageStatus] = useState(TxStatus.None);
   const [selectedNftId, setSelectedNftId] = useState<number | undefined>();
   const [focused, setFocused] = useState(false);
   const [closed, setClosed] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [leverageHover, setLeverageHover] = useState(false);
   const [tooltipHover, setTooltipHover] = useState(false);
-  const [myNfts, setMyNfts] = useState<PrologueNftInfo[]>([]);
   const [hiding, setHiding] = useState(false);
 
+  const dispatch = useDispatch();
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
+  const { pendingTxHash } = useAppSelector((state) => state.modal);
 
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
   const isDeprecatedVault = vault?.deprecated;
+
+  const getNftPortfolios = () => {
+    if (!account) {
+      return [];
+    }
+
+    return loans.map((row: any) => {
+      const lendGlobalData = lendData.find(
+        (row1: any) => row1.address === row.lendAddr
+      );
+      const userNft = userNfts.find(
+        (row1: any) => row1.tokenId === row.tokenId
+      );
+
+      const value =
+        row?.loan?.tokenAmntInVault ||
+        userNft?.depositAmnt ||
+        BigNumber.from(0);
+      const loanAmount = row?.loan?.balance || BigNumber.from(0);
+      const debtOwed = row?.loan?.repayAmount || BigNumber.from(0);
+      const healthFactor =
+        getBalanceInEther(debtOwed) > 0 && getBalanceInEther(value) > 0
+          ? ((lendGlobalData?.liquidationRatio || 0) *
+              getBalanceInEther(value)) /
+            getBalanceInEther(debtOwed)
+          : 0;
+
+      const borrowApr = row.loan?.terms?.interestRate
+        ? row.loan?.terms?.interestRate.toNumber() / 10000
+        : 0;
+      const startedAt = row.loan?.startedAt || 0;
+      const loanDuration = row.loan?.terms?.duration || 0;
+      const autoRenew =
+        startedAt && loanDuration
+          ? moment((startedAt + loanDuration) * 1000)
+              .subtract(14, "days")
+              .valueOf() / 1000
+          : 0;
+      // calculate net APY
+      let netApy = 0;
+      let leveragedApy = 0;
+      let borrowApy = 0;
+      if (loanDuration > 0) {
+        const m = YEAR_IN_SECONDS / loanDuration;
+        // eslint-disable-next-line no-restricted-properties
+        borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
+        const vaultApy = (vault?.apr || 0) / 100;
+
+        netApy = getNetApy(
+          getBalanceInEther(value),
+          vaultApy,
+          getBalanceInEther(debtOwed),
+          borrowApy
+        );
+        leveragedApy = netApy + borrowApy;
+      }
+
+      return {
+        lendAddr: row.lendAddr,
+        value,
+        isApproved: !!row.isApproved || !!row.loan.terms,
+        state: row.loan?.state ? row.loan.state : 0,
+        loanAmount,
+        healthFactor,
+        borrowApr,
+        autoRenew,
+        netApy,
+        leveragedApy,
+        borrowApy,
+
+        owner: account,
+        amount: getBalanceInEther(value),
+        tokenId: row.tokenId,
+        tokenImg: getTokenImageFromReservoir(
+          PROLOGUE_NFT_ADDRESS,
+          Number(row.tokenId)
+        ),
+        isEscrowed: !!row?.loan?.loanId,
+        apy: netApy,
+      };
+    });
+  };
+
+  const myNfts = getNftPortfolios();
   const selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
 
-  const handleHidePopup = () => {
-    setHiding(true);
-    setTimeout(() => {
-      setHiding(false);
-    }, 700);
+  const reset = () => {
+    setPositionAmount("");
+    setLeverage(leverageTab === LeverageTab.Decrease ? 150 : 0);
+    setTargetLeverage("");
+    setPositionTxHash(undefined);
+    setPositionStatus(TxStatus.None);
+    setClosed(false);
+    setFocused(false);
   };
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
 
-    if (selectedNft && !selectedNft.isEscrowed) {
+    if (!selectedNft || (selectedNft && !selectedNft.isEscrowed)) {
       if (leverageTab == LeverageTab.LeverUp) return;
       setLeverageTab(LeverageTab.LeverUp);
     } else {
@@ -93,62 +183,6 @@ export default function DepositModal({
     setTooltipVisible(leverageHover || tooltipHover);
   }, [leverageHover, tooltipHover]);
 
-  // fetch nft information from backend
-  const fetchData = async () => {
-    if (!account) {
-      return;
-    }
-
-    const myNfts = loans.map((row: any) => {
-      const userNft = userNfts.find(
-        (row1: any) => row1.tokenId === row.tokenId
-      );
-
-      const value =
-        row?.loan?.tokenAmntInVault ||
-        userNft?.depositAmnt ||
-        BigNumber.from(0);
-
-      const debtOwed = row?.loan?.repayAmount || BigNumber.from(0);
-
-      const borrowApr = row.loan?.terms?.interestRate
-        ? row.loan?.terms?.interestRate.toNumber() / 10000
-        : 0;
-      const loanDuration = row.loan?.terms?.duration || 0;
-
-      // calculate net APY
-      let netApy = 0;
-      let borrowApy = 0;
-      if (loanDuration > 0) {
-        const m = YEAR_IN_SECONDS / loanDuration;
-        // eslint-disable-next-line no-restricted-properties
-        borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
-        const vaultApy = (vault?.apr || 0) / 100;
-
-        netApy = getNetApy(
-          getBalanceInEther(value),
-          vaultApy,
-          getBalanceInEther(debtOwed),
-          borrowApy
-        );
-      }
-
-      return {
-        owner: account,
-        amount: getBalanceInEther(value),
-        tokenId: row.tokenId,
-        tokenImg: getTokenImageFromReservoir(
-          PROLOGUE_NFT_ADDRESS,
-          Number(row.tokenId)
-        ),
-        isEscrowed: !!row?.loan?.loanId,
-        apy: netApy,
-      };
-    });
-
-    setMyNfts([...myNfts]);
-  };
-
   useEffect(() => {
     if (defaultNftId) {
       setSelectedNftId(defaultNftId);
@@ -158,28 +192,22 @@ export default function DepositModal({
   useEffect(() => {
     setTooltipVisible(false);
     setPositionSelected(isLeverageModal ? false : true);
-    setIsDeposit(true);
-    setLeverageTab(LeverageTab.Increase);
+    setIsDeposit(!isLeverageModal ? !isDeprecatedVault : false);
+    // setLeverageTab(LeverageTab.Increase);
   }, [open, isLeverageModal, vault, onClose]);
 
   useEffect(() => {
-    if (vault?.address) {
-      fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address, account]);
-
-  const reset = () => {
-    setPositionAmount("");
-    setLeverage(leverageTab === LeverageTab.Decrease ? 150 : 0);
-    setTargetLeverage("");
-    setPositionTxHash(undefined);
-    setPositionStatus(TxStatus.None);
-    setLeverageTxHash(undefined);
-    setLeverageStatus(TxStatus.None);
     setClosed(false);
     setFocused(false);
-  };
+  }, [positionAmount, leverage, targetLeverage]);
+
+  useEffect(() => {
+    setClosed(false);
+  }, [focused]);
+
+  useEffect(() => {
+    reset();
+  }, [isDeposit, positionSelected, leverageTab]);
 
   const onConfirmPosition = () => {
     if (positionStatus === TxStatus.None) {
@@ -193,16 +221,10 @@ export default function DepositModal({
     }
   };
 
-  const onConfirmLeverage = () => {
-    if (leverageStatus === TxStatus.None) {
-      setLeverageStatus(TxStatus.Pending);
-      setLeverageTxHash("0xabcdef");
-      setTimeout(() => {
-        setLeverageStatus(TxStatus.Finish);
-      }, 5000);
-    } else if (leverageStatus === TxStatus.Finish) {
-      reset();
-    }
+  const onConfirmLeverage = async () => {};
+
+  const onCloseRightModal = () => {
+    setClosed(true);
   };
 
   const showRightModal = useCallback(() => {
@@ -211,6 +233,8 @@ export default function DepositModal({
     if (positionSelected) {
       return positionAmount !== "";
     } else {
+      if (selectedNft && !selectedNft.isApproved) return true;
+
       return (
         leverageTab === LeverageTab.Refinance ||
         (leverageTab === LeverageTab.Decrease
@@ -229,21 +253,22 @@ export default function DepositModal({
     targetLeverage,
   ]);
 
-  useEffect(() => {
-    setClosed(false);
-    setFocused(false);
-  }, [positionAmount, leverage, targetLeverage]);
+  const handleHidePopup = () => {
+    setHiding(true);
+    setTimeout(() => {
+      setHiding(false);
+    }, 700);
+  };
 
-  useEffect(() => {
-    setClosed(false);
-  }, [focused]);
-
-  useEffect(() => {
-    reset();
-  }, [isDeposit, positionSelected, leverageTab]);
+  const onCloseModal = () => {
+    dispatch(setActionStatus(ActionStatus.Initial));
+    dispatch(setActionError(undefined));
+    dispatch(setPendingTxHash(""));
+    if (onClose) onClose();
+  };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onCloseModal}>
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
         <div className="flex flex-col gap-3 pt-10 h-full">
           <Card
@@ -255,11 +280,15 @@ export default function DepositModal({
             </h2>
             <div className="flex flex-col lg:flex-row gap-x-3 font-bold text-base text-orange-200 my-1 tracking-tight">
               <div className="flex gap-1 items-center">
-                <span className="drop-shadow-orange-200 leading-5">Ξ300.5</span>
+                <span className="drop-shadow-orange-200 leading-5">
+                  {`Ξ${(vault?.tvl || 0).toFixed(1)}`}
+                </span>
                 <span className="text-xs text-gray-200">TVL</span>
               </div>
               <div className="flex gap-1 items-center">
-                <span className="drop-shadow-orange-200 leading-5">12.00%</span>
+                <span className="drop-shadow-orange-200 leading-5">
+                  {`${(vault?.apy || 0).toFixed(2)}%`}
+                </span>
                 <span className="text-xs text-gray-200">APY</span>
               </div>
             </div>
@@ -489,43 +518,48 @@ export default function DepositModal({
                       disabled={leverageTab === LeverageTab.LeverUp}
                       onClick={() => setLeverageTab(LeverageTab.LeverUp)}
                     >
-                      <span className="text-xs">LEVER UP</span>
+                      <span className="text-xs">
+                        {selectedNft.isApproved ? "LEVER UP" : "APPROVE"}
+                      </span>
                     </Button>
                   </div>
                 )}
               </div>
-              <LeverageInput
-                tab={leverageTab}
-                leverage={leverage}
-                setLeverage={setLeverage}
-                targetLeverage={targetLeverage}
-                setTargetLeverage={setTargetLeverage}
-                txStatus={leverageStatus}
-                txHash={leverageTxHash}
-                onFocus={() => setFocused(true)}
-              />
+              {selectedNft && (
+                <LeverageInput
+                  nft={selectedNft}
+                  tab={leverageTab}
+                  leverage={leverage}
+                  setLeverage={setLeverage}
+                  targetLeverage={targetLeverage}
+                  setTargetLeverage={setTargetLeverage}
+                  onFocus={() => setFocused(true)}
+                />
+              )}
             </>
           )}
         </Card>
 
-        <ConfirmPopup
-          vault={vault}
-          positionSelected={positionSelected}
-          isDeposit={isDeposit}
-          positionStatus={positionStatus}
-          leverageTab={leverageTab}
-          leverageStatus={leverageStatus}
-          onLeverageMaxClicked={() => {
-            setLeverage(150);
-            setTargetLeverage("4");
-          }}
-          show={showRightModal()}
-          hiding={hiding}
-          onConfirm={() =>
-            positionSelected ? onConfirmPosition() : onConfirmLeverage()
-          }
-          onClose={() => setClosed(true)}
-        />
+        {selectedNft && (
+          <ConfirmPopup
+            nft={selectedNft}
+            vault={vault}
+            positionSelected={positionSelected}
+            isDeposit={isDeposit}
+            positionStatus={positionStatus}
+            leverageTab={leverageTab}
+            onLeverageMaxClicked={() => {
+              setLeverage(150);
+              setTargetLeverage("4");
+            }}
+            show={showRightModal()}
+            hiding={hiding}
+            onConfirm={() =>
+              positionSelected ? onConfirmPosition() : onConfirmLeverage()
+            }
+            onClose={onCloseRightModal}
+          />
+        )}
       </div>
     </Modal>
   );

@@ -1,13 +1,30 @@
-import { TxStatus } from "@/types/common";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { BigNumber, providers, utils } from "ethers";
+import { useWeb3React } from "@web3-react/core";
+
+import { ActionStatus } from "@/types/common";
 import { Button, Stats } from "../../common";
 import { LeverageTab } from "./LeverageInput";
-import { useEffect, useState } from "react";
+import { PrologueNftPortofolioInfo } from "@/types/nft";
+import { useSpiceLending } from "@/hooks/useSpiceLending";
+import { useAppSelector } from "@/state/hooks";
+import {
+  DEFAULT_AGGREGATOR_VAULT,
+  DEFAULT_LEND,
+} from "@/config/constants/vault";
+import { activeChainId } from "@/utils/web3";
+import { setActionStatus, setActionError } from "@/state/modal/modalSlice";
+import { getTransactionByHash } from "@/utils/tenderly";
+import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
+import { getWethAddress } from "@/utils/addressHelpers";
+import { getLoanTerms } from "@/utils/lend";
 
 interface Props {
-  txStatus: TxStatus;
+  isOpen: boolean;
+  nft: PrologueNftPortofolioInfo;
   tab: LeverageTab;
   hiding?: boolean;
-  onConfirm: () => void;
   onMaxClicked?: () => void;
 }
 
@@ -15,7 +32,37 @@ export default function LeverageConfirm(props: Props) {
   const [dots, setDots] = useState("");
   const [dotsTimer, setDotsTimer] = useState<NodeJS.Timer>();
   const [tab, setTab] = useState(LeverageTab.Increase);
-  const { txStatus, onConfirm, onMaxClicked } = props;
+
+  // contract call params
+  const [termsParam, setTermsParam] = useState<any>();
+  const [signatureParam, setSignatureParam] = useState<any>();
+
+  const { isOpen, nft, onMaxClicked } = props;
+
+  const dispatch = useDispatch();
+  const { account, library } = useWeb3React();
+  const { vaults, defaultVault } = useAppSelector((state) => state.vault);
+  const { pendingTxHash, actionStatus, actionError } = useAppSelector(
+    (state) => state.modal
+  );
+
+  const isApproved = nft.isApproved;
+
+  const {
+    onApprovePrologueNft,
+    onObtainLeverage,
+    onIncreaseLeverage,
+    onPartialDecreaseLeverage,
+    onDecreaseLeverage,
+  } = useSpiceLending(
+    nft?.lendAddr || DEFAULT_LEND[activeChainId],
+    defaultVault?.address || DEFAULT_AGGREGATOR_VAULT[activeChainId]
+  );
+
+  useEffect(() => {
+    setTermsParam(undefined);
+    setSignatureParam(undefined);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!props.hiding) {
@@ -29,7 +76,7 @@ export default function LeverageConfirm(props: Props) {
       setDotsTimer(undefined);
     }
 
-    if (txStatus === TxStatus.Pending) {
+    if (actionStatus === ActionStatus.Pending) {
       setDots("");
       setDotsTimer(
         setInterval(() => {
@@ -44,16 +91,194 @@ export default function LeverageConfirm(props: Props) {
         }, 1000)
       );
     }
-  }, [txStatus]);
+  }, [actionStatus]);
 
-  const processing = () => txStatus === TxStatus.Pending;
-  const confirmTitle = () => {
-    if (txStatus === TxStatus.Pending) {
-      return "WORKING";
-    } else if (txStatus === TxStatus.Finish) {
-      return "FINISH";
+  const processing = () => actionStatus === ActionStatus.Pending;
+
+  // handle approve nft
+  const handleApproveNft = async () => {
+    dispatch(setActionError(undefined));
+    dispatch(setActionStatus(ActionStatus.Pending));
+
+    try {
+      await onApprovePrologueNft(nft.tokenId);
+
+      dispatch(setActionStatus(ActionStatus.Initial));
+    } catch (err: any) {
+      dispatch(setActionStatus(ActionStatus.Failed));
+      if (err.code) {
+        dispatch(setActionError(err.code));
+      } else {
+        const failedReason = await getTransactionByHash(pendingTxHash);
+        dispatch(setActionError(failedReason));
+      }
+    }
+  };
+
+  // get leverage params from off-chain
+  // call backend spice pricing api
+  const getObtainLeverageParams = async () => {
+    dispatch(setActionError(undefined));
+    dispatch(setActionStatus(ActionStatus.Pending));
+
+    const targetAmount = 0.01;
+    try {
+      const terms = {
+        loanAmount: utils.parseEther(targetAmount.toString()).toString(),
+        duration: 14 * DAY_IN_SECONDS, // 14 days
+        collateralAddress:
+          defaultVault?.address || DEFAULT_AGGREGATOR_VAULT[activeChainId],
+        collateralId: nft.tokenId,
+        borrower: account,
+        currency: getWethAddress(),
+        additionalLoanAmount: 0,
+        additionalDuration: 0,
+      };
+
+      const domain = {
+        name: "Spice Finance",
+        version: "1",
+        chainId: activeChainId,
+      };
+
+      const LoanTermsRequestType = [
+        {
+          name: "loanAmount",
+          type: "uint256",
+        },
+        {
+          name: "duration",
+          type: "uint32",
+        },
+        {
+          name: "collateralAddress",
+          type: "address",
+        },
+        {
+          name: "collateralId",
+          type: "uint256",
+        },
+        {
+          name: "borrower",
+          type: "address",
+        },
+        {
+          name: "currency",
+          type: "address",
+        },
+        {
+          name: "additionalLoanAmount",
+          type: "uint256",
+        },
+        {
+          name: "additionalDuration",
+          type: "uint32",
+        },
+      ];
+
+      const types = {
+        LoanTerms: LoanTermsRequestType,
+      };
+
+      const provider = new providers.Web3Provider(library);
+      const signer = provider.getSigner();
+      // eslint-disable-next-line no-underscore-dangle
+      const signature = await signer._signTypedData(domain, types, terms);
+
+      // call backend api
+      const res = await getLoanTerms(
+        terms,
+        signature,
+        "initiate",
+        activeChainId
+      );
+
+      const loanterms = {
+        ...res.data.data.loanterms,
+        loanAmount: BigNumber.from(
+          res.data.data.loanterms.loanAmount.toString()
+        ),
+      };
+      delete loanterms.repayment;
+
+      setTimeout(() => {
+        setTermsParam(loanterms);
+        setSignatureParam(res.data.data.signature);
+
+        dispatch(setActionStatus(ActionStatus.Initial));
+      }, 2000);
+    } catch (err: any) {
+      dispatch(setActionStatus(ActionStatus.Failed));
+      dispatch(setActionError("Pricing API error"));
+    }
+  };
+
+  // obtain leverage logic by calling on-chain contract
+  const handleObtainLeverage = async () => {
+    dispatch(setActionError(undefined));
+    dispatch(setActionStatus(ActionStatus.Pending));
+
+    try {
+      await onObtainLeverage(termsParam, signatureParam);
+
+      setTimeout(() => {
+        dispatch(setActionStatus(ActionStatus.Success));
+      }, 5000);
+    } catch (err: any) {
+      dispatch(setActionStatus(ActionStatus.Failed));
+
+      if (err.code) {
+        dispatch(setActionError(err.code));
+      } else {
+        const failedReason = await getTransactionByHash(pendingTxHash);
+        dispatch(setActionError(failedReason));
+      }
+    }
+  };
+
+  // obtain leverage logic
+  const handleInitiateLoan = async () => {
+    if (termsParam && signatureParam) {
+      await handleObtainLeverage();
     } else {
-      return tab.toUpperCase();
+      await getObtainLeverageParams();
+    }
+  };
+
+  const onConfirm = async () => {
+    if (!nft) return;
+
+    if (tab === LeverageTab.LeverUp) {
+      // TODO: 1. implement obtain leverage logic
+      if (!nft.isApproved) {
+        await handleApproveNft();
+      } else {
+        if (actionStatus === ActionStatus.Success) {
+          // TODO: should implement close modal logic when tx is succeeded
+        }
+        await handleInitiateLoan();
+      }
+    }
+  };
+
+  const confirmTitle = () => {
+    if (actionStatus === ActionStatus.Pending) {
+      return "WORKING";
+    } else if (actionStatus === ActionStatus.Success) {
+      return "FINISH";
+    } else if (actionStatus === ActionStatus.Failed) {
+      return "RETRY";
+    } else {
+      // 1. show "APPROVE" when nft is not approved
+      if (!isApproved) {
+        return "APPROVE";
+      } else if (!termsParam && !signatureParam) {
+        // 2. show "ACCEPT" when nft is approved but we don't have terms and signature params
+        return "ACCEPT";
+      } else {
+        // 3. show "LEVER UP" when nft is approved and we have terms and signature params
+        return tab.toUpperCase();
+      }
     }
   };
 
@@ -128,7 +353,7 @@ export default function LeverageConfirm(props: Props) {
       >
         <span className="text-base">
           {confirmTitle()}
-          {txStatus === TxStatus.Pending ? dots : ""}
+          {actionStatus === ActionStatus.Pending ? dots : ""}
         </span>
       </Button>
     </div>

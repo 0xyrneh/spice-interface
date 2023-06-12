@@ -189,7 +189,7 @@ export default function VaultNfts({ vault, className }: Props) {
           <span className="font-medium text-white text-xs">Prologue NFT</span>
         </div>
         <div
-          className={`h-[calc(100%-38px)] flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto h-full ${
+          className={`h-[calc(100%-38px)] max-h-[calc(100%-38px)] flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto h-full ${
             account ? "-mr-2.5 pr-2" : ""
           } ${hoverNftList ? "custom-scroll" : "custom-scroll-transparent"}`}
           onMouseEnter={() => setHoverNftList(true)}
