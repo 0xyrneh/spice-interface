@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { BigNumber } from "ethers";
+import { BigNumber, utils } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 import moment from "moment-timezone";
 
@@ -424,8 +424,12 @@ export default function DepositModal({
 
   const onChangeAmount = (newAmount: string) => {
     if (!isValidNumber(newAmount)) return;
-    setPositionAmount(newAmount);
-    setAmountInWei(getBalanceInWei(Number(newAmount).toString() || "0"));
+    let newAmountInWei = getBalanceInWei(Number(newAmount).toString() || "0");
+    if (newAmountInWei.gt(getBalance())) {
+      newAmountInWei = getBalance();
+    }
+    setPositionAmount(newAmountInWei.eq(0) ? newAmount : utils.formatEther(newAmountInWei));
+    setAmountInWei(newAmountInWei);
   };
 
   const onClickMax = () => {
