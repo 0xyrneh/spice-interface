@@ -76,13 +76,16 @@ const getOptions = (
         minTicksLimit: 7,
         padding: 10,
         callback: function (value: any, index: number, ticks: any) {
-          console.log(value);
-          console.log(moment(data[0].x).unix());
-          if (index === 0 && value === moment(data[0].x).unix() * 1000) {
+          if (
+            index === 0 &&
+            data.length > 0 &&
+            value === moment(data[0].x).unix() * 1000
+          ) {
             return "";
           }
           if (
             index === ticks.length - 1 &&
+            data.length > 0 &&
             value === moment(data[data.length - 1].x).unix() * 1000
           ) {
             return "";
