@@ -54,4 +54,7 @@ export interface PrologueNftPortofolioInfo {
   healthFactor?: number;
   debtOwed?: BigNumber;
   autoRenew?: number;
+  loan?: any;
+  value: BigNumber;
+  loanAmount: BigNumber;
 }
