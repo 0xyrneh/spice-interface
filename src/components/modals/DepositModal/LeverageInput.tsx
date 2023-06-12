@@ -37,6 +37,7 @@ type Props = {
   onFocus?: () => void;
   onBlur?: () => void;
   updateLoanLender: (val: string) => void;
+  getAmountFromSliderStep: (val: number) => number;
 };
 
 const leverages = [0, 30, 60, 90, 120, 150];
@@ -59,14 +60,18 @@ export default function LeverageInput({
   updateLoanLender,
   onFocus,
   onBlur,
+  getAmountFromSliderStep,
 }: Props) {
   const { pendingTxHash, actionStatus, actionError } = useAppSelector(
     (state) => state.modal
   );
-  const { vaults } = useAppSelector((state) => state.vault);
+  const { vaults, leverageVaults } = useAppSelector((state) => state.vault);
   const { data: lendData } = useAppSelector((state) => state.lend);
 
-  const loanLenderVault = vaults.find((row: any) => row.address === loanLender);
+  const loanLenderVault =
+    tab === LeverageTab.LeverUp
+      ? leverageVaults.find((row: any) => !row.deprecated)
+      : vaults.find((row: any) => row.address === loanLender);
   const currentLend = lendData.find(
     (row: any) => row.address === nft?.lendAddr
   );
@@ -112,29 +117,19 @@ export default function LeverageInput({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loanId]);
 
-  const getAmount = (step: number) => {
-    if (tab === LeverageTab.Increase) {
-      return loanValue + (step / 100) * Math.max(0, maxLeverage - loanValue);
-    }
-    return (step / 100) * maxRepayment;
-  };
-
   const processing = () => actionStatus === ActionStatus.Pending;
 
   // change slider input
-  const onChangeTerms = (val: any) => {
-    // if (status === "Confirming") return;
+  const onChangeTerms = (step: number) => {
     if (tab === LeverageTab.Increase && maxLeverage === 0) return;
     if (tab === LeverageTab.Decrease && maxRepayment === 0) return;
 
-    onSetSliderStep(val);
-    onSetTargetAmount(getAmount(val).toFixed(4));
+    onSetSliderStep(step);
+    onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
   };
 
   // change input
   const onChangeTargetAmount = (e: any) => {
-    if (status === "Confirming") return;
-
     if (Number(e.target.value) >= 0) {
       const sliderMax =
         tab === LeverageTab.Increase ? maxLeverage : maxRepayment;
@@ -145,6 +140,16 @@ export default function LeverageInput({
         onSetTargetAmount(Number(sliderMax).toFixed(4));
         onSetSliderStep(100);
         return;
+      }
+
+      if (tab === LeverageTab.LeverUp) {
+        if (e.target.value > maxLeverage) {
+          onSetTargetAmount(Number(maxLeverage).toFixed(4));
+          onSetSliderStep(100);
+        } else {
+          onSetTargetAmount(e.target.value);
+          onSetSliderStep((100 * Number(e.target.value)) / maxLeverage);
+        }
       }
 
       if (tab === LeverageTab.Increase) {
@@ -208,7 +213,7 @@ export default function LeverageInput({
       );
     }
 
-    if (tab === LeverageTab.Increase) {
+    if (tab === LeverageTab.Increase || tab === LeverageTab.LeverUp) {
       return (
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col mx-2.5 text-gray-200 gap-1 text-xs max-w-[324px] w-full gap-3">
