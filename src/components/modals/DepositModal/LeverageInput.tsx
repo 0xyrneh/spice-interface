@@ -9,6 +9,8 @@ import { getExpolorerUrl, shortenTxHash } from "@/utils/string";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { getLenderByLoanId } from "@/state/lend/fetchGlobalLend";
+import { calculateBorrowApr, getNetApy } from "@/utils/apy";
+import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
 
 export enum LeverageTab {
   LeverUp = "Lever Up",
@@ -65,13 +67,15 @@ export default function LeverageInput({
   const { pendingTxHash, actionStatus, actionError } = useAppSelector(
     (state) => state.modal
   );
-  const { vaults, leverageVaults } = useAppSelector((state) => state.vault);
+  const { defaultVault, leverageVaults } = useAppSelector(
+    (state) => state.vault
+  );
   const { data: lendData } = useAppSelector((state) => state.lend);
 
   const loanLenderVault =
     tab === LeverageTab.LeverUp
       ? leverageVaults.find((row: any) => !row.deprecated)
-      : vaults.find((row: any) => row.address === loanLender);
+      : leverageVaults.find((row: any) => row.address === loanLender);
   const currentLend = lendData.find(
     (row: any) => row.address === nft?.lendAddr
   );
@@ -118,6 +122,31 @@ export default function LeverageInput({
   }, [loanId]);
 
   const processing = () => actionStatus === ActionStatus.Pending;
+
+  const getRefinanceApr = () => {
+    if (!loanLenderVault) return 0;
+
+    const additionalDebt =
+      tab === LeverageTab.Increase
+        ? getAmountFromSliderStep(sliderStep) - loanValue
+        : getAmountFromSliderStep(sliderStep);
+    const total = getBalanceInEther(
+      loanLenderVault?.totalAssets || BigNumber.from(0)
+    );
+    const available = getBalanceInEther(
+      loanLenderVault?.wethBalance || BigNumber.from(0)
+    );
+    const duration = (nft?.loan?.terms.duration || 0) / DAY_IN_SECONDS;
+    const ltv =
+      originMaxLtv > 1
+        ? getAmountFromSliderStep(sliderStep) /
+          (collateralValue + additionalDebt)
+        : getAmountFromSliderStep(sliderStep) / collateralValue;
+
+    return (
+      100 * calculateBorrowApr(ltv, additionalDebt, total, available, duration)
+    );
+  };
 
   // change slider input
   const onChangeTerms = (step: number) => {
@@ -206,7 +235,9 @@ export default function LeverageInput({
       return (
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">
-            <span className="text-2xl">5.09%</span>
+            <span className="text-2xl">
+              {`${getRefinanceApr().toFixed(2)}%`}
+            </span>
             <span className="text-xs">New Borrow APR</span>
           </div>
         </div>
@@ -385,6 +416,14 @@ export default function LeverageInput({
                   2
                 )}`}
               </span>
+            )}
+          </>
+        )}
+
+        {tab === LeverageTab.Refinance && (
+          <>
+            {actionError && (
+              <span className="text-red">{`ERROR: ${actionError}`}</span>
             )}
           </>
         )}
