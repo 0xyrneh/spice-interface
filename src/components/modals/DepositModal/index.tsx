@@ -395,6 +395,7 @@ export default function DepositModal({
   };
 
   const getBorrowApr = () => {
+    if (leverageTab === LeverageTab.LeverUp) return 0;
     if (leverageTab === LeverageTab.Decrease)
       return 100 * (selectedNft?.borrowApr || 0);
     return getRefinanceApr();
