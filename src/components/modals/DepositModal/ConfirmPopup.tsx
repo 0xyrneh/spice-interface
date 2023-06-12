@@ -1,20 +1,29 @@
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+
 import { LeverageTab } from "./LeverageInput";
 import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
-import { TxStatus } from "@/types/common";
+import { TxStatus, ActionStatus } from "@/types/common";
 import { VaultInfo } from "@/types/vault";
+import { PrologueNftPortofolioInfo } from "@/types/nft";
+import { useAppSelector } from "@/state/hooks";
 import PositionConfirm from "./PositionConfirm";
 import LeverageConfirm from "./LeverageConfirm";
 import { Card } from "../../common";
+import {
+  setActionStatus,
+  setActionError,
+  setPendingTxHash,
+} from "@/state/modal/modalSlice";
 
 interface Props {
+  nft: PrologueNftPortofolioInfo;
   vault: VaultInfo;
   positionSelected: boolean;
   isDeposit: boolean;
   positionStatus: TxStatus;
 
   leverageTab: LeverageTab;
-  leverageStatus: TxStatus;
   show: boolean;
   hiding: boolean;
   onConfirm: () => void;
@@ -22,13 +31,13 @@ interface Props {
   onLeverageMaxClicked: () => void;
 }
 
-export default function DepositModal(props: Props) {
+export default function ConfirmPopup(props: Props) {
   const {
+    nft,
     vault,
     isDeposit,
     positionStatus,
     leverageTab,
-    leverageStatus,
     onLeverageMaxClicked,
     onConfirm,
     show,
@@ -37,17 +46,26 @@ export default function DepositModal(props: Props) {
 
   const [positionSelected, setPositionSelected] = useState(false);
 
+  const dispatch = useDispatch();
+  const { actionStatus } = useAppSelector((state) => state.modal);
+
   useEffect(() => {
     if (!props.hiding) {
       setPositionSelected(props.positionSelected);
     }
   }, [props.hiding, props.positionSelected]);
 
+  useEffect(() => {
+    dispatch(setActionStatus(ActionStatus.Initial));
+    dispatch(setActionError(undefined));
+    dispatch(setPendingTxHash(""));
+  }, [show]);
+
   const processing = () => {
     if (positionSelected) {
-      return positionStatus === TxStatus.Pending;
+      return actionStatus === ActionStatus.Pending;
     } else {
-      return leverageStatus === TxStatus.Pending;
+      return actionStatus === ActionStatus.Pending;
     }
   };
 
@@ -70,7 +88,7 @@ export default function DepositModal(props: Props) {
           <ArrowLeftSVG />
           Back
         </button>
-        {positionSelected ? (
+        {positionSelected && nft.isApproved ? (
           <PositionConfirm
             isDeposit={isDeposit}
             txStatus={positionStatus}
@@ -79,8 +97,8 @@ export default function DepositModal(props: Props) {
           />
         ) : (
           <LeverageConfirm
-            txStatus={leverageStatus}
-            onConfirm={onConfirm}
+            nft={nft}
+            isOpen={show}
             tab={leverageTab}
             onMaxClicked={onLeverageMaxClicked}
             hiding={props.hiding}

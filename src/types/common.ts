@@ -47,3 +47,10 @@ export enum TxStatus {
   Pending,
   Finish,
 }
+
+export enum ActionStatus {
+  Initial,
+  Pending,
+  Success,
+  Failed,
+}

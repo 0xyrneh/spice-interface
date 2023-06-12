@@ -4,6 +4,7 @@ import { setupListeners } from "@reduxjs/toolkit/query/react";
 import vault from "./vault/vaultSlice";
 import lend from "./lend/lendSlice";
 import nft from "./nft/nftSlice";
+import modal from "./modal/modalSlice";
 
 const customizedMiddleware = getDefaultMiddleware({
   serializableCheck: false,
@@ -14,6 +15,7 @@ export const store = configureStore({
     vault,
     lend,
     nft,
+    modal,
   },
   middleware: customizedMiddleware,
   devTools: process.env.NODE_ENV !== "production",

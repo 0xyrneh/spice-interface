@@ -1,6 +1,9 @@
-import { TxStatus } from "@/types/common";
+import { ActionStatus } from "@/types/common";
 import { Slider } from "../../common";
 import LeverageSVG from "@/assets/icons/leverage.svg";
+import { useAppSelector } from "@/state/hooks";
+import { getExpolorerUrl, shortenTxHash } from "@/utils/string";
+import { PrologueNftPortofolioInfo } from "@/types/nft";
 
 export enum LeverageTab {
   LeverUp = "Lever Up",
@@ -10,11 +13,10 @@ export enum LeverageTab {
 }
 
 type Props = {
+  nft: PrologueNftPortofolioInfo;
   tab: LeverageTab;
   leverage: number;
   targetLeverage: string;
-  txStatus: TxStatus;
-  txHash?: string;
   setLeverage: (leverage: number) => void;
   setTargetLeverage: (value: string) => void;
   onFocus?: () => void;
@@ -25,17 +27,20 @@ const leverages = [0, 30, 60, 90, 120, 150];
 const decreaseLeverage = [150, 120, 90, 60, 30, 0];
 
 export default function LeverageInput({
+  nft,
   tab,
   leverage,
   targetLeverage,
-  txHash,
-  txStatus,
   setLeverage,
   setTargetLeverage,
   onFocus,
   onBlur,
 }: Props) {
-  const processing = () => txStatus === TxStatus.Pending;
+  const { pendingTxHash, actionStatus, actionError } = useAppSelector(
+    (state) => state.modal
+  );
+
+  const processing = () => actionStatus === ActionStatus.Pending;
 
   const leverageUpdateText = () => {
     // const _targetLev = targetLeverage === "" ? "0.00" : targetLeverage;
@@ -50,8 +55,25 @@ export default function LeverageInput({
     }
   };
 
-  return (
-    <div className="flex flex-col px-2 pb-3 flex-1">
+  const renderApproveRequireContent = () => {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-col text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-3 px-3 mx-auto gap-5">
+          <span className="text-xs">
+            {`To interact with Prologue Leverage, you must first approve the Spice
+            Protocol’s request to escrow your NFT.`}
+          </span>
+          <span className="text-xs">
+            {` Hit “Approve” to begin the
+            process.`}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderInputContent = () => {
+    return (
       <div className="flex flex-1 items-center justify-center">
         {tab === LeverageTab.Refinance ? (
           <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">
@@ -130,21 +152,39 @@ export default function LeverageInput({
           </div>
         )}
       </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col px-2 pb-3 flex-1">
+      {/* body content */}
+      <>
+        {!nft.isApproved ? renderApproveRequireContent() : renderInputContent()}
+      </>
+
+      {/* footer content */}
       <div className="flex justify-between text-gray-200 text-xs">
-        <span className={`${txHash ? "opacity-100" : "opacity-0"}`}>
-          Tx Hash:{" "}
-          {txHash && (
+        <span className={`${pendingTxHash ? "opacity-100" : "opacity-0"}`}>
+          {` Tx Hash: `}
+          {pendingTxHash && (
             <a
               className="underline"
-              href="https://etherscan.io"
-              target="__blank"
+              href={getExpolorerUrl(pendingTxHash)}
+              rel="noopener noreferrer"
+              target="_blank"
             >
-              {txHash}
+              {shortenTxHash(pendingTxHash, 4)}
             </a>
           )}
         </span>
         {(tab === LeverageTab.Increase || tab === LeverageTab.LeverUp) && (
-          <span>Leverage Vault Liquid Balance: Ξ300</span>
+          <>
+            {actionError ? (
+              <span className="text-red">{`ERROR: ${actionError}`}</span>
+            ) : (
+              <span>Leverage Vault Liquid Balance: Ξ300</span>
+            )}
+          </>
         )}
       </div>
     </div>
