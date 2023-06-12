@@ -55,6 +55,10 @@ export default function DepositModal({
   const [tooltipHover, setTooltipHover] = useState(false);
   const [hiding, setHiding] = useState(false);
 
+  // slider handling
+  const [sliderStep, setSliderStep] = useState<number>(0);
+  const [targetAmount, setTargetAmount] = useState<string>("");
+
   const dispatch = useDispatch();
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
@@ -133,6 +137,7 @@ export default function DepositModal({
         leveragedApy,
         borrowApy,
         debtOwed,
+        loan: row.loan,
 
         owner: account,
         amount: getBalanceInEther(value),
@@ -162,6 +167,8 @@ export default function DepositModal({
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
+    setTargetAmount("");
+    setSliderStep(0);
 
     if (!selectedNft || (selectedNft && !selectedNft.isEscrowed)) {
       if (leverageTab == LeverageTab.LeverUp) return;
@@ -178,7 +185,7 @@ export default function DepositModal({
 
       setLeverageTab(LeverageTab.Increase);
     }
-  }, [selectedNft]);
+  }, [selectedNftId]);
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
@@ -239,9 +246,9 @@ export default function DepositModal({
       return (
         leverageTab === LeverageTab.Refinance ||
         (leverageTab === LeverageTab.Decrease
-          ? leverage < 150
-          : leverage > 0) ||
-        targetLeverage !== ""
+          ? sliderStep < 150
+          : sliderStep > 0) ||
+        targetAmount !== ""
       );
     }
   }, [
@@ -250,8 +257,8 @@ export default function DepositModal({
     positionSelected,
     positionAmount,
     leverageTab,
-    leverage,
-    targetLeverage,
+    sliderStep,
+    targetAmount,
   ]);
 
   const handleHidePopup = () => {
@@ -266,6 +273,16 @@ export default function DepositModal({
     dispatch(setActionError(undefined));
     dispatch(setPendingTxHash(""));
     if (onClose) onClose();
+  };
+
+  // slider input handling
+  const onSetSliderStep = (val: any) => {
+    setSliderStep(val);
+  };
+
+  //  input handling
+  const onSetTargetAmount = (val: any) => {
+    setTargetAmount(val);
   };
 
   return (
@@ -535,6 +552,10 @@ export default function DepositModal({
                   targetLeverage={targetLeverage}
                   setTargetLeverage={setTargetLeverage}
                   onFocus={() => setFocused(true)}
+                  sliderStep={sliderStep}
+                  targetAmount={targetAmount}
+                  onSetSliderStep={onSetSliderStep}
+                  onSetTargetAmount={onSetTargetAmount}
                 />
               )}
             </>
@@ -545,6 +566,7 @@ export default function DepositModal({
           <ConfirmPopup
             nft={selectedNft}
             vault={vault}
+            targetAmount={targetAmount}
             positionSelected={positionSelected}
             isDeposit={isDeposit}
             positionStatus={positionStatus}

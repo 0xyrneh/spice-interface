@@ -181,7 +181,7 @@ export default function PrologueNftCard({
               <br />
               {`Net APY: `}
               <br className={expanded ? "lg:hidden" : "2xl:hidden"} />
-              {`${(activeNft?.apy || 0).toFixed(2)}%`}
+              {`${(100 * (activeNft?.apy || 0)).toFixed(2)}%`}
             </span>
           )}
         </div>

@@ -19,6 +19,7 @@ import {
 interface Props {
   nft: PrologueNftPortofolioInfo;
   vault: VaultInfo;
+  targetAmount: string;
   positionSelected: boolean;
   isDeposit: boolean;
   positionStatus: TxStatus;
@@ -35,6 +36,7 @@ export default function ConfirmPopup(props: Props) {
   const {
     nft,
     vault,
+    targetAmount,
     isDeposit,
     positionStatus,
     leverageTab,
@@ -98,10 +100,12 @@ export default function ConfirmPopup(props: Props) {
         ) : (
           <LeverageConfirm
             nft={nft}
+            targetAmount={targetAmount}
             isOpen={show}
             tab={leverageTab}
             onMaxClicked={onLeverageMaxClicked}
             hiding={props.hiding}
+            onClose={onClose}
           />
         )}
       </Card>

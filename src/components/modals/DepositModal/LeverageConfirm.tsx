@@ -25,9 +25,11 @@ import { formatLeverageMaturity } from "@/utils/time";
 interface Props {
   isOpen: boolean;
   nft: PrologueNftPortofolioInfo;
+  targetAmount: string;
   tab: LeverageTab;
   hiding?: boolean;
   onMaxClicked?: () => void;
+  onClose: () => void;
 }
 
 export default function LeverageConfirm(props: Props) {
@@ -39,7 +41,7 @@ export default function LeverageConfirm(props: Props) {
   const [termsParam, setTermsParam] = useState<any>();
   const [signatureParam, setSignatureParam] = useState<any>();
 
-  const { isOpen, nft, onMaxClicked } = props;
+  const { isOpen, nft, targetAmount, onMaxClicked, onClose } = props;
 
   const dispatch = useDispatch();
   const { account, library } = useWeb3React();
@@ -48,6 +50,8 @@ export default function LeverageConfirm(props: Props) {
     (state) => state.modal
   );
 
+  const { loanId, repayAmount, balance } = nft.loan;
+  const loanValue = getBalanceInEther(balance || BigNumber.from(0));
   const isApproved = nft.isApproved;
 
   const {
@@ -215,6 +219,104 @@ export default function LeverageConfirm(props: Props) {
     }
   };
 
+  // get leverage params from off-chain
+  // call backend spice pricing api
+  const getIncreaseLeverageParams = async (additionalAmount: string) => {
+    dispatch(setActionError(undefined));
+    dispatch(setActionStatus(ActionStatus.Pending));
+
+    try {
+      const terms = {
+        loanAmount: nft.loanAmount.toString(),
+        duration: 14 * DAY_IN_SECONDS, // 14 days
+        collateralAddress:
+          defaultVault?.address || DEFAULT_AGGREGATOR_VAULT[activeChainId],
+        collateralId: nft.tokenId,
+        borrower: account,
+        currency: getWethAddress(),
+        additionalLoanAmount: additionalAmount,
+        additionalDuration: 0,
+      };
+
+      const domain = {
+        name: "Spice Finance",
+        version: "1",
+        chainId: activeChainId,
+      };
+
+      const LoanTermsRequestType = [
+        {
+          name: "loanAmount",
+          type: "uint256",
+        },
+        {
+          name: "duration",
+          type: "uint32",
+        },
+        {
+          name: "collateralAddress",
+          type: "address",
+        },
+        {
+          name: "collateralId",
+          type: "uint256",
+        },
+        {
+          name: "borrower",
+          type: "address",
+        },
+        {
+          name: "currency",
+          type: "address",
+        },
+        {
+          name: "additionalLoanAmount",
+          type: "uint256",
+        },
+        {
+          name: "additionalDuration",
+          type: "uint32",
+        },
+      ];
+
+      const types = {
+        LoanTerms: LoanTermsRequestType,
+      };
+
+      const provider = new providers.Web3Provider(library);
+      const signer = provider.getSigner();
+      // eslint-disable-next-line no-underscore-dangle
+      const signature = await signer._signTypedData(domain, types, terms);
+
+      // Call backend api
+      const res = await getLoanTerms(
+        terms,
+        signature,
+        additionalAmount === "0" ? "extend" : "increase",
+        activeChainId,
+        loanId
+      );
+
+      const loanterms = {
+        ...res.data.data.loanterms,
+        loanAmount: BigNumber.from(
+          res.data.data.loanterms.loanAmount.toString()
+        ),
+      };
+      delete loanterms.repayment;
+
+      setTimeout(() => {
+        setTermsParam(loanterms);
+        setSignatureParam(res.data.data.signature);
+
+        dispatch(setActionStatus(ActionStatus.Initial));
+      }, 2000);
+    } catch (err: any) {
+      dispatch(setActionStatus(ActionStatus.Failed));
+      dispatch(setActionError("Pricing API error"));
+    }
+  };
+
   // obtain leverage logic by calling on-chain contract
   const handleObtainLeverage = async () => {
     dispatch(setActionError(undefined));
@@ -225,7 +327,34 @@ export default function LeverageConfirm(props: Props) {
 
       setTimeout(() => {
         dispatch(setActionStatus(ActionStatus.Success));
+        dispatch(setActionError(undefined));
       }, 5000);
+    } catch (err: any) {
+      dispatch(setActionStatus(ActionStatus.Failed));
+
+      if (err.code) {
+        dispatch(setActionError(err.code));
+      } else {
+        const failedReason = await getTransactionByHash(pendingTxHash);
+        dispatch(setActionError(failedReason));
+      }
+    }
+  };
+
+  // obtain leverage logic by calling on-chain contract
+  const handleIncreaseLeverage = async () => {
+    if (!loanId) return;
+
+    dispatch(setActionError(undefined));
+    dispatch(setActionStatus(ActionStatus.Pending));
+
+    try {
+      await onIncreaseLeverage(loanId, termsParam, signatureParam);
+
+      setTimeout(() => {
+        dispatch(setActionStatus(ActionStatus.Success));
+        dispatch(setActionError(undefined));
+      }, 4000);
     } catch (err: any) {
       dispatch(setActionStatus(ActionStatus.Failed));
 
@@ -247,19 +376,52 @@ export default function LeverageConfirm(props: Props) {
     }
   };
 
+  // increase loan logic
+  const handleIncreaseLoan = async (additionalAmount: string) => {
+    if (termsParam && signatureParam) {
+      await handleIncreaseLeverage();
+    } else {
+      await getIncreaseLeverageParams(additionalAmount);
+    }
+  };
+
   const onConfirm = async () => {
     if (!nft) return;
 
+    // 1. implement obtain leverage logic
     if (tab === LeverageTab.LeverUp) {
-      // TODO: 1. implement obtain leverage logic
       if (!nft.isApproved) {
         await handleApproveNft();
       } else {
         if (actionStatus === ActionStatus.Success) {
-          // TODO: should implement close modal logic when tx is succeeded
+          onClose();
+          return;
+        } else {
+          await handleInitiateLoan();
         }
-        await handleInitiateLoan();
       }
+    }
+
+    // 2. implement increase leverage logic
+    if (tab === LeverageTab.Increase) {
+      if (actionStatus === ActionStatus.Success) {
+        onClose();
+        return;
+      } else {
+        const additionalAmount = utils
+          .parseEther((Number(targetAmount) - loanValue).toFixed(18))
+          .toString();
+        await handleIncreaseLoan(additionalAmount);
+      }
+    }
+
+    // 3. implement decrease leverage logic
+    if (tab === LeverageTab.Decrease) {
+    }
+
+    // 4. implement refinance leverage logic
+    if (tab === LeverageTab.Refinance) {
+      await handleIncreaseLoan("0");
     }
   };
 
