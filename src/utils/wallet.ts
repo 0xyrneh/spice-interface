@@ -6,7 +6,7 @@ export const setupNetwork = async (): Promise<boolean> => {
   const provider = (window as any).ethereum;
 
   if (provider) {
-    const chainId = parseInt(process.env.REACT_APP_CHAIN_ID || "1", 10);
+    const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "1", 10);
 
     if (chainId === 5) {
       try {
