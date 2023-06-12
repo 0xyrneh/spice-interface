@@ -165,19 +165,19 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
             <div className="hidden 2xl:flex items-center gap-1">
               <span>1W Est. Points:</span>
               <span className="text-white">
-                {`${(annualEstYield / 52).toFixed(2)}`}
+                {`${(annualEstYield / 52).toFixed(2)} `} SPB
               </span>
             </div>
             <div className="flex items-center gap-1">
               <span>1M Est. Points:</span>
               <span className="text-white">
-                {`${(annualEstYield / 12).toFixed(2)}`}
+                {`${(annualEstYield / 12).toFixed(2)} `} SPB
               </span>
             </div>
             <div className="flex items-center gap-1">
               <span>1Y Est. Points:</span>
               <span className="text-white">
-                {`${annualEstYield.toFixed(2)}`}
+                {`${annualEstYield.toFixed(2)} `} SPB
               </span>
             </div>
           </div>
