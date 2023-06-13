@@ -219,12 +219,9 @@ export default function DepositModal({
     setSliderStep(0);
 
     if (!selectedNft || (selectedNft && !selectedNft.isEscrowed)) {
-      if (selectedNft && !selectedNft.loan.balance) {
-        setPositionSelected(true);
-      }
-      if (leverageTab !== LeverageTab.LeverUp) {
-        setLeverageTab(LeverageTab.LeverUp);
-      }
+      if (leverageTab === LeverageTab.LeverUp) return;
+      setLeverageTab(LeverageTab.LeverUp);
+    } else if (selectedNft && !selectedNft.loan.balance) {
     } else {
       if (
         [
