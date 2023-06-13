@@ -109,7 +109,9 @@ export default function LeverageInput({
   };
 
   useEffect(() => {
+    // increase slider
     if (!maxLeverage) return;
+
     let increaseTicks: number[] = [];
     for (let index = 0; index <= 5; index++) {
       increaseTicks = [
@@ -120,6 +122,20 @@ export default function LeverageInput({
     }
     setIncreaseLeverageTicks([...increaseTicks]);
   }, [maxLeverage, loanValue]);
+
+  useEffect(() => {
+    // decrease slider
+    if (!maxRepayment) return;
+
+    let decreaseTicks: number[] = [];
+    for (let index = 0; index <= 5; index++) {
+      decreaseTicks = [
+        ...decreaseTicks,
+        index * ((maxLtv * maxRepayment) / maxLeverage / 5) * maxLtv,
+      ];
+    }
+    setDecreaseLeverageTicks([...decreaseTicks.reverse()]);
+  }, [maxRepayment]);
 
   useEffect(() => {
     if (loanId > 0) {
@@ -225,6 +241,12 @@ export default function LeverageInput({
       onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
     }
     if (tab === LeverageTab.Decrease) {
+      const step =
+        ((decreaseLeverageTicks[0] - val) /
+          (decreaseLeverageTicks[0] - decreaseLeverageTicks[5])) *
+        100;
+      onSetSliderStep(step);
+      onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
     }
   };
 
@@ -379,7 +401,7 @@ export default function LeverageInput({
             />
             <div className="relative flex justify-between mt-1.5 mx-5">
               {(tab === LeverageTab.Decrease
-                ? decreaseLeverage
+                ? decreaseLeverageTicks
                 : increaseLeverageTicks
               ).map((item, idx) => (
                 <button
@@ -410,7 +432,7 @@ export default function LeverageInput({
                   }}
                   onClick={() => onChangeLeverageTick(item)}
                 >
-                  {`${item.toFixed(0)}%`}
+                  {`${(100 * item).toFixed(0)}%`}
                 </button>
               ))}
             </div>
