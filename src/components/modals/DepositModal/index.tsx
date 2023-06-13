@@ -760,6 +760,7 @@ export default function DepositModal({
             nft={selectedNft}
             vault={vault}
             netApy={calculateNetApy()}
+            sliderStep={sliderStep}
             targetAmount={getAmountFromSliderStep(sliderStep).toString()}
             positionSelected={positionSelected}
             isDeposit={isDeposit}
