@@ -110,7 +110,7 @@ export default function LeverageConfirm(props: Props) {
     try {
       await onApprovePrologueNft(nft.tokenId);
 
-      dispatch(setActionStatus(ActionStatus.Initial));
+      dispatch(setActionStatus(ActionStatus.Success));
     } catch (err: any) {
       dispatch(setActionStatus(ActionStatus.Failed));
       if (err.code) {
