@@ -254,7 +254,7 @@ export default function DepositModal({
     }
 
     if (leverageTab === LeverageTab.Increase) {
-      return loanValue + (step / 100) * Math.max(0, maxLeverage - loanValue);
+      return (step / 100) * Math.max(0, maxLeverage - loanValue);
     }
     return (step / 100) * maxRepayment;
   };
@@ -367,7 +367,8 @@ export default function DepositModal({
               else if (selectedNft) {
                 if (selectedNft.lendAddr) {
                   await onLendingDeposit(selectedNft.loan.loanId, amountInWei);
-                } else await onNftVaultDeposit(selectedNft.tokenId, amountInWei);
+                } else
+                  await onNftVaultDeposit(selectedNft.tokenId, amountInWei);
               }
               setPositionStatus(TxStatus.Finish);
             }
@@ -449,10 +450,7 @@ export default function DepositModal({
   const getAdditionalAmnout = () => {
     if (leverageTab === "Refinance") return 0;
     if (leverageTab === LeverageTab.Increase) {
-      if (!selectedNft) return 0;
-      const { balance } = selectedNft.loan;
-      const loanValue = getBalanceInEther(balance || BigNumber.from(0));
-      return getAmountFromSliderStep(sliderStep) - loanValue;
+      return getAmountFromSliderStep(sliderStep);
     }
     return getAmountFromSliderStep(sliderStep);
   };
@@ -468,12 +466,9 @@ export default function DepositModal({
       if (leverageTab === LeverageTab.Renew) return true;
       if (leverageTab === LeverageTab.Increase) {
         if (!selectedNft) return false;
-        const { balance } = selectedNft.loan;
-        const loanValue = getBalanceInEther(balance || BigNumber.from(0));
 
         return (
-          getAmountFromSliderStep(sliderStep) > loanValue &&
-          getAdditionalAmnout() > 0
+          getAmountFromSliderStep(sliderStep) > 0 && getAdditionalAmnout() > 0
         );
       }
 

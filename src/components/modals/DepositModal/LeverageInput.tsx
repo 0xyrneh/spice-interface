@@ -170,7 +170,7 @@ export default function LeverageInput({
   const onChangeTargetAmount = (e: any) => {
     if (Number(e.target.value) >= 0) {
       const sliderMax =
-        tab === LeverageTab.Increase ? maxLeverage : maxRepayment;
+        tab === LeverageTab.Increase ? maxLeverage - loanValue : maxRepayment;
       if (sliderMax === 0) return;
 
       // when the amount is greater than max leverage
@@ -181,27 +181,23 @@ export default function LeverageInput({
       }
 
       if (tab === LeverageTab.LeverUp) {
-        if (e.target.value > maxLeverage) {
-          onSetTargetAmount(Number(maxLeverage).toFixed(4));
+        if (e.target.value > sliderMax) {
+          onSetTargetAmount(Number(sliderMax).toFixed(4));
           onSetSliderStep(100);
         } else {
           onSetTargetAmount(e.target.value);
-          onSetSliderStep((100 * Number(e.target.value)) / maxLeverage);
+          onSetSliderStep((100 * Number(e.target.value)) / sliderMax);
         }
       }
 
       if (tab === LeverageTab.Increase) {
-        // when the amount is smaller than repay value
-        if (Number(e.target.value) < loanValue) {
+        if (e.target.value > sliderMax) {
+          onSetTargetAmount(Number(sliderMax).toFixed(4));
+          onSetSliderStep(100);
+        } else {
           onSetTargetAmount(e.target.value);
-          onSetSliderStep(0);
-          return;
+          onSetSliderStep((100 * Number(e.target.value)) / sliderMax);
         }
-        onSetTargetAmount(e.target.value);
-        onSetSliderStep(
-          (100 * (Number(e.target.value) - loanValue)) /
-            (maxLeverage - loanValue)
-        );
       } else {
         onSetTargetAmount(e.target.value);
         onSetSliderStep((100 * Number(e.target.value)) / sliderMax);
@@ -273,9 +269,9 @@ export default function LeverageInput({
               <div className="flex flex-col items-end">
                 <span>{`Max Increase: `}</span>
                 <span>
-                  {`Ξ${maxLeverage.toFixed(4)} to ${(100 * maxLtv).toFixed(
-                    2
-                  )}% LTV`}
+                  {`Ξ${(maxLeverage - loanValue).toFixed(4)} to ${(
+                    100 * maxLtv
+                  ).toFixed(2)}% LTV`}
                 </span>
               </div>
             </div>
