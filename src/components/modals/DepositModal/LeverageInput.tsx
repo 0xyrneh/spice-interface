@@ -31,6 +31,7 @@ type Props = {
   setTargetLeverage: (value: string) => void;
 
   // new
+  requireApprove?: boolean;
   sliderStep: number;
   targetAmount: string;
   loanLender: string;
@@ -53,6 +54,7 @@ export default function LeverageInput({
   leverage,
   setLeverage,
   // new
+  requireApprove,
   sliderStep,
   targetAmount,
   loanLender,
@@ -400,7 +402,7 @@ export default function LeverageInput({
     <div className="flex flex-col px-2 pb-3 flex-1">
       {/* body content */}
       <>
-        {!nft.isApproved ? renderApproveRequireContent() : renderInputContent()}
+        {requireApprove ? renderApproveRequireContent() : renderInputContent()}
       </>
 
       {/* footer content */}
