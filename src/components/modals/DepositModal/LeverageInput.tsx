@@ -23,14 +23,6 @@ export enum LeverageTab {
 type Props = {
   nft: PrologueNftPortofolioInfo;
   tab: LeverageTab;
-
-  // old
-  leverage: number;
-  targetLeverage: string;
-  setLeverage: (leverage: number) => void;
-  setTargetLeverage: (value: string) => void;
-
-  // new
   requireApprove?: boolean;
   sliderStep: number;
   targetAmount: string;
@@ -44,16 +36,12 @@ type Props = {
   getAmountFromSliderStep: (val: number) => number;
 };
 
-const leverages = [0, 30, 60, 90, 120, 150];
+const increaseLeverageTicks = [0, 30, 60, 90, 120, 150];
 const decreaseLeverage = [150, 120, 90, 60, 30, 0];
 
 export default function LeverageInput({
   nft,
   tab,
-  // old
-  leverage,
-  setLeverage,
-  // new
   requireApprove,
   sliderStep,
   targetAmount,
@@ -65,12 +53,17 @@ export default function LeverageInput({
   onBlur,
   getAmountFromSliderStep,
 }: Props) {
+  const [leverage, setLeverage] = useState<number>();
+  const [increaseLeverageTicks, setIncreaseLeverageTicks] = useState<number[]>(
+    []
+  );
+  const [decreaseLeverageTicks, setDecreaseLeverageTicks] = useState<number[]>(
+    []
+  );
   const { pendingTxHash, actionStatus, actionError } = useAppSelector(
     (state) => state.modal
   );
-  const { defaultVault, leverageVaults } = useAppSelector(
-    (state) => state.vault
-  );
+  const { leverageVaults } = useAppSelector((state) => state.vault);
   const { data: lendData } = useAppSelector((state) => state.lend);
 
   const loanLenderVault =
@@ -114,6 +107,19 @@ export default function LeverageInput({
       updateLoanLender(loanLenderAddr);
     }
   };
+
+  useEffect(() => {
+    if (!maxLeverage) return;
+    let increaseTicks: number[] = [];
+    for (let index = 0; index <= 5; index++) {
+      increaseTicks = [
+        ...increaseTicks,
+        ((loanValue + (index * (maxLeverage - loanValue)) / 5) / maxLeverage) *
+          maxLtv,
+      ];
+    }
+    setIncreaseLeverageTicks([...increaseTicks]);
+  }, [maxLeverage, loanValue]);
 
   useEffect(() => {
     if (loanId > 0) {
@@ -205,6 +211,23 @@ export default function LeverageInput({
     }
   };
 
+  const onChangeLeverageTick = (val: number) => {
+    setLeverage(val);
+
+    if (tab === LeverageTab.LeverUp) {
+    }
+    if (tab === LeverageTab.Increase) {
+      const step =
+        ((val - increaseLeverageTicks[0]) /
+          (increaseLeverageTicks[5] - increaseLeverageTicks[0])) *
+        100;
+      onSetSliderStep(step);
+      onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
+    }
+    if (tab === LeverageTab.Decrease) {
+    }
+  };
+
   const renderApproveRequireContent = () => {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -285,11 +308,11 @@ export default function LeverageInput({
                 onChange={onChangeTerms}
               />
               <div className="relative flex justify-between mt-1.5 mx-5">
-                {leverages.map((item, idx) => (
+                {increaseLeverageTicks.map((item, idx) => (
                   <button
                     key={`leverage-${item}`}
                     className={`absolute ${
-                      idx > 0 && idx < leverages.length - 1
+                      idx > 0 && idx < increaseLeverageTicks.length - 1
                         ? "-translate-x-2/4"
                         : ""
                     } ${
@@ -303,14 +326,18 @@ export default function LeverageInput({
                       left:
                         idx === 0
                           ? "-20px"
-                          : idx === leverages.length - 1
+                          : idx === increaseLeverageTicks.length - 1
                           ? undefined
-                          : (100 * idx) / (leverages.length - 1) + "%",
-                      right: idx === leverages.length - 1 ? "-20px" : undefined,
+                          : (100 * idx) / (increaseLeverageTicks.length - 1) +
+                            "%",
+                      right:
+                        idx === increaseLeverageTicks.length - 1
+                          ? "-20px"
+                          : undefined,
                     }}
-                    onClick={() => setLeverage(item)}
+                    onClick={() => onChangeLeverageTick(item)}
                   >
-                    {item}%
+                    {`${(100 * item).toFixed(0)}%`}
                   </button>
                 ))}
               </div>
@@ -349,21 +376,16 @@ export default function LeverageInput({
               step={10}
               value={sliderStep}
               onChange={onChangeTerms}
-              // value={tab === LeverageTab.Decrease ? leverage * -1 : leverage}
-              // min={tab === LeverageTab.Decrease ? -150 : 0}
-              // max={tab === LeverageTab.Decrease ? 0 : 150}
-              // step={30}
-              // onChange={(_val) => setLeverage(Math.abs(_val))}
             />
             <div className="relative flex justify-between mt-1.5 mx-5">
               {(tab === LeverageTab.Decrease
                 ? decreaseLeverage
-                : leverages
+                : increaseLeverageTicks
               ).map((item, idx) => (
                 <button
                   key={`leverage-${item}`}
                   className={`absolute ${
-                    idx > 0 && idx < leverages.length - 1
+                    idx > 0 && idx < increaseLeverageTicks.length - 1
                       ? "-translate-x-2/4"
                       : ""
                   } ${
@@ -377,14 +399,18 @@ export default function LeverageInput({
                     left:
                       idx === 0
                         ? "-20px"
-                        : idx === leverages.length - 1
+                        : idx === increaseLeverageTicks.length - 1
                         ? undefined
-                        : (100 * idx) / (leverages.length - 1) + "%",
-                    right: idx === leverages.length - 1 ? "-20px" : undefined,
+                        : (100 * idx) / (increaseLeverageTicks.length - 1) +
+                          "%",
+                    right:
+                      idx === increaseLeverageTicks.length - 1
+                        ? "-20px"
+                        : undefined,
                   }}
-                  onClick={() => setLeverage(item)}
+                  onClick={() => onChangeLeverageTick(item)}
                 >
-                  {item}%
+                  {`${item.toFixed(0)}%`}
                 </button>
               ))}
             </div>
