@@ -454,7 +454,7 @@ export default function LeverageConfirm(props: Props) {
   const autoRenew = nft?.autoRenew || 0;
 
   return (
-    <div className="flex flex-col flex-1 justify-between">
+    <div className="flex flex-col flex-1 justify-between w-[160px]">
       <h2
         className={`font-base ${
           processing() ? "text-gray-200" : "text-white"
