@@ -126,7 +126,9 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
         )}
         <PositionSVG />
         <h2 className="font-bold text-white font-sm">
-          {vault
+          {!showPosition
+            ? "ASSETS PER VAULT SHARE"
+            : vault
             ? `YOUR ${(vault?.readable || "").toUpperCase()} ${
                 vault?.deprecated ? "[WITHDRAW ONLY]" : ""
               } POSITION`
@@ -231,7 +233,7 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
           <LineChart
             data={getChartData()}
             period={selectedPeriod}
-            yPrefix={vault && !showPosition ? "" : "Ξ"}
+            yPrefix={!showPosition ? "" : "Ξ"}
           />
         </div>
         <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
