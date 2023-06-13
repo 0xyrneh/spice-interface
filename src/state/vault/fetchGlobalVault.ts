@@ -21,6 +21,14 @@ import { VAULT_DESCRIPTIONS, VAULT_REQUIREMENTS } from "@/constants/vaults";
 
 const apiEnv = activeChainId === 1 ? "prod" : "goerli";
 
+const getVaultHistoricalApy = (vaultInfo: VaultInfo) => {
+  const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
+  return (
+    (activeChainId === 1 ? 1 : 100) *
+    (vaultInfo?.okrs ? vaultInfo?.okrs[aprField] : 0)
+  );
+};
+
 // fetch onchain/offchain data of active vaults
 export const fetchActiveVaults = async (vaults: any[]) => {
   let vaultsWithDetails = (
@@ -107,6 +115,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           maxSupply: row?.fungible ? 0 : onChainInfo[i][3][0].toNumber(),
           apr: 100 * (row?.okrs?.expected_return || 0),
           apy: 100 * (row?.okrs?.expected_return || 0),
+          historicalApy: getVaultHistoricalApy(row),
           name: getVaultDisplayName(row?.name),
           logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated),
           backgroundImage: getVaultBackgroundImage(
@@ -131,6 +140,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
         totalSupply: 0,
         apr: 100 * (row?.okrs?.expected_return || 0),
         apy: 100 * (row?.okrs?.expected_return || 0),
+        historicalApy: getVaultHistoricalApy(row),
         name: getVaultDisplayName(row?.name),
         logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated),
         backgroundImage: getVaultBackgroundImage(
