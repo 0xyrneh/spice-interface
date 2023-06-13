@@ -173,8 +173,8 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
             <div className="flex items-center gap-1">
               <span>1M Est. Points:</span>
               <span className="text-white">
-                {(blurChartInfo?.monthPoints
-                  ? blurChartInfo?.monthPoints.toFixed(2)
+                {(blurChartInfo?.weekPoints
+                  ? ((blurChartInfo?.weekPoints * 30) / 7).toFixed(2)
                   : undefined) ?? "-"}{" "}
                 SPB
               </span>
@@ -182,8 +182,8 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
             <div className="flex items-center gap-1">
               <span>1Y Est. Points:</span>
               <span className="text-white">
-                {(blurChartInfo?.monthPoints
-                  ? (blurChartInfo?.monthPoints * 12).toFixed(2)
+                {(blurChartInfo?.weekPoints
+                  ? (blurChartInfo?.weekPoints * 52).toFixed(2)
                   : undefined) ?? "-"}{" "}
                 SPB
               </span>

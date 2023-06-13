@@ -277,8 +277,9 @@ export default function DepositModal({
     setSliderStep(0);
 
     if (!selectedNft || (selectedNft && !selectedNft.isEscrowed)) {
-      if (leverageTab == LeverageTab.LeverUp) return;
+      if (leverageTab === LeverageTab.LeverUp) return;
       setLeverageTab(LeverageTab.LeverUp);
+    } else if (selectedNft && !selectedNft.loan.balance) {
     } else {
       if (
         [
@@ -299,14 +300,15 @@ export default function DepositModal({
 
   useEffect(() => {
     if (!open) return;
-    if (selectedNftId) return;
 
     if (defaultNftId) {
       setSelectedNftId(defaultNftId);
     } else {
-      setSelectedNftId(myNfts[0]?.tokenId);
+      if (myNfts.length > 0) {
+        setSelectedNftId(myNfts[0].tokenId);
+      }
     }
-  }, [open, myNfts]);
+  }, [open, defaultNftId, myNfts.length]);
 
   useEffect(() => {
     setTooltipVisible(false);
@@ -534,6 +536,8 @@ export default function DepositModal({
       (row: any) => row.address === selectedNft?.lendAddr
     );
     if (!loanLenderVault) return 0;
+    if (!selectedNft.loan.balance) return 0;
+
     const { balance } = selectedNft.loan;
     const collateralValue = getBalanceInEther(selectedNft.value);
     const loanValue = getBalanceInEther(balance || BigNumber.from(0));
