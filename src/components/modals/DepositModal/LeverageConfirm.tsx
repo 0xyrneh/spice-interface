@@ -453,7 +453,7 @@ export default function LeverageConfirm(props: Props) {
     // 2. implement increase leverage logic
     if (tab === LeverageTab.Increase) {
       const additionalAmount = utils
-        .parseEther((Number(targetAmount) - loanValue).toFixed(18))
+        .parseEther(Number(targetAmount).toFixed(18))
         .toString();
       await handleIncreaseLoan(additionalAmount);
     }
