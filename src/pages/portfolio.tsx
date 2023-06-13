@@ -18,10 +18,11 @@ import { useAppSelector } from "@/state/hooks";
 import { VaultInfo, ReceiptToken } from "@/types/vault";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { activeChainId } from "@/utils/web3";
-import { getNftPortfolios } from "@/utils/nft";
+import { getNftPortfolios, getTokenImageFromReservoir } from "@/utils/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { accLoans } from "@/utils/lend";
 import { VaultPositionGraph } from "@/components/vaults";
+import { PROLOGUE_NFT_ADDRESS } from "@/config/constants";
 
 export default function Portfolio() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
@@ -29,6 +30,17 @@ export default function Portfolio() {
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
+
+  const accountImage = () => {
+    if (loans.length === 0) {
+      return "/assets/images/vaultIcon.svg";
+    } else {
+      return getTokenImageFromReservoir(
+        PROLOGUE_NFT_ADDRESS,
+        Number(loans[0].tokenId)
+      );
+    }
+  };
 
   const vaults = vaultsOrigin
     .map((row: VaultInfo) => {
@@ -87,7 +99,7 @@ export default function Portfolio() {
             <div className="flex items-center gap-5 flex-1">
               <Image
                 className="border-1 border-gray-200 rounded-full"
-                src="/assets/images/vaultIcon.svg"
+                src={accountImage()}
                 width={40}
                 height={40}
                 alt=""

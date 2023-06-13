@@ -5,6 +5,10 @@ import { useWeb3React } from "@web3-react/core";
 import { checkIfBlocked } from "@/utils";
 import { Button } from "@/components/common";
 import { useUI } from "@/hooks";
+import { useAppSelector } from "@/state/hooks";
+import { accLoans } from "@/utils/lend";
+import { getTokenImageFromReservoir } from "@/utils/nft";
+import { PROLOGUE_NFT_ADDRESS } from "@/config/constants";
 
 type Props = {
   isHeader?: boolean;
@@ -16,10 +20,23 @@ const ConnectWallet = ({ isHeader }: Props) => {
   const { showConnectModal, showDisconnectModal } = useUI();
 
   const { account } = useWeb3React();
+  const { data: lendData } = useAppSelector((state) => state.lend);
+  const loans = accLoans(lendData);
 
   useEffect(() => {
     checkIfBlocked().then(setBlockedRegion);
   }, []);
+
+  const accountImage = () => {
+    if (loans.length === 0) {
+      return "/assets/images/vaultIcon.svg";
+    } else {
+      return getTokenImageFromReservoir(
+        PROLOGUE_NFT_ADDRESS,
+        Number(loans[0].tokenId)
+      );
+    }
+  };
 
   const handleMouseEnter = () => {
     if (!blockedRegion) return;
@@ -50,7 +67,7 @@ const ConnectWallet = ({ isHeader }: Props) => {
         >
           <Image
             className="border-1 border-orange-200 rounded-full drop-shadow-orange-200"
-            src="/assets/images/vaultIcon.svg"
+            src={accountImage()}
             width={28}
             height={28}
             alt=""
