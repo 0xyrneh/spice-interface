@@ -32,6 +32,7 @@ import { calculateBorrowApr, getNetApy } from "@/utils/apy";
 
 interface Props extends ModalProps {
   vault: VaultInfo;
+  vaultId: number;
   defaultNftId?: number;
   isLeverageModal?: boolean;
 }
@@ -40,7 +41,8 @@ export default function DepositModal({
   open,
   defaultNftId,
   isLeverageModal,
-  vault,
+  vaultId,
+  // vault,
   onClose,
 }: Props) {
   const [positionSelected, setPositionSelected] = useState(true);
@@ -69,6 +71,17 @@ export default function DepositModal({
   const [loanLender, setLoanLender] = useState<string>("");
   const [sliderStep, setSliderStep] = useState<number>(0);
   const [targetAmount, setTargetAmount] = useState<string>("");
+  const { defaultVault, vaults, leverageVaults } = useAppSelector(
+    (state) => state.vault
+  );
+
+  const [vault, setVault] = useState(
+    vaults.find((item) => item.id === vaultId)!
+  );
+
+  useEffect(() => {
+    setVault(vaults.find((item) => item.id === vaultId)!);
+  }, [vaults, vaultId]);
 
   const dispatch = useAppDispatch();
   const { account } = useWeb3React();
@@ -77,9 +90,6 @@ export default function DepositModal({
   const isFungible = vault?.fungible;
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { pendingTxHash } = useAppSelector((state) => state.modal);
-  const { defaultVault, vaults, leverageVaults } = useAppSelector(
-    (state) => state.vault
-  );
   const { ethPrice } = useAppSelector((state) => state.oracle);
 
   const {
@@ -367,7 +377,8 @@ export default function DepositModal({
               else if (selectedNft) {
                 if (selectedNft.lendAddr) {
                   await onLendingDeposit(selectedNft.loan.loanId, amountInWei);
-                } else await onNftVaultDeposit(selectedNft.tokenId, amountInWei);
+                } else
+                  await onNftVaultDeposit(selectedNft.tokenId, amountInWei);
               }
               setPositionStatus(TxStatus.Finish);
             }

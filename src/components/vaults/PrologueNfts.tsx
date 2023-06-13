@@ -136,7 +136,7 @@ export default function PrologueNfts({
         .sort((a, b) => (a.apy <= b.apy ? 1 : -1))
         .sort((a, b) => {
           if (a.isEscrowed || b.isEscrowed) return 0;
-          return a.amount.gte(b.amount) ? 1 : -1;
+          return BigNumber.from(a.amount).gte(b.amount) ? 1 : -1;
         });
     }
     // show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)

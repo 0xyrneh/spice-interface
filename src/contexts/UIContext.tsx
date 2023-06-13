@@ -107,6 +107,7 @@ const UIProvider = ({ children }: Props) => {
           isLeverageModal={isLeverageModalOpened}
           onClose={closeDepositModal}
           vault={activeVault}
+          vaultId={activeVault.id}
         />
       )}
       <ConnectModal
