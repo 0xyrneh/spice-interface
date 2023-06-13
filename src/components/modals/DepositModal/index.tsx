@@ -143,7 +143,7 @@ export default function DepositModal({
         borrowApy,
         debtOwed,
         loan: row.loan,
-        isRenewAvailable,
+        isRenewAvailable: !!isRenewAvailable,
 
         owner: account,
         amount: getBalanceInEther(value),
