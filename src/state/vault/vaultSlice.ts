@@ -9,6 +9,7 @@ interface WalletConnectState {
   defaultVault: VaultInfo | null;
   activeVault: VaultInfo | null;
   leverageVaults: LeverageVaultInfo[];
+  blurVaults: VaultInfo[];
   vaults: VaultInfo[];
 }
 
@@ -16,6 +17,7 @@ const initialState: WalletConnectState = {
   defaultVault: null,
   activeVault: null,
   leverageVaults: [],
+  blurVaults: [],
   vaults: [],
 };
 
@@ -25,6 +27,7 @@ export const vaultSlice = createSlice({
   reducers: {
     reset: (state) => {
       state.leverageVaults = [];
+      state.blurVaults = [];
       state.vaults = [];
       state.activeVault = null;
     },
@@ -34,6 +37,7 @@ export const vaultSlice = createSlice({
         userInfo: state.defaultVault?.userInfo || {},
       };
       state.leverageVaults = action.payload.leverageVaults;
+      state.vaults = action.payload.vaults;
       state.vaults = action.payload.vaults.map((row: VaultInfo, i: number) => ({
         ...row,
         userInfo: state.vaults[i]?.userInfo || {},
@@ -155,12 +159,14 @@ export const {
 } = vaultSlice.actions;
 
 export const fetchVaultGlobalDataAsync = () => async (dispatch: any) => {
-  const { defaultVault, leverageVaults, vaults } = await fetchGlobalData();
+  const { defaultVault, leverageVaults, blurVaults, vaults } =
+    await fetchGlobalData();
 
   dispatch(
     setVaultGlobalData({
       defaultVault,
       leverageVaults,
+      blurVaults,
       vaults,
     })
   );
