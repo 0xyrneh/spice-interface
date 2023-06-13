@@ -48,7 +48,6 @@ export default function DepositModal({
   const [positionAmount, setPositionAmount] = useState("");
   const [amountInWei, setAmountInWei] = useState<BigNumber>(BigNumber.from(0));
   const [isDeposit, setIsDeposit] = useState(false);
-  const [leverage, setLeverage] = useState(0);
   const [targetLeverage, setTargetLeverage] = useState("");
   const [useWeth, setUseWeth] = useState(true);
   const [positionStatus, setPositionStatus] = useState(TxStatus.None);
@@ -261,7 +260,6 @@ export default function DepositModal({
 
   const reset = () => {
     setPositionAmount("");
-    setLeverage(leverageTab === LeverageTab.Decrease ? 150 : 0);
     setTargetLeverage("");
     setClosed(true);
     setTimeout(() => {
@@ -330,7 +328,7 @@ export default function DepositModal({
   useEffect(() => {
     setClosed(false);
     setFocused(false);
-  }, [positionAmount, leverage, targetLeverage]);
+  }, [positionAmount, targetLeverage]);
 
   useEffect(() => {
     setClosed(false);
@@ -912,10 +910,6 @@ export default function DepositModal({
                 <LeverageInput
                   nft={selectedNft}
                   tab={leverageTab}
-                  leverage={leverage}
-                  setLeverage={setLeverage}
-                  targetLeverage={targetLeverage}
-                  setTargetLeverage={setTargetLeverage}
                   requireApprove={leverageApproveRequired}
                   onFocus={() => setFocused(true)}
                   sliderStep={sliderStep}
@@ -955,10 +949,7 @@ export default function DepositModal({
           isApprove={isApprove()}
           positionStatus={positionStatus}
           leverageTab={leverageTab}
-          onLeverageMaxClicked={() => {
-            setLeverage(150);
-            setTargetLeverage("4");
-          }}
+          onLeverageMaxClicked={() => {}}
           show={showRightModal()}
           hiding={hiding}
           onConfirm={() =>
