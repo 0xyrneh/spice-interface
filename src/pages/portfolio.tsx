@@ -98,7 +98,7 @@ export default function Portfolio() {
           <Card className="py-3 !flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-5 flex-1">
               <Image
-                className="border-1 border-gray-200 rounded-full"
+                className="border-1 border-orange-200 rounded-full drop-shadow-orange-200"
                 src={accountImage()}
                 width={40}
                 height={40}
