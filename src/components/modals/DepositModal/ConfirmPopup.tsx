@@ -35,6 +35,8 @@ interface Props {
   onConfirm: () => void;
   onClose: () => void;
   onLeverageMaxClicked: () => void;
+  onSetSliderStep: (step: number) => void;
+  onSetTargetAmount: (value: string) => void;
 }
 
 export default function ConfirmPopup(props: Props) {
@@ -55,6 +57,8 @@ export default function ConfirmPopup(props: Props) {
     onConfirm,
     show,
     onClose,
+    onSetSliderStep,
+    onSetTargetAmount,
   } = props;
 
   const [positionSelected, setPositionSelected] = useState(false);
@@ -124,8 +128,12 @@ export default function ConfirmPopup(props: Props) {
             onMaxClicked={onLeverageMaxClicked}
             hiding={props.hiding}
             onClose={onClose}
+            onSetSliderStep={onSetSliderStep}
+            onSetTargetAmount={onSetTargetAmount}
           />
-        ) : false}
+        ) : (
+          false
+        )}
       </Card>
     </div>
   );

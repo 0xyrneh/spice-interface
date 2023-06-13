@@ -956,6 +956,8 @@ export default function DepositModal({
             positionSelected ? onConfirmPosition() : onConfirmLeverage()
           }
           onClose={onCloseRightModal}
+          onSetSliderStep={onSetSliderStep}
+          onSetTargetAmount={onSetTargetAmount}
         />
       </div>
     </Modal>

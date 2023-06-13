@@ -10,7 +10,7 @@ import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { getLenderByLoanId } from "@/state/lend/fetchGlobalLend";
 import { calculateBorrowApr, getNetApy } from "@/utils/apy";
-import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
+import { DAY_IN_SECONDS } from "@/config/constants/time";
 
 export enum LeverageTab {
   LeverUp = "Lever Up",
@@ -27,7 +27,7 @@ type Props = {
   sliderStep: number;
   targetAmount: string;
   loanLender: string;
-  onSetSliderStep: (leverage: number) => void;
+  onSetSliderStep: (step: number) => void;
   onSetTargetAmount: (value: string) => void;
 
   onFocus?: () => void;
@@ -35,9 +35,6 @@ type Props = {
   updateLoanLender: (val: string) => void;
   getAmountFromSliderStep: (val: number) => number;
 };
-
-const increaseLeverageTicks = [0, 30, 60, 90, 120, 150];
-const decreaseLeverage = [150, 120, 90, 60, 30, 0];
 
 export default function LeverageInput({
   nft,
@@ -309,6 +306,7 @@ export default function LeverageInput({
                   type="number"
                   onFocus={onFocus}
                   onBlur={onBlur}
+                  disabled={processing()}
                 />
               </div>
               <div className="flex flex-col items-end">
