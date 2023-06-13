@@ -40,7 +40,7 @@ export interface PrologueNftInfo {
 
 export interface PrologueNftPortofolioInfo {
   owner: string;
-  amount: number;
+  amount: BigNumber;
   tokenId: number;
   tokenImg: string;
   isEscrowed?: boolean;

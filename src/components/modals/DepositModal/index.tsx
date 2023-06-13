@@ -440,7 +440,7 @@ export default function DepositModal({
   const isApprove = () => {
     if (!isDeposit) return false;
     if (!useWeth) return false;
-    return amountInWei.gt(vault.userInfo.allowance);
+    return amountInWei.gt(vault.userInfo.allowance || BigNumber.from("0"));
   };
 
   const getPositionBalance = () => {

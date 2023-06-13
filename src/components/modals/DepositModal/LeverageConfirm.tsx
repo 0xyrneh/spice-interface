@@ -446,7 +446,7 @@ export default function LeverageConfirm(props: Props) {
     }
   };
 
-  const nftValue = nft?.amount || 0;
+  const nftValue = nft?.amount || BigNumber.from("0");
   // const netApy = nft?.netApy || 0;
   const debtOwed = getBalanceInEther(nft?.debtOwed || BigNumber.from(0));
   const borrowApy = nft?.borrowApy || 0;
@@ -467,7 +467,7 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="NFT Value"
-          value={`Ξ${nftValue.toFixed(2)}`}
+          value={`Ξ${getBalanceInEther(nftValue).toFixed(2)}`}
           size="xs"
         />
         <Stats
