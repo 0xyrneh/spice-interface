@@ -232,6 +232,12 @@ export default function LeverageInput({
     setLeverage(val);
 
     if (tab === LeverageTab.LeverUp) {
+      const step =
+        ((val - increaseLeverageTicks[0]) /
+          (increaseLeverageTicks[5] - increaseLeverageTicks[0])) *
+        100;
+      onSetSliderStep(step);
+      onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
     }
     if (tab === LeverageTab.Increase) {
       const step =
