@@ -7,11 +7,13 @@ import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "../Modal";
 import { useVault } from "@/hooks/useVault";
 import { useNftVault } from "@/hooks/useNftVault";
+import { useSpiceLending } from "@/hooks/useSpiceLending";
 import { useEthBalance } from "@/hooks/useEthBalance";
 import { TxStatus, ActionStatus } from "@/types/common";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { fetchVaultUserDataAsync } from "@/state/actions";
+import { fetchUserWethData } from "@/state/lend/fetchUserLend";
 import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import { isValidNumber } from "@/utils/regex";
@@ -57,6 +59,7 @@ export default function DepositModal({
   const [leverageHover, setLeverageHover] = useState(false);
   const [tooltipHover, setTooltipHover] = useState(false);
   const [hiding, setHiding] = useState(false);
+  const [allowance, setAllowance] = useState(BigNumber.from("0"));
   // position details
   const [oldPosition, setOldPosition] = useState("");
   const [positionChange, setPositionChange] = useState("");
@@ -183,6 +186,29 @@ export default function DepositModal({
 
   const myNfts = getNftPortfolios();
   const selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
+
+  const {
+    onApproveWeth,
+    onLendingDeposit,
+    onLendingDepositETH,
+    onLendingWithdraw,
+    onLendingWithdrawETH,
+  } = useSpiceLending(selectedNft?.lendAddr, vault.address);
+
+  const updateAllowance = async () => {
+    if (!account) return;
+
+    let _allowance = vault.userInfo.allowance;
+    if (selectedNft?.lendAddr) {
+      const res = await fetchUserWethData(account, selectedNft?.lendAddr);
+      _allowance = res.allowance;
+    }
+    setAllowance(_allowance);
+  };
+
+  useEffect(() => {
+    updateAllowance();
+  }, [account, vault.userInfo.allowance, selectedNft?.lendAddr]);
 
   const updateLoanLender = (val: string) => {
     setLoanLender(val);
@@ -318,19 +344,27 @@ export default function DepositModal({
         if (isDeposit) {
           if (useWeth) {
             if (isApprove()) {
-              await (isFungible ? onVaultApprove : onNftVaultApprove)();
+              await (isFungible
+                ? onVaultApprove
+                : selectedNft?.lendAddr
+                ? onApproveWeth
+                : onNftVaultApprove)();
               setPositionStatus(TxStatus.None);
             } else {
               if (isFungible) await onVaultDeposit(amountInWei);
               else if (selectedNft) {
-                await onNftVaultDeposit(selectedNft.tokenId, amountInWei);
+                if (selectedNft.lendAddr) {
+                  await onLendingDeposit(selectedNft.loan.loanId, amountInWei);
+                } else await onNftVaultDeposit(selectedNft.tokenId, amountInWei);
               }
               setPositionStatus(TxStatus.Finish);
             }
           } else {
             if (isFungible) await onVaultDepositETH(amountInWei);
             else if (selectedNft) {
-              await onNftVaultDepositETH(selectedNft.tokenId, amountInWei);
+              if (selectedNft.lendAddr)
+                await onLendingDepositETH(selectedNft.loan.loanId, amountInWei);
+              else await onNftVaultDepositETH(selectedNft.tokenId, amountInWei);
             }
             setPositionStatus(TxStatus.Finish);
           }
@@ -338,10 +372,17 @@ export default function DepositModal({
           if (isFungible) {
             await (useWeth ? onVaultWithdraw : onVaultWithdrawETH)(amountInWei);
           } else if (selectedNft) {
-            await (useWeth ? onNftVaultWithdraw : onNftVaultWithdrawETH)(
-              selectedNft.tokenId,
-              amountInWei
-            );
+            if (selectedNft.lendAddr) {
+              await (useWeth ? onLendingWithdraw : onLendingWithdrawETH)(
+                selectedNft.loan.loanId,
+                amountInWei
+              );
+            } else {
+              await (useWeth ? onNftVaultWithdraw : onNftVaultWithdrawETH)(
+                selectedNft.tokenId,
+                amountInWei
+              );
+            }
           }
           setPositionStatus(TxStatus.Finish);
         }
@@ -440,7 +481,7 @@ export default function DepositModal({
   const isApprove = () => {
     if (!isDeposit) return false;
     if (!useWeth) return false;
-    return amountInWei.gt(vault.userInfo.allowance || BigNumber.from("0"));
+    return amountInWei.gt(allowance || BigNumber.from("0"));
   };
 
   const getPositionBalance = () => {
