@@ -1,13 +1,15 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { fetchETHPrice } from "./fetchPrice";
 
-const initialState = {
+const initialState: {
+  ethPrice: number;
+} = {
   ethPrice: 0,
 };
 
 export const oracleSlice = createSlice({
-  name: 'application',
+  name: "oracle",
   initialState,
   reducers: {
     setETHPrice: (state, action: PayloadAction<number>) => {
@@ -16,14 +18,12 @@ export const oracleSlice = createSlice({
   },
 });
 
-export const {
-  setETHPrice,
-} = oracleSlice.actions;
+export const { setETHPrice } = oracleSlice.actions;
 
 export const fetchETHPriceAsync = () => async (dispatch: any) => {
   const ethPrice = await fetchETHPrice();
 
   dispatch(setETHPrice(ethPrice));
-}
+};
 
 export default oracleSlice.reducer;

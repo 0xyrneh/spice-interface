@@ -119,8 +119,8 @@ export default function DepositModal({
       const healthFactor =
         getBalanceInEther(debtOwed) > 0 && getBalanceInEther(value) > 0
           ? ((lendGlobalData?.liquidationRatio || 0) *
-            getBalanceInEther(value)) /
-          getBalanceInEther(debtOwed)
+              getBalanceInEther(value)) /
+            getBalanceInEther(debtOwed)
           : 0;
 
       const borrowApr = row.loan?.terms?.interestRate
@@ -131,8 +131,8 @@ export default function DepositModal({
       const autoRenew =
         startedAt && loanDuration
           ? moment((startedAt + loanDuration) * 1000)
-            .subtract(14, "days")
-            .valueOf() / 1000
+              .subtract(14, "days")
+              .valueOf() / 1000
           : 0;
       // calculate net APY
       let netApy = 0;
@@ -232,11 +232,15 @@ export default function DepositModal({
     setPositionAmount("");
     setLeverage(leverageTab === LeverageTab.Decrease ? 150 : 0);
     setTargetLeverage("");
-    setPositionStatus(TxStatus.None);
-    setOldPosition("");
-    setPositionChange("");
-    setNewPosition("");
-    setClosed(false);
+    setClosed(true);
+    setTimeout(() => {
+      console.log("===> reset position details");
+      setClosed(false);
+      setPositionStatus(TxStatus.None);
+      setOldPosition("");
+      setPositionChange("");
+      setNewPosition("");
+    }, 500);
     setFocused(false);
     setTargetAmount("");
     setSliderStep(0);
@@ -349,7 +353,7 @@ export default function DepositModal({
     }
   };
 
-  const onConfirmLeverage = async () => { };
+  const onConfirmLeverage = async () => {};
 
   const onCloseRightModal = () => {
     setClosed(true);
@@ -470,7 +474,7 @@ export default function DepositModal({
 
   const onClickMax = () => {
     onChangeAmount("9999999999");
-  }
+  };
 
   const getRefinanceApr = () => {
     if (!selectedNft) return 0;
@@ -500,7 +504,7 @@ export default function DepositModal({
     const ltv =
       originMaxLtv > 1
         ? getAmountFromSliderStep(sliderStep) /
-        (collateralValue + additionalDebt)
+          (collateralValue + additionalDebt)
         : getAmountFromSliderStep(sliderStep) / collateralValue;
     return (
       100 * calculateBorrowApr(ltv, additionalDebt, total, available, duration)
@@ -597,11 +601,13 @@ export default function DepositModal({
         >
           <div className="flex items-center border-b-1 border-gray-200 h-10 text-xs">
             <button
-              className={`${positionSelected ? "flex-1" : "w-[78px] lg:flex-1 lg:w-auto"
-                } h-full transition-all ${positionSelected
+              className={`${
+                positionSelected ? "flex-1" : "w-[78px] lg:flex-1 lg:w-auto"
+              } h-full transition-all ${
+                positionSelected
                   ? "bg-orange-200 bg-opacity-10 rounded-r text-orange-200 text-shadow-orange-200"
                   : "text-gray-200 hover:text-gray-300"
-                }`}
+              }`}
               disabled={positionSelected}
               onClick={() => {
                 handleHidePopup();
@@ -611,13 +617,15 @@ export default function DepositModal({
               POSITION
             </button>
             <button
-              className={`flex-1 h-full transition-all ${!positionSelected
+              className={`flex-1 h-full transition-all ${
+                !positionSelected
                   ? "bg-orange-200 bg-opacity-10 rounded-r text-orange-200 text-shadow-orange-200"
                   : "text-gray-200"
-                } ${vault.receiptToken !== ReceiptToken.ERC20
+              } ${
+                vault.receiptToken !== ReceiptToken.ERC20
                   ? "hover:text-gray-300"
                   : ""
-                }`}
+              }`}
               disabled={
                 !positionSelected ||
                 (selectedNft && getBalanceInEther(selectedNft.value) === 0)
@@ -654,8 +662,9 @@ export default function DepositModal({
                   {!isDeprecatedVault && (
                     <Button
                       type={isDeposit ? "third" : "secondary"}
-                      className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${isDeposit ? "" : "shadow-transparent"
-                        }`}
+                      className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
+                        isDeposit ? "" : "shadow-transparent"
+                      }`}
                       disabled={isDeposit}
                       onClick={() => {
                         handleHidePopup();
@@ -669,10 +678,11 @@ export default function DepositModal({
                     type={
                       !isDeposit || isDeprecatedVault ? "third" : "secondary"
                     }
-                    className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${!isDeposit || isDeprecatedVault
+                    className={`flex-1 h-6 w-[78px] flex items-center justify-center !border-0 ${
+                      !isDeposit || isDeprecatedVault
                         ? ""
                         : "shadow-transparent"
-                      }`}
+                    }`}
                     disabled={!isDeposit || isDeprecatedVault}
                     onClick={() => {
                       handleHidePopup();
@@ -731,10 +741,11 @@ export default function DepositModal({
                           ? "third"
                           : "secondary"
                       }
-                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${leverageTab === LeverageTab.Increase
+                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                        leverageTab === LeverageTab.Increase
                           ? ""
                           : "shadow-transparent"
-                        }`}
+                      }`}
                       disabled={leverageTab === LeverageTab.Increase}
                       onClick={() => {
                         handleHidePopup();
@@ -749,10 +760,11 @@ export default function DepositModal({
                           ? "third"
                           : "secondary"
                       }
-                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${leverageTab === LeverageTab.Decrease
+                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                        leverageTab === LeverageTab.Decrease
                           ? ""
                           : "shadow-transparent"
-                        }`}
+                      }`}
                       disabled={leverageTab === LeverageTab.Decrease}
                       onClick={() => {
                         handleHidePopup();
@@ -767,10 +779,11 @@ export default function DepositModal({
                           ? "third"
                           : "secondary"
                       }
-                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${leverageTab === LeverageTab.Refinance
+                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                        leverageTab === LeverageTab.Refinance
                           ? ""
                           : "shadow-transparent"
-                        }`}
+                      }`}
                       disabled={leverageTab === LeverageTab.Refinance}
                       onClick={() => {
                         handleHidePopup();
@@ -789,10 +802,11 @@ export default function DepositModal({
                           ? "third"
                           : "secondary"
                       }
-                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${leverageTab === LeverageTab.LeverUp
+                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                        leverageTab === LeverageTab.LeverUp
                           ? ""
                           : "shadow-transparent"
-                        }`}
+                      }`}
                       disabled={leverageTab === LeverageTab.LeverUp}
                       onClick={() => setLeverageTab(LeverageTab.LeverUp)}
                     >
@@ -830,23 +844,18 @@ export default function DepositModal({
           netApy={0}
           targetAmount={targetAmount}
           oldPosition={
-            positionStatus === TxStatus.Finish
-              ? oldPosition
-              : getBalanceInEther(getPositionBalance()).toFixed(3)
+            oldPosition || getBalanceInEther(getPositionBalance()).toFixed(3)
           }
           positionChange={
-            positionStatus === TxStatus.Finish
-              ? positionChange
-              : getBalanceInEther(amountInWei).toFixed(3)
+            positionChange || getBalanceInEther(amountInWei).toFixed(3)
           }
           newPosition={
-            positionStatus === TxStatus.Finish
-              ? newPosition
-              : getBalanceInEther(
-                isDeposit
-                  ? getPositionBalance().add(amountInWei)
-                  : getPositionBalance().sub(amountInWei)
-              ).toFixed(3)
+            newPosition ||
+            getBalanceInEther(
+              isDeposit
+                ? getPositionBalance().add(amountInWei)
+                : getPositionBalance().sub(amountInWei)
+            ).toFixed(3)
           }
           positionSelected={positionSelected}
           isDeposit={isDeposit}
