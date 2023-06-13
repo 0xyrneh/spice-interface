@@ -42,6 +42,7 @@ export interface VaultInfo {
   aprChange?: number;
   sponsor?: string;
   depositedAmt?: number;
+  requirement?: string;
   description?: string;
   okrs?: any;
   readable?: string;

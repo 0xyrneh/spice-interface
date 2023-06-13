@@ -17,6 +17,7 @@ import { getWethAddress } from "@/utils/addressHelpers";
 import { activeChainId } from "@/utils/web3";
 import { getVaultBackgroundImage, getVaultLogo } from "@/utils/vault";
 import { VaultFilter } from "@/types/common";
+import { VAULT_DESCRIPTIONS, VAULT_REQUIREMENTS } from "@/constants/vaults";
 
 const apiEnv = activeChainId === 1 ? "prod" : "goerli";
 
@@ -218,7 +219,22 @@ export const fetchGlobalData = async () => {
     ]);
 
     return {
-      vaults: activeVaultsData.all,
+      vaults: activeVaultsData.all.map((vault) => {
+        if (vault.readable) {
+          let prefix = vault.readable.split(" ")[0];
+
+          if (vault.deprecated) {
+            prefix = prefix + "-Deprecated";
+          }
+
+          return {
+            ...vault,
+            description: VAULT_DESCRIPTIONS[prefix],
+            requirement: VAULT_REQUIREMENTS[prefix],
+          };
+        }
+        return vault;
+      }),
       defaultVault: activeVaultsData.default,
       leverageVaults: leverageVaultsData,
     };
