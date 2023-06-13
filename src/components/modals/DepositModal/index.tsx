@@ -241,8 +241,6 @@ export default function DepositModal({
   }, [leverageHover, tooltipHover]);
 
   useEffect(() => {
-    if (selectedNftId) return;
-
     if (defaultNftId) {
       setSelectedNftId(defaultNftId);
     } else {
