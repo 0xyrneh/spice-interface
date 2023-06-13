@@ -520,11 +520,7 @@ export default function DepositModal({
         );
       }
 
-      return (
-        (leverageTab === LeverageTab.Decrease
-          ? sliderStep < 150
-          : sliderStep > 0) || targetAmount !== ""
-      );
+      return getAmountFromSliderStep(sliderStep) > 0;
     }
   }, [
     closed,
@@ -1007,6 +1003,8 @@ export default function DepositModal({
             positionSelected ? onConfirmPosition() : onConfirmLeverage()
           }
           onClose={onCloseRightModal}
+          onSetSliderStep={onSetSliderStep}
+          onSetTargetAmount={onSetTargetAmount}
         />
       </div>
     </Modal>

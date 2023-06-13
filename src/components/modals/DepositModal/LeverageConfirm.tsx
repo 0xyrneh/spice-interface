@@ -32,6 +32,8 @@ interface Props {
   hiding?: boolean;
   onMaxClicked?: () => void;
   onClose: () => void;
+  onSetSliderStep: (step: number) => void;
+  onSetTargetAmount: (value: string) => void;
 }
 
 export default function LeverageConfirm(props: Props) {
@@ -51,6 +53,8 @@ export default function LeverageConfirm(props: Props) {
     netApy,
     onMaxClicked,
     onClose,
+    onSetSliderStep,
+    onSetTargetAmount,
   } = props;
 
   const dispatch = useDispatch();
@@ -337,6 +341,8 @@ export default function LeverageConfirm(props: Props) {
       setTimeout(() => {
         dispatch(setActionStatus(ActionStatus.Success));
         dispatch(setActionError(undefined));
+        onSetSliderStep(0);
+        onSetTargetAmount("");
       }, 5000);
     } catch (err: any) {
       dispatch(setActionStatus(ActionStatus.Failed));
@@ -363,6 +369,8 @@ export default function LeverageConfirm(props: Props) {
       setTimeout(() => {
         dispatch(setActionStatus(ActionStatus.Success));
         dispatch(setActionError(undefined));
+        onSetSliderStep(0);
+        onSetTargetAmount("");
       }, 4000);
     } catch (err: any) {
       dispatch(setActionStatus(ActionStatus.Failed));
@@ -398,6 +406,8 @@ export default function LeverageConfirm(props: Props) {
       setTimeout(() => {
         dispatch(setActionStatus(ActionStatus.Success));
         dispatch(setActionError(undefined));
+        onSetSliderStep(0);
+        onSetTargetAmount("");
       }, 4000);
     } catch (err: any) {
       dispatch(setActionStatus(ActionStatus.Failed));
