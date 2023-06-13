@@ -272,12 +272,15 @@ export default function DepositModal({
   }, [leverageHover, tooltipHover]);
 
   useEffect(() => {
+    if (!open) return;
+    if (selectedNftId) return;
+
     if (defaultNftId) {
       setSelectedNftId(defaultNftId);
     } else {
       setSelectedNftId(myNfts[0]?.tokenId);
     }
-  }, [defaultNftId]);
+  }, [open, myNfts]);
 
   useEffect(() => {
     setTooltipVisible(false);
@@ -348,6 +351,9 @@ export default function DepositModal({
         dispatch(fetchVaultUserDataAsync(account, vault));
       } catch (err) {
         setPositionStatus(TxStatus.None);
+        setOldPosition("");
+        setPositionChange("");
+        setNewPosition("");
       }
     } else if (positionStatus === TxStatus.Finish) {
       reset();
