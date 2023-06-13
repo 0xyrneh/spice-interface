@@ -173,6 +173,8 @@ export default function LeverageInput({
     if (tab === LeverageTab.Increase && maxLeverage === 0) return;
     if (tab === LeverageTab.Decrease && maxRepayment === 0) return;
 
+    setLeverage(undefined);
+
     if (tab === LeverageTab.Increase || tab === LeverageTab.LeverUp) {
       onSetSliderStep(step);
       onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
@@ -188,6 +190,8 @@ export default function LeverageInput({
   // change input
   const onChangeTargetAmount = (e: any) => {
     if (Number(e.target.value) >= 0) {
+      setLeverage(undefined);
+
       const sliderMax =
         tab === LeverageTab.Increase ? maxLeverage - loanValue : maxRepayment;
       if (sliderMax === 0) return;
