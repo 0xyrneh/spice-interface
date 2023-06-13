@@ -8,7 +8,7 @@ import Connectors from "@/constants/connectors";
 import useAuth from "@/hooks/useAuth";
 import { Connector } from "@/types/wallet";
 
-export default function DepositModal({ open, onClose }: ModalProps) {
+export default function ConnectModal({ open, onClose }: ModalProps) {
   const { account } = useWeb3React();
   const { login } = useAuth();
 

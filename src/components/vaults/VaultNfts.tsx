@@ -95,7 +95,7 @@ export default function VaultNfts({ vault, className }: Props) {
 
       return {
         owner: account,
-        amount: getBalanceInEther(value),
+        amount: value,
         tokenId: row.tokenId,
         tokenImg: getTokenImageFromReservoir(
           PROLOGUE_NFT_ADDRESS,
@@ -111,10 +111,10 @@ export default function VaultNfts({ vault, className }: Props) {
     const myPrologueNfts = getNftPortolios();
 
     if (vaultNftsSortFilter === VaultNftsSortFilter.ValueHighToLow) {
-      return myPrologueNfts.sort((a, b) => (a.amount <= b.amount ? 1 : -1));
+      return myPrologueNfts.sort((a, b) => (a.amount.gte(b.amount) ? 1 : -1));
     }
     if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
-      return myPrologueNfts.sort((a, b) => (a.amount < b.amount ? -1 : 1));
+      return myPrologueNfts.sort((a, b) => (a.amount.gt(b.amount) ? -1 : 1));
     }
     // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
     if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
@@ -122,7 +122,7 @@ export default function VaultNfts({ vault, className }: Props) {
         .sort((a, b) => (a.apy <= b.apy ? 1 : -1))
         .sort((a, b) => {
           if (a.isEscrowed || b.isEscrowed) return 0;
-          return a.amount <= b.amount ? 1 : -1;
+          return a.amount.gte(b.amount) ? 1 : -1;
         });
     }
     // show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)
@@ -137,7 +137,7 @@ export default function VaultNfts({ vault, className }: Props) {
         })
         .sort((a, b) => {
           if (a.isEscrowed && b.isEscrowed) return a.apy > b.apy ? 1 : -1;
-          return a.amount <= b.amount ? 1 : -1;
+          return a.amount.gte(b.amount) ? 1 : -1;
         });
     }
 

@@ -60,7 +60,7 @@ export default function PrologueNfts({
     const allNfts1 = allNfts.map((row) => {
       return {
         owner: row.owner.address,
-        amount: getBalanceInEther(row.shares),
+        amount: row.shares,
         tokenId: row.tokenId,
         tokenImg: row.tokenImg,
         isEscrowed: false,
@@ -76,7 +76,7 @@ export default function PrologueNfts({
         (row1: any) => row1.tokenId === row.tokenId
       );
 
-      const value =
+      const value: BigNumber =
         row?.loan?.tokenAmntInVault ||
         userNft?.depositAmnt ||
         BigNumber.from(0);
@@ -107,7 +107,7 @@ export default function PrologueNfts({
 
       return {
         owner: account,
-        amount: getBalanceInEther(value),
+        amount: value,
         tokenId: row.tokenId,
         tokenImg: getTokenImageFromReservoir(
           PROLOGUE_NFT_ADDRESS,
@@ -125,10 +125,10 @@ export default function PrologueNfts({
     const nftPortfolios = getNftPortolios();
 
     if (vaultNftsSortFilter === VaultNftsSortFilter.ValueHighToLow) {
-      return nftPortfolios.sort((a, b) => (a.amount <= b.amount ? 1 : -1));
+      return nftPortfolios.sort((a, b) => (a.amount.gte(b.amount) ? 1 : -1));
     }
     if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
-      return nftPortfolios.sort((a, b) => (a.amount < b.amount ? -1 : 1));
+      return nftPortfolios.sort((a, b) => (a.amount.gt(b.amount) ? -1 : 1));
     }
     // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
     if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
@@ -136,7 +136,7 @@ export default function PrologueNfts({
         .sort((a, b) => (a.apy <= b.apy ? 1 : -1))
         .sort((a, b) => {
           if (a.isEscrowed || b.isEscrowed) return 0;
-          return a.amount <= b.amount ? 1 : -1;
+          return a.amount.gte(b.amount) ? 1 : -1;
         });
     }
     // show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)
@@ -151,7 +151,7 @@ export default function PrologueNfts({
         })
         .sort((a, b) => {
           if (a.isEscrowed && b.isEscrowed) return a.apy > b.apy ? 1 : -1;
-          return a.amount <= b.amount ? 1 : -1;
+          return a.amount.gte(b.amount) ? 1 : -1;
         });
     }
 

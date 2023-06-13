@@ -3,6 +3,7 @@ import WethSVG from "@/assets/icons/weth.svg";
 import EthSVG from "@/assets/icons/eth.svg";
 import TriangleSVG from "@/assets/icons/triangle.svg";
 import { TxStatus } from "@/types/common";
+import { getExpolorerUrl, shortenTxHash } from "@/utils/string";
 
 type Props = {
   isDeposit: boolean;
@@ -11,7 +12,11 @@ type Props = {
   txStatus: TxStatus;
   txHash?: string;
   showTooltip?: boolean;
+  balance: string;
+  usdVal: string;
+  vaultBalance: string;
   setValue: (value: string) => void;
+  onMax?: () => void;
   toggleEth: () => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -23,11 +28,15 @@ export default function PositionInput({
   toggleEth,
   value,
   setValue,
+  onMax,
   txHash,
   txStatus,
   onFocus,
   onBlur,
   showTooltip,
+  balance,
+  usdVal,
+  vaultBalance,
 }: Props) {
   const processing = () => txStatus === TxStatus.Pending;
 
@@ -40,33 +49,41 @@ export default function PositionInput({
         >
           <div className="flex items-center justify-between">
             <input
-              className="text-2xl w-[100px] flex-1 hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
+              className={`text-2xl w-[100px] flex-1 hover:placeholder:text-gray-300 placeholder:text-gray-200 ${
+                processing() ? "text-gray-200" : "text-white"
+              }`}
               placeholder="0.000"
-              type="number"
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onFocus={onFocus}
               onBlur={onBlur}
+              disabled={processing()}
             />
             <button
               className="flex items-center gap-2 bg-gray-200 bg-opacity-20 h-7 rounded px-3"
+              disabled={processing()}
               onClick={toggleEth}
             >
               {useWeth ? <WethSVG /> : <EthSVG />}
-              <span className="text-white text-base text-left w-[47px]">
+              <span
+                className={`${
+                  processing() ? "text-gray-200" : "text-white"
+                } text-base text-left w-[47px]`}
+              >
                 {useWeth ? "WETH" : "ETH"}
               </span>
-              <TriangleSVG className={useWeth ? "" : "rotate-180"} />
+              <TriangleSVG className={`${useWeth ? "" : "rotate-180"} ${processing() ? "text-gray-200" : "text-white"}`} />
             </button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-xs">$0.00</span>
+            <span className="text-xs">${usdVal}</span>
             <div className="flex items-center gap-2">
-              <span className="">Balance: 1.245</span>
+              <span className="">Balance: {balance}</span>
               <Button
                 className={
                   processing() ? "" : "text-orange-900 text-shadow-orange-900"
                 }
+                onClick={onMax}
               >
                 MAX
               </Button>
@@ -80,14 +97,14 @@ export default function PositionInput({
           {txHash && (
             <a
               className="underline"
-              href="https://etherscan.io"
+              href={getExpolorerUrl(txHash)}
               target="__blank"
             >
-              {txHash}
+              {shortenTxHash(txHash, 8)}
             </a>
           )}
         </span>
-        {!isDeposit && <span>Vault Liquid Balance: Ξ300</span>}
+        {!isDeposit && <span>Vault Liquid Balance: Ξ{vaultBalance}</span>}
       </div>
     </div>
   );

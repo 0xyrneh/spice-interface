@@ -1,17 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
-import { BigNumber } from "ethers";
+import { BigNumber, utils, constants } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 import moment from "moment-timezone";
-import { useDispatch } from "react-redux";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "../Modal";
+import { useVault } from "@/hooks/useVault";
+import { useNftVault } from "@/hooks/useNftVault";
+import { useSpiceLending } from "@/hooks/useSpiceLending";
+import { useEthBalance } from "@/hooks/useEthBalance";
 import { TxStatus, ActionStatus } from "@/types/common";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
-import { PrologueNftInfo, PrologueNftPortofolioInfo } from "@/types/nft";
-import { useAppSelector } from "@/state/hooks";
+import { useAppDispatch, useAppSelector } from "@/state/hooks";
+import { fetchVaultUserDataAsync } from "@/state/actions";
+import { fetchUserWethData } from "@/state/lend/fetchUserLend";
 import { accLoans } from "@/utils/lend";
 import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
+import { isValidNumber } from "@/utils/regex";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../../common";
 import PositionInput from "./PositionInput";
 import { YEAR_IN_SECONDS, DAY_IN_SECONDS } from "@/config/constants/time";
@@ -41,11 +46,11 @@ export default function DepositModal({
   const [positionSelected, setPositionSelected] = useState(true);
   const [leverageTab, setLeverageTab] = useState(LeverageTab.Increase);
   const [positionAmount, setPositionAmount] = useState("");
+  const [amountInWei, setAmountInWei] = useState<BigNumber>(BigNumber.from(0));
   const [isDeposit, setIsDeposit] = useState(false);
   const [leverage, setLeverage] = useState(0);
   const [targetLeverage, setTargetLeverage] = useState("");
   const [useWeth, setUseWeth] = useState(true);
-  const [positionTxHash, setPositionTxHash] = useState<string>();
   const [positionStatus, setPositionStatus] = useState(TxStatus.None);
   const [selectedNftId, setSelectedNftId] = useState<number | undefined>();
   const [focused, setFocused] = useState(false);
@@ -54,18 +59,43 @@ export default function DepositModal({
   const [leverageHover, setLeverageHover] = useState(false);
   const [tooltipHover, setTooltipHover] = useState(false);
   const [hiding, setHiding] = useState(false);
+  const [allowance, setAllowance] = useState(BigNumber.from("0"));
+  // position details
+  const [oldPosition, setOldPosition] = useState("");
+  const [positionChange, setPositionChange] = useState("");
+  const [newPosition, setNewPosition] = useState("");
   // leverage handling
   const [leverageApproveRequired, setLeverageApproveRequired] = useState(false);
   const [loanLender, setLoanLender] = useState<string>("");
   const [sliderStep, setSliderStep] = useState<number>(0);
   const [targetAmount, setTargetAmount] = useState<string>("");
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { account } = useWeb3React();
+  const userEthBalance = useEthBalance();
+  const userWethBalance = vault?.userInfo?.tokenBalance;
+  const isFungible = vault?.fungible;
   const { data: lendData } = useAppSelector((state) => state.lend);
+  const { pendingTxHash } = useAppSelector((state) => state.modal);
   const { defaultVault, vaults, leverageVaults } = useAppSelector(
     (state) => state.vault
   );
+  const { ethPrice } = useAppSelector((state) => state.oracle);
+
+  const {
+    onApprove: onVaultApprove,
+    onDeposit: onVaultDeposit,
+    onDepositETH: onVaultDepositETH,
+    onWithdraw: onVaultWithdraw,
+    onWithdrawETH: onVaultWithdrawETH,
+  } = useVault(vault.address);
+  const {
+    onApprove: onNftVaultApprove,
+    onDeposit: onNftVaultDeposit,
+    onDepositETH: onNftVaultDepositETH,
+    onWithdraw: onNftVaultWithdraw,
+    onWithdrawETH: onNftVaultWithdrawETH,
+  } = useNftVault(vault.address);
 
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
@@ -147,7 +177,7 @@ export default function DepositModal({
         isRenewAvailable: !!isRenewAvailable,
 
         owner: account,
-        amount: getBalanceInEther(value),
+        amount: value,
         tokenId: row.tokenId,
         tokenImg: getTokenImageFromReservoir(
           PROLOGUE_NFT_ADDRESS,
@@ -161,6 +191,29 @@ export default function DepositModal({
 
   const myNfts = getNftPortfolios();
   const selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
+
+  const {
+    onApproveWeth,
+    onLendingDeposit,
+    onLendingDepositETH,
+    onLendingWithdraw,
+    onLendingWithdrawETH,
+  } = useSpiceLending(selectedNft?.lendAddr, vault.address);
+
+  const updateAllowance = async () => {
+    if (!account) return;
+
+    let _allowance = vault.userInfo.allowance;
+    if (selectedNft?.lendAddr) {
+      const res = await fetchUserWethData(account, selectedNft?.lendAddr);
+      _allowance = res.allowance;
+    }
+    setAllowance(_allowance);
+  };
+
+  useEffect(() => {
+    updateAllowance();
+  }, [account, vault.userInfo.allowance, selectedNft?.lendAddr]);
 
   const updateLoanLender = (val: string) => {
     setLoanLender(val);
@@ -210,9 +263,14 @@ export default function DepositModal({
     setPositionAmount("");
     setLeverage(leverageTab === LeverageTab.Decrease ? 150 : 0);
     setTargetLeverage("");
-    setPositionTxHash(undefined);
-    setPositionStatus(TxStatus.None);
-    setClosed(false);
+    setClosed(true);
+    setTimeout(() => {
+      setClosed(false);
+      setPositionStatus(TxStatus.None);
+      setOldPosition("");
+      setPositionChange("");
+      setNewPosition("");
+    }, 500);
     setFocused(false);
     setTargetAmount("");
     setSliderStep(0);
@@ -251,6 +309,8 @@ export default function DepositModal({
   }, [leverageHover, tooltipHover]);
 
   useEffect(() => {
+    if (!open) return;
+
     if (defaultNftId) {
       setSelectedNftId(defaultNftId);
     } else {
@@ -258,14 +318,14 @@ export default function DepositModal({
         setSelectedNftId(myNfts[0].tokenId);
       }
     }
-  }, [defaultNftId, myNfts.length]);
+  }, [open, defaultNftId, myNfts.length]);
 
   useEffect(() => {
     setTooltipVisible(false);
     setPositionSelected(isLeverageModal ? false : true);
     setIsDeposit(!isLeverageModal ? !isDeprecatedVault : false);
     // setLeverageTab(LeverageTab.Increase);
-  }, [open, isLeverageModal, vault, onClose]);
+  }, [open, isLeverageModal, vault.address]);
 
   useEffect(() => {
     setClosed(false);
@@ -280,13 +340,74 @@ export default function DepositModal({
     reset();
   }, [isDeposit, positionSelected, leverageTab]);
 
-  const onConfirmPosition = () => {
+  const onConfirmPosition = async () => {
     if (positionStatus === TxStatus.None) {
       setPositionStatus(TxStatus.Pending);
-      setPositionTxHash("0xabcdef");
-      setTimeout(() => {
-        setPositionStatus(TxStatus.Finish);
-      }, 5000);
+      setOldPosition(getBalanceInEther(getPositionBalance()).toFixed(3));
+      setPositionChange(getBalanceInEther(amountInWei).toFixed(3));
+      setNewPosition(
+        getBalanceInEther(
+          isDeposit
+            ? getPositionBalance().add(amountInWei)
+            : getPositionBalance().sub(amountInWei)
+        ).toFixed(3)
+      );
+      try {
+        if (isDeposit) {
+          if (useWeth) {
+            if (isApprove()) {
+              await (isFungible
+                ? onVaultApprove
+                : selectedNft?.lendAddr
+                ? onApproveWeth
+                : onNftVaultApprove)();
+              setPositionStatus(TxStatus.None);
+            } else {
+              if (isFungible) await onVaultDeposit(amountInWei);
+              else if (selectedNft) {
+                if (selectedNft.lendAddr) {
+                  await onLendingDeposit(selectedNft.loan.loanId, amountInWei);
+                } else await onNftVaultDeposit(selectedNft.tokenId, amountInWei);
+              }
+              setPositionStatus(TxStatus.Finish);
+            }
+          } else {
+            if (isFungible) await onVaultDepositETH(amountInWei);
+            else if (selectedNft) {
+              if (selectedNft.lendAddr)
+                await onLendingDepositETH(selectedNft.loan.loanId, amountInWei);
+              else await onNftVaultDepositETH(selectedNft.tokenId, amountInWei);
+            }
+            setPositionStatus(TxStatus.Finish);
+          }
+        } else {
+          if (isFungible) {
+            await (useWeth ? onVaultWithdraw : onVaultWithdrawETH)(amountInWei);
+          } else if (selectedNft) {
+            if (selectedNft.lendAddr) {
+              await (useWeth ? onLendingWithdraw : onLendingWithdrawETH)(
+                selectedNft.loan.loanId,
+                amountInWei
+              );
+            } else {
+              await (useWeth ? onNftVaultWithdraw : onNftVaultWithdrawETH)(
+                selectedNft.tokenId,
+                amountInWei
+              );
+            }
+          }
+          setPositionStatus(TxStatus.Finish);
+        }
+        setPositionAmount("");
+        setAmountInWei(BigNumber.from("0"));
+        dispatch(setPendingTxHash(""));
+        dispatch(fetchVaultUserDataAsync(account, vault));
+      } catch (err) {
+        setPositionStatus(TxStatus.None);
+        setOldPosition("");
+        setPositionChange("");
+        setNewPosition("");
+      }
     } else if (positionStatus === TxStatus.Finish) {
       reset();
     }
@@ -340,7 +461,7 @@ export default function DepositModal({
     if (closed) return false;
     if (focused) return true;
     if (positionSelected) {
-      return positionAmount !== "";
+      return positionStatus === TxStatus.Finish || positionAmount !== "";
     } else {
       if (selectedNft && !selectedNft.isApproved) return true;
       if (leverageTab === LeverageTab.Refinance) return true;
@@ -366,24 +487,68 @@ export default function DepositModal({
     closed,
     focused,
     positionSelected,
+    positionStatus,
     positionAmount,
     leverageTab,
     sliderStep,
     targetAmount,
   ]);
 
+  const isApprove = () => {
+    if (!isDeposit) return false;
+    if (!useWeth) return false;
+    return amountInWei.gt(allowance || BigNumber.from("0"));
+  };
+
+  const getPositionBalance = () => {
+    return isFungible
+      ? vault.userInfo.depositAmnt
+      : selectedNft?.amount || BigNumber.from("0");
+  };
+
+  const getBalance = () => {
+    return isDeposit
+      ? useWeth
+        ? userWethBalance
+        : userEthBalance
+      : getPositionBalance();
+  };
+
+  const onChangeAmount = (newAmount: string) => {
+    while (newAmount.split(".").length - 1 > 1 && newAmount.endsWith(".")) {
+      newAmount = newAmount.slice(0, -1);
+    }
+    if (!isValidNumber(newAmount)) return;
+    let newAmountInWei = getBalanceInWei(Number(newAmount).toString() || "0");
+    if (newAmountInWei.gt(getBalance())) {
+      newAmountInWei = getBalance();
+    }
+    if (newAmountInWei.gt(0)) {
+      newAmount = utils.formatEther(newAmountInWei);
+      const decimalPart = newAmount.split(".")[1];
+      if (decimalPart && decimalPart.length > 7) {
+        newAmount =
+          (Math.floor(parseFloat(newAmount) * 10 ** 7) / 10 ** 7).toString() +
+          "...";
+      }
+    }
+    setPositionAmount(newAmount);
+    setAmountInWei(newAmountInWei);
+  };
+
+  const onClickMax = () => {
+    onChangeAmount("9999999999");
+  };
+
   const getRefinanceApr = () => {
     if (!selectedNft) return 0;
-
     const loanLenderVault =
       leverageTab === LeverageTab.LeverUp
         ? leverageVaults.find((row: any) => !row.deprecated)
         : leverageVaults.find((row: any) => row.address === loanLender);
-
     const currentLend = lendData.find(
       (row: any) => row.address === selectedNft?.lendAddr
     );
-
     if (!loanLenderVault) return 0;
     if (!selectedNft.loan.balance) return 0;
 
@@ -391,7 +556,6 @@ export default function DepositModal({
     const collateralValue = getBalanceInEther(selectedNft.value);
     const loanValue = getBalanceInEther(balance || BigNumber.from(0));
     const originMaxLtv = currentLend?.loanRatio || 0;
-
     const additionalDebt =
       leverageTab === LeverageTab.Increase
         ? getAmountFromSliderStep(sliderStep) - loanValue
@@ -408,7 +572,6 @@ export default function DepositModal({
         ? getAmountFromSliderStep(sliderStep) /
           (collateralValue + additionalDebt)
         : getAmountFromSliderStep(sliderStep) / collateralValue;
-
     return (
       100 * calculateBorrowApr(ltv, additionalDebt, total, available, duration)
     );
@@ -429,7 +592,6 @@ export default function DepositModal({
     const { repayAmount, balance } = selectedNft.loan;
     const loanValue = getBalanceInEther(balance || BigNumber.from(0));
     const repayValue = getBalanceInEther(repayAmount || BigNumber.from(0));
-
     // eslint-disable-next-line no-restricted-properties
     const borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
     const vaultApy = (defaultVault?.apr || 0) / 100;
@@ -438,7 +600,6 @@ export default function DepositModal({
       leverageTab === LeverageTab.Increase
         ? getAmountFromSliderStep(sliderStep) - loanValue
         : getAmountFromSliderStep(sliderStep);
-
     return (
       100 *
       getNetApy(
@@ -493,6 +654,9 @@ export default function DepositModal({
                 bgImg={vault.logo}
                 footerClassName="!h-10"
                 expanded
+                position={getBalanceInEther(vault.userInfo.depositAmnt).toFixed(
+                  2
+                )}
               />
             </>
           )}
@@ -536,7 +700,6 @@ export default function DepositModal({
                 if (vault.receiptToken === ReceiptToken.NFT) {
                   handleHidePopup();
                   setPositionSelected(false);
-
                   if (selectedNft && !selectedNft.isEscrowed) {
                     setLeverageTab(LeverageTab.LeverUp);
                   } else {
@@ -618,11 +781,19 @@ export default function DepositModal({
                 useWeth={useWeth}
                 toggleEth={() => setUseWeth(!useWeth)}
                 value={positionAmount}
-                setValue={setPositionAmount}
+                setValue={onChangeAmount}
+                onMax={onClickMax}
                 txStatus={positionStatus}
-                txHash={positionTxHash}
+                txHash={pendingTxHash}
                 showTooltip={tooltipVisible}
                 onFocus={() => setFocused(true)}
+                balance={getBalanceInEther(getBalance()).toFixed(5)}
+                usdVal={(parseFloat(positionAmount || "0") * ethPrice).toFixed(
+                  2
+                )}
+                vaultBalance={getBalanceInEther(
+                  vault.wethBalance || BigNumber.from(0)
+                ).toFixed(2)}
               />
             </>
           ) : (
@@ -764,30 +935,42 @@ export default function DepositModal({
             </>
           )}
         </Card>
-
-        {selectedNft && (
-          <ConfirmPopup
-            nft={selectedNft}
-            vault={vault}
-            netApy={calculateNetApy()}
-            sliderStep={sliderStep}
-            targetAmount={getAmountFromSliderStep(sliderStep).toString()}
-            positionSelected={positionSelected}
-            isDeposit={isDeposit}
-            positionStatus={positionStatus}
-            leverageTab={leverageTab}
-            onLeverageMaxClicked={() => {
-              setLeverage(150);
-              setTargetLeverage("4");
-            }}
-            show={showRightModal()}
-            hiding={hiding}
-            onConfirm={() =>
-              positionSelected ? onConfirmPosition() : onConfirmLeverage()
-            }
-            onClose={onCloseRightModal}
-          />
-        )}
+        <ConfirmPopup
+          nft={selectedNft}
+          vault={vault}
+          netApy={calculateNetApy()}
+          sliderStep={sliderStep}
+          targetAmount={targetAmount}
+          oldPosition={
+            oldPosition || getBalanceInEther(getPositionBalance()).toFixed(3)
+          }
+          positionChange={
+            positionChange || getBalanceInEther(amountInWei).toFixed(3)
+          }
+          newPosition={
+            newPosition ||
+            getBalanceInEther(
+              isDeposit
+                ? getPositionBalance().add(amountInWei)
+                : getPositionBalance().sub(amountInWei)
+            ).toFixed(3)
+          }
+          positionSelected={positionSelected}
+          isDeposit={isDeposit}
+          isApprove={isApprove()}
+          positionStatus={positionStatus}
+          leverageTab={leverageTab}
+          onLeverageMaxClicked={() => {
+            setLeverage(150);
+            setTargetLeverage("4");
+          }}
+          show={showRightModal()}
+          hiding={hiding}
+          onConfirm={() =>
+            positionSelected ? onConfirmPosition() : onConfirmLeverage()
+          }
+          onClose={onCloseRightModal}
+        />
       </div>
     </Modal>
   );

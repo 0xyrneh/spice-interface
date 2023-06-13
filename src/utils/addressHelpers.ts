@@ -5,6 +5,7 @@ import {
   spiceLendingAddr,
   spiceLendingAddrs,
   wethAddr,
+  ethOracleAddr,
 } from "@/config/constants/contract";
 import { Address } from "@/config/constants/types";
 import { activeChainId, mainNetChainId } from "@/utils/web3";
@@ -25,3 +26,5 @@ export const getSpiceFiLendingAddress = () => getAddress(spiceLendingAddr);
 
 export const getSpiceFiLendingAddresses = () =>
   spiceLendingAddrs[activeChainId].map((row: any) => row.address);
+
+export const getETHOracleAddress = () => getAddress(ethOracleAddr);

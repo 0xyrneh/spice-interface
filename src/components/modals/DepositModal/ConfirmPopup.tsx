@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-
 import { LeverageTab } from "./LeverageInput";
+import { VaultInfo } from "@/types/vault";
 import ArrowLeftSVG from "@/assets/icons/arrow-left.svg";
 import { TxStatus, ActionStatus } from "@/types/common";
-import { VaultInfo } from "@/types/vault";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { useAppSelector } from "@/state/hooks";
 import PositionConfirm from "./PositionConfirm";
@@ -17,13 +16,17 @@ import {
 } from "@/state/modal/modalSlice";
 
 interface Props {
-  nft: PrologueNftPortofolioInfo;
+  nft: PrologueNftPortofolioInfo | undefined;
   vault: VaultInfo;
   netApy: number;
   sliderStep: number;
   targetAmount: string;
+  oldPosition: string;
+  positionChange: string;
+  newPosition: string;
   positionSelected: boolean;
   isDeposit: boolean;
+  isApprove: boolean;
   positionStatus: TxStatus;
 
   leverageTab: LeverageTab;
@@ -41,7 +44,11 @@ export default function ConfirmPopup(props: Props) {
     netApy,
     sliderStep,
     targetAmount,
+    oldPosition,
+    positionChange,
+    newPosition,
     isDeposit,
+    isApprove,
     positionStatus,
     leverageTab,
     onLeverageMaxClicked,
@@ -69,7 +76,7 @@ export default function ConfirmPopup(props: Props) {
 
   const processing = () => {
     if (positionSelected) {
-      return actionStatus === ActionStatus.Pending;
+      return positionStatus === TxStatus.Pending;
     } else {
       return actionStatus === ActionStatus.Pending;
     }
@@ -89,19 +96,24 @@ export default function ConfirmPopup(props: Props) {
           className={`${
             processing() ? "text-gray-200" : "text-orange-900"
           } flex items-center font-medium gap-2 text-xs leading-[15.31px]`}
+          disabled={processing()}
           onClick={onClose}
         >
           <ArrowLeftSVG />
           Back
         </button>
-        {positionSelected && nft.isApproved ? (
+        {positionSelected ? (
           <PositionConfirm
+            oldPosition={oldPosition}
+            positionChange={positionChange}
+            newPosition={newPosition}
             isDeposit={isDeposit}
+            isApprove={isApprove}
             txStatus={positionStatus}
             onConfirm={onConfirm}
             hiding={props.hiding}
           />
-        ) : (
+        ) : nft ? (
           <LeverageConfirm
             nft={nft}
             netApy={netApy}
@@ -113,7 +125,7 @@ export default function ConfirmPopup(props: Props) {
             hiding={props.hiding}
             onClose={onClose}
           />
-        )}
+        ) : false}
       </Card>
     </div>
   );
