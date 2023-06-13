@@ -65,6 +65,7 @@ export default function DepositModal({
   const [positionChange, setPositionChange] = useState("");
   const [newPosition, setNewPosition] = useState("");
   // leverage handling
+  const [leverageApproveRequired, setLeverageApproveRequired] = useState(false);
   const [loanLender, setLoanLender] = useState<string>("");
   const [sliderStep, setSliderStep] = useState<number>(0);
   const [targetAmount, setTargetAmount] = useState<string>("");
@@ -137,6 +138,9 @@ export default function DepositModal({
               .subtract(14, "days")
               .valueOf() / 1000
           : 0;
+      const isRenewAvailable =
+        autoRenew && autoRenew > 0 && moment().valueOf() > 1000 * autoRenew;
+
       // calculate net APY
       let netApy = 0;
       let leveragedApy = 0;
@@ -170,6 +174,7 @@ export default function DepositModal({
         borrowApy,
         debtOwed,
         loan: row.loan,
+        isRenewAvailable: !!isRenewAvailable,
 
         owner: account,
         amount: value,
@@ -275,6 +280,11 @@ export default function DepositModal({
     setTooltipVisible(leverageHover || tooltipHover);
     setTargetAmount("");
     setSliderStep(0);
+    setLeverageApproveRequired(
+      myNfts.find((nft) => nft.tokenId === selectedNftId)?.isApproved
+        ? false
+        : true
+    );
 
     if (!selectedNft || (selectedNft && !selectedNft.isEscrowed)) {
       if (leverageTab === LeverageTab.LeverUp) return;
@@ -406,6 +416,9 @@ export default function DepositModal({
   const onConfirmLeverage = async () => {};
 
   const onCloseRightModal = () => {
+    if (leverageApproveRequired && selectedNft?.isApproved) {
+      setLeverageApproveRequired(false);
+    }
     setClosed(true);
   };
 
@@ -452,6 +465,7 @@ export default function DepositModal({
     } else {
       if (selectedNft && !selectedNft.isApproved) return true;
       if (leverageTab === LeverageTab.Refinance) return true;
+      if (leverageTab === LeverageTab.Renew) return true;
       if (leverageTab === LeverageTab.Increase) {
         if (!selectedNft) return false;
         const { balance } = selectedNft.loan;
@@ -785,67 +799,97 @@ export default function DepositModal({
           ) : (
             <>
               <div className="flex flex-row-reverse px-2 py-3">
-                {selectedNft && selectedNft.isEscrowed && (
-                  <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
-                    <Button
-                      type={
-                        leverageTab === LeverageTab.Increase
-                          ? "third"
-                          : "secondary"
-                      }
-                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-                        leverageTab === LeverageTab.Increase
-                          ? ""
-                          : "shadow-transparent"
-                      }`}
-                      disabled={leverageTab === LeverageTab.Increase}
-                      onClick={() => {
-                        handleHidePopup();
-                        setLeverageTab(LeverageTab.Increase);
-                      }}
-                    >
-                      <span className="text-xs">INCREASE</span>
-                    </Button>
-                    <Button
-                      type={
-                        leverageTab === LeverageTab.Decrease
-                          ? "third"
-                          : "secondary"
-                      }
-                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-                        leverageTab === LeverageTab.Decrease
-                          ? ""
-                          : "shadow-transparent"
-                      }`}
-                      disabled={leverageTab === LeverageTab.Decrease}
-                      onClick={() => {
-                        handleHidePopup();
-                        setLeverageTab(LeverageTab.Decrease);
-                      }}
-                    >
-                      <span className="text-xs">DECREASE</span>
-                    </Button>
-                    <Button
-                      type={
-                        leverageTab === LeverageTab.Refinance
-                          ? "third"
-                          : "secondary"
-                      }
-                      className={`h-6 flex-1 flex items-center justify-center !border-0 ${
-                        leverageTab === LeverageTab.Refinance
-                          ? ""
-                          : "shadow-transparent"
-                      }`}
-                      disabled={leverageTab === LeverageTab.Refinance}
-                      onClick={() => {
-                        handleHidePopup();
-                        setLeverageTab(LeverageTab.Refinance);
-                      }}
-                    >
-                      <span className="text-xs">REFINANCE</span>
-                    </Button>
-                  </div>
-                )}
+                {/* renew */}
+                {selectedNft &&
+                  selectedNft.isEscrowed &&
+                  selectedNft.isRenewAvailable && (
+                    <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
+                      <Button
+                        type={
+                          leverageTab === LeverageTab.Renew
+                            ? "third"
+                            : "secondary"
+                        }
+                        className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                          leverageTab === LeverageTab.Renew
+                            ? ""
+                            : "shadow-transparent"
+                        }`}
+                        disabled={leverageTab === LeverageTab.Renew}
+                        onClick={() => {
+                          handleHidePopup();
+                          setLeverageTab(LeverageTab.Renew);
+                        }}
+                      >
+                        <span className="text-xs">RENEW</span>
+                      </Button>
+                    </div>
+                  )}
+                {/* increase/decrease/refinance */}
+                {selectedNft &&
+                  selectedNft.isEscrowed &&
+                  !selectedNft.isRenewAvailable && (
+                    <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
+                      <Button
+                        type={
+                          leverageTab === LeverageTab.Increase
+                            ? "third"
+                            : "secondary"
+                        }
+                        className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                          leverageTab === LeverageTab.Increase
+                            ? ""
+                            : "shadow-transparent"
+                        }`}
+                        disabled={leverageTab === LeverageTab.Increase}
+                        onClick={() => {
+                          handleHidePopup();
+                          setLeverageTab(LeverageTab.Increase);
+                        }}
+                      >
+                        <span className="text-xs">INCREASE</span>
+                      </Button>
+                      <Button
+                        type={
+                          leverageTab === LeverageTab.Decrease
+                            ? "third"
+                            : "secondary"
+                        }
+                        className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                          leverageTab === LeverageTab.Decrease
+                            ? ""
+                            : "shadow-transparent"
+                        }`}
+                        disabled={leverageTab === LeverageTab.Decrease}
+                        onClick={() => {
+                          handleHidePopup();
+                          setLeverageTab(LeverageTab.Decrease);
+                        }}
+                      >
+                        <span className="text-xs">DECREASE</span>
+                      </Button>
+                      <Button
+                        type={
+                          leverageTab === LeverageTab.Refinance
+                            ? "third"
+                            : "secondary"
+                        }
+                        className={`h-6 flex-1 flex items-center justify-center !border-0 ${
+                          leverageTab === LeverageTab.Refinance
+                            ? ""
+                            : "shadow-transparent"
+                        }`}
+                        disabled={leverageTab === LeverageTab.Refinance}
+                        onClick={() => {
+                          handleHidePopup();
+                          setLeverageTab(LeverageTab.Refinance);
+                        }}
+                      >
+                        <span className="text-xs">REFINANCE</span>
+                      </Button>
+                    </div>
+                  )}
+                {/* approve / lever up */}
                 {selectedNft && !selectedNft.isEscrowed && (
                   <div className="w-[calc(100%-70px)] lg:w-1/2 pl-2 flex items-center gap-2">
                     <Button
@@ -863,7 +907,7 @@ export default function DepositModal({
                       onClick={() => setLeverageTab(LeverageTab.LeverUp)}
                     >
                       <span className="text-xs">
-                        {selectedNft.isApproved ? "LEVER UP" : "APPROVE"}
+                        {leverageApproveRequired ? "APPROVE" : "LEVER UP"}
                       </span>
                     </Button>
                   </div>
@@ -877,6 +921,7 @@ export default function DepositModal({
                   setLeverage={setLeverage}
                   targetLeverage={targetLeverage}
                   setTargetLeverage={setTargetLeverage}
+                  requireApprove={leverageApproveRequired}
                   onFocus={() => setFocused(true)}
                   sliderStep={sliderStep}
                   targetAmount={targetAmount}
@@ -893,7 +938,8 @@ export default function DepositModal({
         <ConfirmPopup
           nft={selectedNft}
           vault={vault}
-          netApy={0}
+          netApy={calculateNetApy()}
+          sliderStep={sliderStep}
           targetAmount={targetAmount}
           oldPosition={
             oldPosition || getBalanceInEther(getPositionBalance()).toFixed(3)

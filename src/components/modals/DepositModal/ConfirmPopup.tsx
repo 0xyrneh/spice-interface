@@ -19,6 +19,7 @@ interface Props {
   nft: PrologueNftPortofolioInfo | undefined;
   vault: VaultInfo;
   netApy: number;
+  sliderStep: number;
   targetAmount: string;
   oldPosition: string;
   positionChange: string;
@@ -41,6 +42,7 @@ export default function ConfirmPopup(props: Props) {
     nft,
     vault,
     netApy,
+    sliderStep,
     targetAmount,
     oldPosition,
     positionChange,
@@ -115,6 +117,7 @@ export default function ConfirmPopup(props: Props) {
           <LeverageConfirm
             nft={nft}
             netApy={netApy}
+            sliderStep={sliderStep}
             targetAmount={targetAmount}
             isOpen={show}
             tab={leverageTab}

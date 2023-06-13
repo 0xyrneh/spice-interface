@@ -116,7 +116,7 @@ export default function CustomizedSlider({
               : "text-orange-900 text-shadow-orange-900"
           }`}
           onClick={() => {
-            if (onChange && max) {
+            if (onChange && max !== undefined) {
               onChange(max);
             }
           }}
