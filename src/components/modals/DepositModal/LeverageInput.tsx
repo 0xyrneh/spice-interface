@@ -17,6 +17,7 @@ export enum LeverageTab {
   Increase = "Increase",
   Decrease = "Decrease",
   Refinance = "Refinance",
+  Renew = "Renew",
 }
 
 type Props = {
@@ -232,6 +233,19 @@ export default function LeverageInput({
 
   const renderInputContent = () => {
     if (tab === LeverageTab.Refinance) {
+      return (
+        <div className="flex flex-1 items-center justify-center">
+          <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">
+            <span className="text-2xl">
+              {`${getRefinanceApr().toFixed(2)}%`}
+            </span>
+            <span className="text-xs">New Borrow APR</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (tab === LeverageTab.Renew) {
       return (
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">

@@ -387,32 +387,26 @@ export default function LeverageConfirm(props: Props) {
 
   const onConfirm = async () => {
     if (!nft) return;
+    if (actionStatus === ActionStatus.Success) {
+      onClose();
+      return;
+    }
 
     // 1. implement obtain leverage logic
     if (tab === LeverageTab.LeverUp) {
       if (!nft.isApproved) {
         await handleApproveNft();
       } else {
-        if (actionStatus === ActionStatus.Success) {
-          onClose();
-          return;
-        } else {
-          await handleInitiateLoan();
-        }
+        await handleInitiateLoan();
       }
     }
 
     // 2. implement increase leverage logic
     if (tab === LeverageTab.Increase) {
-      if (actionStatus === ActionStatus.Success) {
-        onClose();
-        return;
-      } else {
-        const additionalAmount = utils
-          .parseEther((Number(targetAmount) - loanValue).toFixed(18))
-          .toString();
-        await handleIncreaseLoan(additionalAmount);
-      }
+      const additionalAmount = utils
+        .parseEther((Number(targetAmount) - loanValue).toFixed(18))
+        .toString();
+      await handleIncreaseLoan(additionalAmount);
     }
 
     // 3. implement decrease leverage logic
@@ -421,6 +415,11 @@ export default function LeverageConfirm(props: Props) {
 
     // 4. implement refinance leverage logic
     if (tab === LeverageTab.Refinance) {
+      await handleIncreaseLoan("0");
+    }
+
+    // 4. implement renew leverage logic
+    if (tab === LeverageTab.Renew) {
       await handleIncreaseLoan("0");
     }
   };
