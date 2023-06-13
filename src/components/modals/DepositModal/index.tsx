@@ -234,7 +234,6 @@ export default function DepositModal({
     setTargetLeverage("");
     setClosed(true);
     setTimeout(() => {
-      console.log("===> reset position details");
       setClosed(false);
       setPositionStatus(TxStatus.None);
       setOldPosition("");
@@ -275,6 +274,8 @@ export default function DepositModal({
   useEffect(() => {
     if (defaultNftId) {
       setSelectedNftId(defaultNftId);
+    } else {
+      setSelectedNftId(myNfts[0]?.tokenId);
     }
   }, [defaultNftId]);
 
