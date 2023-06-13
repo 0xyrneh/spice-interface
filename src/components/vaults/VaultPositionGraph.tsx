@@ -6,7 +6,7 @@ import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { VaultInfo, ReceiptToken, ChartValue } from "@/types/vault";
 import { LineChart } from "@/components/portfolio";
 import { PeriodFilter } from "@/types/common";
-import { ExampleTotalTvl } from "@/constants";
+import { ExampleShare, ExampleTotalTvl } from "@/constants";
 import moment from "moment";
 import { BLUR_API_BASE } from "@/config/constants/backend";
 import axios from "axios";
@@ -17,6 +17,7 @@ import {
   YEAR_IN_SECONDS,
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
+import { useWeb3React } from "@web3-react/core";
 
 type Props = {
   vault?: VaultInfo | undefined;
@@ -27,6 +28,7 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
+  const { account } = useWeb3React();
 
   const fetchBlurChart = async () => {
     setIsFetching(true);
@@ -40,7 +42,9 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
       );
 
       if (res.status === 200) {
-        setBlurChartInfo(formatBlurChart(res.data.data.historicalRecords));
+        setBlurChartInfo(
+          formatBlurChart(res.data.data.historicalRecords, account)
+        );
       }
     } catch (err) {
       console.log("ranks fetching error");
@@ -53,7 +57,9 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
     if (vault) {
       if (vault.isBlur) {
         const currentTime = Math.floor(Date.now() / 1000);
-        const blurPointsChart: ChartValue[] = blurChartInfo?.pointsChart ?? [];
+        const blurPointsChart: ChartValue[] = showPosition
+          ? blurChartInfo?.tvlChart ?? []
+          : blurChartInfo?.pointsChart ?? [];
 
         if (selectedPeriod === PeriodFilter.Day) {
           return blurPointsChart.filter((item) => {
@@ -74,9 +80,17 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
         }
         return blurPointsChart;
       }
-      return ExampleTotalTvl[selectedPeriod];
+      if (showPosition) {
+        return ExampleTotalTvl[selectedPeriod];
+      } else {
+        return ExampleShare[selectedPeriod];
+      }
     } else {
-      return ExampleTotalTvl[selectedPeriod];
+      if (showPosition) {
+        return ExampleTotalTvl[selectedPeriod];
+      } else {
+        return ExampleShare[selectedPeriod];
+      }
     }
   };
 
@@ -118,15 +132,13 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
               } POSITION`
             : "TOTAL SPICE POSITION"}
         </h2>
-        {vault && vault.isBlur && (
-          <button onClick={() => setShowPosition(!showPosition)}>
-            <SortUpSVG
-              className={`text-gray-100 hover:text-white ${
-                showPosition ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-        )}
+        <button onClick={() => setShowPosition(!showPosition)}>
+          <SortUpSVG
+            className={`text-gray-100 hover:text-white ${
+              showPosition ? "rotate-180" : ""
+            }`}
+          />
+        </button>
       </div>
 
       {/* vault stats */}
@@ -219,7 +231,7 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
           <LineChart
             data={getChartData()}
             period={selectedPeriod}
-            yPrefix={vault && vault.isBlur ? "" : "Ξ"}
+            yPrefix={vault && !showPosition ? "" : "Ξ"}
           />
         </div>
         <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">

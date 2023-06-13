@@ -68,7 +68,7 @@ export default function Portfolio() {
         userNftPortfolios,
 
         // TODO: remove later
-        isBlur: true,
+        // isBlur: true,
       };
     })
     .filter((row1: VaultInfo) => row1.userPosition && row1.userPosition > 0);

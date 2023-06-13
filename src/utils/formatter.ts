@@ -107,12 +107,18 @@ export const formatBlurRanking = async (
   return ranking;
 };
 
-export const formatBlurChart = (historicalRecords: any[]): any => {
+export const formatBlurChart = (
+  historicalRecords: any[],
+  _account?: string | null
+): any => {
+  const account = _account ? _account.toLowerCase() : undefined;
   let totalSpPoints = 0;
   let weekPoints = 0;
   let monthPoints = 0;
   if (historicalRecords.length > 0) {
-    totalSpPoints = historicalRecords[0].okrs.total_points;
+    totalSpPoints = account
+      ? historicalRecords[0].okrs.holders_points[account] ?? 0
+      : historicalRecords[0].okrs.total_points;
     weekPoints = totalSpPoints;
     monthPoints = totalSpPoints;
 
@@ -128,22 +134,28 @@ export const formatBlurChart = (historicalRecords: any[]): any => {
     );
 
     if (weekBeforeInfo) {
-      weekPoints -= weekBeforeInfo.okrs.total_points;
+      weekPoints -= account
+        ? weekBeforeInfo.okrs.holders_points[account] ?? 0
+        : weekBeforeInfo.okrs.total_points;
     }
     if (monthBeforeInfo) {
-      monthPoints -= monthBeforeInfo.okrs.total_points;
+      weekPoints -= account
+        ? monthBeforeInfo.okrs.holders_points[account] ?? 0
+        : monthBeforeInfo.okrs.total_points;
     }
   }
   const pointsChart: ChartValue[] = historicalRecords
     .map((item: any) => ({
       x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
-      y: item.okrs.total_points,
+      y: account
+        ? item.okrs.holders_points[account] ?? 0
+        : item.okrs.total_points,
     }))
     .reverse();
   const tvlChart: ChartValue[] = historicalRecords
     .map((item: any) => ({
       x: moment.unix(Number(item.time)).format("YYYY-M-DD HH:mm:ss"),
-      y: item.okrs.total_eth,
+      y: account ? item.okrs.holders_eth[account] ?? 0 : item.okrs.total_eth,
     }))
     .reverse();
 
