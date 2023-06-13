@@ -34,6 +34,7 @@ type Props = {
   onBlur?: () => void;
   updateLoanLender: (val: string) => void;
   getAmountFromSliderStep: (val: number) => number;
+  getSliderStepFromAmount: (val: number) => number;
 };
 
 const increaseLeverageTicks = [0, 30, 60, 90, 120, 150];
@@ -52,6 +53,7 @@ export default function LeverageInput({
   onFocus,
   onBlur,
   getAmountFromSliderStep,
+  getSliderStepFromAmount,
 }: Props) {
   const [leverage, setLeverage] = useState<number>();
   const [increaseLeverageTicks, setIncreaseLeverageTicks] = useState<number[]>(
@@ -190,39 +192,16 @@ export default function LeverageInput({
 
   // change input
   const onChangeTargetAmount = (e: any) => {
-    if (Number(e.target.value) >= 0) {
-      const sliderMax =
-        tab === LeverageTab.Increase ? maxLeverage - loanValue : maxRepayment;
-      if (sliderMax === 0) return;
+    const newValue = Number(e.target.value);
+    if (newValue >= 0) {
+      const targetMax = getAmountFromSliderStep(100);
 
-      // when the amount is greater than max leverage
-      if (e.target.value > sliderMax) {
-        onSetTargetAmount(Number(sliderMax).toFixed(4));
+      if (newValue > targetMax) {
+        onSetTargetAmount(targetMax.toFixed(4));
         onSetSliderStep(100);
-        return;
-      }
-
-      if (tab === LeverageTab.LeverUp) {
-        if (e.target.value > sliderMax) {
-          onSetTargetAmount(Number(sliderMax).toFixed(4));
-          onSetSliderStep(100);
-        } else {
-          onSetTargetAmount(e.target.value);
-          onSetSliderStep((100 * Number(e.target.value)) / sliderMax);
-        }
-      }
-
-      if (tab === LeverageTab.Increase) {
-        if (e.target.value > sliderMax) {
-          onSetTargetAmount(Number(sliderMax).toFixed(4));
-          onSetSliderStep(100);
-        } else {
-          onSetTargetAmount(e.target.value);
-          onSetSliderStep((100 * Number(e.target.value)) / sliderMax);
-        }
       } else {
         onSetTargetAmount(e.target.value);
-        onSetSliderStep((100 * Number(e.target.value)) / sliderMax);
+        onSetSliderStep(getSliderStepFromAmount(newValue));
       }
     }
   };

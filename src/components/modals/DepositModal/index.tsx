@@ -268,6 +268,46 @@ export default function DepositModal({
     return (step / 100) * maxRepayment;
   };
 
+  const getSliderStepFromAmount = (amount: number): number => {
+    if (!selectedNft) return 0;
+    const loanLenderVault =
+      leverageTab === LeverageTab.LeverUp
+        ? leverageVaults.find((row: any) => !row.deprecated)
+        : leverageVaults.find((row: any) => row.address === loanLender);
+    const { repayAmount, balance } = selectedNft?.loan;
+
+    const collateralValue = getBalanceInEther(selectedNft.value);
+    const currentLend = lendData.find(
+      (row: any) => row.address === selectedNft?.lendAddr
+    );
+    const loanValue = getBalanceInEther(balance || BigNumber.from(0));
+    const repayValue = getBalanceInEther(repayAmount || BigNumber.from(0));
+    const originMaxLtv = currentLend?.loanRatio || 0;
+    const maxRepayment = getBalanceInEther(repayAmount || BigNumber.from(0));
+
+    // max leverage calculation to prevent utilization is greater than 1
+    const lenderWethAvailable = getBalanceInEther(
+      loanLenderVault?.wethBalance || BigNumber.from(0)
+    );
+    const interesteAccrued = repayValue - loanValue;
+    const leverageAvailable = Math.max(
+      0,
+      originMaxLtv < 0.9
+        ? originMaxLtv * (collateralValue - interesteAccrued * 2)
+        : originMaxLtv * (collateralValue - loanValue - interesteAccrued * 2)
+    );
+    const maxLeverage = Math.min(leverageAvailable, lenderWethAvailable);
+
+    if (leverageTab === LeverageTab.LeverUp) {
+      return (amount * 100) / maxLeverage;
+    }
+
+    if (leverageTab === LeverageTab.Increase) {
+      return (amount * 100) / Math.max(0, maxLeverage - loanValue);
+    }
+    return (amount * 100) / maxRepayment;
+  };
+
   const reset = () => {
     setPositionAmount("");
     setTargetLeverage("");
@@ -929,6 +969,7 @@ export default function DepositModal({
                   onSetSliderStep={onSetSliderStep}
                   onSetTargetAmount={onSetTargetAmount}
                   getAmountFromSliderStep={getAmountFromSliderStep}
+                  getSliderStepFromAmount={getSliderStepFromAmount}
                 />
               )}
             </>
