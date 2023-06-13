@@ -55,6 +55,7 @@ export default function DepositModal({
   const [tooltipHover, setTooltipHover] = useState(false);
   const [hiding, setHiding] = useState(false);
   // leverage handling
+  const [leverageApproveRequired, setLeverageApproveRequired] = useState(false);
   const [loanLender, setLoanLender] = useState<string>("");
   const [sliderStep, setSliderStep] = useState<number>(0);
   const [targetAmount, setTargetAmount] = useState<string>("");
@@ -221,6 +222,11 @@ export default function DepositModal({
     setTooltipVisible(leverageHover || tooltipHover);
     setTargetAmount("");
     setSliderStep(0);
+    setLeverageApproveRequired(
+      myNfts.find((nft) => nft.tokenId === selectedNftId)?.isApproved
+        ? false
+        : true
+    );
 
     if (!selectedNft || (selectedNft && !selectedNft.isEscrowed)) {
       if (leverageTab === LeverageTab.LeverUp) return;
@@ -289,6 +295,9 @@ export default function DepositModal({
   const onConfirmLeverage = async () => {};
 
   const onCloseRightModal = () => {
+    if (leverageApproveRequired && selectedNft?.isApproved) {
+      setLeverageApproveRequired(false);
+    }
     setClosed(true);
   };
 
@@ -727,7 +736,7 @@ export default function DepositModal({
                       onClick={() => setLeverageTab(LeverageTab.LeverUp)}
                     >
                       <span className="text-xs">
-                        {selectedNft.isApproved ? "LEVER UP" : "APPROVE"}
+                        {leverageApproveRequired ? "APPROVE" : "LEVER UP"}
                       </span>
                     </Button>
                   </div>
@@ -741,6 +750,7 @@ export default function DepositModal({
                   setLeverage={setLeverage}
                   targetLeverage={targetLeverage}
                   setTargetLeverage={setTargetLeverage}
+                  requireApprove={leverageApproveRequired}
                   onFocus={() => setFocused(true)}
                   sliderStep={sliderStep}
                   targetAmount={targetAmount}
