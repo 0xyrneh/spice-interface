@@ -10,7 +10,7 @@ import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { getLenderByLoanId } from "@/state/lend/fetchGlobalLend";
 import { calculateBorrowApr, getNetApy } from "@/utils/apy";
-import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
+import { DAY_IN_SECONDS } from "@/config/constants/time";
 
 export enum LeverageTab {
   LeverUp = "Lever Up",
@@ -27,7 +27,7 @@ type Props = {
   sliderStep: number;
   targetAmount: string;
   loanLender: string;
-  onSetSliderStep: (leverage: number) => void;
+  onSetSliderStep: (step: number) => void;
   onSetTargetAmount: (value: string) => void;
 
   onFocus?: () => void;
@@ -35,9 +35,6 @@ type Props = {
   updateLoanLender: (val: string) => void;
   getAmountFromSliderStep: (val: number) => number;
 };
-
-const increaseLeverageTicks = [0, 30, 60, 90, 120, 150];
-const decreaseLeverage = [150, 120, 90, 60, 30, 0];
 
 export default function LeverageInput({
   nft,
@@ -176,6 +173,8 @@ export default function LeverageInput({
     if (tab === LeverageTab.Increase && maxLeverage === 0) return;
     if (tab === LeverageTab.Decrease && maxRepayment === 0) return;
 
+    setLeverage(undefined);
+
     if (tab === LeverageTab.Increase || tab === LeverageTab.LeverUp) {
       onSetSliderStep(step);
       onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
@@ -191,6 +190,8 @@ export default function LeverageInput({
   // change input
   const onChangeTargetAmount = (e: any) => {
     if (Number(e.target.value) >= 0) {
+      setLeverage(undefined);
+
       const sliderMax =
         tab === LeverageTab.Increase ? maxLeverage - loanValue : maxRepayment;
       if (sliderMax === 0) return;
@@ -231,6 +232,12 @@ export default function LeverageInput({
     setLeverage(val);
 
     if (tab === LeverageTab.LeverUp) {
+      const step =
+        ((val - increaseLeverageTicks[0]) /
+          (increaseLeverageTicks[5] - increaseLeverageTicks[0])) *
+        100;
+      onSetSliderStep(step);
+      onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
     }
     if (tab === LeverageTab.Increase) {
       const step =
@@ -309,6 +316,7 @@ export default function LeverageInput({
                   type="number"
                   onFocus={onFocus}
                   onBlur={onBlur}
+                  disabled={processing()}
                 />
               </div>
               <div className="flex flex-col items-end">
