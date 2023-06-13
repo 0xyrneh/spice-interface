@@ -51,9 +51,7 @@ export default function LeverageInput({
   tab,
   // old
   leverage,
-  targetLeverage,
   setLeverage,
-  setTargetLeverage,
   // new
   sliderStep,
   targetAmount,
@@ -154,8 +152,16 @@ export default function LeverageInput({
     if (tab === LeverageTab.Increase && maxLeverage === 0) return;
     if (tab === LeverageTab.Decrease && maxRepayment === 0) return;
 
-    onSetSliderStep(step);
-    onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
+    if (tab === LeverageTab.Increase || tab === LeverageTab.LeverUp) {
+      onSetSliderStep(step);
+      onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
+      return;
+    }
+
+    if (tab === LeverageTab.Decrease) {
+      onSetSliderStep(step);
+      onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
+    }
   };
 
   // change input
@@ -198,19 +204,6 @@ export default function LeverageInput({
         onSetTargetAmount(e.target.value);
         onSetSliderStep((100 * Number(e.target.value)) / sliderMax);
       }
-    }
-  };
-
-  const leverageUpdateText = () => {
-    // const _targetLev = targetLeverage === "" ? "0.00" : targetLeverage;
-    if (tab === LeverageTab.LeverUp) {
-      // return `Ξ${10.00} / ${leverage}% LTV`;
-    } else {
-      return `Ξ10.0 ${tab.toLowerCase()} to ${
-        tab === LeverageTab.Increase
-          ? leverages[leverages.length - 1]
-          : decreaseLeverage[decreaseLeverage.length - 1]
-      }% LTV`;
     }
   };
 
@@ -338,8 +331,8 @@ export default function LeverageInput({
               <input
                 className="flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
                 placeholder="0.00"
-                value={targetLeverage}
-                onChange={(e) => setTargetLeverage(e.target.value)}
+                value={targetAmount}
+                onChange={onChangeTargetAmount}
                 type="number"
                 onFocus={onFocus}
                 onBlur={onBlur}
@@ -347,17 +340,22 @@ export default function LeverageInput({
             </div>
             <div className="flex flex-col items-end">
               <span>{`Max Decrease: `}</span>
-              <span>{leverageUpdateText()}</span>
+              <span>{`Ξ${maxRepayment.toFixed(4)} to 0% LTV`}</span>
             </div>
           </div>
           <div className="flex flex-col">
             <Slider
               disabled={processing()}
-              value={tab === LeverageTab.Decrease ? leverage * -1 : leverage}
-              min={tab === LeverageTab.Decrease ? -150 : 0}
-              max={tab === LeverageTab.Decrease ? 0 : 150}
-              step={30}
-              onChange={(_val) => setLeverage(Math.abs(_val))}
+              max={100}
+              min={loanValue >= maxLeverage ? 100 : 0}
+              step={10}
+              value={sliderStep}
+              onChange={onChangeTerms}
+              // value={tab === LeverageTab.Decrease ? leverage * -1 : leverage}
+              // min={tab === LeverageTab.Decrease ? -150 : 0}
+              // max={tab === LeverageTab.Decrease ? 0 : 150}
+              // step={30}
+              // onChange={(_val) => setLeverage(Math.abs(_val))}
             />
             <div className="relative flex justify-between mt-1.5 mx-5">
               {(tab === LeverageTab.Decrease

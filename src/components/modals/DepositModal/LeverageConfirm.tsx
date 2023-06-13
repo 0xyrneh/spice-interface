@@ -25,6 +25,7 @@ import { formatLeverageMaturity } from "@/utils/time";
 interface Props {
   isOpen: boolean;
   nft: PrologueNftPortofolioInfo;
+  sliderStep: number;
   targetAmount: string;
   netApy: number;
   tab: LeverageTab;
@@ -42,7 +43,15 @@ export default function LeverageConfirm(props: Props) {
   const [termsParam, setTermsParam] = useState<any>();
   const [signatureParam, setSignatureParam] = useState<any>();
 
-  const { isOpen, nft, targetAmount, netApy, onMaxClicked, onClose } = props;
+  const {
+    isOpen,
+    nft,
+    targetAmount,
+    sliderStep,
+    netApy,
+    onMaxClicked,
+    onClose,
+  } = props;
 
   const dispatch = useDispatch();
   const { account, library } = useWeb3React();
@@ -341,7 +350,7 @@ export default function LeverageConfirm(props: Props) {
     }
   };
 
-  // obtain leverage logic by calling on-chain contract
+  // increase leverage logic by calling on-chain contract
   const handleIncreaseLeverage = async () => {
     if (!loanId) return;
 
@@ -350,6 +359,41 @@ export default function LeverageConfirm(props: Props) {
 
     try {
       await onIncreaseLeverage(loanId, termsParam, signatureParam);
+
+      setTimeout(() => {
+        dispatch(setActionStatus(ActionStatus.Success));
+        dispatch(setActionError(undefined));
+      }, 4000);
+    } catch (err: any) {
+      dispatch(setActionStatus(ActionStatus.Failed));
+
+      if (err.code) {
+        dispatch(setActionError(err.code));
+      } else {
+        const failedReason = await getTransactionByHash(pendingTxHash);
+        dispatch(setActionError(failedReason));
+      }
+    }
+  };
+
+  // decrease leverage logic by calling on-chain contract
+  const handleDecreaseLeverage = async () => {
+    if (!loanId) return;
+
+    dispatch(setActionError(undefined));
+    dispatch(setActionStatus(ActionStatus.Pending));
+
+    try {
+      if (sliderStep < 100) {
+        // "partial repay"
+        await onPartialDecreaseLeverage(
+          loanId,
+          utils.parseEther(targetAmount).toString()
+        );
+      } else {
+        // "full repay"
+        await onDecreaseLeverage(loanId);
+      }
 
       setTimeout(() => {
         dispatch(setActionStatus(ActionStatus.Success));
@@ -385,6 +429,11 @@ export default function LeverageConfirm(props: Props) {
     }
   };
 
+  // decrease loan logic
+  const handleDecreaseLoan = async () => {
+    await handleDecreaseLeverage();
+  };
+
   const onConfirm = async () => {
     if (!nft) return;
     if (actionStatus === ActionStatus.Success) {
@@ -411,6 +460,7 @@ export default function LeverageConfirm(props: Props) {
 
     // 3. implement decrease leverage logic
     if (tab === LeverageTab.Decrease) {
+      await handleDecreaseLoan();
     }
 
     // 4. implement refinance leverage logic
