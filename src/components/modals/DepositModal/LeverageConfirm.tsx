@@ -119,7 +119,7 @@ export default function LeverageConfirm(props: Props) {
     try {
       await onApprovePrologueNft(nft.tokenId);
 
-      dispatch(setActionStatus(ActionStatus.Initial));
+      dispatch(setActionStatus(ActionStatus.Success));
     } catch (err: any) {
       dispatch(setActionStatus(ActionStatus.Failed));
       if (err.code) {
@@ -503,7 +503,7 @@ export default function LeverageConfirm(props: Props) {
   const autoRenew = nft?.autoRenew || 0;
 
   return (
-    <div className="flex flex-col flex-1 justify-between">
+    <div className="flex flex-col flex-1 justify-between w-[160px]">
       <h2
         className={`font-base ${
           processing() ? "text-gray-200" : "text-white"
