@@ -11,7 +11,7 @@ import {
   LoanAndBidExposure,
 } from "@/components/vaults";
 import { ChartValue, VaultInfo } from "@/types/vault";
-import { ExampleShare, ExampleTotalTvl } from "@/constants";
+import { ExampleTotalTvl } from "@/constants";
 import { BLUR_API_BASE } from "@/config/constants/backend";
 import axios from "axios";
 import moment from "moment";
@@ -22,6 +22,7 @@ import {
   YEAR_IN_SECONDS,
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
+import { activeChainId } from "@/utils/web3";
 
 type Props = {
   vault: VaultInfo;
@@ -55,9 +56,11 @@ export default function DetailChart({ vault }: Props) {
   };
 
   const getChartData = () => {
+    const currentTime = Math.floor(Date.now() / 1000);
+
     if (showPerformance) {
+      // show asset per share graph
       if (vault.isBlur) {
-        const currentTime = Math.floor(Date.now() / 1000);
         const blurTvlChart: ChartValue[] = blurChartInfo?.tvlChart ?? [];
 
         if (selectedPeriod === PeriodFilter.Day) {
@@ -78,12 +81,57 @@ export default function DetailChart({ vault }: Props) {
           });
         }
         return blurTvlChart;
+      } else {
+        // asset share logic
+        const historialRecords = vault?.historicalRecords || [];
+        const aprField =
+          activeChainId === 1 ? "actual_returns" : "expected_return";
+        const graphField =
+          activeChainId === 1 ? "assets_per_share" : "expected_return";
+
+        // apr histories
+        const aprHistories = historialRecords
+          .map((row) => ({
+            time: 1000 * Number(row.time) || 0,
+            apr:
+              (activeChainId === 1 ? 1 : 100) *
+              (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
+            assetPerShare:
+              (activeChainId === 1 ? 1 : 100) *
+              (row?.okrs && row?.okrs[graphField] ? row?.okrs[graphField] : 0),
+          }))
+          .reverse()
+          .filter((row) => row.assetPerShare);
+
+        const chartData = aprHistories.map((row) => {
+          return {
+            x: row.time,
+            y: row.assetPerShare,
+          };
+        });
+
+        if (selectedPeriod === PeriodFilter.All) {
+          return chartData;
+        } else if (selectedPeriod === PeriodFilter.Year) {
+          return chartData.filter((item) => {
+            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Month) {
+          return chartData.filter((item) => {
+            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Week) {
+          return chartData.filter((item) => {
+            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+          });
+        } else {
+          return chartData.filter((item) => {
+            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+          });
+        }
       }
-      return ExampleShare[selectedPeriod];
     } else {
       if (vault.isBlur) {
-        const currentTime = Math.floor(Date.now() / 1000);
-
         const blurPointsChart: ChartValue[] = blurChartInfo?.pointsChart ?? [];
         if (selectedPeriod === PeriodFilter.Day) {
           return blurPointsChart.filter((item) => {
@@ -103,8 +151,10 @@ export default function DetailChart({ vault }: Props) {
           });
         }
         return blurPointsChart;
+      } else {
+        // TODO: implement position graph logic
+        return ExampleTotalTvl[selectedPeriod];
       }
-      return ExampleTotalTvl[selectedPeriod];
     }
   };
 
