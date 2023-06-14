@@ -40,8 +40,6 @@ export default function LoanExposure({
 
   const { setBlur } = useUI();
 
-  const isLeverageVault = !!vault?.leverage;
-
   const fetchLoans = async () => {
     setIsFetching(true);
 
@@ -64,12 +62,13 @@ export default function LoanExposure({
 
         const loansData = await getLoanDataFromCallData(loansCallData);
 
-        const loansOrigin = await Promise.all(
-          res.data.data.loans.map(async (row: any, index: number) => {
+        const loansOrigin = res.data.data.loans.map(
+          (row: any, index: number) => {
             const loanData = loansData[index];
+            const isPrologueLoan = row.collectionName === "Prologue";
 
             let apy = 0;
-            if (isLeverageVault) {
+            if (isPrologueLoan) {
               if (loanData.duration > 0) {
                 const m = YEAR_IN_SECONDS / loanData.duration;
                 // eslint-disable-next-line no-restricted-properties
@@ -97,14 +96,14 @@ export default function LoanExposure({
               collectionAddr: collectionAddr,
               displayName: `${row.collectionName}#${row.nftid}`,
               principal: row.outstanding,
-              matureDate: !isLeverageVault
-                ? row.start + row.duration
-                : loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS,
+              matureDate: isPrologueLoan
+                ? loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS
+                : row.start + row.duration,
               nftId: row.nftid,
               apy,
               tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
             };
-          })
+          }
         );
         setLoans([...loansOrigin]);
       }
