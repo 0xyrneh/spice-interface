@@ -30,6 +30,7 @@ interface Props {
   netApy: number;
   tab: LeverageTab;
   hiding?: boolean;
+  additionalDebt: number;
   onMaxClicked?: () => void;
   onClose: () => void;
   onSetSliderStep: (step: number) => void;
@@ -51,6 +52,7 @@ export default function LeverageConfirm(props: Props) {
     targetAmount,
     sliderStep,
     netApy,
+    additionalDebt,
     onMaxClicked,
     onClose,
     onSetSliderStep,
@@ -526,7 +528,9 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="NFT Value"
-          value={`Ξ${getBalanceInEther(nftValue).toFixed(2)}`}
+          value={`Ξ${(getBalanceInEther(nftValue) + additionalDebt).toFixed(
+            2
+          )}`}
           size="xs"
         />
         <Stats

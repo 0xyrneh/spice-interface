@@ -579,6 +579,18 @@ export default function DepositModal({
     onChangeAmount("9999999999");
   };
 
+  const getAdditionalDebt = () => {
+    if (!selectedNft) return 0;
+    if (!selectedNft.loan.balance) return 0;
+
+    const additionalDebt =
+      leverageTab === LeverageTab.Decrease
+        ? getAmountFromSliderStep(sliderStep) * -1
+        : getAmountFromSliderStep(sliderStep);
+
+    return additionalDebt;
+  };
+
   const getRefinanceApr = () => {
     if (!selectedNft) return 0;
     const loanLenderVault =
@@ -591,14 +603,9 @@ export default function DepositModal({
     if (!loanLenderVault) return 0;
     if (!selectedNft.loan.balance) return 0;
 
-    const { balance } = selectedNft.loan;
     const collateralValue = getBalanceInEther(selectedNft.value);
-    const loanValue = getBalanceInEther(balance || BigNumber.from(0));
     const originMaxLtv = currentLend?.loanRatio || 0;
-    const additionalDebt =
-      leverageTab === LeverageTab.Increase
-        ? getAmountFromSliderStep(sliderStep) - loanValue
-        : getAmountFromSliderStep(sliderStep);
+    const additionalDebt = getAdditionalDebt();
     const total = getBalanceInEther(
       loanLenderVault?.totalAssets || BigNumber.from(0)
     );
@@ -635,10 +642,7 @@ export default function DepositModal({
     const borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
     const vaultApy = (defaultVault?.apr || 0) / 100;
     const { value } = selectedNft;
-    const additionalDebt =
-      leverageTab === LeverageTab.Increase
-        ? getAmountFromSliderStep(sliderStep) - loanValue
-        : getAmountFromSliderStep(sliderStep);
+    const additionalDebt = getAdditionalDebt();
     return (
       100 *
       getNetApy(
@@ -975,6 +979,7 @@ export default function DepositModal({
           nft={selectedNft}
           vault={vault}
           netApy={calculateNetApy()}
+          additionalDebt={getAdditionalDebt()}
           sliderStep={sliderStep}
           targetAmount={targetAmount}
           oldPosition={
