@@ -42,8 +42,6 @@ export default function LoanBreakdown({
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [loans, setLoans] = useState<any[]>([]);
 
-  const isLeverageVault = !!vault?.leverage;
-
   const fetchLoans = async () => {
     setIsFetching(true);
 
