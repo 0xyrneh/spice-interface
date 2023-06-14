@@ -97,8 +97,16 @@ export default function MarketplaceExposure({
   const updateAllocations = async () => {
     if (!account && walletConnectRequired) return;
 
+    let protocolAllocations = vault?.marketplaceExposures || [];
+    if (protocolAllocations.length === 0) {
+      protocolAllocations = [
+        ...protocolAllocations,
+        { name: "SpiceDAO", allocation: 1 },
+      ];
+    }
+
     setAllocations(
-      (vault?.marketplaceExposures || [])
+      protocolAllocations
         .map((row, id) => {
           return { ...row, color: VAULT_COLLECTION_COLORS[id % 4] };
         })

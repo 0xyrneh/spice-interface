@@ -84,9 +84,16 @@ export default function CollectionExposure({
 
   const updateAllocations = async () => {
     if (!account && walletConnectRequired) return;
+    let collectionAllocations0 = vault?.collectionExposures || [];
+    if (collectionAllocations0.length === 0) {
+      collectionAllocations0 = [
+        ...collectionAllocations0,
+        { name: "Prologue", slug: "Prologue", allocation: 1 },
+      ];
+    }
 
     setAllocations(
-      (vault?.collectionExposures || [])
+      collectionAllocations0
         .map((row, id) => {
           return { ...row, color: VAULT_COLLECTION_COLORS[id % 4] };
         })
