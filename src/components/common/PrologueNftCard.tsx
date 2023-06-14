@@ -64,16 +64,6 @@ export default function PrologueNftCard({
       currentComp.style.zIndex = 50;
 
       if (side) {
-        const headerSize = expanded
-          ? breakpoint === "xl" || breakpoint === "2xl" || breakpoint === "3xl"
-            ? 32
-            : 28
-          : breakpoint === "3xl" || breakpoint === "2xl"
-          ? 32
-          : breakpoint === "xl"
-          ? 28
-          : 24;
-
         const marginY = (prevHeight * (scale - 1)) / 2;
         const marginX = (prevWidth * (scale - 1)) / 2;
 

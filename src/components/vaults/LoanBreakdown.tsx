@@ -3,7 +3,6 @@ import Image from "next/image";
 import axios from "axios";
 import moment from "moment-timezone";
 
-import { loans } from "@/constants/prologueNfts";
 import { Card, Search, Table } from "@/components/common";
 import { TableRowInfo } from "@/components/common/Table";
 import ExposureSVG from "@/assets/icons/exposure.svg";
