@@ -194,6 +194,7 @@ export default function DepositModal({
         ),
         isEscrowed: !!row?.loan?.loanId,
         apy: netApy,
+        liquidationRatio: lendGlobalData?.liquidationRatio || 0,
       };
     });
   };
@@ -592,7 +593,6 @@ export default function DepositModal({
 
   const getAdditionalDebt = () => {
     if (!selectedNft) return 0;
-    if (!selectedNft.loan.balance) return 0;
 
     const additionalDebt =
       leverageTab === LeverageTab.Decrease
