@@ -54,7 +54,7 @@ export default function VaultDetailsPage() {
     }
 
     const selectedVault = vaults.find(
-      (vault: VaultInfo) => id && vault.id === Number(id[0])
+      (vault: VaultInfo) => id && vault.address === id[0]
     );
 
     if (selectedVault) {

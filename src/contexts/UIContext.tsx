@@ -106,8 +106,7 @@ const UIProvider = ({ children }: Props) => {
           defaultNftId={defaultNftId}
           isLeverageModal={isLeverageModalOpened}
           onClose={closeDepositModal}
-          vault={activeVault}
-          vaultId={activeVault.id}
+          vaultId={activeVault.address}
         />
       )}
       <ConnectModal

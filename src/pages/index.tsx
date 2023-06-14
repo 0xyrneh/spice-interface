@@ -120,7 +120,7 @@ export default function Vaults() {
                 className="flex justify-between h-10 items-center rounded bg-gray-700 bg-opacity-45 px-4 gap-3 box-border"
                 hoverClassName="hover:bg-white hover:bg-opacity-20"
                 onClick={() => {
-                  router.push(`/vault/${activeVault.id}`);
+                  router.push(`/vault/${activeVault.address}`);
                 }}
               >
                 <span className="text-sm">View Vault</span>
@@ -141,7 +141,7 @@ export default function Vaults() {
       <News />
       <VaultList
         onClickVault={(vault) => {
-          router.push(`/vault/${vault.id}`);
+          router.push(`/vault/${vault.address}`);
         }}
       />
     </div>
