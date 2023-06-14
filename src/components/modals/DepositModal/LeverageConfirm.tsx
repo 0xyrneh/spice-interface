@@ -564,7 +564,9 @@ export default function LeverageConfirm(props: Props) {
           className="flex-1"
           title="Debt Owed"
           value={
-            debtOwed > 0 ? `Ξ${(debtOwed + additionalDebt).toFixed(2)}` : "--"
+            debtOwed + additionalDebt > 0
+              ? `Ξ${(debtOwed + additionalDebt).toFixed(2)}`
+              : "--"
           }
           size="xs"
         />
