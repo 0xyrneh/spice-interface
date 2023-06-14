@@ -932,7 +932,15 @@ export default function DepositModal({
                         disabled={leverageTab === LeverageTab.Refinance}
                         onClick={() => {
                           handleHidePopup();
-                          setLeverageTab(LeverageTab.Refinance);
+                          if (showRightModal()) {
+                            setClosed(true);
+                            setTimeout(() => {
+                              setClosed(false);
+                              setLeverageTab(LeverageTab.Refinance);
+                            }, 700);
+                          } else {
+                            setLeverageTab(LeverageTab.Refinance);
+                          }
                         }}
                       >
                         <span className="text-xs">REFINANCE</span>
