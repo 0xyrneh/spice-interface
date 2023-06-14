@@ -52,8 +52,6 @@ export default function LeverageConfirm(props: Props) {
     nft,
     targetAmount,
     sliderStep,
-    netApy,
-    borrowApr,
     additionalDebt,
     onMaxClicked,
     onClose,
@@ -509,23 +507,58 @@ export default function LeverageConfirm(props: Props) {
     }
   };
 
-  const nftValue = nft?.amount || BigNumber.from("0");
-  // const netApy = nft?.netApy || 0;
-  const debtOwed = getBalanceInEther(nft?.debtOwed || BigNumber.from(0));
   const autoRenew = nft?.autoRenew || 0;
-  const liquidationRatio = nft?.liquidationRatio ?? 0;
 
-  const getHealthFactor = () => {
-    const _debtOwed = debtOwed + additionalDebt;
-    const _nftValue = getBalanceInEther(nftValue) + additionalDebt;
+  const [nftValue, setNftValue] = useState(0);
+  const [debtOwed, setDebtOwed] = useState(0);
+  const [healthFactor, setHealthFactor] = useState(0);
+  const [netApy, setNetApy] = useState(0);
+  const [borrowApr, setBorrowApr] = useState(0);
 
-    const healthFactor =
-      _debtOwed > 0 && _nftValue > 0
-        ? (liquidationRatio * _nftValue) / _debtOwed
-        : 0;
+  useEffect(() => {
+    if (
+      actionStatus === ActionStatus.Initial ||
+      actionStatus === ActionStatus.Failed
+    ) {
+      setNftValue(
+        getBalanceInEther(nft?.amount || BigNumber.from("0")) + additionalDebt
+      );
+      setDebtOwed(
+        getBalanceInEther(nft?.debtOwed || BigNumber.from(0)) + additionalDebt
+      );
+    }
+  }, [nft, actionStatus, additionalDebt]);
 
-    return healthFactor;
-  };
+  useEffect(() => {
+    if (
+      actionStatus === ActionStatus.Initial ||
+      actionStatus === ActionStatus.Failed
+    ) {
+      setNetApy(props.netApy);
+    }
+  }, [props.netApy, actionStatus]);
+
+  useEffect(() => {
+    if (
+      actionStatus === ActionStatus.Initial ||
+      actionStatus === ActionStatus.Failed
+    ) {
+      setBorrowApr(props.borrowApr);
+    }
+  }, [props.borrowApr, actionStatus]);
+
+  useEffect(() => {
+    if (
+      actionStatus === ActionStatus.Initial ||
+      actionStatus === ActionStatus.Failed
+    ) {
+      setHealthFactor(
+        debtOwed > 0 && nftValue > 0
+          ? (nft?.liquidationRatio ?? 0 * nftValue) / debtOwed
+          : 0
+      );
+    }
+  }, [nft, actionStatus, nftValue, debtOwed]);
 
   const getBorrowApy = () => {
     const loanDuration =
@@ -557,9 +590,7 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="NFT Value"
-          value={`Ξ${(getBalanceInEther(nftValue) + additionalDebt).toFixed(
-            2
-          )}`}
+          value={`Ξ${nftValue.toFixed(2)}`}
           size="xs"
         />
         <Stats
@@ -580,11 +611,7 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="Debt Owed"
-          value={
-            debtOwed + additionalDebt > 0
-              ? `Ξ${(debtOwed + additionalDebt).toFixed(2)}`
-              : "--"
-          }
+          value={debtOwed > 0 ? `Ξ${debtOwed.toFixed(2)}` : "--"}
           size="xs"
         />
         <Stats
@@ -602,9 +629,7 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : "green"}
           className="flex-1"
           title="HF"
-          value={`${
-            getHealthFactor() > 0 ? `${getHealthFactor().toFixed(2)}` : "--"
-          }`}
+          value={`${healthFactor > 0 ? `${healthFactor.toFixed(2)}` : "--"}`}
           size="xs"
         />
         <Stats
