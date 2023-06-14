@@ -286,7 +286,7 @@ export default function LeverageInput({
               <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 text-gray-200 hover:text-gray-300 rounded gap-3 px-3 py-2 w-[110px]">
                 <LeverageSVG />
                 <input
-                  className="flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
+                  className={`flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 ${processing() ? "text-gray-200" : "text-white"}`}
                   placeholder="0.00"
                   value={targetAmount}
                   onChange={onChangeTargetAmount}
@@ -361,13 +361,14 @@ export default function LeverageInput({
             <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 text-gray-200 hover:text-gray-300 rounded gap-3 px-3 py-2 w-[110px]">
               <LeverageSVG />
               <input
-                className="flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 text-white"
+                className={`flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 ${processing() ? "text-gray-200" : "text-white"}`}
                 placeholder="0.00"
                 value={targetAmount}
                 onChange={onChangeTargetAmount}
                 type="number"
                 onFocus={onFocus}
                 onBlur={onBlur}
+                disabled={processing()}
               />
             </div>
             <div className="flex flex-col items-end">
