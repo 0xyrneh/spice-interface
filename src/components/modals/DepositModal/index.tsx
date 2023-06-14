@@ -194,6 +194,7 @@ export default function DepositModal({
         ),
         isEscrowed: !!row?.loan?.loanId,
         apy: netApy,
+        liquidationRatio: lendGlobalData?.liquidationRatio || 0,
       };
     });
   };

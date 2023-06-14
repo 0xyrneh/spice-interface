@@ -511,8 +511,20 @@ export default function LeverageConfirm(props: Props) {
   // const netApy = nft?.netApy || 0;
   const debtOwed = getBalanceInEther(nft?.debtOwed || BigNumber.from(0));
   const borrowApy = nft?.borrowApy || 0;
-  const healthFactor = nft?.healthFactor || 0;
   const autoRenew = nft?.autoRenew || 0;
+  const liquidationRatio = nft?.liquidationRatio ?? 0;
+
+  const getHealthFactor = () => {
+    const _debtOwed = debtOwed + additionalDebt;
+    const _nftValue = getBalanceInEther(nftValue) + additionalDebt;
+
+    const healthFactor =
+      _debtOwed > 0 && _nftValue > 0
+        ? (liquidationRatio * _nftValue) / _debtOwed
+        : 0;
+
+    return healthFactor;
+  };
 
   return (
     <div className="flex flex-col flex-1 justify-between w-[160px]">
@@ -551,7 +563,9 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="Debt Owed"
-          value={debtOwed > 0 ? `Ξ${debtOwed.toFixed(2)}` : "--"}
+          value={
+            debtOwed > 0 ? `Ξ${(debtOwed + additionalDebt).toFixed(2)}` : "--"
+          }
           size="xs"
         />
         <Stats
@@ -567,7 +581,9 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : "green"}
           className="flex-1"
           title="HF"
-          value={`${healthFactor > 0 ? `${healthFactor.toFixed(2)}` : "--"}`}
+          value={`${
+            getHealthFactor() > 0 ? `${getHealthFactor().toFixed(2)}` : "--"
+          }`}
           size="xs"
         />
         <Stats
