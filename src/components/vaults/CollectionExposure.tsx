@@ -34,7 +34,7 @@ export default function CollectionExposure({
 
   const { account } = useWeb3React();
 
-  const updateAllocations = async () => {
+  const updateAllocationsOld = async () => {
     if (!account && walletConnectRequired) return;
 
     const collectionAllocationsOrigin =
@@ -75,6 +75,18 @@ export default function CollectionExposure({
 
     setAllocations(
       collectionAllocations0
+        .map((row, id) => {
+          return { ...row, color: VAULT_COLLECTION_COLORS[id % 4] };
+        })
+        .sort((a, b) => (a.allocation >= b.allocation ? -1 : 1))
+    );
+  };
+
+  const updateAllocations = async () => {
+    if (!account && walletConnectRequired) return;
+
+    setAllocations(
+      (vault?.collectionExposures || [])
         .map((row, id) => {
           return { ...row, color: VAULT_COLLECTION_COLORS[id % 4] };
         })
