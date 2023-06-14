@@ -11,13 +11,13 @@ import { VaultInfo } from "@/types/vault";
 import { useUI } from "@/hooks";
 import { VAULT_LOANS } from "@/config/constants/backend";
 import { getSpiceFiLendingAddress } from "@/utils/addressHelpers";
-import { getLoanData } from "@/state/lend/fetchGlobalLend";
 import {
   getTokenImageFromReservoir,
   getNFTCollectionAddressFromSlug,
   getNFTCollectionAddressConvert,
 } from "@/utils/nft";
 import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
+import { getLoanDataFromCallData } from "@/state/lend/fetchGlobalLend";
 
 type Props = {
   vault: VaultInfo;
@@ -56,17 +56,28 @@ export default function LoanBreakdown({
         `${VAULT_LOANS}/${vault?.address}?env=${apiEnv}`
       );
       if (res.status === 200) {
-        const loansOrigin = await Promise.all(
-          res.data.data.loans.map(async (row: any) => {
-            // get onchain loan data
-            const lendAddr = getSpiceFiLendingAddress();
-            const loanData = await getLoanData(lendAddr, row.loanid);
+        const loansCallData = res.data.data.loans.map((row: any) => {
+          return {
+            address: getSpiceFiLendingAddress(),
+            name: "getLoanData",
+            params: [row.loanid],
+          };
+        });
+
+        const loansData = await getLoanDataFromCallData(loansCallData);
+
+        const loansOrigin = res.data.data.loans.map(
+          (row: any, index: number) => {
+            const loanData = loansData[index];
+            const isPrologueLoan = row.collectionName === "Prologue";
 
             let apy = 0;
-            if (isLeverageVault) {
-              const m = YEAR_IN_SECONDS / loanData.duration;
-              // eslint-disable-next-line no-restricted-properties
-              apy = 100 * (Math.pow(1 + loanData.interestRate / m, m) - 1);
+            if (isPrologueLoan) {
+              if (loanData.duration > 0) {
+                const m = YEAR_IN_SECONDS / loanData.duration;
+                // eslint-disable-next-line no-restricted-properties
+                apy = 100 * (Math.pow(1 + loanData.interestRate / m, m) - 1);
+              }
             } else {
               const m = YEAR_IN_SECONDS / row.duration;
               // eslint-disable-next-line no-restricted-properties
@@ -89,14 +100,14 @@ export default function LoanBreakdown({
               collectionAddr: collectionAddr,
               displayName: `${row.collectionName}#${row.nftid}`,
               principal: row.outstanding,
-              matureDate: !isLeverageVault
-                ? row.start + row.duration
-                : loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS,
+              matureDate: isPrologueLoan
+                ? loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS
+                : row.start + row.duration,
               nftId: row.nftid,
               apy,
               tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
             };
-          })
+          }
         );
         setLoans([...loansOrigin]);
       }
