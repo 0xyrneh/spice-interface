@@ -590,7 +590,13 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="Auto Renew"
-          value={autoRenew > 0 ? `${formatLeverageMaturity(autoRenew)}` : "--"}
+          value={
+            tab === LeverageTab.Decrease
+              ? autoRenew > 0
+                ? `${formatLeverageMaturity(autoRenew)}`
+                : "--"
+              : "2555d"
+          }
           size="xs"
         />
       </div>
