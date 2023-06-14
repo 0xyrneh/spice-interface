@@ -65,8 +65,9 @@ export interface VaultInfo {
   id: number;
   backgroundImage?: string;
   category: VaultFilter;
-  // TODO: remove later since this is template type for blur vault
   isBlur?: boolean;
+  marketplaceExposures?: any[];
+  collectionExposures?: any[];
 }
 
 export interface LeverageVaultInfo {

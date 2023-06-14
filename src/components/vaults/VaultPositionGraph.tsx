@@ -21,9 +21,14 @@ import { useWeb3React } from "@web3-react/core";
 
 type Props = {
   vault?: VaultInfo | undefined;
+  vaults: VaultInfo[];
   totalPosition: number;
 };
-export default function VaultPositionGraph({ vault, totalPosition }: Props) {
+export default function VaultPositionGraph({
+  vault,
+  vaults,
+  totalPosition,
+}: Props) {
   const [showPosition, setShowPosition] = useState(true);
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
@@ -98,8 +103,15 @@ export default function VaultPositionGraph({ vault, totalPosition }: Props) {
     let annualYield = 0;
 
     if (vault) {
+      // annual yield of selected vault
       const { userPosition, apr } = vault;
       annualYield = ((userPosition || 0) * (apr || 0)) / 100;
+    } else {
+      // total annual yield
+      vaults.map((row) => {
+        const { userPosition, apr } = row;
+        annualYield += ((userPosition || 0) * (apr || 0)) / 100;
+      });
     }
 
     return annualYield;

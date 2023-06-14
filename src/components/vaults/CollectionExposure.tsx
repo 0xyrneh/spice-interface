@@ -15,6 +15,7 @@ import Table, { TableRowInfo } from "../common/Table";
 
 type Props = {
   vault?: VaultInfo;
+  vaults: VaultInfo[];
   className?: string;
   isBreakdown?: boolean;
   hasToggle?: boolean;
@@ -24,6 +25,7 @@ type Props = {
 
 export default function CollectionExposure({
   vault,
+  vaults,
   className,
   isBreakdown,
   hasToggle,
@@ -34,7 +36,7 @@ export default function CollectionExposure({
 
   const { account } = useWeb3React();
 
-  const updateAllocations = async () => {
+  const updateAllocationsOld = async () => {
     if (!account && walletConnectRequired) return;
 
     const collectionAllocationsOrigin =
@@ -75,6 +77,58 @@ export default function CollectionExposure({
 
     setAllocations(
       collectionAllocations0
+        .map((row, id) => {
+          return { ...row, color: VAULT_COLLECTION_COLORS[id % 4] };
+        })
+        .sort((a, b) => (a.allocation >= b.allocation ? -1 : 1))
+    );
+  };
+
+  const updateAllocations = async () => {
+    if (!account && walletConnectRequired) return;
+
+    let collectionAllocations: any[] = [];
+
+    if (!vault) {
+      // vaults excepting blur vault
+      const vaults0 = vaults.filter((vault) => !vault.isBlur);
+
+      let userTotalPosition = 0;
+      vaults0.map((vault: VaultInfo) => {
+        userTotalPosition += vault?.userPosition || 0;
+      });
+
+      let collectionAllocationsObj: any = {};
+      vaults0.map((row) => {
+        const vaultPortion = (row?.userPosition || 0) / userTotalPosition;
+        (row?.collectionExposures || []).map((row1) => {
+          const { name, allocation } = row1;
+          collectionAllocationsObj[name] =
+            (collectionAllocationsObj[name] || 0) + vaultPortion * allocation;
+        });
+
+        collectionAllocations = Object.entries(collectionAllocationsObj).map(
+          (row) => {
+            return {
+              name: row[0],
+              allocation: row[1],
+            };
+          }
+        );
+      });
+    } else {
+      collectionAllocations = vault?.collectionExposures || [];
+    }
+
+    if (collectionAllocations.length === 0) {
+      collectionAllocations = [
+        ...collectionAllocations,
+        { name: "Prologue", slug: "Prologue", allocation: 1 },
+      ];
+    }
+
+    setAllocations(
+      collectionAllocations
         .map((row, id) => {
           return { ...row, color: VAULT_COLLECTION_COLORS[id % 4] };
         })
@@ -149,7 +203,7 @@ export default function CollectionExposure({
     setAllocations([]);
     updateAllocations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address, account]);
+  }, [vault?.address, vaults.length, account]);
 
   const onSwitchTable = () => {
     if (!hasToggle) return;

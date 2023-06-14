@@ -37,7 +37,7 @@ export const vaultSlice = createSlice({
         userInfo: state.defaultVault?.userInfo || {},
       };
       state.leverageVaults = action.payload.leverageVaults;
-      state.vaults = action.payload.vaults;
+      state.blurVaults = action.payload.blurVaults;
       state.vaults = action.payload.vaults.map((row: VaultInfo, i: number) => ({
         ...row,
         userInfo: state.vaults[i]?.userInfo || {},

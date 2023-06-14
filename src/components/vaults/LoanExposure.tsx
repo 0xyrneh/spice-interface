@@ -17,7 +17,7 @@ import {
 } from "@/utils/nft";
 import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getSpiceFiLendingAddress } from "@/utils/addressHelpers";
-import { getLoanData } from "@/state/lend/fetchGlobalLend";
+import { getLoanDataFromCallData } from "@/state/lend/fetchGlobalLend";
 
 type Props = {
   vault: VaultInfo;
@@ -54,17 +54,27 @@ export default function LoanExposure({
         `${VAULT_LOANS}/${vault?.address}?env=${apiEnv}`
       );
       if (res.status === 200) {
+        const loansCallData = res.data.data.loans.map((row: any) => {
+          return {
+            address: getSpiceFiLendingAddress(),
+            name: "getLoanData",
+            params: [row.loanid],
+          };
+        });
+
+        const loansData = await getLoanDataFromCallData(loansCallData);
+
         const loansOrigin = await Promise.all(
-          res.data.data.loans.map(async (row: any) => {
-            // get onchain loan data
-            const lendAddr = getSpiceFiLendingAddress();
-            const loanData = await getLoanData(lendAddr, row.loanid);
+          res.data.data.loans.map(async (row: any, index: number) => {
+            const loanData = loansData[index];
 
             let apy = 0;
             if (isLeverageVault) {
-              const m = YEAR_IN_SECONDS / loanData.duration;
-              // eslint-disable-next-line no-restricted-properties
-              apy = 100 * (Math.pow(1 + loanData.interestRate / m, m) - 1);
+              if (loanData.duration > 0) {
+                const m = YEAR_IN_SECONDS / loanData.duration;
+                // eslint-disable-next-line no-restricted-properties
+                apy = 100 * (Math.pow(1 + loanData.interestRate / m, m) - 1);
+              }
             } else {
               const m = YEAR_IN_SECONDS / row.duration;
               // eslint-disable-next-line no-restricted-properties

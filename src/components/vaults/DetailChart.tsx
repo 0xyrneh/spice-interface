@@ -256,11 +256,13 @@ export default function DetailChart({ vault }: Props) {
             <MarketplaceExposure
               className="flex-1"
               vault={vault}
+              vaults={[]}
               walletConnectRequired={false}
             />
             <CollectionExposure
               className="flex-1"
               vault={vault}
+              vaults={[]}
               walletConnectRequired={false}
             />
           </>
