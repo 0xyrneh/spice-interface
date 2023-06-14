@@ -102,7 +102,7 @@ export default function Vaults() {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-gray-200 text-sm font-medium">
-                  HIST.APY
+                  {`HIST. APY`}
                 </span>
                 <span className="text-xl font-bold">
                   {`${(activeVault?.historicalApy || 0)?.toFixed(2)}%`}
@@ -110,7 +110,7 @@ export default function Vaults() {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-gray-200 text-sm font-medium">
-                  EST.APY
+                  {`EST. APY`}
                 </span>
                 <span className="text-xl font-bold">
                   {`${(activeVault?.apy || 0)?.toFixed(2)}%`}
