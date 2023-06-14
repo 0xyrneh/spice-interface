@@ -19,7 +19,11 @@ import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import { isValidNumber } from "@/utils/regex";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../../common";
 import PositionInput from "./PositionInput";
-import { YEAR_IN_SECONDS, DAY_IN_SECONDS } from "@/config/constants/time";
+import {
+  YEAR_IN_SECONDS,
+  DAY_IN_SECONDS,
+  YEAR_IN_DAYS,
+} from "@/config/constants/time";
 import { getTokenImageFromReservoir } from "@/utils/nft";
 import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 import ConfirmPopup from "./ConfirmPopup";
@@ -195,6 +199,7 @@ export default function DepositModal({
         isEscrowed: !!row?.loan?.loanId,
         apy: netApy,
         liquidationRatio: lendGlobalData?.liquidationRatio || 0,
+        loanDuration,
       };
     });
   };
@@ -601,7 +606,6 @@ export default function DepositModal({
       (row: any) => row.address === selectedNft?.lendAddr
     );
     if (!loanLenderVault) return 0;
-    if (!selectedNft.loan.balance) return 0;
 
     const collateralValue = getBalanceInEther(selectedNft.value);
     const originMaxLtv = currentLend?.loanRatio || 0;
@@ -612,7 +616,10 @@ export default function DepositModal({
     const available = getBalanceInEther(
       loanLenderVault?.wethBalance || BigNumber.from(0)
     );
-    const duration = (selectedNft?.loan?.terms.duration || 0) / DAY_IN_SECONDS;
+    const duration =
+      leverageTab === LeverageTab.Decrease
+        ? (selectedNft?.loan?.terms?.duration || 0) / DAY_IN_SECONDS
+        : YEAR_IN_DAYS;
     const ltv =
       originMaxLtv > 1
         ? getAmountFromSliderStep(sliderStep) /
@@ -624,7 +631,7 @@ export default function DepositModal({
   };
 
   const getBorrowApr = () => {
-    if (leverageTab === LeverageTab.LeverUp) return 0;
+    // if (leverageTab === LeverageTab.LeverUp) return 0;
     if (leverageTab === LeverageTab.Decrease)
       return 100 * (selectedNft?.borrowApr || 0);
     return getRefinanceApr();
@@ -978,6 +985,7 @@ export default function DepositModal({
         <ConfirmPopup
           nft={selectedNft}
           vault={vault}
+          borrowApr={getBorrowApr()}
           netApy={calculateNetApy()}
           additionalDebt={getAdditionalDebt()}
           sliderStep={sliderStep}
