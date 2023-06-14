@@ -35,8 +35,7 @@ import {
 import { calculateBorrowApr, getNetApy } from "@/utils/apy";
 
 interface Props extends ModalProps {
-  vault: VaultInfo;
-  vaultId: number;
+  vaultId: string;
   defaultNftId?: number;
   isLeverageModal?: boolean;
 }
@@ -46,7 +45,6 @@ export default function DepositModal({
   defaultNftId,
   isLeverageModal,
   vaultId,
-  // vault,
   onClose,
 }: Props) {
   const [positionSelected, setPositionSelected] = useState(true);
@@ -79,11 +77,11 @@ export default function DepositModal({
   );
 
   const [vault, setVault] = useState(
-    vaults.find((item) => item.id === vaultId)!
+    vaults.find((item) => item.address === vaultId)!
   );
 
   useEffect(() => {
-    setVault(vaults.find((item) => item.id === vaultId)!);
+    setVault(vaults.find((item) => item.address === vaultId)!);
   }, [vaults, vaultId]);
 
   const dispatch = useAppDispatch();
@@ -92,7 +90,9 @@ export default function DepositModal({
   const userWethBalance = vault?.userInfo?.tokenBalance;
   const isFungible = vault?.fungible;
   const { data: lendData } = useAppSelector((state) => state.lend);
-  const { pendingTxHash, actionStatus } = useAppSelector((state) => state.modal);
+  const { pendingTxHash, actionStatus } = useAppSelector(
+    (state) => state.modal
+  );
   const { ethPrice } = useAppSelector((state) => state.oracle);
 
   const {

@@ -243,7 +243,7 @@ export default function LoanExposure({
             ? "hidden xl:table-cell w-[50px]"
             : "hidden lg:table-cell w-[50px]",
         format: (item) => {
-          return formatMaturity(item?.matureDate || 0);
+          return formatMaturity(1000 * (item?.matureDate || 0));
         },
       },
       {

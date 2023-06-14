@@ -42,8 +42,6 @@ export default function LoanBreakdown({
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [loans, setLoans] = useState<any[]>([]);
 
-  const isLeverageVault = !!vault?.leverage;
-
   const fetchLoans = async () => {
     setIsFetching(true);
 
@@ -142,7 +140,7 @@ export default function LoanBreakdown({
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
-        title: `LOANS [${loans.length}]`,
+        title: `LOANS111 [${loans.length}]`,
         key: "displayName",
         itemPrefix: (item) => {
           return (
@@ -239,7 +237,7 @@ export default function LoanBreakdown({
       },
       {
         title: "DUE",
-        key: "due",
+        key: "matureDate",
         rowClass: () =>
           loanExpanded
             ? "w-[10%]"
@@ -247,7 +245,7 @@ export default function LoanBreakdown({
             ? "hidden xl:table-cell w-[50px]"
             : "hidden lg:table-cell w-[50px]",
         format: (item) => {
-          return formatMaturity(item?.matureDate || 0);
+          return formatMaturity(1000 * (item?.matureDate || 0));
         },
       },
       {

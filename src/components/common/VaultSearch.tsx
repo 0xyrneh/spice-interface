@@ -93,7 +93,7 @@ const VaultSearch = () => {
                 className="flex justify-between items-center text-xs rounded p-[5px] hover:bg-gray-300 hover:bg-opacity-10 hover:text-white gap-1"
                 onClick={() => {
                   setOpened(false);
-                  router.push(`/vault/${vault.id}`);
+                  router.push(`/vault/${vault.address}`);
                 }}
               >
                 <div className="flex items-center gap-3 text-left w-[calc(100%-60px)]">
@@ -126,7 +126,7 @@ const VaultSearch = () => {
                 className="flex justify-between items-center text-xs rounded p-[5px] hover:bg-gray-300 hover:bg-opacity-10 hover:text-white"
                 onClick={() => {
                   setOpened(false);
-                  router.push(`/vault/${vault.id}`);
+                  router.push(`/vault/${vault.address}`);
                 }}
               >
                 <div className="flex items-center gap-3 text-left w-[calc(100%-60px)]">
@@ -159,8 +159,8 @@ const VaultSearch = () => {
                 className="flex justify-between items-center text-xs rounded p-[5px] hover:bg-gray-300 hover:bg-opacity-10"
                 onClick={() => {
                   setOpened(false);
-                  if (defaultVault?.id) {
-                    router.push(`/vault/${defaultVault?.id}`);
+                  if (defaultVault?.address) {
+                    router.push(`/vault/${defaultVault?.address}`);
                   }
                 }}
               >

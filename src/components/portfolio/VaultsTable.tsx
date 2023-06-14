@@ -100,7 +100,7 @@ export default function VaultsTable({
             type="secondary"
             className="px-1 h-[22px]"
             onClick={() => {
-              router.push(`/vault/${item.id}`);
+              router.push(`/vault/${item.address}`);
             }}
           >
             <span className="text-xs font-bold">DETAILS</span>
@@ -163,7 +163,7 @@ export default function VaultsTable({
         defaultSortKey="apy"
         bodyClass="h-[calc(100%-40px)]"
         isActive={(item) => {
-          return !!selectedVault && item.id === selectedVault.id;
+          return !!selectedVault && item.address === selectedVault.address;
         }}
         isLoading={isFetching}
         walletConnectRequired={true}
