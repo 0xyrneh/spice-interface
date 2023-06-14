@@ -176,15 +176,24 @@ export default function Portfolio() {
                 vault={selectedVault}
               />
             ) : (
-              <MarketplaceExposure className="flex-1" vault={selectedVault} />
+              <MarketplaceExposure
+                className="flex-1"
+                vault={selectedVault}
+                vaults={vaults}
+              />
             ))}
 
           {!selectedVault && (
-            <MarketplaceExposure className="flex-1" vault={selectedVault} />
+            <MarketplaceExposure
+              className="flex-1"
+              vault={selectedVault}
+              vaults={vaults}
+            />
           )}
           {(!selectedVault || !selectedVault.isBlur) && (
             <CombineExposure
               vault={selectedVault}
+              vaults={vaults}
               hasToggle={
                 selectedVault && selectedVault.receiptToken === ReceiptToken.NFT
               }

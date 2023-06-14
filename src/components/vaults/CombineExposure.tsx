@@ -5,11 +5,12 @@ import { MarketplaceExposure, CollectionExposure } from "../vaults";
 
 type Props = {
   vault?: VaultInfo;
+  vaults: VaultInfo[];
   className?: string;
   hasToggle?: boolean;
 };
 
-export default function CombineExposure({ vault, hasToggle }: Props) {
+export default function CombineExposure({ vault, vaults, hasToggle }: Props) {
   const [exposureKey, setExposureKey] = useState("collection");
 
   const onToggle = () => {
@@ -27,12 +28,14 @@ export default function CombineExposure({ vault, hasToggle }: Props) {
       <MarketplaceExposure
         className={`flex-1 ${exposureKey === "marketplace" ? "" : "hidden"}`}
         vault={vault}
+        vaults={vaults}
         hasToggle={hasToggle}
         onToggle={onToggle}
       />
       <CollectionExposure
         className={`flex-1 ${exposureKey === "collection" ? "" : "hidden"}`}
         vault={vault}
+        vaults={vaults}
         hasToggle={hasToggle}
         onToggle={onToggle}
       />

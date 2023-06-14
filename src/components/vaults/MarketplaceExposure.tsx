@@ -16,6 +16,7 @@ import Table, { TableRowInfo } from "../common/Table";
 
 type Props = {
   vault?: VaultInfo;
+  vaults: VaultInfo[];
   className?: string;
   isBreakdown?: boolean;
   hasToggle?: boolean;
@@ -25,6 +26,7 @@ type Props = {
 
 export default function MarketplaceExposure({
   vault,
+  vaults,
   className,
   isBreakdown,
   hasToggle,
@@ -97,14 +99,45 @@ export default function MarketplaceExposure({
   const updateAllocations = async () => {
     if (!account && walletConnectRequired) return;
 
-    let protocolAllocations = vault?.marketplaceExposures || [];
+    let protocolAllocations: any[] = [];
+
+    if (!vault) {
+      // vaults excepting blur vault
+      const vaults0 = vaults.filter((vault) => !vault.isBlur);
+
+      let userTotalPosition = 0;
+      vaults0.map((vault: VaultInfo) => {
+        userTotalPosition += vault?.userPosition || 0;
+      });
+
+      let protocolAllocationsObj: any = {};
+      vaults0.map((row) => {
+        const vaultPortion = (row?.userPosition || 0) / userTotalPosition;
+        (row?.marketplaceExposures || []).map((row1) => {
+          const { name, allocation } = row1;
+          protocolAllocationsObj[name] =
+            (protocolAllocationsObj[name] || 0) + vaultPortion * allocation;
+        });
+
+        protocolAllocations = Object.entries(protocolAllocationsObj).map(
+          (row) => {
+            return {
+              name: row[0],
+              allocation: row[1],
+            };
+          }
+        );
+      });
+    } else {
+      protocolAllocations = vault?.marketplaceExposures || [];
+    }
+
     if (protocolAllocations.length === 0) {
       protocolAllocations = [
         ...protocolAllocations,
         { name: "SpiceDAO", allocation: 1 },
       ];
     }
-
     setAllocations(
       protocolAllocations
         .map((row, id) => {
@@ -156,7 +189,7 @@ export default function MarketplaceExposure({
     setAllocations([]);
     updateAllocations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address, account]);
+  }, [vault?.address, vaults.length, account]);
 
   const onSwitchTable = () => {
     if (!hasToggle) return;
