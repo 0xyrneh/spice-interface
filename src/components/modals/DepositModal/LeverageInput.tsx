@@ -130,7 +130,7 @@ export default function LeverageInput({
     for (let index = 0; index <= 5; index++) {
       decreaseTicks = [
         ...decreaseTicks,
-        index * ((maxLtv * maxRepayment) / maxLeverage / 5) * maxLtv,
+        index * (maxRepayment / maxLeverage / 5) * maxLtv,
       ];
     }
     setDecreaseLeverageTicks([...decreaseTicks.reverse()]);
@@ -286,7 +286,9 @@ export default function LeverageInput({
               <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 text-gray-200 hover:text-gray-300 rounded gap-3 px-3 py-2 w-[110px]">
                 <LeverageSVG />
                 <input
-                  className={`flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 ${processing() ? "text-gray-200" : "text-white"}`}
+                  className={`flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 ${
+                    processing() ? "text-gray-200" : "text-white"
+                  }`}
                   placeholder="0.00"
                   value={targetAmount}
                   onChange={onChangeTargetAmount}
@@ -361,7 +363,9 @@ export default function LeverageInput({
             <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 text-gray-200 hover:text-gray-300 rounded gap-3 px-3 py-2 w-[110px]">
               <LeverageSVG />
               <input
-                className={`flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 ${processing() ? "text-gray-200" : "text-white"}`}
+                className={`flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 ${
+                  processing() ? "text-gray-200" : "text-white"
+                }`}
                 placeholder="0.00"
                 value={targetAmount}
                 onChange={onChangeTargetAmount}
@@ -380,7 +384,7 @@ export default function LeverageInput({
             <Slider
               disabled={processing()}
               max={100}
-              min={loanValue >= maxLeverage ? 100 : 0}
+              min={0}
               step={10}
               value={sliderStep}
               onChange={onChangeTerms}
