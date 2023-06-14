@@ -239,45 +239,19 @@ export const fetchBlurVaults = async (vaults: any[]) => {
   try {
     const onChainInfo = await Promise.all(
       vaultsWithDetails.map((row: VaultInfo) => {
-        const callData = row?.fungible
-          ? [
-              {
-                address: row.address,
-                name: "totalAssets",
-                params: [],
-              },
-              {
-                address: row.address,
-                name: "totalSupply",
-                params: [],
-              },
-            ]
-          : [
-              {
-                address: row.address,
-                name: "totalShares",
-                params: [],
-              },
-              {
-                address: row.address,
-                name: "totalAssets",
-                params: [],
-              },
-              {
-                address: row.address,
-                name: "totalSupply",
-                params: [],
-              },
-              {
-                address: row.address,
-                name: "maxSupply",
-                params: [],
-              },
-            ];
-        return multicall(
-          row?.fungible ? VaultAbi : SpiceFiNFT4626Abi,
-          callData
-        );
+        const callData = [
+          {
+            address: row.address,
+            name: "totalAssets",
+            params: [],
+          },
+          {
+            address: row.address,
+            name: "totalSupply",
+            params: [],
+          },
+        ];
+        return multicall(VaultAbi, callData);
       })
     );
 
@@ -311,7 +285,7 @@ export const fetchBlurVaults = async (vaults: any[]) => {
           row?.deprecated,
           row.name
         ),
-        receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
+        receiptToken: ReceiptToken.ERC20,
         userInfo: {
           allowance: BigNumber.from(0),
           tokenBalance: BigNumber.from(0),
