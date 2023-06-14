@@ -73,7 +73,6 @@ export default function ConfirmPopup(props: Props) {
   }, [props.hiding, props.positionSelected]);
 
   useEffect(() => {
-    dispatch(setActionStatus(ActionStatus.Initial));
     dispatch(setActionError(undefined));
     dispatch(setPendingTxHash(""));
   }, [show]);

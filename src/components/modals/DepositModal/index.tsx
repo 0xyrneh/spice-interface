@@ -88,7 +88,7 @@ export default function DepositModal({
   const userWethBalance = vault?.userInfo?.tokenBalance;
   const isFungible = vault?.fungible;
   const { data: lendData } = useAppSelector((state) => state.lend);
-  const { pendingTxHash } = useAppSelector((state) => state.modal);
+  const { pendingTxHash, actionStatus } = useAppSelector((state) => state.modal);
   const { ethPrice } = useAppSelector((state) => state.oracle);
 
   const {
@@ -378,7 +378,7 @@ export default function DepositModal({
   useEffect(() => {
     setClosed(false);
     setFocused(false);
-  }, [positionAmount, targetLeverage]);
+  }, [positionAmount, targetLeverage, targetAmount]);
 
   useEffect(() => {
     setClosed(false);
@@ -462,13 +462,22 @@ export default function DepositModal({
     }
   };
 
-  const onConfirmLeverage = async () => {};
+  const onConfirmLeverage = async () => {
+    reset();
+  };
 
   const onCloseRightModal = () => {
     if (leverageApproveRequired && selectedNft?.isApproved) {
       setLeverageApproveRequired(false);
     }
     setClosed(true);
+    setFocused(false);
+    setTargetAmount("");
+    setSliderStep(0);
+    setTimeout(() => {
+      setClosed(false);
+      dispatch(setActionStatus(ActionStatus.Initial));
+    }, 500);
   };
 
   const handleHidePopup = () => {
@@ -512,6 +521,7 @@ export default function DepositModal({
       if (selectedNft && !selectedNft.isApproved) return true;
       if (leverageTab === LeverageTab.Refinance) return true;
       if (leverageTab === LeverageTab.Renew) return true;
+      if (actionStatus === ActionStatus.Success) return true;
       if (leverageTab === LeverageTab.Increase) {
         if (!selectedNft) return false;
 
@@ -528,6 +538,7 @@ export default function DepositModal({
     positionSelected,
     positionStatus,
     positionAmount,
+    actionStatus,
     leverageTab,
     sliderStep,
     targetAmount,
