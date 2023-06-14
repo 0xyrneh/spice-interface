@@ -155,6 +155,7 @@ export default function Portfolio() {
         {/* vault chart graph */}
         <VaultPositionGraph
           vault={selectedVault}
+          vaults={vaults}
           totalPosition={getUserTotalPosition()}
         />
 
