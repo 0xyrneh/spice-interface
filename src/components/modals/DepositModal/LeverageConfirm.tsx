@@ -599,10 +599,10 @@ export default function LeverageConfirm(props: Props) {
           title="Net APY"
           value={`${netApy ? `${netApy.toFixed(2)}%` : "--"}`}
           size="xs"
-          showMax={
-            nft.isApproved &&
-            (tab === LeverageTab.LeverUp || tab === LeverageTab.Increase)
-          }
+          // showMax={
+          //   nft.isApproved &&
+          //   (tab === LeverageTab.LeverUp || tab === LeverageTab.Increase)
+          // }
           onMaxClicked={onMaxClicked}
         />
       </div>
