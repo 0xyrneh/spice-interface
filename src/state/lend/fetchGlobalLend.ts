@@ -64,6 +64,20 @@ export const getLoanData = async (lendAddr: string, loanId: number) => {
   };
 };
 
+export const getLoanDataFromCallData = async (callData: any[]) => {
+  const loanData = await multicall(SpiceFiLendingAbi, callData);
+
+  return loanData.map((row: any) => {
+    const { startedAt, terms } = row[0];
+
+    return {
+      startedAt: startedAt.toNumber(),
+      duration: terms.duration,
+      interestRate: terms.interestRate.toNumber() / 10000,
+    };
+  });
+};
+
 export const getLenderByLoanId = async (
   lenderNoteAddr: string,
   loanId: number

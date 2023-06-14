@@ -35,7 +35,7 @@ export default function MarketplaceExposure({
 
   const { account } = useWeb3React();
 
-  const updateAllocations = async () => {
+  const updateAllocationsOld = async () => {
     if (!account && walletConnectRequired) return;
 
     const protocolAllocationsOrigin = vault?.okrs?.protocol_allocations || {};
@@ -84,8 +84,21 @@ export default function MarketplaceExposure({
         { name: "SpiceDAO", allocation: 1 },
       ];
     }
+
     setAllocations(
       protocolAllocations1
+        .map((row, id) => {
+          return { ...row, color: VAULT_COLLECTION_COLORS[id % 4] };
+        })
+        .sort((a, b) => (a.allocation >= b.allocation ? -1 : 1))
+    );
+  };
+
+  const updateAllocations = async () => {
+    if (!account && walletConnectRequired) return;
+
+    setAllocations(
+      (vault?.marketplaceExposures || [])
         .map((row, id) => {
           return { ...row, color: VAULT_COLLECTION_COLORS[id % 4] };
         })
