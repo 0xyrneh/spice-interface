@@ -36,6 +36,7 @@ export interface VaultInfo {
   totalShares?: number;
   apr?: number;
   apy?: number;
+  historicalApy?: number;
   totalSupply?: number;
   maxSupply?: number;
   tvlChange?: number;

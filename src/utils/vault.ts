@@ -28,8 +28,12 @@ export const getVaultDescription = (
 export const getVaultBackgroundImage = (
   isFungible?: boolean,
   type?: string,
-  isDeprecated?: boolean
+  isDeprecated?: boolean,
+  name?: string
 ): string => {
+  if (name === "blur") {
+    return VAULT_BACKGROUND_IMAGES.blur;
+  }
   if (isFungible) {
     if (type === "aggregator") {
       return VAULT_BACKGROUND_IMAGES.flagship;
@@ -44,8 +48,12 @@ export const getVaultBackgroundImage = (
 export const getVaultLogo = (
   isFungible?: boolean,
   type?: string,
-  isDeprecated?: boolean
+  isDeprecated?: boolean,
+  name?: string
 ): string => {
+  if (name === "blur") {
+    return VAULT_LOGOS.blur;
+  }
   if (isFungible) {
     if (type === "aggregator") {
       return VAULT_LOGOS.flagship;

@@ -4,6 +4,7 @@ import axios from "axios";
 import { VAULT_API } from "@/config/constants/backend";
 import {
   DEFAULT_AGGREGATOR_VAULT,
+  DEFAULT_BLUR_VAULT,
   VAULT_BLACKLISTED,
 } from "@/config/constants/vault";
 import multicall from "@/utils/multicall";
@@ -20,6 +21,14 @@ import { VaultFilter } from "@/types/common";
 import { VAULT_DESCRIPTIONS, VAULT_REQUIREMENTS } from "@/constants/vaults";
 
 const apiEnv = activeChainId === 1 ? "prod" : "goerli";
+
+const getVaultHistoricalApy = (vaultInfo: VaultInfo) => {
+  const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
+  return (
+    (activeChainId === 1 ? 1 : 100) *
+    (vaultInfo?.okrs ? vaultInfo?.okrs[aprField] : 0)
+  );
+};
 
 // fetch onchain/offchain data of active vaults
 export const fetchActiveVaults = async (vaults: any[]) => {
@@ -107,12 +116,19 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           maxSupply: row?.fungible ? 0 : onChainInfo[i][3][0].toNumber(),
           apr: 100 * (row?.okrs?.expected_return || 0),
           apy: 100 * (row?.okrs?.expected_return || 0),
+          historicalApy: getVaultHistoricalApy(row),
           name: getVaultDisplayName(row?.name),
-          logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated),
+          logo: getVaultLogo(
+            row?.fungible,
+            row?.type,
+            row?.deprecated,
+            row.name
+          ),
           backgroundImage: getVaultBackgroundImage(
             row?.fungible,
             row?.type,
-            row?.deprecated
+            row?.deprecated,
+            row.name
           ),
           receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
           userInfo: {
@@ -131,12 +147,14 @@ export const fetchActiveVaults = async (vaults: any[]) => {
         totalSupply: 0,
         apr: 100 * (row?.okrs?.expected_return || 0),
         apy: 100 * (row?.okrs?.expected_return || 0),
+        historicalApy: getVaultHistoricalApy(row),
         name: getVaultDisplayName(row?.name),
-        logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated),
+        logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated, row.name),
         backgroundImage: getVaultBackgroundImage(
           row?.fungible,
           row?.type,
-          row?.deprecated
+          row?.deprecated,
+          row.name
         ),
         receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
         userInfo: {
@@ -146,6 +164,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           amount: BigNumber.from(0),
         },
         category: VaultFilter.Public,
+        isBlur: false,
       };
     });
 
@@ -190,9 +209,121 @@ export const fetchLeverageVaults = async (vaults: any[]) => {
       wethBalance: onChainInfo[i][0][0],
       totalAssets: onChainInfo[i][1][0],
       category: VaultFilter.Public,
+      isBlur: false,
     }));
 
     return data;
+  } catch (err) {
+    console.log("err", err);
+    return [];
+  }
+};
+
+// fetch active blur vaults
+export const fetchBlurVaults = async (vaults: any[]) => {
+  let vaultsWithDetails = (
+    await Promise.all(
+      vaults.map((row: VaultInfo) =>
+        axios.get(`${VAULT_API}/${row.address}?env=${apiEnv}`)
+      )
+    )
+  )
+    .filter((row: any) => row.status === 200)
+    .map((row: any) => row.data.data);
+
+  vaultsWithDetails = vaults.map((row: any, i: number) => ({
+    ...row,
+    ...vaultsWithDetails[i],
+  }));
+
+  try {
+    const onChainInfo = await Promise.all(
+      vaultsWithDetails.map((row: VaultInfo) => {
+        const callData = row?.fungible
+          ? [
+              {
+                address: row.address,
+                name: "totalAssets",
+                params: [],
+              },
+              {
+                address: row.address,
+                name: "totalSupply",
+                params: [],
+              },
+            ]
+          : [
+              {
+                address: row.address,
+                name: "totalShares",
+                params: [],
+              },
+              {
+                address: row.address,
+                name: "totalAssets",
+                params: [],
+              },
+              {
+                address: row.address,
+                name: "totalSupply",
+                params: [],
+              },
+              {
+                address: row.address,
+                name: "maxSupply",
+                params: [],
+              },
+            ];
+        return multicall(
+          row?.fungible ? VaultAbi : SpiceFiNFT4626Abi,
+          callData
+        );
+      })
+    );
+
+    const vaultWethInfo = await Promise.all(
+      vaultsWithDetails.map((row: VaultInfo) => {
+        const callData = [
+          {
+            address: getWethAddress(),
+            name: "balanceOf",
+            params: [row.address],
+          },
+        ];
+        return multicall(WethAbi, callData);
+      })
+    );
+
+    const vaultsWithTvl = vaultsWithDetails.map((row: VaultInfo, i: number) => {
+      return {
+        ...row,
+        tvl: getBalanceInEther(onChainInfo[i][0][0]),
+        wethBalance: vaultWethInfo[i][0][0],
+        totalSupply: 0,
+        apr: 100 * (row?.okrs?.expected_return || 0),
+        apy: 100 * (row?.okrs?.expected_return || 0),
+        historicalApy: getVaultHistoricalApy(row),
+        name: getVaultDisplayName(row?.name),
+        logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated, row.name),
+        backgroundImage: getVaultBackgroundImage(
+          row?.fungible,
+          row?.type,
+          row?.deprecated,
+          row.name
+        ),
+        receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
+        userInfo: {
+          allowance: BigNumber.from(0),
+          tokenBalance: BigNumber.from(0),
+          nfts: [],
+          amount: BigNumber.from(0),
+        },
+        category: VaultFilter.Public,
+        isBlur: true,
+      };
+    });
+
+    return vaultsWithTvl;
   } catch (err) {
     console.log("err", err);
     return [];
@@ -213,13 +344,21 @@ export const fetchGlobalData = async () => {
     );
     const leverageVaults = vaults.filter((row: VaultInfo) => row.leverage);
 
-    const [activeVaultsData, leverageVaultsData] = await Promise.all([
-      fetchActiveVaults(activeVaults),
-      fetchLeverageVaults(leverageVaults),
-    ]);
+    // blur vault
+    const blurVaultAddr = DEFAULT_BLUR_VAULT[activeChainId];
+    const blurVaults = vaults.filter(
+      (row: VaultInfo) => row.depositable && row.address === blurVaultAddr
+    );
+
+    const [activeVaultsData, leverageVaultsData, blurVaultsData] =
+      await Promise.all([
+        fetchActiveVaults(activeVaults),
+        fetchLeverageVaults(leverageVaults),
+        fetchBlurVaults(blurVaults),
+      ]);
 
     return {
-      vaults: activeVaultsData.all.map((vault) => {
+      vaults: [...activeVaultsData.all, ...blurVaultsData].map((vault) => {
         if (vault.readable) {
           let prefix = vault.readable.split(" ")[0];
 
@@ -237,12 +376,14 @@ export const fetchGlobalData = async () => {
       }),
       defaultVault: activeVaultsData.default,
       leverageVaults: leverageVaultsData,
+      blurVaults: blurVaultsData,
     };
   }
   return {
     vaults: [],
     defaultVault: {},
     leverageVaults: [],
+    blurVaults: [],
   };
 };
 
