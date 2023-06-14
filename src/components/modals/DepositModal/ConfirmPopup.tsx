@@ -19,6 +19,7 @@ interface Props {
   nft: PrologueNftPortofolioInfo | undefined;
   vault: VaultInfo;
   netApy: number;
+  borrowApr: number;
   additionalDebt: number;
   sliderStep: number;
   targetAmount: string;
@@ -44,6 +45,7 @@ export default function ConfirmPopup(props: Props) {
   const {
     nft,
     netApy,
+    borrowApr,
     additionalDebt,
     sliderStep,
     targetAmount,
@@ -122,6 +124,7 @@ export default function ConfirmPopup(props: Props) {
             nft={nft}
             additionalDebt={additionalDebt}
             netApy={netApy}
+            borrowApr={borrowApr}
             sliderStep={sliderStep}
             targetAmount={targetAmount}
             isOpen={show}

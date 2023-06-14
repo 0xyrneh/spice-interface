@@ -28,6 +28,7 @@ interface Props {
   sliderStep: number;
   targetAmount: string;
   netApy: number;
+  borrowApr: number;
   tab: LeverageTab;
   hiding?: boolean;
   additionalDebt: number;
@@ -52,6 +53,7 @@ export default function LeverageConfirm(props: Props) {
     targetAmount,
     sliderStep,
     netApy,
+    borrowApr,
     additionalDebt,
     onMaxClicked,
     onClose,
@@ -510,7 +512,6 @@ export default function LeverageConfirm(props: Props) {
   const nftValue = nft?.amount || BigNumber.from("0");
   // const netApy = nft?.netApy || 0;
   const debtOwed = getBalanceInEther(nft?.debtOwed || BigNumber.from(0));
-  const borrowApy = nft?.borrowApy || 0;
   const autoRenew = nft?.autoRenew || 0;
   const liquidationRatio = nft?.liquidationRatio ?? 0;
 
@@ -524,6 +525,22 @@ export default function LeverageConfirm(props: Props) {
         : 0;
 
     return healthFactor;
+  };
+
+  const getBorrowApy = () => {
+    const loanDuration =
+      tab === LeverageTab.Decrease
+        ? nft?.loanDuration ?? 0
+        : YEAR_IN_SECONDS * 7;
+
+    if (loanDuration > 0) {
+      const m = YEAR_IN_SECONDS / loanDuration;
+      // eslint-disable-next-line no-restricted-properties
+      const borrowApy = Math.pow(1 + borrowApr / 100 / m, m) - 1;
+      return borrowApy;
+    }
+
+    return 0;
   };
 
   return (
@@ -574,7 +591,9 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="Borrow APY"
-          value={`${borrowApy > 0 ? `${(100 * borrowApy).toFixed(2)}%` : "--"}`}
+          value={`${
+            getBorrowApy() > 0 ? `${(100 * getBorrowApy()).toFixed(2)}%` : "--"
+          }`}
           size="xs"
         />
       </div>

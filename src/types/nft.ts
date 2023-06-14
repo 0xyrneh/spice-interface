@@ -59,4 +59,5 @@ export interface PrologueNftPortofolioInfo {
   loanAmount: BigNumber;
   isRenewAvailable: boolean;
   liquidationRatio?: number;
+  loanDuration: number;
 }
