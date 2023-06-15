@@ -68,7 +68,7 @@ export const getLoanData = async (lendAddr: string, loanId: number) => {
 export const getLoanDataFromCallData = async (callData: any[]) => {
   const loanData = await multicall(SpiceFiLendingAbi, callData);
 
-  return loanData.map((row: any) => {
+  return loanData.map((row: any, index: number) => {
     const { startedAt, interestAccrued, terms } = row[0];
 
     return {
@@ -80,6 +80,7 @@ export const getLoanDataFromCallData = async (callData: any[]) => {
       repayAmount:
         getBalanceInEther(terms.loanAmount) +
         getBalanceInEther(interestAccrued),
+      loanId: callData[index].params[0],
     };
   });
 };

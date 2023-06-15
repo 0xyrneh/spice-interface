@@ -19,7 +19,6 @@ import {
 import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getLoanDataFromCallData } from "@/state/lend/fetchGlobalLend";
 import { useAppSelector } from "@/state/hooks";
-import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 
 type Props = {
   vault: VaultInfo;
@@ -44,7 +43,7 @@ export default function LoanBreakdown({
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [loans, setLoans] = useState<any[]>([]);
 
-  const { collections } = useAppSelector((state) => state.nft);
+  const { collections, allNfts } = useAppSelector((state) => state.nft);
 
   const fetchLoans = async () => {
     setIsFetching(true);
@@ -58,23 +57,43 @@ export default function LoanBreakdown({
         `${VAULT_LOANS}/${vault?.address}?env=${apiEnv}`
       );
       if (res.status === 200) {
-        const loansCallData = res.data.data.loans.map((row: any) => {
-          return {
-            address: getSpiceFiLendingAddress(),
-            name: "getLoanData",
-            params: [row.loanid],
-          };
-        });
+        const loans = res.data.data.loans;
+        const prologueLoans = loans.filter(
+          (loan: any) => loan.collectionName === "Prologue"
+        );
 
-        const loansData = await getLoanDataFromCallData(loansCallData);
+        // fetch onchain loan data
+        const prologueLoansData = await getLoanDataFromCallData(
+          prologueLoans.map((row: any) => {
+            return {
+              address: getSpiceFiLendingAddress(),
+              name: "getLoanData",
+              params: [row.loanid],
+            };
+          })
+        );
 
+        // get formatted data
         const loansOrigin = await Promise.all(
-          res.data.data.loans.map(async (row: any, index: number) => {
-            const loanData = loansData[index];
+          loans.map(async (row: any) => {
             const isPrologueLoan = row.collectionName === "Prologue";
+            const collectionAddr =
+              getNFTCollectionAddressConvert(row.collectionAddress) ||
+              getNFTCollectionAddressFromSlug(row.slug);
 
             let apy = 0;
+            let ltv;
+            let matureDate;
+
+            // calculate apy and mature date
             if (isPrologueLoan) {
+              const loanData = prologueLoansData.find(
+                (row1: any) => row1.loanId === row.loanid
+              );
+
+              matureDate =
+                loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS;
+
               if (loanData.duration > 0) {
                 const m = YEAR_IN_SECONDS / loanData.duration;
                 // eslint-disable-next-line no-restricted-properties
@@ -82,6 +101,7 @@ export default function LoanBreakdown({
               }
             } else {
               const m = YEAR_IN_SECONDS / row.duration;
+              matureDate = row.start + row.duration;
               // eslint-disable-next-line no-restricted-properties
               apy =
                 100 *
@@ -92,13 +112,16 @@ export default function LoanBreakdown({
                   1);
             }
 
-            const collectionAddr =
-              getNFTCollectionAddressConvert(row.collectionAddress) ||
-              getNFTCollectionAddressFromSlug(row.slug);
-            const loanAmount = loanData.amount;
-
-            let ltv;
+            // calculate ltv
             if (isPrologueLoan) {
+              const nftData = allNfts.find(
+                (row1: any) => Number(row1.tokenId) === Number(row.nftid)
+              );
+              if (nftData.redeemAmount - row.outstanding !== 0) {
+                ltv =
+                  100 *
+                  (row.outstanding / (nftData.redeemAmount - row.outstanding));
+              }
             } else {
               const collection = collections.find(
                 (row) =>
@@ -116,12 +139,10 @@ export default function LoanBreakdown({
               displayName: `${row.collectionName}#${row.nftid}`,
               principal: row.outstanding,
               repayAmount: row.max_loan_size,
-              ltv,
-              matureDate: isPrologueLoan
-                ? loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS
-                : row.start + row.duration,
-              nftId: row.nftid,
               apy,
+              matureDate,
+              ltv,
+              nftId: row.nftid,
               tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
             };
           })
