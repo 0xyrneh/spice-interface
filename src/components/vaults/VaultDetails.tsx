@@ -66,11 +66,13 @@ export default function VaultDetails({ vault }: Props) {
               title="Historical APY"
               value={`${getVaultHistoricalApy().toFixed(2)}%`}
             />
-            <Stats
-              className="hidden xl:flex"
-              title="Up Time"
-              value={`${getVaultUpTime(vault?.address)}d`}
-            />
+            {getVaultUpTime(vault.startTime) > 0 && (
+              <Stats
+                className="hidden xl:flex"
+                title="Up Time"
+                value={`${getVaultUpTime(vault.startTime)}d`}
+              />
+            )}
           </div>
         </Card>
         {!vault.isBlur && vault.receiptToken === ReceiptToken.NFT && (

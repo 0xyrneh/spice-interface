@@ -48,6 +48,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
   vaultsWithDetails = vaults.map((row: any, i: number) => ({
     ...row,
     ...vaultsWithDetails[i],
+    startTime: row.start_time,
   }));
 
   try {
@@ -340,6 +341,7 @@ export const fetchBlurVaults = async (vaults: any[]) => {
   vaultsWithDetails = vaults.map((row: any, i: number) => ({
     ...row,
     ...vaultsWithDetails[i],
+    startTime: row.start_time,
   }));
 
   try {
