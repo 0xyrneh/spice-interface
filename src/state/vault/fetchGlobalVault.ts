@@ -22,6 +22,7 @@ import { VAULT_DESCRIPTIONS, VAULT_REQUIREMENTS } from "@/constants/vaults";
 import { getNFTMarketplaceDisplayName } from "@/utils/nft";
 import { COLLECTION_API_BASE } from "@/config/constants/backend";
 import { getNFTCollectionDisplayName } from "@/utils/nft";
+import { PROLOGUE_NFT_ADDRESS } from "@/config/constants";
 
 const apiEnv = activeChainId === 1 ? "prod" : "goerli";
 
@@ -48,6 +49,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
   vaultsWithDetails = vaults.map((row: any, i: number) => ({
     ...row,
     ...vaultsWithDetails[i],
+    startTime: row.start_time,
   }));
 
   try {
@@ -340,6 +342,7 @@ export const fetchBlurVaults = async (vaults: any[]) => {
   vaultsWithDetails = vaults.map((row: any, i: number) => ({
     ...row,
     ...vaultsWithDetails[i],
+    startTime: row.start_time,
   }));
 
   try {
@@ -484,6 +487,24 @@ export const getVaultWithdrawable = async (
   );
 
   return maxWithdrawable[0];
+};
+
+// get prologue vault withdrawable
+export const getPrologueVaultWithdrawable = async ({
+  callData,
+  tokenIds,
+}: {
+  callData: any;
+  tokenIds: any;
+}) => {
+  const data = await multicall(SpiceFiNFT4626Abi, callData);
+
+  return data.map((row: any, index: number) => {
+    return {
+      redeemAmount: getBalanceInEther(row[0]),
+      tokenId: tokenIds[index],
+    };
+  });
 };
 
 // get vault share by nftId

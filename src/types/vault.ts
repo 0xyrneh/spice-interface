@@ -68,6 +68,7 @@ export interface VaultInfo {
   isBlur?: boolean;
   marketplaceExposures?: any[];
   collectionExposures?: any[];
+  startTime: number;
 }
 
 export interface LeverageVaultInfo {
