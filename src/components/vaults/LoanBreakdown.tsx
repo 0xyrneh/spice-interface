@@ -292,13 +292,17 @@ export default function LoanBreakdown({
       {
         title: "MARKET",
         component: (item) => (
-          <Image
-            className="mr-1"
-            src={item.market}
-            width={16}
-            height={16}
-            alt=""
-          />
+          <>
+            {item.market && (
+              <Image
+                className="mr-1"
+                src={item.market}
+                width={16}
+                height={16}
+                alt=""
+              />
+            )}
+          </>
         ),
         rowClass: () => (loanExpanded ? "w-[10%]" : "hidden"),
       },
