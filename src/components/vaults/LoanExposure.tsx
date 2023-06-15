@@ -225,7 +225,7 @@ export default function LoanExposure({
       },
       {
         title: "LTV",
-        subTitle: loanExpanded ? "/SPICE/" : undefined,
+        // subTitle: loanExpanded ? "/FLOOR/" : undefined,
         key: "ltv",
         itemSuffix: () => "",
         rowClass: () =>
@@ -239,17 +239,17 @@ export default function LoanExposure({
           return ltv ? `${Number(ltv).toFixed(1)}%` : "N/A";
         },
       },
-      {
-        title: "LTV",
-        subTitle: loanExpanded ? "/FLOOR/" : undefined,
-        key: "ltvFloor",
-        itemSuffix: () => "",
-        rowClass: () =>
-          loanExpanded ? "hidden lg:table-cell w-[10%]" : "hidden",
-        format: (item) => {
-          return "N/A";
-        },
-      },
+      // {
+      //   title: "LTV",
+      //   subTitle: loanExpanded ? "/FLOOR/" : undefined,
+      //   key: "ltvFloor",
+      //   itemSuffix: () => "",
+      //   rowClass: () =>
+      //     loanExpanded ? "hidden lg:table-cell w-[10%]" : "hidden",
+      //   format: (item) => {
+      //     return "N/A";
+      //   },
+      // },
       {
         title: "APY",
         key: "apy",
