@@ -650,11 +650,13 @@ export default function DepositModal({
 
   const calculateNetApy = () => {
     if (!selectedNft) return 0;
-    const loanDuration = 28 * DAY_IN_SECONDS;
+    const loanDuration =
+      leverageTab === LeverageTab.Refinance || leverageTab === LeverageTab.Renew
+        ? 7 * YEAR_IN_SECONDS
+        : selectedNft.loanDuration;
     const m = YEAR_IN_SECONDS / loanDuration;
     const borrowApr = getBorrowApr() / 100;
-    const { repayAmount, balance } = selectedNft.loan;
-    const loanValue = getBalanceInEther(balance || BigNumber.from(0));
+    const { repayAmount } = selectedNft.loan;
     const repayValue = getBalanceInEther(repayAmount || BigNumber.from(0));
     // eslint-disable-next-line no-restricted-properties
     const borrowApy = Math.pow(1 + borrowApr / m, m) - 1;
