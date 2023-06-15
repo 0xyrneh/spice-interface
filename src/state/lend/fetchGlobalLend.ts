@@ -3,6 +3,7 @@ import { getWethAddress } from "@/utils/addressHelpers";
 import SpiceFiLendingAbi from "@/config/abi/SpiceFiLending.json";
 import WethAbi from "@/config/abi/WETH.json";
 import NoteAbi from "@/config/abi/Note.json";
+import { getBalanceInEther } from "@/utils/formatBalance";
 
 const LOAN_RATIO_DENOMINATOR = 10000;
 const LIQUIDATION_RATIO_DENOMINATOR = 10000;
@@ -68,12 +69,17 @@ export const getLoanDataFromCallData = async (callData: any[]) => {
   const loanData = await multicall(SpiceFiLendingAbi, callData);
 
   return loanData.map((row: any) => {
-    const { startedAt, terms } = row[0];
+    const { startedAt, interestAccrued, terms } = row[0];
 
     return {
       startedAt: startedAt.toNumber(),
       duration: terms.duration,
       interestRate: terms.interestRate.toNumber() / 10000,
+      amount: getBalanceInEther(terms.loanAmount),
+      interestAccrued: getBalanceInEther(interestAccrued),
+      repayAmount:
+        getBalanceInEther(terms.loanAmount) +
+        getBalanceInEther(interestAccrued),
     };
   });
 };

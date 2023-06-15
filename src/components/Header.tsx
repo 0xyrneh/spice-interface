@@ -17,6 +17,7 @@ import {
   fetchLendUserWethDataAsync,
   resetLendUserLoanData,
   fetchLendUserNftApproveDataAsync,
+  fetchCollectionsGlobalDataAsync,
 } from "@/state/actions";
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { VaultInfo } from "@/types/vault";
@@ -48,6 +49,7 @@ const Header = () => {
     dispatch(fetchVaultGlobalDataAsync());
     dispatch(fetchLendGlobalDataAsync());
     dispatch(fetchNftGlobalDataAsync());
+    dispatch(fetchCollectionsGlobalDataAsync());
   };
 
   useEffect(() => {

@@ -18,6 +18,8 @@ import {
 } from "@/utils/nft";
 import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getLoanDataFromCallData } from "@/state/lend/fetchGlobalLend";
+import { useAppSelector } from "@/state/hooks";
+import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 
 type Props = {
   vault: VaultInfo;
@@ -42,6 +44,8 @@ export default function LoanBreakdown({
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [loans, setLoans] = useState<any[]>([]);
 
+  const { collections } = useAppSelector((state) => state.nft);
+
   const fetchLoans = async () => {
     setIsFetching(true);
 
@@ -64,8 +68,8 @@ export default function LoanBreakdown({
 
         const loansData = await getLoanDataFromCallData(loansCallData);
 
-        const loansOrigin = res.data.data.loans.map(
-          (row: any, index: number) => {
+        const loansOrigin = await Promise.all(
+          res.data.data.loans.map(async (row: any, index: number) => {
             const loanData = loansData[index];
             const isPrologueLoan = row.collectionName === "Prologue";
 
@@ -91,6 +95,19 @@ export default function LoanBreakdown({
             const collectionAddr =
               getNFTCollectionAddressConvert(row.collectionAddress) ||
               getNFTCollectionAddressFromSlug(row.slug);
+            const loanAmount = loanData.amount;
+
+            let ltv;
+            if (isPrologueLoan) {
+            } else {
+              const collection = collections.find(
+                (row) =>
+                  row.contract.toLowerCase() === collectionAddr.toLowerCase()
+              );
+              if (collection.price) {
+                ltv = 100 * (row.outstanding / collection.price);
+              }
+            }
 
             return {
               name: row.collectionName,
@@ -98,6 +115,8 @@ export default function LoanBreakdown({
               collectionAddr: collectionAddr,
               displayName: `${row.collectionName}#${row.nftid}`,
               principal: row.outstanding,
+              repayAmount: row.max_loan_size,
+              ltv,
               matureDate: isPrologueLoan
                 ? loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS
                 : row.start + row.duration,
@@ -105,7 +124,7 @@ export default function LoanBreakdown({
               apy,
               tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
             };
-          }
+          })
         );
         setLoans([...loansOrigin]);
       }
@@ -131,7 +150,7 @@ export default function LoanBreakdown({
     setLoans([]);
     fetchLoans();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address]);
+  }, [vault?.address, collections.length]);
 
   useEffect(() => {
     setBlur(loanExpanded);
@@ -140,7 +159,7 @@ export default function LoanBreakdown({
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
-        title: `LOANS111 [${loans.length}]`,
+        title: `LOANS [${loans.length}]`,
         key: "displayName",
         itemPrefix: (item) => {
           return (
@@ -174,7 +193,7 @@ export default function LoanBreakdown({
       },
       {
         title: "REPAY",
-        key: "repay",
+        key: "repayAmount",
         rowClass: () =>
           loanExpanded
             ? "w-[10%]"
@@ -183,14 +202,14 @@ export default function LoanBreakdown({
             : "hidden xl:table-cell w-[65px]",
         itemPrefix: () => "Ξ",
         format: (item) => {
-          return (item?.repay || 0).toFixed(2);
+          return (item?.repayAmount || 0).toFixed(2);
         },
       },
       {
         title: "LTV",
         subTitle: loanExpanded ? "/SPICE/" : undefined,
         key: "ltv",
-        itemSuffix: () => "%",
+        itemSuffix: () => "",
         rowClass: () =>
           loanExpanded
             ? "w-[10%]"
@@ -198,18 +217,19 @@ export default function LoanBreakdown({
             ? "hidden 3xl:table-cell w-[50px]"
             : "hidden lg:table-cell w-[50px]",
         format: (item) => {
-          return (item?.ltv || 0).toFixed(1);
+          const { ltv } = item;
+          return ltv ? `${Number(ltv).toFixed(1)}%` : "N/A";
         },
       },
       {
         title: "LTV",
         subTitle: loanExpanded ? "/FLOOR/" : undefined,
         key: "ltvFloor",
-        itemSuffix: () => "%",
+        itemSuffix: () => "",
         rowClass: () =>
           loanExpanded ? "hidden lg:table-cell w-[10%]" : "hidden",
         format: (item) => {
-          return (item?.ltvFloor || 0).toFixed(1);
+          return "N/A";
         },
       },
       {

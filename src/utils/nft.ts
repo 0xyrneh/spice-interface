@@ -1,11 +1,11 @@
 import { BigNumber, ethers } from "ethers";
+import axios from "axios";
 
 import {
   RESERVOIR_API_BASE,
   RESERVOIR_API_COLLECTIONS_BASE,
   RESERVOIR_API_TOKENS_BASE,
 } from "@/config/constants/backend";
-import axios from "axios";
 
 export const getMarketplaceDisplayName = (name: string): string => {
   switch (name) {
@@ -162,13 +162,17 @@ export const getTokenImageFromReservoir = (
 export const getFloorPrice = async (
   collectionAddr: string
 ): Promise<number> => {
-  const floorPrice = (
-    await axios.get(
-      `${RESERVOIR_API_BASE}/oracle/collections/floor-ask/v5?collection=${collectionAddr}`
-    )
-  ).data.price;
+  try {
+    const floorPrice = (
+      await axios.get(
+        `${RESERVOIR_API_BASE}/oracle/collections/floor-ask/v5?collection=${collectionAddr}`
+      )
+    ).data.price;
 
-  return floorPrice;
+    return floorPrice;
+  } catch (err) {
+    return 1;
+  }
 };
 
 export const getCollectionInfoByAddress = async (

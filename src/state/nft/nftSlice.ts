@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { fetchSpiceNfts } from "./fetchGlobalNft";
+import { fetchSpiceNfts, fetchCollections } from "./fetchGlobalNft";
 
 interface WalletConnectState {
   allNfts: any[];
+  collections: any[];
 }
 
 const initialState: WalletConnectState = {
   allNfts: [],
+  collections: [],
 };
 
 export const nftSlice = createSlice({
@@ -22,10 +24,18 @@ export const nftSlice = createSlice({
         ...row,
       }));
     },
+
+    setCollections: (state, action) => {
+      state.collections = action.payload.collections.map(
+        (row: any, i: number) => ({
+          ...row,
+        })
+      );
+    },
   },
 });
 
-export const { reset, setAllNfts } = nftSlice.actions;
+export const { reset, setAllNfts, setCollections } = nftSlice.actions;
 
 export const fetchNftGlobalDataAsync = () => async (dispatch: any) => {
   const { nfts } = await fetchSpiceNfts();
@@ -33,6 +43,16 @@ export const fetchNftGlobalDataAsync = () => async (dispatch: any) => {
   dispatch(
     setAllNfts({
       nfts,
+    })
+  );
+};
+
+export const fetchCollectionsGlobalDataAsync = () => async (dispatch: any) => {
+  const { collections } = await fetchCollections();
+
+  dispatch(
+    setCollections({
+      collections,
     })
   );
 };
