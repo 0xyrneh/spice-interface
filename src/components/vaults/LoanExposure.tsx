@@ -18,6 +18,7 @@ import {
 import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getSpiceFiLendingAddress } from "@/utils/addressHelpers";
 import { getLoanDataFromCallData } from "@/state/lend/fetchGlobalLend";
+import { useAppSelector } from "@/state/hooks";
 
 type Props = {
   vault: VaultInfo;
@@ -38,6 +39,7 @@ export default function LoanExposure({
   const [loans, setLoans] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
 
+  const { collections, allNfts } = useAppSelector((state) => state.nft);
   const { setBlur } = useUI();
 
   const fetchLoans = async () => {
@@ -52,23 +54,43 @@ export default function LoanExposure({
         `${VAULT_LOANS}/${vault?.address}?env=${apiEnv}`
       );
       if (res.status === 200) {
-        const loansCallData = res.data.data.loans.map((row: any) => {
-          return {
-            address: getSpiceFiLendingAddress(),
-            name: "getLoanData",
-            params: [row.loanid],
-          };
-        });
+        const loans = res.data.data.loans;
+        const prologueLoans = loans.filter(
+          (loan: any) => loan.collectionName === "Prologue"
+        );
 
-        const loansData = await getLoanDataFromCallData(loansCallData);
+        // fetch onchain loan data
+        const prologueLoansData = await getLoanDataFromCallData(
+          prologueLoans.map((row: any) => {
+            return {
+              address: getSpiceFiLendingAddress(),
+              name: "getLoanData",
+              params: [row.loanid],
+            };
+          })
+        );
 
-        const loansOrigin = res.data.data.loans.map(
-          (row: any, index: number) => {
-            const loanData = loansData[index];
+        // get formatted data
+        const loansOrigin = await Promise.all(
+          loans.map(async (row: any) => {
             const isPrologueLoan = row.collectionName === "Prologue";
+            const collectionAddr =
+              getNFTCollectionAddressConvert(row.collectionAddress) ||
+              getNFTCollectionAddressFromSlug(row.slug);
 
             let apy = 0;
+            let ltv;
+            let matureDate;
+
+            // calculate apy and mature date
             if (isPrologueLoan) {
+              const loanData = prologueLoansData.find(
+                (row1: any) => row1.loanId === row.loanid
+              );
+
+              matureDate =
+                loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS;
+
               if (loanData.duration > 0) {
                 const m = YEAR_IN_SECONDS / loanData.duration;
                 // eslint-disable-next-line no-restricted-properties
@@ -76,6 +98,7 @@ export default function LoanExposure({
               }
             } else {
               const m = YEAR_IN_SECONDS / row.duration;
+              matureDate = row.start + row.duration;
               // eslint-disable-next-line no-restricted-properties
               apy =
                 100 *
@@ -86,9 +109,25 @@ export default function LoanExposure({
                   1);
             }
 
-            const collectionAddr =
-              getNFTCollectionAddressConvert(row.collectionAddress) ||
-              getNFTCollectionAddressFromSlug(row.slug);
+            // calculate ltv
+            if (isPrologueLoan) {
+              const nftData = allNfts.find(
+                (row1: any) => Number(row1.tokenId) === Number(row.nftid)
+              );
+              if (nftData.redeemAmount - row.outstanding !== 0) {
+                ltv =
+                  100 *
+                  (row.outstanding / (nftData.redeemAmount - row.outstanding));
+              }
+            } else {
+              const collection = collections.find(
+                (row) =>
+                  row.contract.toLowerCase() === collectionAddr.toLowerCase()
+              );
+              if (collection.price) {
+                ltv = 100 * (row.outstanding / collection.price);
+              }
+            }
 
             return {
               name: row.collectionName,
@@ -96,14 +135,14 @@ export default function LoanExposure({
               collectionAddr: collectionAddr,
               displayName: `${row.collectionName}#${row.nftid}`,
               principal: row.outstanding,
-              matureDate: isPrologueLoan
-                ? loanData.startedAt + loanData.duration - 14 * DAY_IN_SECONDS
-                : row.start + row.duration,
-              nftId: row.nftid,
+              repayAmount: row.max_loan_size,
               apy,
+              matureDate,
+              ltv,
+              nftId: row.nftid,
               tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
             };
-          }
+          })
         );
         setLoans([...loansOrigin]);
       }
@@ -129,7 +168,7 @@ export default function LoanExposure({
     setLoans([]);
     fetchLoans();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address]);
+  }, [vault?.address, collections.length]);
 
   useEffect(() => {
     setBlur(loanExpanded);
@@ -172,7 +211,7 @@ export default function LoanExposure({
       },
       {
         title: "REPAY",
-        key: "repay",
+        key: "repayAmount",
         rowClass: () =>
           loanExpanded
             ? "w-[10%]"
@@ -181,14 +220,14 @@ export default function LoanExposure({
             : "hidden xl:table-cell w-[65px]",
         itemPrefix: () => "Ξ",
         format: (item) => {
-          return (item?.repay || 0).toFixed(2);
+          return (item?.repayAmount || 0).toFixed(2);
         },
       },
       {
         title: "LTV",
         subTitle: loanExpanded ? "/SPICE/" : undefined,
         key: "ltv",
-        itemSuffix: () => "%",
+        itemSuffix: () => "",
         rowClass: () =>
           loanExpanded
             ? "w-[10%]"
@@ -196,18 +235,19 @@ export default function LoanExposure({
             ? "hidden 3xl:table-cell w-[50px]"
             : "hidden lg:table-cell w-[50px]",
         format: (item) => {
-          return (item?.ltv || 0).toFixed(1);
+          const { ltv } = item;
+          return ltv ? `${Number(ltv).toFixed(1)}%` : "N/A";
         },
       },
       {
         title: "LTV",
         subTitle: loanExpanded ? "/FLOOR/" : undefined,
         key: "ltvFloor",
-        itemSuffix: () => "%",
+        itemSuffix: () => "",
         rowClass: () =>
           loanExpanded ? "hidden lg:table-cell w-[10%]" : "hidden",
         format: (item) => {
-          return (item?.ltvFloor || 0).toFixed(1);
+          return "N/A";
         },
       },
       {
@@ -273,6 +313,7 @@ export default function LoanExposure({
       }`}
       expanded={loanExpanded}
       onCollapse={() => setLoanExpanded(false)}
+      animate
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5 text-white">
