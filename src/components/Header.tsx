@@ -60,7 +60,7 @@ const Header = () => {
     fetchData();
     setInterval(() => {
       fetchData();
-    }, 60000);
+    }, 600000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
