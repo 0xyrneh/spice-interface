@@ -590,7 +590,7 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="NFT Value"
-          value={`Ξ${nftValue.toFixed(2)}`}
+          value={`Ξ${nftValue.toFixed(3)}`}
           size="xs"
         />
         <Stats
@@ -611,7 +611,7 @@ export default function LeverageConfirm(props: Props) {
           type={processing() ? "gray" : undefined}
           className="flex-1"
           title="Debt Owed"
-          value={debtOwed > 0 ? `Ξ${debtOwed.toFixed(2)}` : "--"}
+          value={debtOwed > 0 ? `Ξ${debtOwed.toFixed(3)}` : "--"}
           size="xs"
         />
         <Stats
