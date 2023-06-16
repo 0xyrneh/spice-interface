@@ -21,7 +21,10 @@ import { DEFAULT_LEND } from "@/config/constants/vault";
 import { activeChainId } from "@/utils/web3";
 import { setPendingTxHash } from "@/state/modal/modalSlice";
 
-export const useSpiceLending = (lendAddr: string, vaultAddr: string) => {
+export const useSpiceLending = (
+  lendAddr: string | undefined,
+  vaultAddr: string
+) => {
   const currentLendAddr = lendAddr || DEFAULT_LEND[activeChainId];
 
   const dispatch = useDispatch();
