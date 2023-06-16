@@ -155,13 +155,21 @@ export default function LeverageInput({
       actionStatus === ActionStatus.Pending ||
       actionStatus === ActionStatus.Success
     ) {
-      setDisabled(true);
       setProcessing(true);
     } else {
-      setDisabled(false);
       setProcessing(false);
     }
   }, [actionStatus]);
+
+  useEffect(() => {
+    if (processing) {
+      setDisabled(true);
+    } else if (tab !== LeverageTab.Decrease && loanValue >= maxLeverage) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [processing, tab, loanValue, maxLeverage]);
 
   useEffect(() => {
     if (processing) return;

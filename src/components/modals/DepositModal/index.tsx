@@ -336,19 +336,22 @@ export default function DepositModal({
   };
 
   useEffect(() => {
+    setTooltipVisible(leverageHover || tooltipHover);
+  }, [leverageHover, tooltipHover]);
+
+  useEffect(() => {
     const _selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
 
     setSelectedNft(_selectedNft);
+  }, [selectedNftId, myNfts]);
 
-    setTooltipVisible(leverageHover || tooltipHover);
-    setTargetAmount("");
-    setSliderStep(0);
-    setLeverageApproveRequired(_selectedNft?.isApproved ? false : true);
+  useEffect(() => {
+    if (!selectedNft || processing) return;
+    setLeverageApproveRequired(selectedNft.isApproved ? false : true);
 
-    if (!selectedNft || (selectedNft && !selectedNft.isEscrowed)) {
-      if (leverageTab === LeverageTab.LeverUp) return;
+    if (!selectedNft.isEscrowed) {
       setLeverageTab(LeverageTab.LeverUp);
-    } else if (selectedNft && !selectedNft.loan.balance) {
+    } else if (!selectedNft.loan.balance) {
     } else {
       if (
         [
@@ -361,7 +364,7 @@ export default function DepositModal({
 
       setLeverageTab(LeverageTab.Increase);
     }
-  }, [selectedNftId, myNfts]);
+  }, [selectedNft, leverageTab, processing]);
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
@@ -793,11 +796,6 @@ export default function DepositModal({
                 if (vault.receiptToken === ReceiptToken.NFT) {
                   handleHidePopup();
                   setPositionSelected(false);
-                  if (selectedNft && !selectedNft.isEscrowed) {
-                    setLeverageTab(LeverageTab.LeverUp);
-                  } else {
-                    setLeverageTab(LeverageTab.Increase);
-                  }
                 }
               }}
               onMouseOver={() => {
