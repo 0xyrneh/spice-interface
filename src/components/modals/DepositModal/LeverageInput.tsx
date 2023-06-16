@@ -9,7 +9,7 @@ import { getExpolorerUrl, shortenTxHash } from "@/utils/string";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { getLenderByLoanId } from "@/state/lend/fetchGlobalLend";
-import { calculateBorrowApr, getNetApy } from "@/utils/apy";
+import { calculateBorrowApr } from "@/utils/apy";
 import { DAY_IN_SECONDS } from "@/config/constants/time";
 
 export enum LeverageTab {
@@ -126,7 +126,7 @@ export default function LeverageInput({
       ];
     }
     setIncreaseLeverageTicks([...increaseTicks]);
-  }, [maxLeverage, loanValue]);
+  }, [maxLeverage, maxLtv, loanValue, processing]);
 
   useEffect(() => {
     if (processing) return;
@@ -141,7 +141,7 @@ export default function LeverageInput({
       ];
     }
     setDecreaseLeverageTicks([...decreaseTicks.reverse()]);
-  }, [maxRepayment, processing]);
+  }, [maxRepayment, maxLeverage, maxLtv, processing]);
 
   useEffect(() => {
     if (loanId > 0) {
