@@ -33,6 +33,7 @@ import {
   setPendingTxHash,
 } from "@/state/modal/modalSlice";
 import { calculateBorrowApr, getNetApy } from "@/utils/apy";
+import { PrologueNftPortofolioInfo } from "@/types/nft";
 
 interface Props extends ModalProps {
   vaultId: string;
@@ -75,10 +76,12 @@ export default function DepositModal({
   const { defaultVault, vaults, leverageVaults } = useAppSelector(
     (state) => state.vault
   );
+  const [processing, setProcessing] = useState(false);
 
   const [vault, setVault] = useState(
     vaults.find((item) => item.address === vaultId)!
   );
+  const [myNfts, setMyNfts] = useState<PrologueNftPortofolioInfo[]>([]);
 
   useEffect(() => {
     setVault(vaults.find((item) => item.address === vaultId)!);
@@ -110,14 +113,16 @@ export default function DepositModal({
     onWithdrawETH: onNftVaultWithdrawETH,
   } = useNftVault(vault.address);
 
-  const loans = accLoans(lendData);
-  const userNfts = vault?.userInfo?.nftsRaw || [];
   const isDeprecatedVault = vault?.deprecated;
 
-  const getNftPortfolios = () => {
+  const getNftPortfolios = useCallback((): PrologueNftPortofolioInfo[] => {
     if (!account) {
       return [];
     }
+
+    const loans = accLoans(lendData);
+
+    const userNfts = vault?.userInfo?.nftsRaw || [];
 
     return loans.map((row: any) => {
       const lendGlobalData = lendData.find(
@@ -202,9 +207,8 @@ export default function DepositModal({
         loanDuration,
       };
     });
-  };
+  }, [account, vault, lendData]);
 
-  const myNfts = getNftPortfolios();
   const selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
 
   const {
@@ -393,6 +397,22 @@ export default function DepositModal({
   useEffect(() => {
     reset();
   }, [isDeposit, positionSelected, leverageTab]);
+
+  useEffect(() => {
+    if (processing) return;
+    setMyNfts(getNftPortfolios());
+  }, [getNftPortfolios, processing]);
+
+  useEffect(() => {
+    if (
+      actionStatus === ActionStatus.Pending ||
+      actionStatus === ActionStatus.Success
+    ) {
+      setProcessing(true);
+    } else {
+      setProcessing(false);
+    }
+  }, [actionStatus]);
 
   const onConfirmPosition = async () => {
     if (positionStatus === TxStatus.None) {
