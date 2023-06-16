@@ -633,7 +633,9 @@ export default function LeverageConfirm(props: Props) {
           className="flex-1"
           title="Auto Renew"
           value={
-            tab !== LeverageTab.Refinance && tab !== LeverageTab.Renew
+            tab !== LeverageTab.Refinance &&
+            tab !== LeverageTab.Renew &&
+            tab !== LeverageTab.LeverUp
               ? autoRenew > 0
                 ? `${formatLeverageMaturity(autoRenew)}`
                 : "--"
