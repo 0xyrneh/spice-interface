@@ -33,6 +33,7 @@ import {
   setPendingTxHash,
 } from "@/state/modal/modalSlice";
 import { calculateBorrowApr, getNetApy } from "@/utils/apy";
+import { PrologueNftPortofolioInfo } from "@/types/nft";
 
 interface Props extends ModalProps {
   vaultId: string;
@@ -75,10 +76,15 @@ export default function DepositModal({
   const { defaultVault, vaults, leverageVaults } = useAppSelector(
     (state) => state.vault
   );
+  const [processing, setProcessing] = useState(false);
 
   const [vault, setVault] = useState(
     vaults.find((item) => item.address === vaultId)!
   );
+  const [vaultToShow, setVaultToShow] = useState<VaultInfo>();
+
+  const [myNfts, setMyNfts] = useState<PrologueNftPortofolioInfo[]>([]);
+  const [selectedNft, setSelectedNft] = useState<PrologueNftPortofolioInfo>();
 
   useEffect(() => {
     setVault(vaults.find((item) => item.address === vaultId)!);
@@ -110,14 +116,16 @@ export default function DepositModal({
     onWithdrawETH: onNftVaultWithdrawETH,
   } = useNftVault(vault.address);
 
-  const loans = accLoans(lendData);
-  const userNfts = vault?.userInfo?.nftsRaw || [];
   const isDeprecatedVault = vault?.deprecated;
 
-  const getNftPortfolios = () => {
+  const getNftPortfolios = useCallback((): PrologueNftPortofolioInfo[] => {
     if (!account) {
       return [];
     }
+
+    const loans = accLoans(lendData);
+
+    const userNfts = vault?.userInfo?.nftsRaw || [];
 
     return loans.map((row: any) => {
       const lendGlobalData = lendData.find(
@@ -202,10 +210,7 @@ export default function DepositModal({
         loanDuration,
       };
     });
-  };
-
-  const myNfts = getNftPortfolios();
-  const selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
+  }, [account, vault, lendData]);
 
   const {
     onApproveWeth,
@@ -332,18 +337,21 @@ export default function DepositModal({
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
-    setTargetAmount("");
-    setSliderStep(0);
-    setLeverageApproveRequired(
-      myNfts.find((nft) => nft.tokenId === selectedNftId)?.isApproved
-        ? false
-        : true
-    );
+  }, [leverageHover, tooltipHover]);
 
-    if (!selectedNft || (selectedNft && !selectedNft.isEscrowed)) {
-      if (leverageTab === LeverageTab.LeverUp) return;
+  useEffect(() => {
+    const _selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
+
+    setSelectedNft(_selectedNft);
+  }, [selectedNftId, myNfts]);
+
+  useEffect(() => {
+    if (!selectedNft || processing) return;
+    setLeverageApproveRequired(selectedNft.isApproved ? false : true);
+
+    if (!selectedNft.isEscrowed) {
       setLeverageTab(LeverageTab.LeverUp);
-    } else if (selectedNft && !selectedNft.loan.balance) {
+    } else if (!selectedNft.loan.balance) {
     } else {
       if (
         [
@@ -356,7 +364,7 @@ export default function DepositModal({
 
       setLeverageTab(LeverageTab.Increase);
     }
-  }, [selectedNftId]);
+  }, [selectedNft, leverageTab, processing]);
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
@@ -372,7 +380,7 @@ export default function DepositModal({
         setSelectedNftId(myNfts[0].tokenId);
       }
     }
-  }, [open, defaultNftId, myNfts.length]);
+  }, [open, defaultNftId, myNfts]);
 
   useEffect(() => {
     setTooltipVisible(false);
@@ -393,6 +401,31 @@ export default function DepositModal({
   useEffect(() => {
     reset();
   }, [isDeposit, positionSelected, leverageTab]);
+
+  useEffect(() => {
+    if (processing) return;
+    setMyNfts(getNftPortfolios());
+  }, [getNftPortfolios, processing]);
+
+  useEffect(() => {
+    if (processing) return;
+    setVaultToShow(vault);
+  }, [vault, processing]);
+
+  useEffect(() => {
+    setVault(vaults.find((item) => item.address === vaultId)!);
+  }, [vaults, vaultId]);
+
+  useEffect(() => {
+    if (
+      actionStatus === ActionStatus.Pending ||
+      actionStatus === ActionStatus.Success
+    ) {
+      setProcessing(true);
+    } else {
+      setProcessing(false);
+    }
+  }, [actionStatus]);
 
   const onConfirmPosition = async () => {
     if (positionStatus === TxStatus.None) {
@@ -683,18 +716,18 @@ export default function DepositModal({
             notBlur
           >
             <h2 className="font-base text-white leading-5">
-              {vault?.readable || ""}
+              {vaultToShow?.readable || ""}
             </h2>
             <div className="flex flex-col lg:flex-row gap-x-3 font-bold text-base text-orange-200 my-1 tracking-tight">
               <div className="flex gap-1 items-center">
                 <span className="drop-shadow-orange-200 leading-5">
-                  {`Ξ${(vault?.tvl || 0).toFixed(1)}`}
+                  {`Ξ${(vaultToShow?.tvl || 0).toFixed(1)}`}
                 </span>
                 <span className="text-xs text-gray-200">TVL</span>
               </div>
               <div className="flex gap-1 items-center">
                 <span className="drop-shadow-orange-200 leading-5">
-                  {`${(vault?.apy || 0).toFixed(2)}%`}
+                  {`${(vaultToShow?.apy || 0).toFixed(2)}%`}
                 </span>
                 <span className="text-xs text-gray-200">APY</span>
               </div>
@@ -763,11 +796,6 @@ export default function DepositModal({
                 if (vault.receiptToken === ReceiptToken.NFT) {
                   handleHidePopup();
                   setPositionSelected(false);
-                  if (selectedNft && !selectedNft.isEscrowed) {
-                    setLeverageTab(LeverageTab.LeverUp);
-                  } else {
-                    setLeverageTab(LeverageTab.Increase);
-                  }
                 }
               }}
               onMouseOver={() => {

@@ -9,7 +9,7 @@ import { getExpolorerUrl, shortenTxHash } from "@/utils/string";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { getLenderByLoanId } from "@/state/lend/fetchGlobalLend";
-import { calculateBorrowApr, getNetApy } from "@/utils/apy";
+import { calculateBorrowApr } from "@/utils/apy";
 import { DAY_IN_SECONDS } from "@/config/constants/time";
 
 export enum LeverageTab {
@@ -72,6 +72,11 @@ export default function LeverageInput({
   const currentLend = lendData.find(
     (row: any) => row.address === nft?.lendAddr
   );
+  const [disabled, setDisabled] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [maxIncreaseToShow, setMaxIncreaseToShow] = useState(0);
+  const [maxDecreaseToShow, setMaxDecreaseToShow] = useState(0);
+  const [maxLtvToShow, setMaxLtvToShow] = useState(0);
 
   const { loanId, repayAmount, balance } = nft.loan;
   const collateralValue = getBalanceInEther(nft.value);
@@ -108,6 +113,7 @@ export default function LeverageInput({
   };
 
   useEffect(() => {
+    if (processing) return;
     // increase slider
     if (!maxLeverage) return;
 
@@ -120,9 +126,10 @@ export default function LeverageInput({
       ];
     }
     setIncreaseLeverageTicks([...increaseTicks]);
-  }, [maxLeverage, loanValue]);
+  }, [maxLeverage, maxLtv, loanValue, processing]);
 
   useEffect(() => {
+    if (processing) return;
     // decrease slider
     if (!maxRepayment) return;
 
@@ -134,7 +141,7 @@ export default function LeverageInput({
       ];
     }
     setDecreaseLeverageTicks([...decreaseTicks.reverse()]);
-  }, [maxRepayment]);
+  }, [maxRepayment, maxLeverage, maxLtv, processing]);
 
   useEffect(() => {
     if (loanId > 0) {
@@ -143,7 +150,41 @@ export default function LeverageInput({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loanId]);
 
-  const processing = () => actionStatus === ActionStatus.Pending;
+  useEffect(() => {
+    if (
+      actionStatus === ActionStatus.Pending ||
+      actionStatus === ActionStatus.Success
+    ) {
+      setProcessing(true);
+    } else {
+      setProcessing(false);
+    }
+  }, [actionStatus]);
+
+  useEffect(() => {
+    if (processing) {
+      setDisabled(true);
+    } else if (tab !== LeverageTab.Decrease && loanValue >= maxLeverage) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [processing, tab, loanValue, maxLeverage]);
+
+  useEffect(() => {
+    if (processing) return;
+    setMaxIncreaseToShow(maxLeverage - loanValue);
+  }, [maxLeverage, loanValue, processing]);
+
+  useEffect(() => {
+    if (processing) return;
+    setMaxDecreaseToShow(maxRepayment);
+  }, [maxRepayment, processing]);
+
+  useEffect(() => {
+    if (processing) return;
+    setMaxLtvToShow(maxLtv);
+  }, [maxLtv, processing]);
 
   const getRefinanceApr = () => {
     if (!loanLenderVault) return 0;
@@ -287,7 +328,7 @@ export default function LeverageInput({
                 <LeverageSVG />
                 <input
                   className={`flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 ${
-                    processing() ? "text-gray-200" : "text-white"
+                    disabled ? "text-gray-200" : "text-white"
                   }`}
                   placeholder="0.00"
                   value={targetAmount}
@@ -295,21 +336,21 @@ export default function LeverageInput({
                   type="number"
                   onFocus={onFocus}
                   onBlur={onBlur}
-                  disabled={processing()}
+                  disabled={disabled}
                 />
               </div>
               <div className="flex flex-col items-end">
                 <span>{`Max Increase: `}</span>
                 <span>
-                  {`Ξ${(maxLeverage - loanValue).toFixed(4)} to ${(
-                    100 * maxLtv
+                  {`Ξ${maxIncreaseToShow.toFixed(4)} to ${(
+                    100 * maxLtvToShow
                   ).toFixed(2)}% LTV`}
                 </span>
               </div>
             </div>
             <div className="flex flex-col">
               <Slider
-                disabled={processing()}
+                disabled={disabled}
                 max={100}
                 min={loanValue >= maxLeverage ? 100 : 0}
                 step={10}
@@ -326,7 +367,7 @@ export default function LeverageInput({
                         : ""
                     } ${
                       item === leverage
-                        ? processing()
+                        ? disabled
                           ? "text-shadow-white"
                           : "text-orange-200 text-shadow-orange-900"
                         : ""
@@ -364,7 +405,7 @@ export default function LeverageInput({
               <LeverageSVG />
               <input
                 className={`flex-1 w-px hover:placeholder:text-gray-300 placeholder:text-gray-200 ${
-                  processing() ? "text-gray-200" : "text-white"
+                  disabled ? "text-gray-200" : "text-white"
                 }`}
                 placeholder="0.00"
                 value={targetAmount}
@@ -372,17 +413,17 @@ export default function LeverageInput({
                 type="number"
                 onFocus={onFocus}
                 onBlur={onBlur}
-                disabled={processing()}
+                disabled={disabled}
               />
             </div>
             <div className="flex flex-col items-end">
               <span>{`Max Decrease: `}</span>
-              <span>{`Ξ${maxRepayment.toFixed(4)} to 0% LTV`}</span>
+              <span>{`Ξ${maxDecreaseToShow.toFixed(4)} to 0% LTV`}</span>
             </div>
           </div>
           <div className="flex flex-col">
             <Slider
-              disabled={processing()}
+              disabled={disabled}
               max={100}
               min={0}
               step={10}
@@ -402,7 +443,7 @@ export default function LeverageInput({
                       : ""
                   } ${
                     item === leverage
-                      ? processing()
+                      ? disabled
                         ? "text-shadow-white"
                         : "text-orange-200 text-shadow-orange-900"
                       : ""

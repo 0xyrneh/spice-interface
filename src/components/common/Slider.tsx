@@ -115,6 +115,7 @@ export default function CustomizedSlider({
               ? "text-gray-200"
               : "text-orange-900 text-shadow-orange-900"
           }`}
+          disabled={disabled}
           onClick={() => {
             if (onChange && max !== undefined) {
               onChange(max);

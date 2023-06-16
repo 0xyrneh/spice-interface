@@ -343,8 +343,6 @@ export default function LeverageConfirm(props: Props) {
       setTimeout(() => {
         dispatch(setActionStatus(ActionStatus.Success));
         dispatch(setActionError(undefined));
-        onSetSliderStep(0);
-        onSetTargetAmount("");
       }, 5000);
     } catch (err: any) {
       dispatch(setActionStatus(ActionStatus.Failed));
@@ -371,8 +369,6 @@ export default function LeverageConfirm(props: Props) {
       setTimeout(() => {
         dispatch(setActionStatus(ActionStatus.Success));
         dispatch(setActionError(undefined));
-        onSetSliderStep(0);
-        onSetTargetAmount("");
       }, 4000);
     } catch (err: any) {
       dispatch(setActionStatus(ActionStatus.Failed));
@@ -408,8 +404,6 @@ export default function LeverageConfirm(props: Props) {
       setTimeout(() => {
         dispatch(setActionStatus(ActionStatus.Success));
         dispatch(setActionError(undefined));
-        onSetSliderStep(0);
-        onSetTargetAmount("");
       }, 4000);
     } catch (err: any) {
       dispatch(setActionStatus(ActionStatus.Failed));
@@ -450,6 +444,8 @@ export default function LeverageConfirm(props: Props) {
     if (!nft) return;
     if (actionStatus === ActionStatus.Success) {
       onClose();
+      onSetSliderStep(0);
+      onSetTargetAmount("");
       return;
     }
 
