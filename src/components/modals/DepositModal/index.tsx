@@ -81,7 +81,10 @@ export default function DepositModal({
   const [vault, setVault] = useState(
     vaults.find((item) => item.address === vaultId)!
   );
+  const [vaultToShow, setVaultToShow] = useState<VaultInfo>();
+
   const [myNfts, setMyNfts] = useState<PrologueNftPortofolioInfo[]>([]);
+  const [selectedNft, setSelectedNft] = useState<PrologueNftPortofolioInfo>();
 
   useEffect(() => {
     setVault(vaults.find((item) => item.address === vaultId)!);
@@ -209,8 +212,6 @@ export default function DepositModal({
     });
   }, [account, vault, lendData]);
 
-  const selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
-
   const {
     onApproveWeth,
     onLendingDeposit,
@@ -335,14 +336,14 @@ export default function DepositModal({
   };
 
   useEffect(() => {
+    const _selectedNft = myNfts.find((nft) => nft.tokenId === selectedNftId);
+
+    setSelectedNft(_selectedNft);
+
     setTooltipVisible(leverageHover || tooltipHover);
     setTargetAmount("");
     setSliderStep(0);
-    setLeverageApproveRequired(
-      myNfts.find((nft) => nft.tokenId === selectedNftId)?.isApproved
-        ? false
-        : true
-    );
+    setLeverageApproveRequired(_selectedNft?.isApproved ? false : true);
 
     if (!selectedNft || (selectedNft && !selectedNft.isEscrowed)) {
       if (leverageTab === LeverageTab.LeverUp) return;
@@ -360,7 +361,7 @@ export default function DepositModal({
 
       setLeverageTab(LeverageTab.Increase);
     }
-  }, [selectedNftId]);
+  }, [selectedNftId, myNfts]);
 
   useEffect(() => {
     setTooltipVisible(leverageHover || tooltipHover);
@@ -376,7 +377,7 @@ export default function DepositModal({
         setSelectedNftId(myNfts[0].tokenId);
       }
     }
-  }, [open, defaultNftId, myNfts.length]);
+  }, [open, defaultNftId, myNfts]);
 
   useEffect(() => {
     setTooltipVisible(false);
@@ -402,6 +403,15 @@ export default function DepositModal({
     if (processing) return;
     setMyNfts(getNftPortfolios());
   }, [getNftPortfolios, processing]);
+
+  useEffect(() => {
+    if (processing) return;
+    setVaultToShow(vault);
+  }, [vault, processing]);
+
+  useEffect(() => {
+    setVault(vaults.find((item) => item.address === vaultId)!);
+  }, [vaults, vaultId]);
 
   useEffect(() => {
     if (
@@ -703,18 +713,18 @@ export default function DepositModal({
             notBlur
           >
             <h2 className="font-base text-white leading-5">
-              {vault?.readable || ""}
+              {vaultToShow?.readable || ""}
             </h2>
             <div className="flex flex-col lg:flex-row gap-x-3 font-bold text-base text-orange-200 my-1 tracking-tight">
               <div className="flex gap-1 items-center">
                 <span className="drop-shadow-orange-200 leading-5">
-                  {`Ξ${(vault?.tvl || 0).toFixed(1)}`}
+                  {`Ξ${(vaultToShow?.tvl || 0).toFixed(1)}`}
                 </span>
                 <span className="text-xs text-gray-200">TVL</span>
               </div>
               <div className="flex gap-1 items-center">
                 <span className="drop-shadow-orange-200 leading-5">
-                  {`${(vault?.apy || 0).toFixed(2)}%`}
+                  {`${(vaultToShow?.apy || 0).toFixed(2)}%`}
                 </span>
                 <span className="text-xs text-gray-200">APY</span>
               </div>
