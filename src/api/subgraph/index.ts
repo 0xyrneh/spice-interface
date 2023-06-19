@@ -6,6 +6,7 @@ import {
   prologueNftQuery,
   userVaultPositionQuery,
   vaultPositionQuery,
+  userSpicePositionQuery,
 } from "./queries";
 
 export const getUserSpiceNfts = async (userAddr: string) => {
@@ -55,7 +56,7 @@ export const getVaultPositions = async (vaultAddress: string) => {
   }
 };
 
-// user position
+// user vault position
 export const getUserVaultPositions = async (
   userAddress: string,
   vaultAddress: string
@@ -75,6 +76,26 @@ export const getUserVaultPositions = async (
 
     const { userHourPositions } = result.data;
     return userHourPositions || [];
+  } catch (err) {
+    return [];
+  }
+};
+
+// user spice position
+export const getUserSpicePositions = async (userAddress: string) => {
+  if (!userAddress) return [];
+  try {
+    const result = await vaultSubgraphClient.query({
+      query: gql(userSpicePositionQuery),
+      variables: {
+        cnt: 1000,
+        userAddress: userAddress.toLowerCase(),
+      },
+      fetchPolicy: "network-only",
+    });
+
+    const { userSpiceHourPositions } = result.data;
+    return userSpiceHourPositions || [];
   } catch (err) {
     return [];
   }
