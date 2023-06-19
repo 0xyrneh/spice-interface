@@ -8,7 +8,8 @@ const prologueNftSubgraphApiUrl =
 
 const vaultSubgraphApiUrl =
   activeChainId === 1
-    ? "https://api.thegraph.com/subgraphs/name/daisai3/vault-position-mainnet"
+    ? // ? "https://api.thegraph.com/subgraphs/name/daisai3/vault-position-mainnet"
+      "https://api.thegraph.com/subgraphs/name/teamspice/spice-vaults-2"
     : "https://api.thegraph.com/subgraphs/name/daisai3/vault-position";
 
 export const prologueNftSubgraphClient = new ApolloClient({
