@@ -223,7 +223,8 @@ export default function LeverageInput({
         0,
         maxLtv,
         total,
-        lenderWethAvailable
+        lenderWethAvailable,
+        nft.borrowApr
       )
     );
   };

@@ -81,11 +81,17 @@ export const calculateBorrowApr = (
   maxLtv: number,
   total: number,
   available: number,
+  prevApr?: number,
   loanDuration?: number
 ) => {
   // calc utilization
   let utilization =
     total > 0 ? (total - available + additionalDebt) / total : 0;
+
+  const duration = loanDuration ?? 7; // default loan duration is 7 years
+
+  const previousPrincipal = newDebt - additionalDebt;
+  const previousRepayment = previousPrincipal * (1 + (prevApr ?? 0) * duration);
 
   if (utilization < 0) utilization = 0;
   if (utilization > 1) utilization = 1;
@@ -125,12 +131,11 @@ export const calculateBorrowApr = (
       (utilization - UTIL_KINK_2) * UTIL_SLOPE_3;
   }
 
-  const duration = loanDuration ?? 7; // default loan duration is 7 years
-  const repayment = newDebt * Math.pow(1 + apy, duration);
+  const repayment = Math.max(
+    newDebt * Math.pow(1 + apy, duration),
+    previousRepayment
+  );
   const apr = (repayment - newDebt) / (duration * newDebt);
 
-  // return apr;
-  // eslint-disable-next-line no-restricted-properties
-  // const borrowApr = (Math.pow(1 + apy, duration) - 1) / duration;
   return Math.floor(apr * 10000) / 10000;
 };

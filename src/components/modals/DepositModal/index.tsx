@@ -540,11 +540,8 @@ export default function DepositModal({
     setTargetAmount(val);
   };
 
-  const getAdditionalAmnout = () => {
+  const getAdditionalAmout = () => {
     if (leverageTab === "Refinance") return 0;
-    if (leverageTab === LeverageTab.Increase) {
-      return getAmountFromSliderStep(sliderStep);
-    }
     return getAmountFromSliderStep(sliderStep);
   };
 
@@ -562,7 +559,7 @@ export default function DepositModal({
         if (!selectedNft) return false;
 
         return (
-          getAmountFromSliderStep(sliderStep) > 0 && getAdditionalAmnout() > 0
+          getAmountFromSliderStep(sliderStep) > 0 && getAdditionalAmout() > 0
         );
       }
 
@@ -629,10 +626,9 @@ export default function DepositModal({
   const getAdditionalDebt = () => {
     if (!selectedNft) return 0;
 
+    const debtNum = Number(targetAmount);
     const additionalDebt =
-      leverageTab === LeverageTab.Decrease
-        ? getAmountFromSliderStep(sliderStep) * -1
-        : getAmountFromSliderStep(sliderStep);
+      leverageTab === LeverageTab.Decrease ? debtNum * -1 : debtNum;
 
     return additionalDebt;
   };
@@ -698,6 +694,7 @@ export default function DepositModal({
         maxLtv,
         total,
         available,
+        selectedNft.borrowApr,
         duration
       )
     );
