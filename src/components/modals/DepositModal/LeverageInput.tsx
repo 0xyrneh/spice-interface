@@ -229,6 +229,15 @@ export default function LeverageInput({
     );
   };
 
+  const getRefinanceApy = () => {
+    const apr = getRefinanceApr();
+
+    const m = 1 / 7;
+    // eslint-disable-next-line no-restricted-properties
+    const borrowApy = Math.pow(1 + apr / 100 / m, m) - 1;
+    return borrowApy * 100;
+  };
+
   // change slider input
   const onChangeTerms = (step: number) => {
     if (tab === LeverageTab.Increase && maxLeverage === 0) return;
@@ -316,9 +325,9 @@ export default function LeverageInput({
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">
             <span className="text-2xl">
-              {`${getRefinanceApr().toFixed(2)}%`}
+              {`${getRefinanceApy().toFixed(2)}%`}
             </span>
-            <span className="text-xs">New Borrow APR</span>
+            <span className="text-xs">New Borrow APY</span>
           </div>
         </div>
       );
@@ -329,9 +338,9 @@ export default function LeverageInput({
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">
             <span className="text-2xl">
-              {`${getRefinanceApr().toFixed(2)}%`}
+              {`${getRefinanceApy().toFixed(2)}%`}
             </span>
-            <span className="text-xs">New Borrow APR</span>
+            <span className="text-xs">New Borrow APY</span>
           </div>
         </div>
       );

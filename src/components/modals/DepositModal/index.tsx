@@ -710,7 +710,9 @@ export default function DepositModal({
   const calculateNetApy = () => {
     if (!selectedNft) return 0;
     const loanDuration =
-      leverageTab === LeverageTab.Refinance || leverageTab === LeverageTab.Renew
+      leverageTab === LeverageTab.Refinance ||
+      leverageTab === LeverageTab.Renew ||
+      leverageTab === LeverageTab.LeverUp
         ? 7 * YEAR_IN_SECONDS
         : selectedNft.loanDuration;
     const m = YEAR_IN_SECONDS / loanDuration;

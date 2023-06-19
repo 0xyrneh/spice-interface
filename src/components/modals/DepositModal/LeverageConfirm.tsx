@@ -558,7 +558,7 @@ export default function LeverageConfirm(props: Props) {
 
   const getBorrowApy = () => {
     const loanDuration =
-      tab === LeverageTab.Decrease
+      tab === LeverageTab.Decrease || tab === LeverageTab.Increase
         ? nft?.loanDuration ?? 0
         : YEAR_IN_SECONDS * 7;
 
