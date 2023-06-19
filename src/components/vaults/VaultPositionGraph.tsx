@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useWeb3React } from "@web3-react/core";
+import moment from "moment";
 
 import { Card, Stats } from "@/components/common";
 import PositionSVG from "@/assets/icons/position.svg";
@@ -8,8 +9,6 @@ import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { VaultInfo, ReceiptToken, ChartValue } from "@/types/vault";
 import { LineChart } from "@/components/portfolio";
 import { PeriodFilter } from "@/types/common";
-import { ExampleShare, ExampleTotalTvl } from "@/constants";
-import moment from "moment";
 import { BLUR_API_BASE } from "@/config/constants/backend";
 import axios from "axios";
 import {
@@ -20,7 +19,7 @@ import {
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
 import { activeChainId } from "@/utils/web3";
-import { getUserVaultPositions } from "@/api/subgraph";
+import { getUserVaultPositions, getUserSpicePositions } from "@/api/subgraph";
 import { getBalanceInEther } from "@/utils/formatBalance";
 
 type Props = {
@@ -38,7 +37,8 @@ export default function VaultPositionGraph({
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const { account } = useWeb3React();
-  const [noneBlurVaultPositions, setNoneBlurVaultPositions] = useState<any>();
+  const [noneBlurVaultPositions, setNoneBlurVaultPositions] = useState<any>([]);
+  const [spiceUserPositions, setSpiceUserPositions] = useState<any>([]);
 
   const fetchBlurChart = async () => {
     setIsFetching(true);
@@ -63,86 +63,56 @@ export default function VaultPositionGraph({
     setIsFetching(false);
   };
 
-  const fetchNoneBlurVaultPosition = async () => {
+  const fetchNoneBlurVaultUserPosition = async () => {
     if (!account) return;
-    if (!vault?.address) return;
+    if (!vault?.address) {
+      const positionsRaw = await getUserSpicePositions(account);
 
-    const positionsRaw = await getUserVaultPositions(account, vault.address);
-    setNoneBlurVaultPositions(
-      positionsRaw.map((row: any) => {
-        return {
-          time: Number(row.date) * 1000,
-          position: getBalanceInEther(row.position),
-        };
-      })
-    );
+      setSpiceUserPositions(
+        positionsRaw.map((row: any) => {
+          return {
+            time: Number(row.date) * 1000,
+            position: getBalanceInEther(row.position),
+          };
+        })
+      );
+    } else {
+      const positionsRaw = await getUserVaultPositions(account, vault.address);
+      setNoneBlurVaultPositions(
+        positionsRaw.map((row: any) => {
+          return {
+            time: Number(row.date) * 1000,
+            position: getBalanceInEther(row.position),
+          };
+        })
+      );
+    }
   };
 
   useEffect(() => {
     if (vault && vault.isBlur) {
       fetchBlurChart();
     } else {
-      fetchNoneBlurVaultPosition();
+      fetchNoneBlurVaultUserPosition();
     }
   }, [vault, account]);
 
   const getChartData = () => {
-    if (vault) {
-      const currentTime = Math.floor(Date.now() / 1000);
+    let chartData: ChartValue[] = [];
 
+    if (vault) {
       if (vault.isBlur) {
-        const blurPointsChart: ChartValue[] = showPosition
+        chartData = showPosition
           ? blurChartInfo?.tvlChart ?? []
           : blurChartInfo?.pointsChart ?? [];
-
-        if (selectedPeriod === PeriodFilter.Day) {
-          return blurPointsChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Week) {
-          return blurPointsChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Month) {
-          return blurPointsChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Year) {
-          return blurPointsChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
-          });
-        }
-        return blurPointsChart;
       } else {
         if (showPosition) {
-          const chartData = noneBlurVaultPositions
-            ? noneBlurVaultPositions.map((row: any) => {
-                return {
-                  x: row.time,
-                  y: row.position,
-                };
-              })
-            : [];
-
-          if (selectedPeriod === PeriodFilter.All) {
-            return chartData;
-          } else if (selectedPeriod === PeriodFilter.Year) {
-            return chartData.filter((item: any) => {
-              return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
-            });
-          } else if (selectedPeriod === PeriodFilter.Month) {
-            return chartData.filter((item: any) => {
-              return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
-            });
-          } else if (selectedPeriod === PeriodFilter.Week) {
-            return chartData.filter((item: any) => {
-              return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
-            });
-          } else {
-            return chartData.filter((item: any) => {
-              return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
-            });
-          }
+          chartData = noneBlurVaultPositions.map((row: any) => {
+            return {
+              x: row.time,
+              y: row.position,
+            };
+          });
         } else {
           // asset share logic
           const historialRecords = vault?.historicalRecords || [];
@@ -167,40 +137,51 @@ export default function VaultPositionGraph({
             .reverse()
             .filter((row) => row.assetPerShare);
 
-          const chartData = aprHistories.map((row) => {
+          chartData = aprHistories.map((row) => {
             return {
               x: row.time,
               y: row.assetPerShare,
             };
           });
-
-          if (selectedPeriod === PeriodFilter.All) {
-            return chartData;
-          } else if (selectedPeriod === PeriodFilter.Year) {
-            return chartData.filter((item) => {
-              return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
-            });
-          } else if (selectedPeriod === PeriodFilter.Month) {
-            return chartData.filter((item) => {
-              return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
-            });
-          } else if (selectedPeriod === PeriodFilter.Week) {
-            return chartData.filter((item) => {
-              return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
-            });
-          } else {
-            return chartData.filter((item) => {
-              return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
-            });
-          }
         }
       }
     } else {
       if (showPosition) {
-        return ExampleTotalTvl[selectedPeriod];
+        if (!account) {
+          chartData = [];
+        } else {
+          chartData = spiceUserPositions.map((row: any) => {
+            return {
+              x: row.time,
+              y: row.position,
+            };
+          });
+        }
       } else {
-        return ExampleShare[selectedPeriod];
+        chartData = [];
       }
+    }
+
+    // filter data by show option
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (selectedPeriod === PeriodFilter.All) {
+      return chartData;
+    } else if (selectedPeriod === PeriodFilter.Year) {
+      return chartData.filter((item: any) => {
+        return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+      });
+    } else if (selectedPeriod === PeriodFilter.Month) {
+      return chartData.filter((item: any) => {
+        return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+      });
+    } else if (selectedPeriod === PeriodFilter.Week) {
+      return chartData.filter((item: any) => {
+        return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+      });
+    } else {
+      return chartData.filter((item: any) => {
+        return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+      });
     }
   };
 
@@ -247,13 +228,15 @@ export default function VaultPositionGraph({
               } POSITION`
             : "TOTAL SPICE POSITION"}
         </h2>
-        <button onClick={() => setShowPosition(!showPosition)}>
-          <SortUpSVG
-            className={`text-gray-100 hover:text-white ${
-              showPosition ? "rotate-180" : ""
-            }`}
-          />
-        </button>
+        {vault && (
+          <button onClick={() => setShowPosition(!showPosition)}>
+            <SortUpSVG
+              className={`text-gray-100 hover:text-white ${
+                showPosition ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+        )}
       </div>
 
       {/* vault stats */}

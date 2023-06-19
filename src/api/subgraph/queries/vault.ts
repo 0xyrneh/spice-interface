@@ -7,7 +7,7 @@ const userVaultPositionQuery = `
         vault: $vaultAddress
       }
       orderBy: date
-      orderDirectioni: asc
+      orderDirection: asc
     )
       {
         date
@@ -24,7 +24,7 @@ const vaultPositionQuery = `
         vault: $vaultAddress
       }
       orderBy: date
-      orderDirectioni: asc
+      orderDirection: asc
     )
       {
         date
@@ -33,4 +33,21 @@ const vaultPositionQuery = `
   }
 `;
 
-export { userVaultPositionQuery, vaultPositionQuery };
+const userSpicePositionQuery = `
+  query getUserSpicePositions($userAddress: String!) {
+    userSpiceHourPositions(
+      first:$cnt
+      where: {
+        address: $userAddress
+      }
+      orderBy: date
+      orderDirection: asc
+    )
+      {
+        date
+        position
+      }
+  }
+`;
+
+export { userVaultPositionQuery, vaultPositionQuery, userSpicePositionQuery };
