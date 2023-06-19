@@ -20,6 +20,8 @@ import {
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
 import { activeChainId } from "@/utils/web3";
+import { getUserVaultPositions } from "@/api/subgraph";
+import { getBalanceInEther } from "@/utils/formatBalance";
 
 type Props = {
   vault?: VaultInfo | undefined;
@@ -36,6 +38,7 @@ export default function VaultPositionGraph({
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const { account } = useWeb3React();
+  const [noneBlurVaultPositions, setNoneBlurVaultPositions] = useState<any>();
 
   const fetchBlurChart = async () => {
     setIsFetching(true);
@@ -59,6 +62,29 @@ export default function VaultPositionGraph({
 
     setIsFetching(false);
   };
+
+  const fetchNoneBlurVaultPosition = async () => {
+    if (!account) return;
+    if (!vault?.address) return;
+
+    const positionsRaw = await getUserVaultPositions(account, vault.address);
+    setNoneBlurVaultPositions(
+      positionsRaw.map((row: any) => {
+        return {
+          time: Number(row.date) * 1000,
+          position: getBalanceInEther(row.position),
+        };
+      })
+    );
+  };
+
+  useEffect(() => {
+    if (vault && vault.isBlur) {
+      fetchBlurChart();
+    } else {
+      fetchNoneBlurVaultPosition();
+    }
+  }, [vault, account]);
 
   const getChartData = () => {
     if (vault) {
@@ -89,8 +115,34 @@ export default function VaultPositionGraph({
         return blurPointsChart;
       } else {
         if (showPosition) {
-          // TODO: implement position graph logic
-          return ExampleTotalTvl[selectedPeriod];
+          const chartData = noneBlurVaultPositions
+            ? noneBlurVaultPositions.map((row: any) => {
+                return {
+                  x: row.time,
+                  y: row.position,
+                };
+              })
+            : [];
+
+          if (selectedPeriod === PeriodFilter.All) {
+            return chartData;
+          } else if (selectedPeriod === PeriodFilter.Year) {
+            return chartData.filter((item: any) => {
+              return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+            });
+          } else if (selectedPeriod === PeriodFilter.Month) {
+            return chartData.filter((item: any) => {
+              return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+            });
+          } else if (selectedPeriod === PeriodFilter.Week) {
+            return chartData.filter((item: any) => {
+              return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+            });
+          } else {
+            return chartData.filter((item: any) => {
+              return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+            });
+          }
         } else {
           // asset share logic
           const historialRecords = vault?.historicalRecords || [];
@@ -171,10 +223,6 @@ export default function VaultPositionGraph({
   };
 
   const annualEstYield = calculateYields();
-
-  useEffect(() => {
-    if (vault && vault.isBlur) fetchBlurChart();
-  }, [vault]);
 
   return (
     <Card className="gap-3 flex-1 overflow-hidden min-h-[323px] h-[50%]">
