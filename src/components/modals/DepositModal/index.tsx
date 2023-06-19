@@ -19,11 +19,7 @@ import { getBalanceInEther, getBalanceInWei } from "@/utils/formatBalance";
 import { isValidNumber } from "@/utils/regex";
 import { Button, Card, Erc20Card, PrologueNftCard } from "../../common";
 import PositionInput from "./PositionInput";
-import {
-  YEAR_IN_SECONDS,
-  DAY_IN_SECONDS,
-  YEAR_IN_DAYS,
-} from "@/config/constants/time";
+import { YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getTokenImageFromReservoir } from "@/utils/nft";
 import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 import ConfirmPopup from "./ConfirmPopup";
@@ -208,6 +204,7 @@ export default function DepositModal({
         apy: netApy,
         liquidationRatio: lendGlobalData?.liquidationRatio || 0,
         loanDuration,
+        price: row.loan?.price || 0.5,
       };
     });
   }, [account, vault, lendData]);
@@ -543,11 +540,8 @@ export default function DepositModal({
     setTargetAmount(val);
   };
 
-  const getAdditionalAmnout = () => {
+  const getAdditionalAmout = () => {
     if (leverageTab === "Refinance") return 0;
-    if (leverageTab === LeverageTab.Increase) {
-      return getAmountFromSliderStep(sliderStep);
-    }
     return getAmountFromSliderStep(sliderStep);
   };
 
@@ -565,7 +559,7 @@ export default function DepositModal({
         if (!selectedNft) return false;
 
         return (
-          getAmountFromSliderStep(sliderStep) > 0 && getAdditionalAmnout() > 0
+          getAmountFromSliderStep(sliderStep) > 0 && getAdditionalAmout() > 0
         );
       }
 
@@ -632,10 +626,9 @@ export default function DepositModal({
   const getAdditionalDebt = () => {
     if (!selectedNft) return 0;
 
+    const debtNum = Number(targetAmount);
     const additionalDebt =
-      leverageTab === LeverageTab.Decrease
-        ? getAmountFromSliderStep(sliderStep) * -1
-        : getAmountFromSliderStep(sliderStep);
+      leverageTab === LeverageTab.Decrease ? debtNum * -1 : debtNum;
 
     return additionalDebt;
   };
@@ -661,16 +654,49 @@ export default function DepositModal({
       loanLenderVault?.wethBalance || BigNumber.from(0)
     );
     const duration =
-      leverageTab === LeverageTab.Decrease
-        ? (selectedNft?.loan?.terms?.duration || 0) / DAY_IN_SECONDS
-        : YEAR_IN_DAYS;
-    const ltv =
-      originMaxLtv > 1
-        ? getAmountFromSliderStep(sliderStep) /
-          (collateralValue + additionalDebt)
-        : getAmountFromSliderStep(sliderStep) / collateralValue;
+      leverageTab === LeverageTab.Refinance ||
+      leverageTab === LeverageTab.Renew ||
+      leverageTab === LeverageTab.LeverUp
+        ? undefined
+        : (selectedNft?.loan?.terms?.duration ?? 0) / YEAR_IN_SECONDS;
+    // const ltv =
+    //   originMaxLtv > 1
+    //     ? getAmountFromSliderStep(sliderStep) /
+    //       (collateralValue + additionalDebt)
+    //     : getAmountFromSliderStep(sliderStep) / collateralValue;
+
+    const loanValue = getBalanceInEther(selectedNft.loan.balance);
+    const repayValue = getBalanceInEther(selectedNft.loan.repayAmount);
+    const interesteAccrued = repayValue - loanValue;
+
+    const leverageAvailable = Math.max(
+      0,
+      originMaxLtv < 0.9
+        ? originMaxLtv * (collateralValue - interesteAccrued * 2)
+        : originMaxLtv * (collateralValue - loanValue - interesteAccrued * 2)
+    );
+
+    const maxLeverage = Math.min(leverageAvailable, available);
+
+    const maxLtv =
+      available > leverageAvailable
+        ? originMaxLtv
+        : maxLeverage / (collateralValue - loanValue);
+
+    const price = selectedNft.loan.price;
+
     return (
-      100 * calculateBorrowApr(ltv, additionalDebt, total, available, duration)
+      100 *
+      calculateBorrowApr(
+        price,
+        loanValue + additionalDebt,
+        additionalDebt,
+        maxLtv,
+        total,
+        available,
+        selectedNft.borrowApr,
+        duration
+      )
     );
   };
 
@@ -684,7 +710,9 @@ export default function DepositModal({
   const calculateNetApy = () => {
     if (!selectedNft) return 0;
     const loanDuration =
-      leverageTab === LeverageTab.Refinance || leverageTab === LeverageTab.Renew
+      leverageTab === LeverageTab.Refinance ||
+      leverageTab === LeverageTab.Renew ||
+      leverageTab === LeverageTab.LeverUp
         ? 7 * YEAR_IN_SECONDS
         : selectedNft.loanDuration;
     const m = YEAR_IN_SECONDS / loanDuration;

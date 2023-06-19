@@ -8,6 +8,7 @@ import { getWethAddress } from "@/utils/addressHelpers";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import SpiceFiNFT4626Abi from "@/config/abi/SpiceFiNFT4626.json";
 import { activeChainId } from "@/utils/web3";
+import { getBalanceInEther } from "@/utils/formatBalance";
 
 const spiceNftAddr = DEFAULT_AGGREGATOR_VAULT[activeChainId];
 
@@ -89,10 +90,15 @@ export const fetchUserLendLoanData = async (
           },
         ]);
 
-        const [tokenAsset] = await multicall(SpiceFiNFT4626Abi, [
+        const [tokenAsset, rawPrice] = await multicall(SpiceFiNFT4626Abi, [
           {
             address: vaultAddr,
             name: "convertToAssets",
+            params: [tokenShare[0]],
+          },
+          {
+            address: vaultAddr,
+            name: "previewRedeem",
             params: [tokenShare[0]],
           },
         ]);
@@ -109,6 +115,7 @@ export const fetchUserLendLoanData = async (
           tokenId,
           tokenAmntInVault: tokenAsset[0],
           balance,
+          price: getBalanceInEther(rawPrice[0]),
         };
       })
     );

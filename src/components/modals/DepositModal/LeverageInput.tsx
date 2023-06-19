@@ -10,7 +10,6 @@ import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { getLenderByLoanId } from "@/state/lend/fetchGlobalLend";
 import { calculateBorrowApr } from "@/utils/apy";
-import { DAY_IN_SECONDS } from "@/config/constants/time";
 
 export enum LeverageTab {
   LeverUp = "Lever Up",
@@ -189,26 +188,54 @@ export default function LeverageInput({
   const getRefinanceApr = () => {
     if (!loanLenderVault) return 0;
 
-    const additionalDebt =
-      tab === LeverageTab.Increase
-        ? getAmountFromSliderStep(sliderStep) - loanValue
-        : getAmountFromSliderStep(sliderStep);
     const total = getBalanceInEther(
       loanLenderVault?.totalAssets || BigNumber.from(0)
     );
-    const available = getBalanceInEther(
-      loanLenderVault?.wethBalance || BigNumber.from(0)
+    // const ltv =
+    //   originMaxLtv > 1
+    //     ? getAmountFromSliderStep(sliderStep) /
+    //       (collateralValue + additionalDebt)
+    //     : getAmountFromSliderStep(sliderStep) / collateralValue;
+
+    const interesteAccrued = repayValue - loanValue;
+
+    const leverageAvailable = Math.max(
+      0,
+      originMaxLtv < 0.9
+        ? originMaxLtv * (collateralValue - interesteAccrued * 2)
+        : originMaxLtv * (collateralValue - loanValue - interesteAccrued * 2)
     );
-    const duration = (nft?.loan?.terms.duration || 0) / DAY_IN_SECONDS;
-    const ltv =
-      originMaxLtv > 1
-        ? getAmountFromSliderStep(sliderStep) /
-          (collateralValue + additionalDebt)
-        : getAmountFromSliderStep(sliderStep) / collateralValue;
+
+    const maxLeverage = Math.min(leverageAvailable, lenderWethAvailable);
+
+    const maxLtv =
+      lenderWethAvailable > leverageAvailable
+        ? originMaxLtv
+        : maxLeverage / (collateralValue - loanValue);
+
+    const price = nft.price;
 
     return (
-      100 * calculateBorrowApr(ltv, additionalDebt, total, available, duration)
+      100 *
+      calculateBorrowApr(
+        price,
+        loanValue,
+        0,
+        maxLtv,
+        total,
+        lenderWethAvailable,
+        nft.borrowApr
+      )
     );
+  };
+
+  const getRefinanceApy = () => {
+    const apr = getRefinanceApr();
+
+    const m = 1 / 7;
+    // eslint-disable-next-line no-restricted-properties
+    const borrowApy = Math.pow(1 + apr / 100 / m, m) - 1;
+    return borrowApy * 100;
   };
 
   // change slider input
@@ -298,9 +325,9 @@ export default function LeverageInput({
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">
             <span className="text-2xl">
-              {`${getRefinanceApr().toFixed(2)}%`}
+              {`${getRefinanceApy().toFixed(2)}%`}
             </span>
-            <span className="text-xs">New Borrow APR</span>
+            <span className="text-xs">New Borrow APY</span>
           </div>
         </div>
       );
@@ -311,9 +338,9 @@ export default function LeverageInput({
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-col items-center text-gray-200 border-1 border-gray-200 rounded w-full max-w-[324px] py-5 px-8">
             <span className="text-2xl">
-              {`${getRefinanceApr().toFixed(2)}%`}
+              {`${getRefinanceApy().toFixed(2)}%`}
             </span>
-            <span className="text-xs">New Borrow APR</span>
+            <span className="text-xs">New Borrow APY</span>
           </div>
         </div>
       );
