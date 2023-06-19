@@ -1,13 +1,13 @@
 import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
 import { activeChainId } from "@/utils/web3";
 
-const subgraphApiUrl =
+const prologueNftSubgraphApiUrl =
   activeChainId === 1
     ? "https://api.thegraph.com/subgraphs/name/teamspice/spice-vaults"
     : "https://api.thegraph.com/subgraphs/name/teamspice/spice-vaultss";
 
 export const spiceSubgraphClient = new ApolloClient({
-  uri: subgraphApiUrl,
+  uri: prologueNftSubgraphApiUrl,
   cache: new InMemoryCache(),
 });
 

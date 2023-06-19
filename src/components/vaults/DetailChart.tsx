@@ -11,7 +11,6 @@ import {
   LoanAndBidExposure,
 } from "@/components/vaults";
 import { ChartValue, VaultInfo } from "@/types/vault";
-import { ExampleTotalTvl } from "@/constants";
 import { BLUR_API_BASE } from "@/config/constants/backend";
 import axios from "axios";
 import moment from "moment";
@@ -23,6 +22,8 @@ import {
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
 import { activeChainId } from "@/utils/web3";
+import { getVaultPositions } from "@/api/subgraph";
+import { getBalanceInEther } from "@/utils/formatBalance";
 
 type Props = {
   vault: VaultInfo;
@@ -33,6 +34,7 @@ export default function DetailChart({ vault }: Props) {
   const [showPerformance, setShowPerformance] = useState(false);
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
+  const [noneBlurVaultPositions, setNoneBlurVaultPositions] = useState<any>();
 
   const fetchBlurChart = async () => {
     setIsFetching(true);
@@ -152,14 +154,56 @@ export default function DetailChart({ vault }: Props) {
         }
         return blurPointsChart;
       } else {
-        // TODO: implement position graph logic
-        return ExampleTotalTvl[selectedPeriod];
+        const chartData = noneBlurVaultPositions
+          ? noneBlurVaultPositions.map((row: any) => {
+              return {
+                x: row.time,
+                y: row.position,
+              };
+            })
+          : [];
+
+        if (selectedPeriod === PeriodFilter.All) {
+          return chartData;
+        } else if (selectedPeriod === PeriodFilter.Year) {
+          return chartData.filter((item: any) => {
+            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Month) {
+          return chartData.filter((item: any) => {
+            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+          });
+        } else if (selectedPeriod === PeriodFilter.Week) {
+          return chartData.filter((item: any) => {
+            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+          });
+        } else {
+          return chartData.filter((item: any) => {
+            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+          });
+        }
       }
     }
   };
 
+  const fetchNoneBlurVaultPosition = async () => {
+    const positionsRaw = await getVaultPositions(vault.address);
+    setNoneBlurVaultPositions(
+      positionsRaw.map((row: any) => {
+        return {
+          time: Number(row.date) * 1000,
+          position: getBalanceInEther(row.position),
+        };
+      })
+    );
+  };
+
   useEffect(() => {
-    if (vault.isBlur) fetchBlurChart();
+    if (vault.isBlur) {
+      fetchBlurChart();
+    } else {
+      fetchNoneBlurVaultPosition();
+    }
   }, [vault]);
 
   return (
