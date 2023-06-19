@@ -10,7 +10,6 @@ import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { getLenderByLoanId } from "@/state/lend/fetchGlobalLend";
 import { calculateBorrowApr } from "@/utils/apy";
-import { DAY_IN_SECONDS } from "@/config/constants/time";
 
 export enum LeverageTab {
   LeverUp = "Lever Up",
@@ -189,25 +188,43 @@ export default function LeverageInput({
   const getRefinanceApr = () => {
     if (!loanLenderVault) return 0;
 
-    const additionalDebt =
-      tab === LeverageTab.Increase
-        ? getAmountFromSliderStep(sliderStep) - loanValue
-        : getAmountFromSliderStep(sliderStep);
     const total = getBalanceInEther(
       loanLenderVault?.totalAssets || BigNumber.from(0)
     );
-    const available = getBalanceInEther(
-      loanLenderVault?.wethBalance || BigNumber.from(0)
+    // const ltv =
+    //   originMaxLtv > 1
+    //     ? getAmountFromSliderStep(sliderStep) /
+    //       (collateralValue + additionalDebt)
+    //     : getAmountFromSliderStep(sliderStep) / collateralValue;
+
+    const interesteAccrued = repayValue - loanValue;
+
+    const leverageAvailable = Math.max(
+      0,
+      originMaxLtv < 0.9
+        ? originMaxLtv * (collateralValue - interesteAccrued * 2)
+        : originMaxLtv * (collateralValue - loanValue - interesteAccrued * 2)
     );
-    const duration = (nft?.loan?.terms.duration || 0) / DAY_IN_SECONDS;
-    const ltv =
-      originMaxLtv > 1
-        ? getAmountFromSliderStep(sliderStep) /
-          (collateralValue + additionalDebt)
-        : getAmountFromSliderStep(sliderStep) / collateralValue;
+
+    const maxLeverage = Math.min(leverageAvailable, lenderWethAvailable);
+
+    const maxLtv =
+      lenderWethAvailable > leverageAvailable
+        ? originMaxLtv
+        : maxLeverage / (collateralValue - loanValue);
+
+    const price = nft.price;
 
     return (
-      100 * calculateBorrowApr(ltv, additionalDebt, total, available, duration)
+      100 *
+      calculateBorrowApr(
+        price,
+        loanValue,
+        0,
+        maxLtv,
+        total,
+        lenderWethAvailable
+      )
     );
   };
 

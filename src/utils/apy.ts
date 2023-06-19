@@ -1,11 +1,23 @@
 // leverage
-export const getLeveredApy = (nftValue: number, vaultApy: number, debtOwed: number, borrowApy: number) =>
-  (nftValue * vaultApy - debtOwed * borrowApy) / (nftValue - debtOwed);
+export const getLeveredApy = (
+  nftValue: number,
+  vaultApy: number,
+  debtOwed: number,
+  borrowApy: number
+) => (nftValue * vaultApy - debtOwed * borrowApy) / (nftValue - debtOwed);
 
-export const getNetApy = (nftValue: number, vaultApy: number, debtOwed: number, borrowApy: number) =>
-  (nftValue * vaultApy - debtOwed * borrowApy) / (nftValue - debtOwed);
+export const getNetApy = (
+  nftValue: number,
+  vaultApy: number,
+  debtOwed: number,
+  borrowApy: number
+) => (nftValue * vaultApy - debtOwed * borrowApy) / (nftValue - debtOwed);
 
-export const calculateBorrowAprOld = (ltv: number, total: number, available: number) => {
+export const calculateBorrowAprOld = (
+  ltv: number,
+  total: number,
+  available: number
+) => {
   const GROWTH_FACTOR = 0.05;
   const BASE_FACTOR_1 = 50;
   const BASE_FACTOR_2 = 5;
@@ -30,7 +42,11 @@ export const calculateBorrowAprOld = (ltv: number, total: number, available: num
   return baseApy * Math.pow(BASE_FACTOR_2, utilization);
 };
 
-export const calculateBorrowAprOld2 = (total: number, available: number, loanDuration?: number) => {
+export const calculateBorrowAprOld2 = (
+  total: number,
+  available: number,
+  loanDuration?: number
+) => {
   const duration = loanDuration || 28 / 365; // loan duration is 28 days
   const baseApy = 0.045;
   const UTIL_SLOPE_1 = 0.02;
@@ -58,26 +74,35 @@ export const calculateBorrowAprOld2 = (total: number, available: number, loanDur
   return borrowApr;
 };
 
-/*
- * @param "repayValue": repayAmount(loanId)
- * @param "additionalDebt": additional loan amount
- * @pram "total": total supply of loan lender valut
- * @param "available": weth balance of loan lender vault
- * @param "loanDuration": loan duration in days
- */
 export const calculateBorrowApr = (
-  ltv: number,
+  price: number,
+  newDebt: number,
   additionalDebt: number,
+  maxLtv: number,
   total: number,
   available: number,
   loanDuration?: number
 ) => {
   // calc utilization
-  let utilization = total > 0 ? (total - available + additionalDebt) / total : 0;
+  let utilization =
+    total > 0 ? (total - available + additionalDebt) / total : 0;
+
   if (utilization < 0) utilization = 0;
   if (utilization > 1) utilization = 1;
 
-  const baseApy = 0.045;
+  let ltv = maxLtv >= 1 ? newDebt / (price + additionalDebt) : newDebt / price;
+
+  let baseApy = 0.045;
+  const ltvSlope = 2;
+  const ltvKink = 0.6;
+
+  if (ltv < 0) ltv = 0;
+  if (ltv > 1) ltv = 1;
+
+  if (ltv > ltvKink) {
+    baseApy += (ltv - ltvKink) * ltvSlope;
+  }
+
   const UTIL_SLOPE_1 = 0.07;
   const UTIL_SLOPE_2 = 0.5;
   const UTIL_SLOPE_3 = 6;
@@ -85,30 +110,27 @@ export const calculateBorrowApr = (
   const UTIL_KINK_1 = 0.75;
   const UTIL_KINK_2 = 0.85;
 
-  // const UTIL_SLOPE_L = 2;
-  // const UTIL_KINK_L = 0.6;
-
-  // if (ltv > UTIL_KINK_L) {
-  //   baseApy += ltv * UTIL_SLOPE_L - UTIL_KINK_L * UTIL_SLOPE_L;
-  // }
-
-  let apy = 0;
+  let apy = baseApy;
   if (utilization <= UTIL_KINK_1) {
     // apy at kink1
-    apy = baseApy + utilization * UTIL_SLOPE_1;
+    apy += utilization * UTIL_SLOPE_1;
   } else if (utilization <= UTIL_KINK_2) {
     // apy at kink2
-    apy = baseApy + UTIL_KINK_1 * UTIL_SLOPE_1 + (utilization - UTIL_KINK_1) * UTIL_SLOPE_2;
+    apy +=
+      UTIL_KINK_1 * UTIL_SLOPE_1 + (utilization - UTIL_KINK_1) * UTIL_SLOPE_2;
   } else {
-    apy =
-      baseApy +
+    apy +=
       UTIL_KINK_1 * UTIL_SLOPE_1 +
       (UTIL_KINK_2 - UTIL_KINK_1) * UTIL_SLOPE_2 +
       (utilization - UTIL_KINK_2) * UTIL_SLOPE_3;
   }
 
-  // calculate apr from apy
-  const duration = (loanDuration || 28) / 365;
+  const duration = loanDuration ?? 7; // default loan duration is 7 years
+  const repayment = newDebt * Math.pow(1 + apy, duration);
+  const apr = (repayment - newDebt) / (duration * newDebt);
+
+  // return apr;
   // eslint-disable-next-line no-restricted-properties
-  return (Math.pow(1 + apy, duration) - 1) / duration;
+  // const borrowApr = (Math.pow(1 + apy, duration) - 1) / duration;
+  return Math.floor(apr * 10000) / 10000;
 };
