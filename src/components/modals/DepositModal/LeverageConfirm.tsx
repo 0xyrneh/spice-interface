@@ -550,7 +550,7 @@ export default function LeverageConfirm(props: Props) {
     ) {
       setHealthFactor(
         debtOwed > 0 && nftValue > 0
-          ? (nft?.liquidationRatio ?? 0 * nftValue) / debtOwed
+          ? ((nft?.liquidationRatio ?? 0) * nftValue) / debtOwed
           : 0
       );
     }
