@@ -33,7 +33,7 @@ export default function Portfolio() {
 
   const accountImage = () => {
     if (loans.length === 0) {
-      return "/assets/images/vaultIcon.svg";
+      return undefined;
     } else {
       return getTokenImageFromReservoir(
         PROLOGUE_NFT_ADDRESS,
@@ -94,13 +94,23 @@ export default function Portfolio() {
         {account && (
           <Card className="py-3 !flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-5 flex-1">
-              <Image
-                className="border-1 border-orange-200 rounded-full drop-shadow-orange-200"
-                src={accountImage()}
-                width={40}
-                height={40}
-                alt=""
-              />
+              {accountImage() ? (
+                <Image
+                  className="border-1 border-orange-200 rounded-full drop-shadow-orange-200"
+                  src={accountImage()!}
+                  width={40}
+                  height={40}
+                  alt=""
+                />
+              ) : (
+                <Image
+                  className=""
+                  src="/assets/images/profile.svg"
+                  width={52}
+                  height={52}
+                  alt=""
+                />
+              )}
               <span className="hidden 3xl:flex font-bold text-base text-orange-200 text-shadow-orange-200 max-w-[60%]">
                 {shortAddress(account, 18, -16)}
               </span>
