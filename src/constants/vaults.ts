@@ -7,7 +7,7 @@ export const VAULT_DESCRIPTIONS: Record<string, string> = {
     "The Leverage Vault uses ETH deposits solely to fund leverage requests made by Prologue NFT holders, generating yield for depositors. This vault lends ETH to Prologue NFT holders against the ETH that they have deposited into the Prologue Vault. This makes the Leverage Vault the safest vault on the SPICE protocol. The SPICE protocol determines the vault’s APY as a function of its utilization rate. Depositors can withdraw at any time.",
   "Leverage-Deprecated":
     "This is a deprecated version of the Leverage Vault. This vault is no longer accepting any new deposits. Depositors seeking to gain exposure to Prologue Leverage yields may deposit into the new Leverage Vault. Previous depositors may withdraw funds only.",
-  Blend:
+  "SP-BLUR":
     "The SP-BLUR Vault uses ETH deposits to fund P2P NFT-backed loans on Blend, generating ETH yield and farming Blur Points for depositors. ETH yield is generated continuously while Blur Point rewards are distributed at the end of the Blur Season. This vault runs a lending strategy that seeks to maximize both Blur Point farming efficiency and ETH yield via strategic loan bidding. The SP-BLUR Vault will fund loans across all whitelisted NFT collections on Blend only. Depositors are instantly earning a 1.5X - 2.5X multiplier on Blur points. The distribution of Blur Points earned by SP-BLUR vault depositors at the end of the Blur Season will be determined by time in vault and average size deposited. The longer and larger the deposit, the higher the share of Blur points. Depositors can withdraw at any time.",
 };
 
