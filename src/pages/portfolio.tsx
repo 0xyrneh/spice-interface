@@ -63,6 +63,7 @@ export default function Portfolio() {
 
       return {
         ...row,
+        apy: Math.max(row.apy ?? 0, row.historicalApy ?? 0),
         userPositionRaw,
         userPosition: getBalanceInEther(userPositionRaw),
         userNftPortfolios,
