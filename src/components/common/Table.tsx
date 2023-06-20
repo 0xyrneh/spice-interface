@@ -57,14 +57,15 @@ const Table = ({
   const getSortedItems = () => {
     if (sortKey) {
       return items.sort((a, b) => {
-        if (!a[sortKey] || !b[sortKey]) return false;
         if (typeof a[sortKey] === "number") {
+          if (a[sortKey] === undefined || b[sortKey] === undefined) return 0;
           if (sortAsc) {
             return a[sortKey] > b[sortKey] ? 1 : -1;
           }
 
           return a[sortKey] > b[sortKey] ? -1 : 1;
         } else {
+          if (!a[sortKey] || !b[sortKey]) return 0;
           if (sortAsc) {
             return a[sortKey].localeCompare(b[sortKey]);
           }

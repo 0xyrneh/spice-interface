@@ -29,7 +29,7 @@ const ConnectWallet = ({ isHeader }: Props) => {
 
   const accountImage = () => {
     if (loans.length === 0) {
-      return "/assets/images/vaultIcon.svg";
+      return undefined;
     } else {
       return getTokenImageFromReservoir(
         PROLOGUE_NFT_ADDRESS,
@@ -65,13 +65,24 @@ const ConnectWallet = ({ isHeader }: Props) => {
           className="flex items-center gap-3"
           onClick={showDisconnectModal}
         >
-          <Image
-            className="border-1 border-orange-200 rounded-full drop-shadow-orange-200"
-            src={accountImage()}
-            width={28}
-            height={28}
-            alt=""
-          />
+          {accountImage() ? (
+            <Image
+              className="border-1 border-orange-200 rounded-full drop-shadow-orange-200"
+              src={accountImage()!}
+              width={28}
+              height={28}
+              alt=""
+            />
+          ) : (
+            <Image
+              className=""
+              src="/assets/images/profile.svg"
+              width={36}
+              height={36}
+              alt=""
+            />
+          )}
+
           <span className="text-xs text-bold text-orange-200 text-shadow-orange-200">
             {account.slice(0, 8)}
           </span>

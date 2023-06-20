@@ -46,22 +46,26 @@ const VaultList = ({ onClickVault }: Props) => {
     let oneDayChange = 0;
     let sevenDayChange = 0;
 
-    if (row?.historicalRecords) {
-      if (row?.historicalRecords[1]) {
-        oneDayChange =
-          100 *
-          (row?.historicalRecords[0]?.okrs?.expected_return -
-            row?.historicalRecords[1]?.okrs?.expected_return);
+    const { historicalRecords } = row;
+
+    if (historicalRecords && historicalRecords.length > 0) {
+      const lastReturn = historicalRecords[0].okrs.expected_return;
+
+      if (historicalRecords[1]) {
+        const prevReturn = historicalRecords[1].okrs.expected_return;
+
+        oneDayChange = 100 * (lastReturn - prevReturn);
       }
-      if (row?.historicalRecords[6]) {
-        sevenDayChange =
-          100 *
-          (row?.historicalRecords[0]?.okrs?.expected_return -
-            row?.historicalRecords[6]?.okrs?.expected_return);
+
+      if (historicalRecords[6]) {
+        const prevReturn = historicalRecords[6].okrs.expected_return;
+
+        sevenDayChange = 100 * (lastReturn - prevReturn);
       }
     }
     return {
       ...row,
+      apy: Math.max(row.apy ?? 0, row.historicalApy ?? 0),
       oneDayChange,
       sevenDayChange,
     };
