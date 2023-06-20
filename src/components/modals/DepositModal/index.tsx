@@ -598,23 +598,24 @@ export default function DepositModal({
   };
 
   const onChangeAmount = (newAmount: string) => {
-    while (newAmount.split(".").length - 1 > 1 && newAmount.endsWith(".")) {
-      newAmount = newAmount.slice(0, -1);
-    }
-    if (!isValidNumber(newAmount)) return;
+    // while (newAmount.split(".").length - 1 > 1 && newAmount.endsWith(".")) {
+    //   newAmount = newAmount.slice(0, -1);
+    // }
+    // if (!isValidNumber(newAmount)) return;
     let newAmountInWei = getBalanceInWei(Number(newAmount).toString() || "0");
     if (newAmountInWei.gt(getBalance())) {
       newAmountInWei = getBalance();
-    }
-    if (newAmountInWei.gt(0)) {
       newAmount = utils.formatEther(newAmountInWei);
-      const decimalPart = newAmount.split(".")[1];
-      if (decimalPart && decimalPart.length > 7) {
-        newAmount =
-          (Math.floor(parseFloat(newAmount) * 10 ** 7) / 10 ** 7).toString() +
-          "...";
-      }
     }
+    // if (newAmountInWei.gt(0)) {
+    //   newAmount = utils.formatEther(newAmountInWei);
+    //   const decimalPart = newAmount.split(".")[1];
+    //   if (decimalPart && decimalPart.length > 7) {
+    //     newAmount =
+    //       (Math.floor(parseFloat(newAmount) * 10 ** 7) / 10 ** 7).toString() +
+    //       "...";
+    //   }
+    // }
     setPositionAmount(newAmount);
     setAmountInWei(newAmountInWei);
   };
