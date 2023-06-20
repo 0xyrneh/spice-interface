@@ -54,13 +54,13 @@ const VaultList = ({ onClickVault }: Props) => {
       if (historicalRecords[1]) {
         const prevReturn = historicalRecords[1].okrs.expected_return;
 
-        oneDayChange = (100 * (lastReturn - prevReturn)) / prevReturn;
+        oneDayChange = 100 * (lastReturn - prevReturn);
       }
 
       if (historicalRecords[6]) {
         const prevReturn = historicalRecords[6].okrs.expected_return;
 
-        sevenDayChange = (100 * (lastReturn - prevReturn)) / prevReturn;
+        sevenDayChange = 100 * (lastReturn - prevReturn);
       }
     }
     return {
