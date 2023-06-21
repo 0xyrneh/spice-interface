@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import useBreakpoint from "use-breakpoint";
-import { BlurStats, Button, Card, Stats } from "@/components/common";
+import { BlurStats, Button, Card, Stats, CopyClipboard } from "@/components/common";
 import BlurSVG from "@/assets/icons/blur.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import { VaultInfo } from "@/types/vault";
@@ -152,14 +152,12 @@ export default function BlurPts({
         itemClass: () => "!justify-start",
         itemPrefix: (item) => {
           return (
-            <button className="hidden lg:flex items-center min-w-4 w-4 h-4 mr-1">
-              <Image
-                src="/assets/icons/copy.svg"
-                width={16}
-                height={16}
-                alt=""
-              />
-            </button>
+            <CopyClipboard
+              text={item.wallet}
+              width={16}
+              height={16}
+              className="hidden lg:flex items-center min-w-4 w-4 h-4 mr-1"
+            />
           );
         },
         format: (item) => {
