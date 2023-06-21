@@ -218,16 +218,13 @@ export default function DepositModal({
   } = useSpiceLending(selectedNft?.lendAddr, vault.address);
 
   const updateAllowance = async () => {
-    console.log("===> updating allowance 1", account);
     if (!account) return;
 
     let _allowance = vault.userInfo.allowance;
-    console.log("===> updating allowance 2", _allowance.toString(), selectedNft?.lendAddr);
-    if (selectedNft?.lendAddr) {
+    if (!isFungible && selectedNft?.lendAddr) {
       const res = await fetchUserWethData(account, selectedNft?.lendAddr);
       _allowance = res.allowance;
     }
-    console.log("===> updating allowance 3", _allowance.toString());
     setAllowance(_allowance);
   };
 
