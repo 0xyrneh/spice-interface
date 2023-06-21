@@ -212,10 +212,10 @@ export const fetchActiveVaults = async (vaults: any[]) => {
       if (row.type === "aggregator") {
         return {
           ...row,
-          totalShares: getBalanceInEther(onChainInfo[i][0][0]),
-          tvl: getBalanceInEther(onChainInfo[i][1][0]),
+          totalShares: row?.fungible ? getBalanceInEther(onChainInfo[i][1][0]) : getBalanceInEther(onChainInfo[i][0][0]),
+          tvl: row?.fungible ? getBalanceInEther(onChainInfo[i][0][0]) : getBalanceInEther(onChainInfo[i][1][0]),
           wethBalance: vaultWethInfo[i][0][0],
-          totalSupply: row?.fungible ? 0 : onChainInfo[i][2][0].toNumber(),
+          totalSupply: row?.fungible ? getBalanceInEther(onChainInfo[i][1][0]) : onChainInfo[i][2][0].toNumber(),
           maxSupply: row?.fungible ? 0 : onChainInfo[i][3][0].toNumber(),
           apr: 100 * (row?.okrs?.expected_return || 0),
           apy: 100 * (row?.okrs?.expected_return || 0),
