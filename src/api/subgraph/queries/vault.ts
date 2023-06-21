@@ -16,6 +16,24 @@ const userVaultPositionQuery = `
   }
 `;
 
+const userVaultShareQuery = `
+  query getUserPositions($userAddress: String!, $vaultAddress: String!) {
+    userHourPositions(
+      first:$cnt
+      where: {
+        user: $userAddress
+        vault: $vaultAddress
+      }
+      orderBy: date
+      orderDirection: asc
+    )
+      {
+        date
+        share
+      }
+  }
+`;
+
 const vaultPositionQuery = `
   query getVaultPositions($cnt: Int!, $vaultAddress: String!) {
     vaultHourPositions(
@@ -50,4 +68,9 @@ const userSpicePositionQuery = `
   }
 `;
 
-export { userVaultPositionQuery, vaultPositionQuery, userSpicePositionQuery };
+export {
+  userVaultPositionQuery,
+  userVaultShareQuery,
+  vaultPositionQuery,
+  userSpicePositionQuery,
+};

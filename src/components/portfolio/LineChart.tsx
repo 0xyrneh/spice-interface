@@ -103,12 +103,14 @@ const getOptions = (
       },
       ticks: {
         callback: function (value: any) {
-          return (yPrefix ?? "") + value;
+          return (yPrefix ?? "") + Number(value).toFixed(2);
         },
         padding: 10,
       },
     },
   },
+  pointRadius: 1,
+  hoverRadius: 2,
 });
 
 const getChartData = (data: ChartValue[]) => ({

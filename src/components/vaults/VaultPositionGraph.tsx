@@ -19,7 +19,7 @@ import {
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
 import { activeChainId } from "@/utils/web3";
-import { getUserVaultPositions, getUserSpicePositions } from "@/api/subgraph";
+import { getUserVaultShares, getUserSpicePositions } from "@/api/subgraph";
 import { getBalanceInEther } from "@/utils/formatBalance";
 
 type Props = {
@@ -33,11 +33,12 @@ export default function VaultPositionGraph({
   totalPosition,
 }: Props) {
   const [showPosition, setShowPosition] = useState(true);
-  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
+  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Day);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const { account } = useWeb3React();
   const [noneBlurVaultPositions, setNoneBlurVaultPositions] = useState<any>([]);
+  const [noneBlurVaultShares, setNoneBlurVaultShares] = useState<any>([]);
   const [spiceUserPositions, setSpiceUserPositions] = useState<any>([]);
 
   const fetchBlurChart = async () => {
@@ -77,12 +78,13 @@ export default function VaultPositionGraph({
         })
       );
     } else {
-      const positionsRaw = await getUserVaultPositions(account, vault.address);
-      setNoneBlurVaultPositions(
-        positionsRaw.map((row: any) => {
+      const sharesRaw = await getUserVaultShares(account, vault.address);
+
+      setNoneBlurVaultShares(
+        sharesRaw.map((row: any) => {
           return {
             time: Number(row.date) * 1000,
-            position: getBalanceInEther(row.position),
+            share: getBalanceInEther(row.share),
           };
         })
       );
@@ -106,37 +108,47 @@ export default function VaultPositionGraph({
           ? blurChartInfo?.tvlChart ?? []
           : blurChartInfo?.pointsChart ?? [];
       } else {
+        // asset share logic
+        const historialRecords = vault?.historicalRecords || [];
+        const aprField =
+          activeChainId === 1 ? "actual_returns" : "expected_return";
+        const graphField =
+          activeChainId === 1 ? "assets_per_share" : "expected_return";
+
+        // apr histories
+        const aprHistories = historialRecords
+          .map((row) => ({
+            time: 1000 * Number(row.time) || 0,
+            apr:
+              (activeChainId === 1 ? 1 : 100) *
+              (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
+            assetPerShare:
+              (activeChainId === 1 ? 1 : 100) *
+              (row?.okrs && row?.okrs[graphField] ? row?.okrs[graphField] : 0),
+          }))
+          .reverse()
+          .filter((row) => row.assetPerShare);
+
         if (showPosition) {
-          chartData = noneBlurVaultPositions.map((row: any) => {
+          const sharePriceChartData = aprHistories.map((row) => {
             return {
               x: row.time,
-              y: row.position,
+              y: row.assetPerShare,
+            };
+          });
+          const shareValueChartData = noneBlurVaultShares.map((row: any) => {
+            return {
+              x: row.time,
+              y: Number(row.share.toFixed(2)),
+            };
+          });
+          chartData = noneBlurVaultShares.map((row: any) => {
+            return {
+              x: row.time,
+              y: Number(row.share.toFixed(2)),
             };
           });
         } else {
-          // asset share logic
-          const historialRecords = vault?.historicalRecords || [];
-          const aprField =
-            activeChainId === 1 ? "actual_returns" : "expected_return";
-          const graphField =
-            activeChainId === 1 ? "assets_per_share" : "expected_return";
-
-          // apr histories
-          const aprHistories = historialRecords
-            .map((row) => ({
-              time: 1000 * Number(row.time) || 0,
-              apr:
-                (activeChainId === 1 ? 1 : 100) *
-                (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
-              assetPerShare:
-                (activeChainId === 1 ? 1 : 100) *
-                (row?.okrs && row?.okrs[graphField]
-                  ? row?.okrs[graphField]
-                  : 0),
-            }))
-            .reverse()
-            .filter((row) => row.assetPerShare);
-
           chartData = aprHistories.map((row) => {
             return {
               x: row.time,
