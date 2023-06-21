@@ -437,6 +437,7 @@ export default function DepositModal({
         ).toFixed(3)
       );
       try {
+        let isApproving = false;
         if (isDeposit) {
           if (useWeth) {
             if (isApprove()) {
@@ -446,6 +447,7 @@ export default function DepositModal({
                 ? onApproveWeth
                 : onNftVaultApprove)();
               setPositionStatus(TxStatus.None);
+              isApproving = true;
             } else {
               if (isFungible) await onVaultDeposit(amountInWei);
               else if (selectedNft) {
@@ -483,8 +485,10 @@ export default function DepositModal({
           }
           setPositionStatus(TxStatus.Finish);
         }
-        setPositionAmount("");
-        setAmountInWei(BigNumber.from("0"));
+        if (!isApproving) {
+          setPositionAmount("");
+          setAmountInWei(BigNumber.from("0"));
+        }
         dispatch(setPendingTxHash(""));
         dispatch(fetchVaultUserDataAsync(account, vault));
       } catch (err) {
