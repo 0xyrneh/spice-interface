@@ -188,10 +188,12 @@ export const fetchVaultUserTokenDataAsync =
 
     if (!vault) return;
 
+    console.log("===> fetchVaultUserTokenDataAsync: before fetching allowance");
     const { userTokenAllowance, userTokenBalance } = await fetchUserTokenData(
       account,
       vault
     );
+    console.log("===> fetchVaultUserTokenDataAsync: after fetching allowance", userTokenAllowance.toString());
 
     dispatch(
       setVaultUserTokenData({
