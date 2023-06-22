@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { BigNumber, utils, constants } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 import moment from "moment-timezone";
+import { useRouter } from "next/router";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "../Modal";
@@ -96,6 +97,7 @@ export default function DepositModal({
     (state) => state.modal
   );
   const { ethPrice } = useAppSelector((state) => state.oracle);
+  const router = useRouter();
 
   const {
     onApprove: onVaultApprove,
@@ -745,8 +747,14 @@ export default function DepositModal({
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
         <div className="flex flex-col gap-3 pt-10 h-full">
           <Card
-            className="!pt-4 !pb-2 !px-2 justify-center items-center leading-5 border-1 border-gray-200 !bg-gray-700 !bg-opacity-95"
+            className="!pt-4 !pb-2 !px-2 justify-center items-center leading-5 border-1 border-gray-200 !bg-gray-700 !bg-opacity-95 cursor-pointer"
             notBlur
+            onClick={() => {
+              if (vault.address) {
+                router.push(`/vault/${vault.address}`);
+                onCloseModal();
+              }
+            }}
           >
             <h2 className="font-base text-white leading-5">
               {vaultToShow?.readable || ""}
@@ -766,29 +774,39 @@ export default function DepositModal({
               </div>
             </div>
           </Card>
-          {vault.receiptToken === ReceiptToken.NFT ? (
-            <PrologueNftCard
-              containerClassName="w-[176px] lg:w-[198px]"
-              nfts={myNfts}
-              selectedNftId={selectedNftId}
-              onItemChanged={(_: any, idx: number) => setSelectedNftId(idx)}
-              footerClassName="!h-10"
-              expanded
-              showBorder
-            />
-          ) : (
-            <>
-              <Erc20Card
-                className="w-[176px] lg:w-[198px]"
-                bgImg={vault.logo}
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              if (vault.address) {
+                router.push(`/vault/${vault.address}`);
+                onCloseModal();
+              }
+            }}
+          >
+            {vault.receiptToken === ReceiptToken.NFT ? (
+              <PrologueNftCard
+                containerClassName="w-[176px] lg:w-[198px]"
+                nfts={myNfts}
+                selectedNftId={selectedNftId}
+                onItemChanged={(_: any, idx: number) => setSelectedNftId(idx)}
                 footerClassName="!h-10"
                 expanded
-                position={getBalanceInEther(vault.userInfo.depositAmnt).toFixed(
-                  2
-                )}
+                showBorder
               />
-            </>
-          )}
+            ) : (
+              <>
+                <Erc20Card
+                  className="w-[176px] lg:w-[198px]"
+                  bgImg={vault.logo}
+                  footerClassName="!h-10"
+                  expanded
+                  position={getBalanceInEther(
+                    vault.userInfo.depositAmnt
+                  ).toFixed(2)}
+                />
+              </>
+            )}
+          </div>
         </div>
         <Card
           className="flex flex-col border-1 border-gray-200 !py-0 !px-0 h-full flex-1 !bg-gray-700 !bg-opacity-95 w-[calc(min(50vw,500px))] lg:w-[500px]"

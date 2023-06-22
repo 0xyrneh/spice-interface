@@ -229,7 +229,7 @@ export default function MarketplaceExposure({
   return (
     <Card className={`gap-3 ${className}`}>
       <div className="flex items-center gap-2.5 font-bold text-white font-sm whitespace-nowrap leading-[18px]">
-        {vault && (
+        {/* {vault && (
           <Image
             className="border-1 border-gray-200 rounded-full"
             src={vault.logo}
@@ -237,18 +237,18 @@ export default function MarketplaceExposure({
             height={16}
             alt=""
           />
-        )}
+        )} */}
         <MarketExposureSVG className="text-white" />
         <h2 className="block lg:hidden">
           {isBreakdown ? "MRKTPLACE" : "MARKET"}
-          {isBreakdown ? "B/D" : "EXP."}
+          {isBreakdown ? " B/D" : " B/D"}
         </h2>
         <h2 className="hidden lg:block xl:hidden">
           {isBreakdown ? "MRKTPLACE" : "MARKETPLACE"}
-          {isBreakdown ? "BREAKDOWN" : "EXP."}
+          {isBreakdown ? " BREAKDOWN" : " B/D"}
         </h2>
         <h2 className="hidden xl:block">
-          {`MARKETPLACE ${isBreakdown ? "BREAKDOWN" : "EXPOSURE"}`}
+          {`MARKETPLACE ${isBreakdown ? "BREAKDOWN" : "BREAKDOWN"}`}
         </h2>
         {hasToggle && (
           <button onClick={onSwitchTable}>
