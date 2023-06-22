@@ -147,7 +147,7 @@ export default function VaultNfts({ vault, className }: Props) {
   const sortedNfts = sortNfts();
 
   return (
-    <Card className={`gap-5 overflow-hidden ${className}`}>
+    <Card className={`gap-3 overflow-hidden ${className}`}>
       <div className="flex items-center gap-2.5">
         {vault && (
           <Image
