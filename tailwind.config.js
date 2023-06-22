@@ -53,6 +53,7 @@ module.exports = {
       dropShadow: {
         sm: "0px 0px 4px rgba(255, 255, 255, 0.4)",
         "orange-200": "0px 0px 4px rgba(255, 227, 202, 0.4)",
+        "orange-900": "0px 0px 4px rgba(253, 167, 57, 0.4)",
         green: "0px 0px 4px rgba(52, 211, 153, 0.4)",
       },
       borderWidth: {
