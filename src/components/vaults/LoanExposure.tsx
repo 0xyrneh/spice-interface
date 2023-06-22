@@ -184,7 +184,7 @@ export default function LoanExposure({
             <>
               {item.tokenImg && (
                 <Image
-                  className="mr-1 border-1 border-gray-200 rounded-full"
+                  className="mr-1 border-1 border-gray-200 rounded-full w-[16px] min-w-[16px] h-[16px] min-h-[16px]"
                   src={item.tokenImg}
                   width={16}
                   height={16}
