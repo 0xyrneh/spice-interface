@@ -4,6 +4,7 @@ import { useWeb3React } from "@web3-react/core";
 import { useRouter } from "next/router";
 import axios from "axios";
 
+import VaultAbi from "@/config/abi/SpiceFiVault.json";
 import GameSVG from "@/assets/icons/game.svg";
 import UserSVG from "@/assets/icons/user-small.svg";
 import BlurSVG from "@/assets/icons/blur-pts.svg";
@@ -11,7 +12,7 @@ import { Button, Card, Stats } from "@/components/common";
 import { BLUR_API_BASE } from "@/config/constants/backend";
 import { formatBlurChart } from "@/utils/formatter";
 import { useAppSelector } from "@/state/hooks";
-import { getWeb3 } from "@/utils/web3";
+import { activeChainId, getWeb3 } from "@/utils/web3";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import moment from "moment";
 import { PeriodFilter } from "@/types/common";
@@ -23,6 +24,8 @@ import {
   YEAR_IN_SECONDS,
 } from "@/config/constants/time";
 import { LineChart } from "@/components/portfolio";
+import { DEFAULT_BLUR_VAULT } from "@/config/constants";
+import multicall from "@/utils/multicall";
 
 export default function Portfolio() {
   const [address, setAddress] = useState<string>();
@@ -35,6 +38,7 @@ export default function Portfolio() {
   const [historicalData, setHistoricalData] = useState<any>();
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [balance, setBalance] = useState(0);
+  const [isInblur, setIsInBlur] = useState(false);
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
 
   const router = useRouter();
@@ -57,8 +61,9 @@ export default function Portfolio() {
         setUserInfo(undefined);
       }
 
-      if (addr && (!data[1] || !data[1][7])) {
+      if (addr) {
         fetchBalance(addr);
+        fetchBlurBalance(addr);
       }
       setCheckedAddress(addr);
     } catch (err) {
@@ -84,6 +89,20 @@ export default function Portfolio() {
     const web3 = getWeb3();
     const res = await web3.eth.getBalance(addr);
     setBalance(getBalanceInEther(BigNumber.from(res)));
+  };
+
+  const fetchBlurBalance = async (addr: string) => {
+    if (!DEFAULT_BLUR_VAULT[activeChainId]) return;
+
+    const [balance] = await multicall(VaultAbi, [
+      {
+        address: DEFAULT_BLUR_VAULT[activeChainId],
+        name: "balanceOf",
+        params: [addr],
+      },
+    ]);
+
+    setIsInBlur(!balance[0].eq(0));
   };
 
   const formatNumber = (val: any, digits = 2) => {
@@ -356,16 +375,13 @@ export default function Portfolio() {
             </div>
           </div>
 
-          {checkedAddress && vaultInfo && (!userInfo || !userInfo[7]) && (
+          {isInblur && checkedAddress && vaultInfo && (
             <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
-              {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
-              currently has ZERO BLUR POINTS.{" "}
-              {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "} can be
-              earning {(balance * vaultInfo[2]).toFixed(3)}{" "}
-              <span className="font-bold">BLUR POINTS PER DAY</span> by
-              depositing the {balance.toFixed(3)} ETH in their wallet into the
-              SP-BLUR Vault. Will you continue to fade rational decision making
-              anon?{" "}
+              You&apos;re already in the SP-BLUR Vault! You could be earning{" "}
+              {(balance * vaultInfo[2]).toFixed(3)}{" "}
+              <span className="font-bold">MORE BLUR POINTS</span> depositing
+              your current wallet balance. Will you continue to fade rational
+              decision making anon?{" "}
               <span
                 className="underline cursor-pointer font-bold hover:text-orange-300"
                 onClick={goVaultDetails}
@@ -375,37 +391,67 @@ export default function Portfolio() {
             </span>
           )}
 
-          {checkedAddress && userInfo && userInfo[7] && earnedPoints > 0 && (
-            <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
-              {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
-              would have earned {earnedPoints.toFixed(2)}{" "}
-              <span className="font-bold">MORE BLUR POINTS</span> depositing ETH
-              into the SP-BLUR Vault than farming themselves. Will you continue
-              to fade rational decision making anon?{" "}
-              <span
-                className="underline cursor-pointer font-bold hover:text-orange-300"
-                onClick={goVaultDetails}
-              >
-                DEPOSIT NOW
+          {!isInblur &&
+            checkedAddress &&
+            vaultInfo &&
+            (!userInfo || !userInfo[7]) && (
+              <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
+                {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
+                currently has ZERO BLUR POINTS.{" "}
+                {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "} can be
+                earning {(balance * vaultInfo[2]).toFixed(3)}{" "}
+                <span className="font-bold">BLUR POINTS PER DAY</span> by
+                depositing the {balance.toFixed(3)} ETH in their wallet into the
+                SP-BLUR Vault. Will you continue to fade rational decision
+                making anon?{" "}
+                <span
+                  className="underline cursor-pointer font-bold hover:text-orange-300"
+                  onClick={goVaultDetails}
+                >
+                  DEPOSIT NOW
+                </span>
               </span>
-            </span>
-          )}
+            )}
 
-          {checkedAddress && userInfo && userInfo[7] && earnedPoints < 0 && (
-            <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
-              {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
-              is earning {Math.abs(earnedPoints).toFixed(2)}{" "}
-              <span className="font-bold">MORE BLUR POINTS</span> farming
-              themselves vs depositing ETH into the SP-BLUR Vault. Do you want
-              to continue spending the time farming yourself?{" "}
-              <span
-                className="underline cursor-pointer font-bold hover:text-orange-300"
-                onClick={goVaultDetails}
-              >
-                DEPOSIT NOW
+          {!isInblur &&
+            checkedAddress &&
+            userInfo &&
+            userInfo[7] &&
+            earnedPoints > 0 && (
+              <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
+                {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
+                would have earned {earnedPoints.toFixed(2)}{" "}
+                <span className="font-bold">MORE BLUR POINTS</span> depositing
+                ETH into the SP-BLUR Vault than farming themselves. Will you
+                continue to fade rational decision making anon?{" "}
+                <span
+                  className="underline cursor-pointer font-bold hover:text-orange-300"
+                  onClick={goVaultDetails}
+                >
+                  DEPOSIT NOW
+                </span>
               </span>
-            </span>
-          )}
+            )}
+
+          {!isInblur &&
+            checkedAddress &&
+            userInfo &&
+            userInfo[7] &&
+            earnedPoints < 0 && (
+              <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
+                {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
+                is earning {Math.abs(earnedPoints).toFixed(2)}{" "}
+                <span className="font-bold">MORE BLUR POINTS</span> farming
+                themselves vs depositing ETH into the SP-BLUR Vault. Do you want
+                to continue spending the time farming yourself?{" "}
+                <span
+                  className="underline cursor-pointer font-bold hover:text-orange-300"
+                  onClick={goVaultDetails}
+                >
+                  DEPOSIT NOW
+                </span>
+              </span>
+            )}
 
           {/* <LineChart data={getChartData()} period={selectedPeriod} /> */}
         </Card>
