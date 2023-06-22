@@ -262,25 +262,33 @@ export default function Portfolio() {
                 />
                 <Stats
                   title="Points Earned"
-                  value={formatNumber(userInfo ? userInfo[7] : undefined)}
+                  value={formatNumber(
+                    userInfo ? userInfo[3] * userInfo[5] : undefined
+                  )}
                   size="xs"
                   valueSize="base"
                 />
                 <Stats
                   title="1W Est. Points"
-                  value={formatNumber(userInfo ? userInfo[7] * 7 : undefined)}
+                  value={formatNumber(
+                    userInfo ? userInfo[3] * userInfo[5] * 7 : undefined
+                  )}
                   size="xs"
                   valueSize="base"
                 />
                 <Stats
                   title="1M Est. Points"
-                  value={formatNumber(userInfo ? userInfo[7] * 30 : undefined)}
+                  value={formatNumber(
+                    userInfo ? userInfo[3] * userInfo[5] * 30 : undefined
+                  )}
                   size="xs"
                   valueSize="base"
                 />
                 <Stats
                   title="1Y Est. Points"
-                  value={formatNumber(userInfo ? userInfo[7] * 365 : undefined)}
+                  value={formatNumber(
+                    userInfo ? userInfo[3] * userInfo[5] * 365 : undefined
+                  )}
                   size="xs"
                   valueSize="base"
                 />
