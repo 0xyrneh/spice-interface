@@ -256,39 +256,21 @@ export default function Portfolio() {
                 />
                 <Stats
                   title="Multiplier"
-                  value={`${formatNumber(userInfo ? userInfo[5] : undefined)}x`}
+                  value={`${formatNumber(userInfo ? userInfo[5] : undefined)}X`}
                   size="xs"
                   valueSize="base"
                 />
                 <Stats
                   title="Points Earned"
-                  value={formatNumber(
+                  value={`${formatNumber(
                     userInfo ? userInfo[3] * userInfo[5] : undefined
-                  )}
+                  )}/day`}
                   size="xs"
                   valueSize="base"
                 />
                 <Stats
-                  title="1W Est. Points"
-                  value={formatNumber(
-                    userInfo ? userInfo[3] * userInfo[5] * 7 : undefined
-                  )}
-                  size="xs"
-                  valueSize="base"
-                />
-                <Stats
-                  title="1M Est. Points"
-                  value={formatNumber(
-                    userInfo ? userInfo[3] * userInfo[5] * 30 : undefined
-                  )}
-                  size="xs"
-                  valueSize="base"
-                />
-                <Stats
-                  title="1Y Est. Points"
-                  value={formatNumber(
-                    userInfo ? userInfo[3] * userInfo[5] * 365 : undefined
-                  )}
+                  title="TVL"
+                  value={`Ξ${formatNumber(userInfo ? userInfo[4] : undefined)}`}
                   size="xs"
                   valueSize="base"
                 />
@@ -298,8 +280,20 @@ export default function Portfolio() {
 
           <div className="flex flex-col font-medium gap-3">
             <div className="flex items-center gap-3">
-              <BlurSVG />
-              <span className="text-base text-orange-900 -ml-1">
+              <BlurSVG
+                className={
+                  checkedAddress && userInfo && userInfo[7] > 0
+                    ? "text-orange-900"
+                    : "text-white"
+                }
+              />
+              <span
+                className={`text-base -ml-1 ${
+                  checkedAddress && userInfo && userInfo[7] > 0
+                    ? "text-orange-900"
+                    : "text-white"
+                }`}
+              >
                 SP-BLUR VAULT
               </span>
               <Button
@@ -326,7 +320,7 @@ export default function Portfolio() {
               />
               <Stats
                 title="Multiplier"
-                value={`${formatNumber(vaultInfo ? vaultInfo[5] : undefined)}x`}
+                value={`${formatNumber(vaultInfo ? vaultInfo[5] : undefined)}X`}
                 size="xs"
                 valueSize="base"
                 type={
@@ -337,7 +331,9 @@ export default function Portfolio() {
               />
               <Stats
                 title="Points Earned"
-                value={formatNumber(vaultInfo ? vaultInfo[7] : undefined)}
+                value={`${formatNumber(
+                  vaultInfo ? vaultInfo[7] : undefined
+                )}/day`}
                 size="xs"
                 valueSize="base"
                 type={
@@ -347,30 +343,8 @@ export default function Portfolio() {
                 }
               />
               <Stats
-                title="1W Est. Points"
-                value={formatNumber(vaultInfo ? vaultInfo[7] * 7 : undefined)}
-                size="xs"
-                valueSize="base"
-                type={
-                  checkedAddress && userInfo && userInfo[7] > 0
-                    ? "orange"
-                    : "white"
-                }
-              />
-              <Stats
-                title="1M Est. Points"
-                value={formatNumber(vaultInfo ? vaultInfo[7] * 30 : undefined)}
-                size="xs"
-                valueSize="base"
-                type={
-                  checkedAddress && userInfo && userInfo[7] > 0
-                    ? "orange"
-                    : "white"
-                }
-              />
-              <Stats
-                title="1Y Est. Points"
-                value={formatNumber(vaultInfo ? vaultInfo[7] * 365 : undefined)}
+                title="TVL"
+                value={`Ξ${formatNumber(vaultInfo ? vaultInfo[4] : undefined)}`}
                 size="xs"
                 valueSize="base"
                 type={
@@ -385,10 +359,11 @@ export default function Portfolio() {
           {isInblur && checkedAddress && vaultInfo && (
             <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
               You&apos;re already in the SP-BLUR Vault! You could be earning{" "}
-              {(balance * vaultInfo[2]).toFixed(3)}{" "}
-              <span className="font-bold">MORE BLUR POINTS</span> depositing
-              your current wallet balance. Will you continue to fade rational
-              decision making anon?{" "}
+              <span className="font-bold">
+                {(balance * vaultInfo[2]).toFixed(3)} MORE BLUR POINTS PER DAY
+              </span>{" "}
+              depositing your current wallet balance. Will you continue to fade
+              rational decision making anon?{" "}
               <span
                 className="underline cursor-pointer font-bold hover:text-orange-300"
                 onClick={goVaultDetails}
@@ -403,13 +378,12 @@ export default function Portfolio() {
             vaultInfo &&
             (!userInfo || !userInfo[7]) && (
               <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
-                {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
-                currently has ZERO BLUR POINTS.{" "}
-                {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "} can be
-                earning {(balance * vaultInfo[2]).toFixed(3)}{" "}
-                <span className="font-bold">BLUR POINTS PER DAY</span> by
-                depositing the {balance.toFixed(3)} ETH in their wallet into the
-                SP-BLUR Vault. Will you continue to fade rational decision
+                You currently has zero Blur Points. You can be earning{" "}
+                <span className="font-bold">
+                  {(balance * vaultInfo[2]).toFixed(3)} BLUR POINTS PER DAY
+                </span>{" "}
+                by depositing the {balance.toFixed(3)} ETH in YOUR wallet into
+                the SP-BLUR Vault. Will you continue to fade rational decision
                 making anon?{" "}
                 <span
                   className="underline cursor-pointer font-bold hover:text-orange-300"
@@ -422,15 +396,21 @@ export default function Portfolio() {
 
           {!isInblur &&
             checkedAddress &&
+            vaultInfo &&
             userInfo &&
             userInfo[7] &&
             earnedPoints > 0 && (
               <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
-                {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
-                would have earned {earnedPoints.toFixed(2)}{" "}
-                <span className="font-bold">MORE BLUR POINTS</span> depositing
-                ETH into the SP-BLUR Vault than farming themselves. Will you
-                continue to fade rational decision making anon?{" "}
+                You would have earned{" "}
+                <span className="font-bold">
+                  {earnedPoints.toFixed(2)} MORE BLUR POINTS PER DAY
+                </span>{" "}
+                depositing ETH into the SP-BLUR Vault(
+                <span className="font-bold">
+                  {vaultInfo[2] - userInfo[2]}x more efficient)
+                </span>{" "}
+                than farming yourself. Will you continue to fade rational
+                decision making anon?{" "}
                 <span
                   className="underline cursor-pointer font-bold hover:text-orange-300"
                   onClick={goVaultDetails}
@@ -446,11 +426,12 @@ export default function Portfolio() {
             userInfo[7] &&
             earnedPoints < 0 && (
               <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
-                {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
-                is earning {Math.abs(earnedPoints).toFixed(2)}{" "}
-                <span className="font-bold">MORE BLUR POINTS</span> farming
-                themselves vs depositing ETH into the SP-BLUR Vault. Do you want
-                to continue spending the time farming yourself?{" "}
+                You are earning{" "}
+                <span className="font-bold">
+                  {Math.abs(earnedPoints).toFixed(2)} MORE BLUR POINTS PER DAY
+                </span>{" "}
+                farming themselves vs depositing ETH into the SP-BLUR Vault. Do
+                you want to continue spending the time farming yourself?{" "}
                 <span
                   className="underline cursor-pointer font-bold hover:text-orange-300"
                   onClick={goVaultDetails}
