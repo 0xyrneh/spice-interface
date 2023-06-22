@@ -13,6 +13,16 @@ import { formatBlurChart } from "@/utils/formatter";
 import { useAppSelector } from "@/state/hooks";
 import { getWeb3 } from "@/utils/web3";
 import { getBalanceInEther } from "@/utils/formatBalance";
+import moment from "moment";
+import { PeriodFilter } from "@/types/common";
+import { ChartValue } from "@/types/vault";
+import {
+  DAY_IN_SECONDS,
+  MONTH_IN_SECONDS,
+  WEEK_IN_SECONDS,
+  YEAR_IN_SECONDS,
+} from "@/config/constants/time";
+import { LineChart } from "@/components/portfolio";
 
 export default function Portfolio() {
   const [address, setAddress] = useState<string>();
@@ -25,6 +35,7 @@ export default function Portfolio() {
   const [historicalData, setHistoricalData] = useState<any>();
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [balance, setBalance] = useState(0);
+  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
 
   const router = useRouter();
   const { vaults } = useAppSelector((state) => state.vault);
@@ -38,8 +49,13 @@ export default function Portfolio() {
 
       const data = res.data.data;
 
-      setVaultInfo(data[0]);
-      setUserInfo(data[1]);
+      if (data.length === 2) {
+        setVaultInfo(data[1]);
+        setUserInfo(data[0]);
+      } else {
+        setVaultInfo(data[0]);
+        setUserInfo(undefined);
+      }
 
       if (addr && (!data[1] || !data[1][7])) {
         fetchBalance(addr);
@@ -75,6 +91,30 @@ export default function Portfolio() {
     return Number(val).toFixed(digits);
   };
 
+  const getChartData = () => {
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    const blurPointsChart: ChartValue[] = vaultChartInfo?.pointsChart ?? [];
+    if (selectedPeriod === PeriodFilter.Day) {
+      return blurPointsChart.filter((item) => {
+        return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+      });
+    } else if (selectedPeriod === PeriodFilter.Week) {
+      return blurPointsChart.filter((item) => {
+        return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+      });
+    } else if (selectedPeriod === PeriodFilter.Month) {
+      return blurPointsChart.filter((item) => {
+        return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+      });
+    } else if (selectedPeriod === PeriodFilter.Year) {
+      return blurPointsChart.filter((item) => {
+        return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+      });
+    }
+    return blurPointsChart;
+  };
+
   useEffect(() => {
     if (historicalData) {
       setUserChartInfo(formatBlurChart(historicalData, checkedAddress));
@@ -90,7 +130,7 @@ export default function Portfolio() {
     if (checkedAddress && vaultInfo) {
       const vaultEfficiency = vaultInfo[2];
       const userEfficiency = userInfo ? userInfo[2] : 0;
-      const userTvl = userChartInfo ? userChartInfo.tvl : 0;
+      const userTvl = userInfo ? userInfo[4] : 0;
 
       let points = (vaultEfficiency - userEfficiency) * userTvl;
 
@@ -210,31 +250,19 @@ export default function Portfolio() {
                 />
                 <Stats
                   title="1W Est. Points"
-                  value={formatNumber(
-                    userChartInfo?.weekPoints
-                      ? userChartInfo?.weekPoints
-                      : undefined
-                  )}
+                  value={formatNumber(userInfo ? userInfo[7] * 7 : undefined)}
                   size="xs"
                   valueSize="base"
                 />
                 <Stats
                   title="1M Est. Points"
-                  value={formatNumber(
-                    userChartInfo?.weekPoints
-                      ? (userChartInfo?.weekPoints * 30) / 7
-                      : undefined
-                  )}
+                  value={formatNumber(userInfo ? userInfo[7] * 30 : undefined)}
                   size="xs"
                   valueSize="base"
                 />
                 <Stats
                   title="1Y Est. Points"
-                  value={formatNumber(
-                    userChartInfo?.weekPoints
-                      ? userChartInfo?.weekPoints * 52
-                      : undefined
-                  )}
+                  value={formatNumber(userInfo ? userInfo[7] * 365 : undefined)}
                   size="xs"
                   valueSize="base"
                 />
@@ -294,11 +322,7 @@ export default function Portfolio() {
               />
               <Stats
                 title="1W Est. Points"
-                value={formatNumber(
-                  vaultChartInfo?.weekPoints
-                    ? vaultChartInfo?.weekPoints
-                    : undefined
-                )}
+                value={formatNumber(vaultInfo ? vaultInfo[7] * 7 : undefined)}
                 size="xs"
                 valueSize="base"
                 type={
@@ -309,11 +333,7 @@ export default function Portfolio() {
               />
               <Stats
                 title="1M Est. Points"
-                value={formatNumber(
-                  vaultChartInfo?.weekPoints
-                    ? (vaultChartInfo?.weekPoints * 30) / 7
-                    : undefined
-                )}
+                value={formatNumber(vaultInfo ? vaultInfo[7] * 30 : undefined)}
                 size="xs"
                 valueSize="base"
                 type={
@@ -324,11 +344,7 @@ export default function Portfolio() {
               />
               <Stats
                 title="1Y Est. Points"
-                value={formatNumber(
-                  vaultChartInfo?.weekPoints
-                    ? vaultChartInfo?.weekPoints * 52
-                    : undefined
-                )}
+                value={formatNumber(vaultInfo ? vaultInfo[7] * 365 : undefined)}
                 size="xs"
                 valueSize="base"
                 type={
@@ -390,6 +406,8 @@ export default function Portfolio() {
               </span>
             </span>
           )}
+
+          {/* <LineChart data={getChartData()} period={selectedPeriod} /> */}
         </Card>
       </div>
     </div>
