@@ -225,13 +225,13 @@ export default function CollectionExposure({
         {<UserSVG className="text-white" />}
 
         <h2 className="block lg:hidden">
-          {isBreakdown ? "COLLECTION" : "NFT"} {isBreakdown ? "B/D" : "EXP."}
+          {isBreakdown ? "COLLECTION" : "NFT"} {isBreakdown ? "B/D" : "B/D"}
         </h2>
         <h2 className="hidden lg:block xl:hidden">
-          {isBreakdown ? "COLLECTION BREAKDOWN" : "COLLECTION EXP."}
+          {isBreakdown ? "COLLECTION BREAKDOWN" : "COLLECTION B/D"}
         </h2>
         <h2 className="hidden xl:block">
-          {isBreakdown ? "COLLECTION BREAKDOWN" : "COLLECTION EXPOSURE"}
+          {isBreakdown ? "COLLECTION BREAKDOWN" : "COLLECTION BREAKDOWN"}
         </h2>
         {hasToggle && (
           <button onClick={onSwitchTable}>
