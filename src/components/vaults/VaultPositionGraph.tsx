@@ -142,12 +142,14 @@ export default function VaultPositionGraph({
   const getChartData = () => {
     let chartData: ChartValue[] = [];
 
+    let makeStepLike = false;
     if (vault) {
       if (vault.isBlur) {
         chartData = showPosition
           ? blurChartInfo?.tvlChart ?? []
           : blurChartInfo?.pointsChart ?? [];
       } else {
+        makeStepLike = true;
         // asset share logic
         const historialRecords = vault?.historicalRecords || [];
         const aprField =
@@ -217,6 +219,7 @@ export default function VaultPositionGraph({
         if (!account) {
           chartData = [];
         } else {
+          makeStepLike = true;
           chartData = spiceUserPositions.map((row: any) => {
             return {
               x: row.time,
@@ -226,6 +229,20 @@ export default function VaultPositionGraph({
         }
       } else {
         chartData = [];
+      }
+    }
+
+    if (makeStepLike) {
+      let temp = chartData;
+      chartData = [];
+      for (let i = 0; i < temp.length; i++) {
+        if (i > 0 && temp[i - 1].y !== temp[i].y) {
+          chartData.push({
+            x: (temp[i].x as number) - 1,
+            y: temp[i - 1].y,
+          })
+        }
+        chartData.push(temp[i]);
       }
     }
 
@@ -288,7 +305,9 @@ export default function VaultPositionGraph({
         <PositionSVG />
         <h2 className="font-bold text-white font-sm">
           {!showPosition
-            ? "ASSETS PER VAULT SHARE"
+            ? vault && vault.isBlur
+              ? "POINTS"
+              : "ASSETS PER VAULT SHARE"
             : vault
             ? `YOUR ${(vault?.readable || "").toUpperCase()} ${
                 vault?.deprecated ? "[WITHDRAW ONLY]" : ""
