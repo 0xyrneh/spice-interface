@@ -62,8 +62,7 @@ export default function Portfolio() {
       }
 
       if (addr) {
-        fetchBalance(addr);
-        fetchBlurBalance(addr);
+        await Promise.all([fetchBalance(addr), fetchBlurBalance(addr)]);
       }
       setCheckedAddress(addr);
     } catch (err) {
