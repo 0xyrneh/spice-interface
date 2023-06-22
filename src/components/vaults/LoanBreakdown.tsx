@@ -42,6 +42,7 @@ export default function LoanBreakdown({
   const [loanExpanded, setLoanExpanded] = useState(false);
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [loans, setLoans] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { collections, allNfts } = useAppSelector((state) => state.nft);
 
@@ -177,17 +178,24 @@ export default function LoanBreakdown({
     setBlur(loanExpanded);
   }, [loanExpanded, setBlur]);
 
+  const filteredLoans =
+    searchQuery.length > 0
+      ? loans.filter((row) =>
+          String(row.name).toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : loans;
+
   const getRowInfos = (): TableRowInfo[] => {
     return [
       {
-        title: `LOANS [${loans.length}]`,
+        title: `LOANS [${filteredLoans.length}]`,
         key: "displayName",
         itemPrefix: (item) => {
           return (
             <>
               {item.tokenImg && (
                 <Image
-                  className="mr-1 border-1 border-gray-200 rounded-full"
+                  className="mr-1 border-1 border-gray-200 rounded-full w-[16px] min-w-[16px] h-[16px] min-h-[16px]"
                   src={item.tokenImg}
                   width={16}
                   height={16}
@@ -353,13 +361,17 @@ export default function LoanBreakdown({
       </div>
 
       <div className="flex">
-        <Search placeholder="Search loans" className="xl:flex-none w-full" />
+        <Search
+          placeholder="Search loans"
+          className="xl:flex-none w-full"
+          onChange={(val) => setSearchQuery(val)}
+        />
       </div>
       <Table
         containerClassName="flex-1"
         className="block h-full"
         rowInfos={getRowInfos()}
-        items={loans}
+        items={filteredLoans}
         trStyle="h-10"
         rowStyle="h-8"
         defaultSortKey="apy"

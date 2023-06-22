@@ -10,6 +10,7 @@ type Props = {
   animate?: boolean;
   onCollapse?: () => void;
   onMouseLeave?: () => void;
+  onClick?: () => void;
 };
 
 const Card = ({
@@ -20,6 +21,7 @@ const Card = ({
   animate,
   notBlur,
   onMouseLeave,
+  onClick,
 }: Props) => {
   const { blur } = useUI();
   const comp = useRef();
@@ -55,6 +57,7 @@ const Card = ({
             : "bg-opacity-80"
         } ${!notBlur && blur && !expanded ? "blur-[5px]" : ""}`}
         onMouseLeave={onMouseLeave}
+        onClick={onClick}
       >
         {children}
       </motion.div>

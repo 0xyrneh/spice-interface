@@ -100,7 +100,7 @@ export default function Exposure({
         </h2>
         <h2 className="hidden xl:block">
           {marketplaceSelected ? "MARKETPLACE" : "COLLECTION"}{" "}
-          {isBreakdown ? "BREAKDOWN" : "EXPOSURE"}
+          {isBreakdown ? "BREAKDOWN" : "BREAKDOWN"}
         </h2>
         {(showMarketplace || showCollection) && (
           <button onClick={() => setMarketplaceSelected(!marketplaceSelected)}>

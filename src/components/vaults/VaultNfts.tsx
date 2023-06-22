@@ -147,7 +147,7 @@ export default function VaultNfts({ vault, className }: Props) {
   const sortedNfts = sortNfts();
 
   return (
-    <Card className={`gap-5 overflow-hidden ${className}`}>
+    <Card className={`gap-3 overflow-hidden ${className}`}>
       <div className="flex items-center gap-2.5">
         {vault && (
           <Image
@@ -185,9 +185,9 @@ export default function VaultNfts({ vault, className }: Props) {
         </div>
       </div>
       <div className="table flex flex-col border-y-1 border-y-gray-200 px-1 py-2 overflow-y-hidden h-full">
-        <div className="pb-4">
+        {/* <div className="pb-4">
           <span className="font-medium text-white text-xs">Prologue NFT</span>
-        </div>
+        </div> */}
         <div
           className={`h-[calc(100%-38px)] max-h-[calc(100%-38px)] flex flex-wrap gap-y-3 gap-x-[0.5%] overflow-y-auto h-full ${
             account ? "-mr-2.5 pr-2" : ""

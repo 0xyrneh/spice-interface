@@ -213,7 +213,7 @@ export default function CollectionExposure({
   return (
     <Card className={`gap-3 ${className}`}>
       <div className="flex items-center gap-2.5 font-bold text-white font-sm whitespace-nowrap leading-[18px]">
-        {vault && (
+        {/* {vault && (
           <Image
             className="border-1 border-gray-200 rounded-full"
             src={vault.logo}
@@ -221,17 +221,17 @@ export default function CollectionExposure({
             height={16}
             alt=""
           />
-        )}
+        )} */}
         {<UserSVG className="text-white" />}
 
         <h2 className="block lg:hidden">
-          {isBreakdown ? "COLLECTION" : "NFT"} {isBreakdown ? "B/D" : "EXP."}
+          {isBreakdown ? "COLLECTION" : "NFT"} {isBreakdown ? "B/D" : "B/D"}
         </h2>
         <h2 className="hidden lg:block xl:hidden">
-          {isBreakdown ? "COLLECTION BREAKDOWN" : "COLLECTION EXP."}
+          {isBreakdown ? "COLLECTION BREAKDOWN" : "COLLECTION B/D"}
         </h2>
         <h2 className="hidden xl:block">
-          {isBreakdown ? "COLLECTION BREAKDOWN" : "COLLECTION EXPOSURE"}
+          {isBreakdown ? "COLLECTION BREAKDOWN" : "COLLECTION BREAKDOWN"}
         </h2>
         {hasToggle && (
           <button onClick={onSwitchTable}>
