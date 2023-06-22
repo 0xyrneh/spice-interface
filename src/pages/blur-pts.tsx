@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { constants, utils } from "ethers";
+import { BigNumber, constants, utils } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 import { useRouter } from "next/router";
 import axios from "axios";
@@ -11,6 +11,8 @@ import { Button, Card, Stats } from "@/components/common";
 import { BLUR_API_BASE } from "@/config/constants/backend";
 import { formatBlurChart } from "@/utils/formatter";
 import { useAppSelector } from "@/state/hooks";
+import { getWeb3 } from "@/utils/web3";
+import { getBalanceInEther } from "@/utils/formatBalance";
 
 export default function Portfolio() {
   const [address, setAddress] = useState<string>();
@@ -22,6 +24,7 @@ export default function Portfolio() {
   const [userChartInfo, setUserChartInfo] = useState<any>();
   const [historicalData, setHistoricalData] = useState<any>();
   const [earnedPoints, setEarnedPoints] = useState(0);
+  const [balance, setBalance] = useState(0);
 
   const router = useRouter();
   const { vaults } = useAppSelector((state) => state.vault);
@@ -33,6 +36,9 @@ export default function Portfolio() {
         `${BLUR_API_BASE}/efficiency/${addr ?? constants.AddressZero}`
       );
 
+      if (addr) {
+        fetchBalance(addr);
+      }
       setCheckedAddress(addr);
 
       const data = res.data.data;
@@ -56,6 +62,12 @@ export default function Portfolio() {
     } catch (err) {
       console.error("ranks fetching error");
     }
+  };
+
+  const fetchBalance = async (addr: string) => {
+    const web3 = getWeb3();
+    const res = await web3.eth.getBalance(addr);
+    setBalance(getBalanceInEther(BigNumber.from(res)));
   };
 
   const formatNumber = (val: any, digits = 2) => {
@@ -167,7 +179,7 @@ export default function Portfolio() {
             {error && <span className="mt-px text-red text-xs">{error}</span>}
           </div>
 
-          {checkedAddress && (
+          {checkedAddress && userInfo && userInfo[7] > 0 && (
             <div className="flex flex-col font-medium gap-3">
               <div className="flex items-center gap-3">
                 <UserSVG />
@@ -252,21 +264,33 @@ export default function Portfolio() {
                 )} PTS/Ξ`}
                 size="xs"
                 valueSize="base"
-                type={checkedAddress ? "orange" : "white"}
+                type={
+                  checkedAddress && userInfo && userInfo[7] > 0
+                    ? "orange"
+                    : "white"
+                }
               />
               <Stats
                 title="Multiplier"
                 value={`${formatNumber(vaultInfo ? vaultInfo[5] : undefined)}x`}
                 size="xs"
                 valueSize="base"
-                type={checkedAddress ? "orange" : "white"}
+                type={
+                  checkedAddress && userInfo && userInfo[7] > 0
+                    ? "orange"
+                    : "white"
+                }
               />
               <Stats
                 title="Points Earned"
                 value={formatNumber(vaultInfo ? vaultInfo[7] : undefined)}
                 size="xs"
                 valueSize="base"
-                type={checkedAddress ? "orange" : "white"}
+                type={
+                  checkedAddress && userInfo && userInfo[7] > 0
+                    ? "orange"
+                    : "white"
+                }
               />
               <Stats
                 title="1W Est. Points"
@@ -277,7 +301,11 @@ export default function Portfolio() {
                 )}
                 size="xs"
                 valueSize="base"
-                type={checkedAddress ? "orange" : "white"}
+                type={
+                  checkedAddress && userInfo && userInfo[7] > 0
+                    ? "orange"
+                    : "white"
+                }
               />
               <Stats
                 title="1M Est. Points"
@@ -288,7 +316,11 @@ export default function Portfolio() {
                 )}
                 size="xs"
                 valueSize="base"
-                type={checkedAddress ? "orange" : "white"}
+                type={
+                  checkedAddress && userInfo && userInfo[7] > 0
+                    ? "orange"
+                    : "white"
+                }
               />
               <Stats
                 title="1Y Est. Points"
@@ -299,12 +331,35 @@ export default function Portfolio() {
                 )}
                 size="xs"
                 valueSize="base"
-                type={checkedAddress ? "orange" : "white"}
+                type={
+                  checkedAddress && userInfo && userInfo[7] > 0
+                    ? "orange"
+                    : "white"
+                }
               />
             </div>
           </div>
 
-          {checkedAddress && earnedPoints > 0 && (
+          {checkedAddress && vaultInfo && (!userInfo || !userInfo[7]) && (
+            <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
+              {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
+              currently has ZERO BLUR POINTS.{" "}
+              {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "} can be
+              earning {(balance * vaultInfo[2]).toFixed(3)}{" "}
+              <span className="font-bold">BLUR POINTS PER DAY</span> by
+              depositing the {balance.toFixed(3)} ETH in their wallet into the
+              SP-BLUR Vault. Will you continue to fade rational decision making
+              anon?{" "}
+              <span
+                className="underline cursor-pointer font-bold hover:text-orange-300"
+                onClick={goVaultDetails}
+              >
+                DEPOSIT NOW
+              </span>
+            </span>
+          )}
+
+          {checkedAddress && userInfo && userInfo[7] && earnedPoints > 0 && (
             <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
               {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
               would have earned {earnedPoints.toFixed(2)}{" "}
@@ -320,7 +375,7 @@ export default function Portfolio() {
             </span>
           )}
 
-          {checkedAddress && earnedPoints < 0 && (
+          {checkedAddress && userInfo && userInfo[7] && earnedPoints < 0 && (
             <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
               {"0x" + checkedAddress.slice(2, 8).toUpperCase() + " "}
               is earning {Math.abs(earnedPoints).toFixed(2)}{" "}
