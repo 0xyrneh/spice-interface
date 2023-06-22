@@ -83,7 +83,7 @@ export default function MarketplaceExposure({
     if (protocolAllocations1.length === 0) {
       protocolAllocations1 = [
         ...protocolAllocations1,
-        { name: "SpiceDAO", allocation: 1 },
+        { name: "SPICE", allocation: 1 },
       ];
     }
 
@@ -135,7 +135,7 @@ export default function MarketplaceExposure({
     if (protocolAllocations.length === 0) {
       protocolAllocations = [
         ...protocolAllocations,
-        { name: "SpiceDAO", allocation: 1 },
+        { name: "SPICE", allocation: 1 },
       ];
     }
     setAllocations(

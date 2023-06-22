@@ -29,7 +29,7 @@ export default function Vaults() {
         ...row,
         oneDayChange: 0,
         sevenDayChange: 0,
-        sponsor: row.sponsor || "SpiceDAO",
+        sponsor: row.sponsor || "SPICE",
         orderIdx: orderIdx,
       };
     })
