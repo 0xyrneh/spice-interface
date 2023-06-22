@@ -36,15 +36,15 @@ export default function Portfolio() {
         `${BLUR_API_BASE}/efficiency/${addr ?? constants.AddressZero}`
       );
 
-      if (addr) {
-        fetchBalance(addr);
-      }
-      setCheckedAddress(addr);
-
       const data = res.data.data;
 
       setVaultInfo(data[0]);
       setUserInfo(data[1]);
+
+      if (addr && (!data[1] || !data[1][7])) {
+        fetchBalance(addr);
+      }
+      setCheckedAddress(addr);
     } catch (err) {
       console.error(err);
     }
