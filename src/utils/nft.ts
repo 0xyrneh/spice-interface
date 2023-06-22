@@ -67,7 +67,7 @@ export const getNFTMarketplaceDisplayName = (slug: string): string => {
   if (slug.includes("arcade")) return "Arcade";
   if (slug.includes("para")) return "ParaSpace";
   if (slug.includes("meta")) return "MetaStreet";
-  if (slug.includes("spice")) return "SpiceDAO";
+  if (slug.includes("spice")) return "SPICE";
 
   return slug;
 };

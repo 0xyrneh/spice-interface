@@ -143,7 +143,7 @@ const VaultList = ({ onClickVault }: Props) => {
         key: "sponsor",
         rowClass: () => "hidden md:table-cell",
         format: (item) => {
-          return item?.sponsor || "SpiceDAO";
+          return item?.sponsor || "SPICE";
         },
       },
       {
