@@ -18,7 +18,11 @@ import { getWethAddress } from "@/utils/addressHelpers";
 import { activeChainId } from "@/utils/web3";
 import { getVaultBackgroundImage, getVaultLogo } from "@/utils/vault";
 import { VaultFilter } from "@/types/common";
-import { VAULT_DESCRIPTIONS, VAULT_REQUIREMENTS, VAULT_RISK } from "@/constants/vaults";
+import {
+  VAULT_DESCRIPTIONS,
+  VAULT_REQUIREMENTS,
+  VAULT_RISK,
+} from "@/constants/vaults";
 import { getNFTMarketplaceDisplayName } from "@/utils/nft";
 import { COLLECTION_API_BASE } from "@/config/constants/backend";
 import { getNFTCollectionDisplayName } from "@/utils/nft";
@@ -117,7 +121,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           vault?.okrs?.protocol_allocations || {};
         const protocolAllocations0 = Object.keys(protocolAllocationsOrigin)
           .map((key) => ({
-            name: getNFTMarketplaceDisplayName(key),
+            name: key,
             allocation: protocolAllocationsOrigin[key],
           }))
           .sort((a, b) => (a.allocation >= b.allocation ? -1 : 1));
@@ -126,7 +130,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
         let protocolAllocations1: any[] = [];
         await Promise.all(
           protocolAllocations0.map(async (row: any) => {
-            if (row?.name && row?.name.includes("spice-")) {
+            if (row?.name && row?.name.toLowerCase().includes("spice-")) {
               const res = await axios.get(`${VAULT_API}/result/${row.name}`);
               if (res.status === 200) {
                 const bidderVaultProtocolAllocations =
@@ -161,7 +165,9 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           ];
         }
 
-        return protocolAllocations1;
+        return protocolAllocations1.map((row) => {
+          return { ...row, name: getNFTMarketplaceDisplayName(row.name) };
+        });
       })
     );
 
@@ -409,6 +415,7 @@ export const fetchBlurVaults = async (vaults: any[]) => {
         },
         category: VaultFilter.Public,
         isBlur: true,
+        marketplaceExposures: [{ name: "BLUR", allocation: 1 }],
       };
     });
 
@@ -459,7 +466,7 @@ export const fetchGlobalData = async () => {
             ...vault,
             description: VAULT_DESCRIPTIONS[prefix],
             requirement: VAULT_REQUIREMENTS[prefix],
-            risk: VAULT_RISK[prefix]
+            risk: VAULT_RISK[prefix],
           };
         }
         return vault;

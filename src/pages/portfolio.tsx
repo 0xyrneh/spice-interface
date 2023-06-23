@@ -141,7 +141,10 @@ export default function Portfolio() {
         <div className="h-[44%] overflow-y-hidden p-1 -m-1">
           {selectedVault &&
             (selectedVault.isBlur ? (
-              <div className="flex flex-col h-full gap-5 overflow-hidden" style={{ margin: -5, padding: 5}}>
+              <div
+                className="flex flex-col h-full gap-5 overflow-hidden"
+                style={{ margin: -5, padding: 5 }}
+              >
                 <BlurLeaderboard vault={selectedVault} showIcon onlyPts />
                 <BlurLeaderboard
                   vault={selectedVault}

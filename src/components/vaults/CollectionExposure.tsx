@@ -120,13 +120,6 @@ export default function CollectionExposure({
       collectionAllocations = vault?.collectionExposures || [];
     }
 
-    if (collectionAllocations.length === 0) {
-      collectionAllocations = [
-        ...collectionAllocations,
-        { name: "Prologue", slug: "Prologue", allocation: 1 },
-      ];
-    }
-
     setAllocations(
       collectionAllocations
         .map((row, id) => {

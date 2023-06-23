@@ -530,6 +530,8 @@ export default function DepositModal({
   };
 
   const onCloseModal = () => {
+    if (actionStatus === ActionStatus.Pending) return;
+    if (positionStatus === TxStatus.Pending) return;
     dispatch(setActionStatus(ActionStatus.Initial));
     dispatch(setActionError(undefined));
     dispatch(setPendingTxHash(""));

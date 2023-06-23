@@ -102,17 +102,15 @@ export default function MarketplaceExposure({
     let protocolAllocations: any[] = [];
 
     if (!vault) {
-      // vaults excepting blur vault
-      const vaults0 = vaults.filter((vault) => !vault.isBlur);
-
       let userTotalPosition = 0;
-      vaults0.map((vault: VaultInfo) => {
+      vaults.map((vault: VaultInfo) => {
         userTotalPosition += vault?.userPosition || 0;
       });
 
       let protocolAllocationsObj: any = {};
-      vaults0.map((row) => {
+      vaults.map((row) => {
         const vaultPortion = (row?.userPosition || 0) / userTotalPosition;
+
         (row?.marketplaceExposures || []).map((row1) => {
           const { name, allocation } = row1;
           protocolAllocationsObj[name] =
@@ -132,12 +130,6 @@ export default function MarketplaceExposure({
       protocolAllocations = vault?.marketplaceExposures || [];
     }
 
-    if (protocolAllocations.length === 0) {
-      protocolAllocations = [
-        ...protocolAllocations,
-        { name: "SPICE", allocation: 1 },
-      ];
-    }
     setAllocations(
       protocolAllocations
         .map((row, id) => {
