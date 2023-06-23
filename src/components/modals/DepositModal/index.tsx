@@ -51,7 +51,7 @@ export default function DepositModal({
   const [amountInWei, setAmountInWei] = useState<BigNumber>(BigNumber.from(0));
   const [isDeposit, setIsDeposit] = useState(false);
   const [targetLeverage, setTargetLeverage] = useState("");
-  const [useWeth, setUseWeth] = useState(true);
+  const [useWeth, setUseWeth] = useState(false);
   const [positionStatus, setPositionStatus] = useState(TxStatus.None);
   const [selectedNftId, setSelectedNftId] = useState<number | undefined>();
   const [focused, setFocused] = useState(false);
