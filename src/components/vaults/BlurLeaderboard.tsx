@@ -272,19 +272,19 @@ export default function BlurPts({
               </div>
               <Stats
                 title="1D"
-                value={myRank?.day ?? "0"}
+                value={myRank?.day ? myRank?.day.toFixed(2) : "0"}
                 valueSize="sm"
                 className="w-[16%] items-end"
               />
               <Stats
                 title="1W"
-                value={myRank?.week ?? "0"}
+                value={myRank?.week ? myRank?.week.toFixed(2) : "0"}
                 valueSize="sm"
                 className="w-[16%] items-end"
               />
               <Stats
                 title="TOTAL SPB"
-                value={myRank?.total ?? "0"}
+                value={myRank?.total ? myRank?.total.toFixed(2) : "0"}
                 valueSize="sm"
                 className="w-[16%] items-end"
               />
@@ -355,7 +355,7 @@ export default function BlurPts({
             </Button>
           </div>
           <div className="flex h-[46px] py-2 items-center border-[1.5px] border-gray-100 rounded-lg text-gray-100 text-xs drop-shadow-sm">
-            <span className="tracking-normal text-center px-4">{total}</span>
+            <span className="tracking-normal text-center px-4">{total.toFixed(2)}</span>
             <span className="border-l-[1.5px] px-4 tracking-normal w-[95px]">
               Total SPB emitted
             </span>
@@ -366,7 +366,7 @@ export default function BlurPts({
         <>
           {showAccumulated && (
             <div className="flex justify-center py-2 items-center text-gray-100 text-sm drop-shadow-sm">
-              <span className="tracking-normal text-center px-4">{total}</span>
+              <span className="tracking-normal text-center px-4">{total.toFixed(2)}</span>
               <span className="border-l-[1.5px] px-4 tracking-normal">
                 Total SPB accumulated
               </span>
