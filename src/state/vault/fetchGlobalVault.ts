@@ -121,7 +121,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           vault?.okrs?.protocol_allocations || {};
         const protocolAllocations0 = Object.keys(protocolAllocationsOrigin)
           .map((key) => ({
-            name: getNFTMarketplaceDisplayName(key),
+            name: key,
             allocation: protocolAllocationsOrigin[key],
           }))
           .sort((a, b) => (a.allocation >= b.allocation ? -1 : 1));
@@ -130,7 +130,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
         let protocolAllocations1: any[] = [];
         await Promise.all(
           protocolAllocations0.map(async (row: any) => {
-            if (row?.name && row?.name.includes("spice-")) {
+            if (row?.name && row?.name.toLowerCase().includes("spice-")) {
               const res = await axios.get(`${VAULT_API}/result/${row.name}`);
               if (res.status === 200) {
                 const bidderVaultProtocolAllocations =
@@ -165,7 +165,9 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           ];
         }
 
-        return protocolAllocations1;
+        return protocolAllocations1.map((row) => {
+          return { ...row, name: getNFTMarketplaceDisplayName(row.name) };
+        });
       })
     );
 
