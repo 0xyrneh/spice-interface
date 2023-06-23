@@ -20,6 +20,7 @@ module.exports = {
         "gray-300": "#C9C9C9",
         "gray-200": "#A1A1A1",
         "gray-100": "#D4D4D4",
+        "yellow": "#FBAF5E",
         "warm-gray-50": "#FAFAF9",
         red: "#FF255A",
         green: "#34D399",
@@ -55,6 +56,7 @@ module.exports = {
         "orange-200": "0px 0px 4px rgba(255, 227, 202, 0.4)",
         "orange-900": "0px 0px 4px rgba(253, 167, 57, 0.4)",
         green: "0px 0px 4px rgba(52, 211, 153, 0.4)",
+        yellow: "0px 0px 4px rgba(251, 175, 94, 0.4)",
       },
       borderWidth: {
         1: "1px",

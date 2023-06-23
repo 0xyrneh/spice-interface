@@ -45,6 +45,7 @@ export interface VaultInfo {
   depositedAmt?: number;
   requirement?: string;
   description?: string;
+  risk?: VaultRisk;
   okrs?: any;
   readable?: string;
   userInfo: any;
@@ -90,4 +91,9 @@ export interface LeverageVaultInfo {
 export interface ChartValue {
   x: number | string;
   y: number | string;
+}
+
+export enum VaultRisk {
+  LOW = "LOW RISK",
+  MEDIUM = "MEDIUM RISK"
 }

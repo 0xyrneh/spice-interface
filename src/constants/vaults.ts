@@ -1,3 +1,5 @@
+import { VaultRisk } from "@/types/vault";
+
 export const VAULT_DESCRIPTIONS: Record<string, string> = {
   Prologue:
     "The Prologue Vault deploys ETH deposits to fund NFT-backed P2P and P2Pool loans, generating yield for depositors. The vault uses state-of-the-art NFT lending models to bid at optimal loan LTVs and APYs, diversifying its portfolio to safeguard against market volatility and maximizing yield. This is the same lending strategy used in the Flagship Vault. The Prologue Vault extends loans across all whitelisted NFT lending platforms and collections. Unlike other SPICE Vaults, this vault enables leveraging for increased yield. Depositors can withdraw at any time.",
@@ -14,3 +16,7 @@ export const VAULT_DESCRIPTIONS: Record<string, string> = {
 export const VAULT_REQUIREMENTS: Record<string, string> = {
   Prologue: "Must hold Prologue NFT",
 };
+
+export const VAULT_RISK: Record<string, VaultRisk> = {
+  Prologue: VaultRisk.MEDIUM
+}
