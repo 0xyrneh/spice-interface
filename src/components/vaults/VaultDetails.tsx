@@ -84,7 +84,7 @@ export default function VaultDetails({ vault }: Props) {
         )}
 
         {vault.isBlur ? (
-          <div className="flex flex-col h-full gap-5">
+          <div className="flex flex-col h-full gap-5 overflow-hidden" style={{ margin: -5, padding: 5}}>
             <BlurLeaderboard vault={vault} showIcon onlyPts />
             <BlurLeaderboard
               vault={vault}
