@@ -21,6 +21,7 @@ type Props = {
   className?: string;
   onlyPts?: boolean;
   showAccumulated?: boolean;
+  onDeposit?: () => void,
 };
 
 const BlurCards = [
@@ -55,6 +56,7 @@ export default function BlurPts({
   nonExpandedClassName,
   onlyPts,
   showAccumulated,
+  onDeposit,
 }: Props) {
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
   const [expanded, setExpanded] = useState(false);
@@ -137,6 +139,13 @@ export default function BlurPts({
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vault?.address]);
+
+  const handleDepositClicked = () => {
+    setExpanded(false);
+    setTimeout(() => {
+      onDeposit && onDeposit();
+    }, 500);
+  };
 
   const getRowInfos = (): TableRowInfo[] => {
     return [
@@ -336,9 +345,7 @@ export default function BlurPts({
             <Button
               type="primary"
               className="w-[104px] h-8"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
+              onClick={handleDepositClicked}
             >
               <span className="text-xs font-bold">DEPOSIT</span>
             </Button>

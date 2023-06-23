@@ -15,6 +15,7 @@ import {
 import { VaultsTable } from "@/components/portfolio";
 import VaultNfts from "@/components/vaults/VaultNfts";
 import { useAppSelector } from "@/state/hooks";
+import { useUI } from "@/hooks";
 import { VaultInfo, ReceiptToken } from "@/types/vault";
 import { DEFAULT_AGGREGATOR_VAULT } from "@/config/constants/vault";
 import { activeChainId } from "@/utils/web3";
@@ -25,6 +26,7 @@ import { VaultPositionGraph } from "@/components/vaults";
 import { PROLOGUE_NFT_ADDRESS } from "@/config/constants";
 
 export default function Portfolio() {
+  const { showDepositModal } = useUI();
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
   const { account } = useWeb3React();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
@@ -145,6 +147,9 @@ export default function Portfolio() {
                   vault={selectedVault}
                   showIcon
                   nonExpandedClassName="flex-1"
+                  onDeposit={() => {
+                    showDepositModal({ vault: selectedVault });
+                  }}
                 />
               </div>
             ) : selectedVault.receiptToken === ReceiptToken.ERC20 ? (
