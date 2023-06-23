@@ -44,7 +44,8 @@ export default function Vaults() {
       }`}
     >
       <div
-        className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[982px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-warm-gray-50 font-semibold shadow-black"
+        // className="min-w-[1024px] h-[709.04px] lg:h-[756.04px] xl:h-[982px] 2xl:h-[936.63px] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-warm-gray-50 font-semibold shadow-black"
+        className="min-w-[1024px] h-[calc(100vh-61px)] bg-cover hidden sm:flex flex-col-reverse px-8 py-7 gap-3 text-warm-gray-50 font-semibold shadow-black"
         style={{
           backgroundImage: `url(${
             activeVault?.backgroundImage || DEFAULT_VAULT_BACKGROUND_IMAGE

@@ -186,3 +186,14 @@ export const getCollectionInfoByAddress = async (
 
   return collections[0];
 };
+
+export const getNftMarketLogo = (marketName: string): string => {
+  if (marketName === "arcade") return "/assets/icons/loan/arcade.svg";
+  if (marketName === "nftfi") return "/assets/icons/loan/nftfi.svg";
+  if (marketName === "x2y2") return "/assets/icons/loan/x2y2.svg";
+  if (marketName === "paraspace") return "/assets/icons/loan/paraspace.svg";
+  if (marketName === "drop") return "/assets/icons/loan/drop.svg";
+  if (marketName === "benddao") return "/assets/icons/loan/benddao.svg";
+  if (marketName === "spice") return "/assets/icons/loan/spice.svg";
+  return "/assets/icons/loan/arcade.svg";
+};

@@ -14,6 +14,7 @@ import {
   getNFTCollectionAddressConvert,
   getNFTCollectionAddressFromSlug,
   getTokenImageFromReservoir,
+  getNftMarketLogo,
 } from "@/utils/nft";
 import { DAY_IN_SECONDS, YEAR_IN_SECONDS } from "@/config/constants/time";
 import { getSpiceFiLendingAddress } from "@/utils/addressHelpers";
@@ -142,6 +143,7 @@ export default function LoanExposure({
               ltv,
               nftId: row.nftid,
               tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
+              market: getNftMarketLogo(row.market),
             };
           })
         );
