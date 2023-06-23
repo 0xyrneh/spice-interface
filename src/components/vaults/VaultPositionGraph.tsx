@@ -240,7 +240,7 @@ export default function VaultPositionGraph({
           chartData.push({
             x: (temp[i].x as number) - 1,
             y: temp[i - 1].y,
-          })
+          });
         }
         chartData.push(temp[i]);
       }

@@ -1,24 +1,6 @@
-const userVaultPositionQuery = `
-  query getUserPositions($userAddress: String!, $vaultAddress: String!) {
-    userHourPositions(
-      first:$cnt
-      where: {
-        user: $userAddress
-        vault: $vaultAddress
-      }
-      orderBy: date
-      orderDirection: asc
-    )
-      {
-        date
-        position
-      }
-  }
-`;
-
 const userVaultShareQuery = `
   query getUserPositions($userAddress: String!, $vaultAddress: String!) {
-    userHourPositions(
+    userVaultHourPositions(
       first:$cnt
       where: {
         user: $userAddress
@@ -68,9 +50,4 @@ const userSpicePositionQuery = `
   }
 `;
 
-export {
-  userVaultPositionQuery,
-  userVaultShareQuery,
-  vaultPositionQuery,
-  userSpicePositionQuery,
-};
+export { userVaultShareQuery, vaultPositionQuery, userSpicePositionQuery };

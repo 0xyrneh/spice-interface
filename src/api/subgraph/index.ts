@@ -4,7 +4,6 @@ import { prologueNftSubgraphClient, vaultSubgraphClient } from "./config";
 import {
   userPrologueNftQuery,
   prologueNftQuery,
-  userVaultPositionQuery,
   userVaultShareQuery,
   vaultPositionQuery,
   userSpicePositionQuery,
@@ -57,31 +56,6 @@ export const getVaultPositions = async (vaultAddress: string) => {
   }
 };
 
-// user vault position
-export const getUserVaultPositions = async (
-  userAddress: string,
-  vaultAddress: string
-) => {
-  if (!userAddress) return [];
-  if (!vaultAddress) return [];
-  try {
-    const result = await vaultSubgraphClient.query({
-      query: gql(userVaultPositionQuery),
-      variables: {
-        cnt: 1000,
-        userAddress: userAddress.toLowerCase(),
-        vaultAddress: vaultAddress.toLowerCase(),
-      },
-      fetchPolicy: "network-only",
-    });
-
-    const { userHourPositions } = result.data;
-    return userHourPositions || [];
-  } catch (err) {
-    return [];
-  }
-};
-
 // user vault shares
 export const getUserVaultShares = async (
   userAddress: string,
@@ -100,8 +74,8 @@ export const getUserVaultShares = async (
       fetchPolicy: "network-only",
     });
 
-    const { userHourPositions } = result.data;
-    return userHourPositions || [];
+    const { userVaultHourPositions } = result.data;
+    return userVaultHourPositions || [];
   } catch (err) {
     return [];
   }

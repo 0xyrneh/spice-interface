@@ -116,11 +116,13 @@ export default function LoanExposure({
               const nftData = allNfts.find(
                 (row1: any) => Number(row1.tokenId) === Number(row.nftid)
               );
-              if (nftData.redeemAmount - row.outstanding !== 0) {
-                ltv =
-                  100 *
-                  (row.outstanding /
-                    (row.outstanding + nftData.redeemAmount - row.outstanding));
+              if (nftData?.redeemAmount) {
+                if (nftData.redeemAmount - row.outstanding !== 0) {
+                  ltv =
+                    100 *
+                    (row.outstanding /
+                      (nftData.redeemAmount - row.outstanding));
+                }
               }
             } else {
               const collection = collections.find(
@@ -150,8 +152,8 @@ export default function LoanExposure({
         );
         setLoans([...loansOrigin]);
       }
-    } catch {
-      console.log("loans fetching error");
+    } catch (err) {
+      console.log("loans fetching error111", err);
     }
     setIsFetching(false);
   };
