@@ -259,14 +259,12 @@ export default function BlurPts({
                     "flex items-center font-bold text-sm text-orange-200 drop-shadow-orange-200"
                   }
                 >
-                  <button className="hidden lg:flex items-center min-w-4 w-4 h-4 mr-1">
-                    <Image
-                      src="/assets/icons/copy.svg"
-                      width={16}
-                      height={16}
-                      alt=""
-                    />
-                  </button>
+                  <CopyClipboard
+                    text={account!}
+                    width={16}
+                    height={16}
+                    className="hidden lg:flex items-center min-w-4 w-4 h-4 mr-1"
+                  />
                   YOU
                 </div>
               </div>
