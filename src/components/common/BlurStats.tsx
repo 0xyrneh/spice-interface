@@ -6,6 +6,7 @@ type Props = {
   title: string;
   value: string;
   tooltip: string;
+  disabled: boolean;
   className?: string;
   type?: "orange";
 };
@@ -31,6 +32,7 @@ export default function BlurStats({
   className,
   tooltip,
   type,
+  disabled,
 }: Props) {
   return (
     <div
@@ -46,7 +48,7 @@ export default function BlurStats({
         <span className={`text-sm font-medium ${styles[type ?? "default"]}`}>
           {title}
         </span>
-        <Tooltip tooltip={tooltip} className={styles[type ?? "default"]}>
+        <Tooltip tooltip={disabled ? "" : tooltip} className={styles[type ?? "default"]}>
           <QuestionSVG />
         </Tooltip>
       </div>

@@ -327,6 +327,7 @@ export default function BlurPts({
                 value={BlurCards[count * page + idx].value}
                 type={BlurCards[count * page + idx].type as any}
                 tooltip={BlurCards[count * page + idx].tooltip}
+                disabled={count * page + idx !== 0}
                 className={`${expanded ? "w-[153px] lg:w-[196px]" : ""} ${
                   count * page + idx === 0 ? "" : "blur-[2px]"
                 }`}
