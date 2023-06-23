@@ -15,6 +15,8 @@ export type Vault = {
   apy: number;
   oneDayChange: number;
   sevenDayChange: number;
+  oneDayReturn: number;
+  sevenDayReturn: number;
   creator: string;
   receiptToken: ReceiptToken;
   favorite?: boolean;
