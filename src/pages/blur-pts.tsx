@@ -39,6 +39,7 @@ export default function Portfolio() {
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [balance, setBalance] = useState(0);
   const [isInblur, setIsInBlur] = useState(false);
+  const [blurBalance, setBlurBalance] = useState(0);
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
 
   const router = useRouter();
@@ -102,6 +103,7 @@ export default function Portfolio() {
     ]);
 
     setIsInBlur(!balance[0].eq(0));
+    setBlurBalance(getBalanceInEther(balance[0]));
   };
 
   const formatNumber = (val: any, digits = 2) => {
@@ -237,59 +239,81 @@ export default function Portfolio() {
             {error && <span className="mt-px text-red text-xs">{error}</span>}
           </div>
 
-          {checkedAddress && userInfo && userInfo[7] > 0 && (
-            <div className="flex flex-col font-medium gap-3">
-              <div className="flex items-center gap-3">
-                <UserSVG />
-                <span className="text-base text-orange-200 -ml-1">
-                  {"0x" + checkedAddress.slice(2, 8).toUpperCase()}
-                </span>
+          {checkedAddress &&
+            vaultInfo &&
+            (isInblur || (userInfo && userInfo[7] > 0)) && (
+              <div className="flex flex-col font-medium gap-3">
+                <div className="flex items-center gap-3">
+                  <UserSVG />
+                  <span className="text-base text-orange-200 -ml-1">
+                    {"0x" + checkedAddress.slice(2, 8).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex gap-4">
+                  <Stats
+                    title="Efficiency"
+                    value={`${formatNumber(
+                      userInfo
+                        ? userInfo[2]
+                        : isInblur
+                        ? vaultInfo[2]
+                        : undefined
+                    )} PTS/Ξ`}
+                    size="xs"
+                    valueSize="base"
+                  />
+                  <Stats
+                    title="Multiplier"
+                    value={`${formatNumber(
+                      userInfo
+                        ? userInfo[5]
+                        : isInblur
+                        ? vaultInfo[5]
+                        : undefined
+                    )}X`}
+                    size="xs"
+                    valueSize="base"
+                  />
+                  <Stats
+                    title="Points Earned"
+                    value={`${formatNumber(
+                      userInfo
+                        ? userInfo[3] * userInfo[5]
+                        : isInblur
+                        ? blurBalance * vaultInfo[2]
+                        : undefined
+                    )}/day`}
+                    size="xs"
+                    valueSize="base"
+                  />
+                  <Stats
+                    title="TVL"
+                    value={`Ξ${formatNumber(
+                      userInfo
+                        ? userInfo[4]
+                        : isInblur
+                        ? blurBalance
+                        : undefined
+                    )}`}
+                    size="xs"
+                    valueSize="base"
+                  />
+                </div>
               </div>
-              <div className="flex gap-4">
-                <Stats
-                  title="Efficiency"
-                  value={`${formatNumber(
-                    userInfo ? userInfo[2] : undefined
-                  )} PTS/Ξ`}
-                  size="xs"
-                  valueSize="base"
-                />
-                <Stats
-                  title="Multiplier"
-                  value={`${formatNumber(userInfo ? userInfo[5] : undefined)}X`}
-                  size="xs"
-                  valueSize="base"
-                />
-                <Stats
-                  title="Points Earned"
-                  value={`${formatNumber(
-                    userInfo ? userInfo[3] * userInfo[5] : undefined
-                  )}/day`}
-                  size="xs"
-                  valueSize="base"
-                />
-                <Stats
-                  title="TVL"
-                  value={`Ξ${formatNumber(userInfo ? userInfo[4] : undefined)}`}
-                  size="xs"
-                  valueSize="base"
-                />
-              </div>
-            </div>
-          )}
+            )}
 
           <div className="flex flex-col font-medium gap-3">
             <div className="flex items-center gap-3">
               <BlurSVG
                 className={
-                  checkedAddress && userInfo && userInfo[7] > 0
+                  checkedAddress && (isInblur || (userInfo && userInfo[7] > 0))
                     ? "text-orange-900"
                     : "text-white"
                 }
               />
               <span
                 className={`text-base -ml-1 ${
-                  checkedAddress && userInfo && userInfo[7] > 0
+                  checkedAddress && (isInblur || (userInfo && userInfo[7] > 0))
                     ? "text-orange-900"
                     : "text-white"
                 }`}
@@ -313,7 +337,7 @@ export default function Portfolio() {
                 size="xs"
                 valueSize="base"
                 type={
-                  checkedAddress && userInfo && userInfo[7] > 0
+                  checkedAddress && (isInblur || (userInfo && userInfo[7] > 0))
                     ? "orange"
                     : "white"
                 }
@@ -324,7 +348,7 @@ export default function Portfolio() {
                 size="xs"
                 valueSize="base"
                 type={
-                  checkedAddress && userInfo && userInfo[7] > 0
+                  checkedAddress && (isInblur || (userInfo && userInfo[7] > 0))
                     ? "orange"
                     : "white"
                 }
@@ -337,7 +361,7 @@ export default function Portfolio() {
                 size="xs"
                 valueSize="base"
                 type={
-                  checkedAddress && userInfo && userInfo[7] > 0
+                  checkedAddress && (isInblur || (userInfo && userInfo[7] > 0))
                     ? "orange"
                     : "white"
                 }
@@ -348,7 +372,7 @@ export default function Portfolio() {
                 size="xs"
                 valueSize="base"
                 type={
-                  checkedAddress && userInfo && userInfo[7] > 0
+                  checkedAddress && (isInblur || (userInfo && userInfo[7] > 0))
                     ? "orange"
                     : "white"
                 }
