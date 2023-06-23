@@ -122,7 +122,8 @@ export default function LoanBreakdown({
               if (nftData.redeemAmount - row.outstanding !== 0) {
                 ltv =
                   100 *
-                  (row.outstanding / (nftData.redeemAmount - row.outstanding));
+                  (row.outstanding /
+                    (row.outstanding + nftData.redeemAmount - row.outstanding));
               }
             } else {
               const collection = collections.find(

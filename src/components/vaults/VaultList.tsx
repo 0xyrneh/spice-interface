@@ -1,4 +1,6 @@
+import { useWeb3React } from "@web3-react/core";
 import Image from "next/image";
+import moment from "moment";
 
 // import vaults from "@/constants/vaults";
 import { VaultInfo } from "@/types/vault";
@@ -18,7 +20,7 @@ import {
 } from "@/constants";
 import { useUI } from "@/hooks";
 import { TableRowInfo } from "../common/Table";
-import { useWeb3React } from "@web3-react/core";
+import { activeChainId } from "@/utils/web3";
 
 type Props = {
   onClickVault: (vault: VaultInfo) => void;
@@ -42,32 +44,87 @@ const VaultList = ({ onClickVault }: Props) => {
     }, 3000);
   }, []);
 
-  const vaults = vaultsOrigin.map((row) => {
-    let oneDayChange = 0;
-    let sevenDayChange = 0;
+  const getWeeklyReturn = (historyData: any[]) => {
+    if (historyData.length === 0) return { oneDayReturn: 0, sevenDayReturn: 0 };
 
-    const { historicalRecords } = row;
+    const latestRecord = historyData.slice(-1)[0];
+    const oneDayBeforeTimestamp = moment(latestRecord.time)
+      .subtract(1, "d")
+      .valueOf();
+    const oneWeekBeforeTimestamp = moment(latestRecord.time)
+      .subtract(7, "d")
+      .valueOf();
 
-    if (historicalRecords && historicalRecords.length > 0) {
-      const lastReturn = historicalRecords[0].okrs.expected_return;
-
-      if (historicalRecords[1]) {
-        const prevReturn = historicalRecords[1].okrs.expected_return;
-
-        oneDayChange = 100 * (lastReturn - prevReturn);
+    let oneDayNearHisRecord: any = { time: 0, assetPerShare: 0 };
+    let oneWeekNearHisRecord: any = { time: 0, assetPerShare: 0 };
+    historyData.map((row: any) => {
+      if (
+        Math.abs(row.time - oneDayBeforeTimestamp) <
+        Math.abs(oneDayNearHisRecord.time - oneDayBeforeTimestamp)
+      ) {
+        oneDayNearHisRecord = row;
       }
-
-      if (historicalRecords[6]) {
-        const prevReturn = historicalRecords[6].okrs.expected_return;
-
-        sevenDayChange = 100 * (lastReturn - prevReturn);
+      if (
+        Math.abs(row.time - oneWeekBeforeTimestamp) <
+        Math.abs(oneWeekNearHisRecord.time - oneWeekBeforeTimestamp)
+      ) {
+        oneWeekNearHisRecord = row;
       }
+      return row;
+    });
+
+    let oneDayReturn = 0;
+    let sevenDayReturn = 0;
+
+    if (oneDayNearHisRecord.assetPerShare > 0) {
+      oneDayReturn =
+        latestRecord.assetPerShare / oneDayNearHisRecord.assetPerShare - 1;
     }
+
+    if (oneWeekNearHisRecord.assetPerShare > 0) {
+      sevenDayReturn =
+        latestRecord.assetPerShare / oneWeekNearHisRecord.assetPerShare - 1;
+    }
+
     return {
-      ...row,
-      apy: Math.max(row.apy ?? 0, row.historicalApy ?? 0),
-      oneDayChange,
-      sevenDayChange,
+      oneDayReturn: 100 * oneDayReturn,
+      sevenDayReturn: 100 * sevenDayReturn,
+    };
+
+    // TODO: yearly apy: [Deprecated]
+    // const timeDiff = moment.duration(moment(latestRecord.time).diff(nearHisRecord.time));
+    // const dayDiff = timeDiff.asDays() % 24;
+
+    // if (nearHisRecord.assetPerShare > 0 && dayDiff > 0) {
+    //   // eslint-disable-next-line no-restricted-properties
+    //   const dailyApy = Math.pow(latestRecord.assetPerShare / nearHisRecord.assetPerShare, 1 / dayDiff) - 1;
+    //   // eslint-disable-next-line no-restricted-properties
+    //   const yearlyApy = Math.pow(1 + dailyApy, 365) - 1;
+
+    //   return 100 * yearlyApy;
+    // }
+  };
+
+  const vaults = vaultsOrigin.map((vault) => {
+    // day return logic
+    const historicalRecords = vault?.historicalRecords || [];
+    const graphField =
+      activeChainId === 1 ? "assets_per_share" : "expected_return";
+
+    const historyData = historicalRecords
+      .map((row) => ({
+        time: 1000 * Number(row.time) || 0,
+        assetPerShare:
+          (activeChainId === 1 ? 1 : 100) *
+          (row?.okrs && row?.okrs[graphField] ? row?.okrs[graphField] : 0),
+      }))
+      .reverse();
+
+    return {
+      ...vault,
+      apy: Math.max(vault.apy ?? 0, vault.historicalApy ?? 0),
+      oneDayReturn: getWeeklyReturn(historyData).oneDayReturn,
+      sevenDayReturn: getWeeklyReturn(historyData).sevenDayReturn,
     };
   });
 
@@ -109,25 +166,25 @@ const VaultList = ({ onClickVault }: Props) => {
         },
       },
       {
-        title: "1D CHANGE",
-        key: "oneDayChange",
+        title: "1D RETURN",
+        key: "oneDayReturn",
         rowClass: () => "hidden md:table-cell",
         itemSuffix: () => "%",
         itemClass: (item) =>
-          item.oneDayChange >= 0 ? "text-green" : "text-red",
+          item.oneDayReturn >= 0 ? "text-green" : "text-red",
         format: (item) => {
-          return (item?.oneDayChange || 0).toFixed(2);
+          return (item?.oneDayReturn || 0).toFixed(2);
         },
       },
       {
-        title: "7D CHANGE",
+        title: "7D RETURN",
         key: "sevenDayChange",
         rowClass: () => "hidden md:table-cell",
         itemSuffix: () => "%",
         itemClass: (item) =>
-          item.sevenDayChange >= 0 ? "text-green" : "text-red",
+          item.sevenDayReturn >= 0 ? "text-green" : "text-red",
         format: (item) => {
-          return (item?.sevenDayChange || 0).toFixed(2);
+          return (item?.sevenDayReturn || 0).toFixed(2);
         },
       },
       {
