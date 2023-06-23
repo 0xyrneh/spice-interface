@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import useBreakpoint from "use-breakpoint";
-import { BlurStats, Button, Card, Stats, CopyClipboard } from "@/components/common";
+import {
+  BlurStats,
+  Button,
+  Card,
+  Stats,
+  CopyClipboard,
+} from "@/components/common";
 import BlurSVG from "@/assets/icons/blur.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import { VaultInfo } from "@/types/vault";
@@ -21,7 +27,7 @@ type Props = {
   className?: string;
   onlyPts?: boolean;
   showAccumulated?: boolean;
-  onDeposit?: () => void,
+  onDeposit?: () => void;
 };
 
 const BlurCards = [
@@ -145,6 +151,13 @@ export default function BlurPts({
     setTimeout(() => {
       onDeposit && onDeposit();
     }, 500);
+  };
+
+  const handleLearnMoreClicked = () => {
+    window.open(
+      "https://docs.spicefi.xyz/blur/what-is-the-sp-blur-vault",
+      "_blank"
+    );
   };
 
   const getRowInfos = (): TableRowInfo[] => {
@@ -352,9 +365,7 @@ export default function BlurPts({
             <Button
               type="secondary"
               className="w-[104px] h-8"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
+              onClick={handleLearnMoreClicked}
             >
               <span className="text-xs font-bold">LEARN MORE</span>
             </Button>
