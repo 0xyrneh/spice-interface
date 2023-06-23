@@ -9,6 +9,7 @@ import ChartSVG from "@/assets/icons/chart.svg";
 import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { activeChainId } from "@/utils/web3";
 import { getVaultUpTime } from "@/utils/vault";
+import { useUI } from "@/hooks";
 import { useState } from "react";
 import VaultDesc from "./VaultDesc";
 
@@ -17,6 +18,8 @@ type Props = {
 };
 
 export default function VaultDetails({ vault }: Props) {
+  const { showDepositModal } = useUI();
+
   const [showFullDescription, setShowFullDescription] = useState(false);
 
   const getVaultHistoricalApy = () => {
@@ -84,13 +87,16 @@ export default function VaultDetails({ vault }: Props) {
         )}
 
         {vault.isBlur ? (
-          <div className="flex flex-col h-full gap-5">
+          <div className="flex flex-col h-full gap-5 overflow-hidden" style={{ margin: -5, padding: 5}}>
             <BlurLeaderboard vault={vault} showIcon onlyPts />
             <BlurLeaderboard
               vault={vault}
               showIcon
               nonExpandedClassName="flex-1"
               showAccumulated
+              onDeposit={() => {
+                showDepositModal({ vault: vault });
+              }}
             />
           </div>
         ) : (

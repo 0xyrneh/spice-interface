@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import useBreakpoint from "use-breakpoint";
-import { BlurStats, Button, Card, Stats, CopyClipboard } from "@/components/common";
+import {
+  BlurStats,
+  Button,
+  Card,
+  Stats,
+  CopyClipboard,
+} from "@/components/common";
 import BlurSVG from "@/assets/icons/blur.svg";
 import ExternalLinkSVG from "@/assets/icons/external-link.svg";
 import { VaultInfo } from "@/types/vault";
@@ -21,6 +27,7 @@ type Props = {
   className?: string;
   onlyPts?: boolean;
   showAccumulated?: boolean;
+  onDeposit?: () => void;
 };
 
 const BlurCards = [
@@ -55,6 +62,7 @@ export default function BlurPts({
   nonExpandedClassName,
   onlyPts,
   showAccumulated,
+  onDeposit,
 }: Props) {
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
   const [expanded, setExpanded] = useState(false);
@@ -137,6 +145,20 @@ export default function BlurPts({
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vault?.address]);
+
+  const handleDepositClicked = () => {
+    setExpanded(false);
+    setTimeout(() => {
+      onDeposit && onDeposit();
+    }, 500);
+  };
+
+  const handleLearnMoreClicked = () => {
+    window.open(
+      "https://docs.spicefi.xyz/blur/what-is-the-sp-blur-vault",
+      "_blank"
+    );
+  };
 
   const getRowInfos = (): TableRowInfo[] => {
     return [
@@ -259,14 +281,12 @@ export default function BlurPts({
                     "flex items-center font-bold text-sm text-orange-200 drop-shadow-orange-200"
                   }
                 >
-                  <button className="hidden lg:flex items-center min-w-4 w-4 h-4 mr-1">
-                    <Image
-                      src="/assets/icons/copy.svg"
-                      width={16}
-                      height={16}
-                      alt=""
-                    />
-                  </button>
+                  <CopyClipboard
+                    text={account!}
+                    width={16}
+                    height={16}
+                    className="hidden lg:flex items-center min-w-4 w-4 h-4 mr-1"
+                  />
                   YOU
                 </div>
               </div>
@@ -307,6 +327,7 @@ export default function BlurPts({
                 value={BlurCards[count * page + idx].value}
                 type={BlurCards[count * page + idx].type as any}
                 tooltip={BlurCards[count * page + idx].tooltip}
+                disabled={count * page + idx !== 0}
                 className={`${expanded ? "w-[153px] lg:w-[196px]" : ""} ${
                   count * page + idx === 0 ? "" : "blur-[2px]"
                 }`}
@@ -338,18 +359,14 @@ export default function BlurPts({
             <Button
               type="primary"
               className="w-[104px] h-8"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
+              onClick={handleDepositClicked}
             >
               <span className="text-xs font-bold">DEPOSIT</span>
             </Button>
             <Button
               type="secondary"
               className="w-[104px] h-8"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
+              onClick={handleLearnMoreClicked}
             >
               <span className="text-xs font-bold">LEARN MORE</span>
             </Button>

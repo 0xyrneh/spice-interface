@@ -16,7 +16,7 @@ const CopyClipboard = ({ text, width, height, className }: Props) => {
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
-    }, 3000);
+    }, 1500);
   };
 
   return (

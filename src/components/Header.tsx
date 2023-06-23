@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useWeb3React } from "@web3-react/core";
 
 import LogoSVG from "@/assets/icons/logo.svg";
+import { connectorLocalStorageKey } from "@/config/constants/wallet";
 import { NavOption } from "@/types/common";
 import { VaultSearch, ConnectWallet } from "@/components/common";
 import { NAV_OPTIONS } from "@/constants";
@@ -21,13 +22,19 @@ import {
 } from "@/state/actions";
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { VaultInfo } from "@/types/vault";
+import { ConnectorNames } from "@/types/wallet";
 import { getSpiceFiLendingAddresses } from "@/utils/addressHelpers";
+import useAuth from "@/hooks/useAuth";
+import { setupNetwork } from "@/utils/wallet";
+import { activeChainId } from "@/utils/web3";
 
 const Header = () => {
+  const { login } = useAuth();
+
   const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
   const { vaults, defaultVault } = useAppSelector((state) => state.vault);
   const router = useRouter();
   const { blur, showTosModal } = useUI();
@@ -36,14 +43,20 @@ const Header = () => {
 
   const dispatch = useAppDispatch();
 
-  // const persistConnect = () => {
-  //   const connectorId = window.localStorage.getItem(
-  //     connectorLocalStorageKey
-  //   ) as ConnectorNames;
-  //   if (connectorId) {
-  //     login(connectorId);
-  //   }
-  // };
+  useEffect(() => {
+    if (!chainId || chainId !== activeChainId) {
+      setupNetwork();
+    }
+  }, [chainId, activeChainId]);
+
+  const persistConnect = () => {
+    const connectorId = window.localStorage.getItem(
+      connectorLocalStorageKey
+    ) as ConnectorNames;
+    if (connectorId) {
+      login(connectorId);
+    }
+  };
 
   const fetchData = async () => {
     dispatch(fetchVaultGlobalDataAsync());
@@ -65,7 +78,7 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    // persistConnect();
+    persistConnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

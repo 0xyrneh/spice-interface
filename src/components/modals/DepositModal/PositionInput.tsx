@@ -58,7 +58,6 @@ export default function PositionInput({
               onFocus={onFocus}
               onBlur={onBlur}
               disabled={processing()}
-              type="number"
             />
             <button
               className="flex items-center gap-2 bg-gray-200 bg-opacity-20 h-7 rounded px-3"
