@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 
 import { Button, Card } from "@/components/common";
 import CircleDotSvg from "@/assets/icons/circle-dot.svg";
-import { VaultInfo } from "@/types/vault";
+import { VaultInfo, VaultRisk } from "@/types/vault";
 import { activeChainId } from "@/utils/web3";
 import { useWeb3React } from "@web3-react/core";
 import { getNftPortfolios } from "@/utils/nft";
@@ -64,6 +64,10 @@ export default function VaultDesc({
 
   const { userPosition } = getVaultWithPosition();
 
+  const getVaultRisk = () => {
+    return vault.risk ?? VaultRisk.LOW;
+  };
+
   const isWithdrawOnly = vault.deprecated;
 
   return (
@@ -114,16 +118,50 @@ export default function VaultDesc({
             </Button>
           )}
         </div>
-        <div className="flex xl:hidden items-center text-green">
-          <CircleDotSvg />
-          <span className="hidden lg:block font-semibold text-xs text-shadow-green">
-            LOW RISK
+        <div
+          className={`flex xl:hidden items-center gap-2 ${
+            getVaultRisk() === VaultRisk.LOW ? "text-green" : "text-yellow"
+          }`}
+        >
+          <CircleDotSvg
+            className={
+              getVaultRisk() === VaultRisk.LOW
+                ? "drop-shadow-green"
+                : "drop-shadow-yellow"
+            }
+          />
+          <span
+            className={`hidden lg:block font-semibold text-xs ${
+              getVaultRisk() === VaultRisk.LOW
+                ? "text-shadow-green"
+                : "text-shadow-yellow"
+            }`}
+          >
+            {getVaultRisk()}
           </span>
         </div>
       </div>
-      <div className="hidden xl:flex items-center text-green h-4">
-        <CircleDotSvg />
-        <span className="font-semibold text-xs">LOW RISK</span>
+      <div
+        className={`hidden xl:flex items-center text-green h-4 gap-2 ${
+          getVaultRisk() === VaultRisk.LOW ? "text-green" : "text-yellow"
+        }`}
+      >
+        <CircleDotSvg
+          className={
+            getVaultRisk() === VaultRisk.LOW
+              ? "drop-shadow-green"
+              : "drop-shadow-yellow"
+          }
+        />
+        <span
+          className={`font-semibold text-xs ${
+            getVaultRisk() === VaultRisk.LOW
+              ? "text-shadow-green"
+              : "text-shadow-yellow"
+          }`}
+        >
+          {getVaultRisk()}
+        </span>
       </div>
       {showFullDesc ? (
         <div className="tracking-normal text-white text-xs font-medium leading-4 h-auto relative">

@@ -49,9 +49,9 @@ const VaultFooter = () => {
       }] ${blur ? "blur-[5px]" : ""}`}
     >
       <div className="flex gap-4 items-center">
-        <div className="flex items-center">
-          <CircleDotSvg />
-          <span className="text-green font-bold text-xs text-shadow-green">
+        <div className="flex items-center gap-2 text-green">
+          <CircleDotSvg className="drop-shadow-green" />
+          <span className="font-bold text-xs text-shadow-green">
             SPICE MARKET IS OPEN
           </span>
         </div>
