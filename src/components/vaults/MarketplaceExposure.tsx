@@ -132,12 +132,6 @@ export default function MarketplaceExposure({
       protocolAllocations = vault?.marketplaceExposures || [];
     }
 
-    if (protocolAllocations.length === 0) {
-      protocolAllocations = [
-        ...protocolAllocations,
-        { name: "SPICE", allocation: 1 },
-      ];
-    }
     setAllocations(
       protocolAllocations
         .map((row, id) => {
