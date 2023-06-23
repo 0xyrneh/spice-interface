@@ -415,6 +415,7 @@ export const fetchBlurVaults = async (vaults: any[]) => {
         },
         category: VaultFilter.Public,
         isBlur: true,
+        marketplaceExposures: [{ name: "BLUR", allocation: 1 }],
       };
     });
 
