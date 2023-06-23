@@ -429,9 +429,9 @@ export default function Portfolio() {
                 <span className="font-bold">
                   {earnedPoints.toFixed(2)} MORE BLUR POINTS PER DAY
                 </span>{" "}
-                depositing ETH into the SP-BLUR Vault(
+                depositing ETH into the SP-BLUR Vault (
                 <span className="font-bold">
-                  {vaultInfo[2] - userInfo[2]}x more efficient)
+                  {(vaultInfo[2] / userInfo[2]).toFixed(1)}x more efficient)
                 </span>{" "}
                 than farming yourself. Will you continue to fade rational
                 decision making anon?{" "}
@@ -454,7 +454,7 @@ export default function Portfolio() {
                 <span className="font-bold">
                   {Math.abs(earnedPoints).toFixed(2)} MORE BLUR POINTS PER DAY
                 </span>{" "}
-                farming themselves vs depositing ETH into the SP-BLUR Vault. Do
+                farming yourself vs depositing ETH into the SP-BLUR Vault. Do
                 you want to continue spending the time farming yourself?{" "}
                 <span
                   className="underline cursor-pointer font-bold hover:text-orange-300"
