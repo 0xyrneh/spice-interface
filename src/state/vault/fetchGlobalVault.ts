@@ -18,7 +18,11 @@ import { getWethAddress } from "@/utils/addressHelpers";
 import { activeChainId } from "@/utils/web3";
 import { getVaultBackgroundImage, getVaultLogo } from "@/utils/vault";
 import { VaultFilter } from "@/types/common";
-import { VAULT_DESCRIPTIONS, VAULT_REQUIREMENTS, VAULT_RISK } from "@/constants/vaults";
+import {
+  VAULT_DESCRIPTIONS,
+  VAULT_REQUIREMENTS,
+  VAULT_RISK,
+} from "@/constants/vaults";
 import { getNFTMarketplaceDisplayName } from "@/utils/nft";
 import { COLLECTION_API_BASE } from "@/config/constants/backend";
 import { getNFTCollectionDisplayName } from "@/utils/nft";
@@ -459,7 +463,7 @@ export const fetchGlobalData = async () => {
             ...vault,
             description: VAULT_DESCRIPTIONS[prefix],
             requirement: VAULT_REQUIREMENTS[prefix],
-            risk: VAULT_RISK[prefix]
+            risk: VAULT_RISK[prefix],
           };
         }
         return vault;
