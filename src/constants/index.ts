@@ -16,6 +16,7 @@ export const NAV_OPTIONS: NavOption[] = [
     bigFooter: true,
   },
   { href: "/portfolio", name: "Portfolio", breakpoint: "md" },
+  { href: "/blur-pts", name: "Blur Pts", breakpoint: "md" },
 ];
 
 export const VAULT_FILTERS = [

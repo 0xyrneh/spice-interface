@@ -113,12 +113,16 @@ export const formatBlurChart = (
 ): any => {
   const account = _account ? _account.toLowerCase() : undefined;
   let totalSpPoints = 0;
+  let tvl = 0;
   let weekPoints = 0;
   let monthPoints = 0;
   if (historicalRecords.length > 0) {
     totalSpPoints = account
       ? historicalRecords[0].okrs.holders_points[account] ?? 0
       : historicalRecords[0].okrs.total_points;
+    tvl = account
+      ? historicalRecords[0].okrs.holders_eth[account] ?? 0
+      : historicalRecords[0].okrs.total_eth;
     weekPoints = totalSpPoints;
     monthPoints = totalSpPoints;
 
@@ -161,6 +165,7 @@ export const formatBlurChart = (
 
   return {
     totalSpPoints,
+    tvl,
     weekPoints,
     monthPoints,
     pointsChart,
