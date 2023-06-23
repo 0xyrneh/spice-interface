@@ -18,6 +18,7 @@ import { getTokenImageFromReservoir } from "@/utils/nft";
 import { YEAR_IN_SECONDS } from "@/config/constants/time";
 import { PROLOGUE_NFT_ADDRESS } from "@/config/constants/nft";
 import { useAppSelector } from "@/state/hooks";
+import { getBalanceInWei } from "@/utils/formatBalance";
 
 type Props = {
   vault?: VaultInfo;
@@ -32,7 +33,7 @@ export default function PrologueNfts({
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
-    VaultNftsSortFilter.ApyHighToLow
+    VaultNftsSortFilter.ValueHighToLow
   );
   const [selectedIdx, setSelectedIdx] = useState<number>();
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,10 +58,17 @@ export default function PrologueNfts({
   }, [expanded, setBlur]);
 
   const getNftPortolios = () => {
+    if (!vault) return [];
     const allNfts1 = allNfts.map((row) => {
       return {
         owner: row.owner.address,
-        amount: row.shares,
+        amount: BigNumber.from(row.shares)
+          .mul(BigNumber.from(getBalanceInWei((vault?.tvl || 0).toString())))
+          .div(
+            BigNumber.from(
+              getBalanceInWei((vault?.totalShares || 0).toString())
+            )
+          ),
         tokenId: row.tokenId,
         tokenImg: row.tokenImg,
         isEscrowed: false,
@@ -125,10 +133,10 @@ export default function PrologueNfts({
     const nftPortfolios = getNftPortolios();
 
     if (vaultNftsSortFilter === VaultNftsSortFilter.ValueHighToLow) {
-      return nftPortfolios.sort((a, b) => (a.amount.gte(b.amount) ? 1 : -1));
+      return nftPortfolios.sort((a, b) => (a.amount.gte(b.amount) ? -1 : 1));
     }
     if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
-      return nftPortfolios.sort((a, b) => (a.amount.gt(b.amount) ? -1 : 1));
+      return nftPortfolios.sort((a, b) => (a.amount.gt(b.amount) ? 1 : -1));
     }
     // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
     if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
