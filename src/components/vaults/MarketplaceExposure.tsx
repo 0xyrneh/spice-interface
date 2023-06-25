@@ -232,15 +232,13 @@ export default function MarketplaceExposure({
         )} */}
         <MarketExposureSVG className="text-white" />
         <h2 className="block lg:hidden">
-          {isBreakdown ? "MRKTPLACE" : "MARKET"}
-          {isBreakdown ? " B/D" : " B/D"}
+          {isBreakdown ? "MRKTPLACE B/D" : "MARKET EXP."}
         </h2>
         <h2 className="hidden lg:block xl:hidden">
-          {isBreakdown ? "MRKTPLACE" : "MARKETPLACE"}
-          {isBreakdown ? " BREAKDOWN" : " B/D"}
+          {isBreakdown ? "MRKTPLACE BREAKDOWN" : "MARKETPLACE EXP."}
         </h2>
         <h2 className="hidden xl:block">
-          {`MARKETPLACE ${isBreakdown ? "BREAKDOWN" : "BREAKDOWN"}`}
+          {isBreakdown ? "MARKETPLACE BREAKDOWN" : "MARKETPLACE EXPOSURE"}
         </h2>
         {hasToggle && (
           <button onClick={onSwitchTable}>

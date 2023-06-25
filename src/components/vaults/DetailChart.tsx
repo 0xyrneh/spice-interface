@@ -344,7 +344,13 @@ export default function DetailChart({ vault }: Props) {
       </Card>
       <div className="flex gap-5 h-[37%]  overflow-hidden p-1 -m-1">
         {vault.isBlur ? (
-          <LoanAndBidExposure className="flex-1" small showIcon vault={vault} />
+          <LoanAndBidExposure
+            className="flex-1"
+            small
+            showIcon
+            vault={vault}
+            isBreakdown
+          />
         ) : (
           <>
             <MarketplaceExposure
@@ -352,12 +358,14 @@ export default function DetailChart({ vault }: Props) {
               vault={vault}
               vaults={[]}
               walletConnectRequired={false}
+              isBreakdown
             />
             <CollectionExposure
               className="flex-1"
               vault={vault}
               vaults={[]}
               walletConnectRequired={false}
+              isBreakdown
             />
           </>
         )}

@@ -18,6 +18,7 @@ type Props = {
   showIcon?: boolean;
   nonExpandedClassName?: string;
   className?: string;
+  isBreakdown?: boolean;
 };
 
 export default function LoanAndBidExposure({
@@ -26,6 +27,7 @@ export default function LoanAndBidExposure({
   showIcon,
   className,
   nonExpandedClassName,
+  isBreakdown,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [loans, setLoans] = useState<any[]>([]);
@@ -173,11 +175,11 @@ export default function LoanAndBidExposure({
               small ? "hidden lg:block" : ""
             }`}
           >
-            LOAN & BID EXPOSURE
+            LOAN & BID {isBreakdown ? "BREAKDOWN" : "EXPOSURE"}
           </h2>
           {small && (
             <h2 className="lg:hidden font-bold text-white font-sm">
-              LOAN EXP.
+              LOAN {isBreakdown ? "BREAKDOWN" : "EXP."}
             </h2>
           )}
         </div>

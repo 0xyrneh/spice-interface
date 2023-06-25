@@ -28,6 +28,7 @@ type Props = {
   nonExpandedClassName?: string;
   className?: string;
   walletConnectRequired?: boolean;
+  isBreakdown?: boolean;
 };
 
 export default function LoanBreakdown({
@@ -37,6 +38,7 @@ export default function LoanBreakdown({
   className,
   nonExpandedClassName,
   walletConnectRequired,
+  isBreakdown,
 }: Props) {
   const { setBlur } = useUI();
 
@@ -346,11 +348,11 @@ export default function LoanBreakdown({
               small ? "hidden lg:block" : ""
             }`}
           >
-            LOAN EXPOSURE
+            LOAN {isBreakdown ? "BREAKDOWN" : "EXPOSURE"}
           </h2>
           {small && (
             <h2 className="lg:hidden font-bold text-white font-sm">
-              LOAN EXP.
+              LOAN {isBreakdown ? "BREAKDOWN" : "EXP."}
             </h2>
           )}
         </div>
