@@ -34,9 +34,9 @@ export const VAULT_COLLECTION_COLORS = [
 ];
 
 export const VAULT_BACKGROUND_IMAGES = {
-  flagship: "/assets/images/bg-flagship-vault.png",
-  prologue: "/assets/images/bg-prologue-vault.png",
-  leverage: "/assets/images/bg-leverage-vault.png",
+  flagship: "/assets/images/bg-flagship-vault.jpg",
+  prologue: "/assets/images/bg-prologue-vault.jpg",
+  leverage: "/assets/images/bg-leverage-vault.jpg",
   leverageWithrawOnly: "/assets/images/bg-leverage-vault-withdraw-only.png",
   blur: "/assets/images/bg-blur-vault.png",
 };
