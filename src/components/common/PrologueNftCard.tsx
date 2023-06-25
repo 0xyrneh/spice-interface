@@ -1,5 +1,4 @@
 import { BigNumber } from "ethers";
-import Image from "next/image";
 
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
@@ -7,10 +6,13 @@ import { motion } from "framer-motion";
 import useBreakpoint from "use-breakpoint";
 import { getBalanceInEther } from "@/utils/formatBalance";
 
+import { accLoans } from "@/utils/lend";
 import { PrologueNftInfo } from "@/types/nft";
 import Dropdown from "./Dropdown";
 import { BREAKPOINTS } from "@/constants";
 import { CopyClipboard } from "@/components/common";
+import CircleDotSvg from "@/assets/icons/circle-dot.svg";
+import { useAppSelector } from "@/state/hooks";
 
 type Props = {
   containerClassName?: string;
@@ -44,6 +46,7 @@ export default function PrologueNftCard({
   onClick,
 }: Props) {
   const [dropdownOpened, setDropdownOpened] = useState(false);
+  const { data: lendData } = useAppSelector((state) => state.lend);
 
   const comp = useRef();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
@@ -108,6 +111,31 @@ export default function PrologueNftCard({
 
   const ownerAddr = activeNft?.owner || "";
 
+  const hfClassName = () => {
+    const loans = accLoans(lendData);
+    const loan = loans.find((row) => row.tokenId === activeNft.tokenId);
+    if (!loan) return "";
+
+    const lendGlobalData = lendData.find(
+      (row1: any) => row1.address === loan.lendAddr
+    );
+
+    const value = loan.loan?.tokenAmntInVault || BigNumber.from(0);
+    const debtOwed = loan.loan?.repayAmount || BigNumber.from(0);
+
+    const healthFactor =
+      getBalanceInEther(debtOwed) > 0 && getBalanceInEther(value) > 0
+        ? ((lendGlobalData?.liquidationRatio || 0) * getBalanceInEther(value)) /
+          getBalanceInEther(debtOwed)
+        : 0;
+
+    if (healthFactor === 0) return "";
+    if (healthFactor <= 1.0) return "text-hf-red drop-shadow-hf-red";
+    if (healthFactor <= 1.1) return "text-hf-orange drop-shadow-hf-orange";
+    if (healthFactor <= 1.2) return "text-yellow drop-shadow-yellow";
+    return "text-hf-green drop-shadow-hf-green";
+  };
+
   return (
     <div className={`rounded ${containerClassName} cursor-pointer`}>
       <motion.div
@@ -153,13 +181,9 @@ export default function PrologueNftCard({
           }}
         >
           {activeNft?.isEscrowed && (
-            <Image
-              className="absolute -top-1.5 -left-1.5"
-              src="/assets/icons/circle-dot.svg"
-              width={28}
-              height={28}
-              alt=""
-            />
+            <div className="absolute top-[2px] left-[2px]">
+              <CircleDotSvg className={hfClassName()} />
+            </div>
           )}
           {activeNft?.isEscrowed && (
             <span

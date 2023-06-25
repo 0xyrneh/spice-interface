@@ -572,6 +572,14 @@ export default function LeverageConfirm(props: Props) {
     return 0;
   };
 
+  const hfClassName = () => {
+    if (healthFactor === 0) return "";
+    if (healthFactor <= 1.0) return "text-hf-red drop-shadow-hf-red";
+    if (healthFactor <= 1.1) return "text-hf-orange drop-shadow-hf-orange";
+    if (healthFactor <= 1.2) return "text-yellow drop-shadow-yellow";
+    return "text-hf-green drop-shadow-hf-green";
+  };
+
   return (
     <div className="flex flex-col flex-1 justify-between w-[160px]">
       <h2
@@ -624,6 +632,7 @@ export default function LeverageConfirm(props: Props) {
         <Stats
           type={processing() ? "gray" : "green"}
           className="flex-1"
+          valueClass={hfClassName()}
           title="HF"
           value={`${healthFactor > 0 ? `${healthFactor.toFixed(2)}` : "--"}`}
           size="xs"

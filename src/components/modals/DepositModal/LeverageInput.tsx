@@ -286,7 +286,6 @@ export default function LeverageInput({
   };
 
   const onChangeLeverageTick = (val: number) => {
-    console.log(val);
     setLeverage(val);
 
     if (tab === LeverageTab.LeverUp || tab === LeverageTab.Increase) {

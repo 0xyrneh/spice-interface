@@ -2,6 +2,7 @@ type Props = {
   title: string;
   value: string;
   className?: string;
+  valueClass?: string;
   type?: "green" | "gray" | "orange" | "white";
   size?: "xs" | "sm" | "base" | "lg";
   valueSize?: "xl" | "xs" | "sm" | "base" | "lg";
@@ -29,6 +30,7 @@ export default function Stats({
   title,
   value,
   className,
+  valueClass,
   type,
   size,
   valueSize,
@@ -57,7 +59,7 @@ export default function Stats({
       <span
         className={`font-bold ${valueSize ? "text-" + valueSize : "text-xl"} ${
           valueStyles[type ?? "default"]
-        }`}
+        } ${valueClass}`}
       >
         {value}
       </span>
