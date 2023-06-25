@@ -80,7 +80,13 @@ export default function Vaults() {
                 backgroundPosition: "center",
                 transition: "transform 450ms",
               }}
-              onClick={() => setActiveVaultIndex(index)}
+              onClick={() => {
+                if (activeVaultIndex === index) {
+                  router.push(`/vault/${activeVault.address}`);
+                } else {
+                  setActiveVaultIndex(index);
+                }
+              }}
               onMouseEnter={() => setFocusedVaultIndex(index)}
               onMouseLeave={() => setFocusedVaultIndex(-1)}
             >
