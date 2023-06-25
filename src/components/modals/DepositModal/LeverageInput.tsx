@@ -185,6 +185,10 @@ export default function LeverageInput({
     setMaxLtvToShow(maxLtv);
   }, [maxLtv, processing]);
 
+  useEffect(() => {
+    onChangeTerms(0);
+  }, [tab]);
+
   const getRefinanceApr = () => {
     if (!loanLenderVault) return 0;
 
@@ -243,7 +247,15 @@ export default function LeverageInput({
     if (tab === LeverageTab.Increase && maxLeverage === 0) return;
     if (tab === LeverageTab.Decrease && maxRepayment === 0) return;
 
-    setLeverage(undefined);
+    if (step % 20 === 0) {
+      setLeverage(
+        tab === LeverageTab.Decrease
+          ? decreaseLeverageTicks[step / 20]
+          : increaseLeverageTicks[step / 20]
+      );
+    } else {
+      setLeverage(undefined);
+    }
 
     if (tab === LeverageTab.Increase || tab === LeverageTab.LeverUp) {
       onSetSliderStep(step);
@@ -274,25 +286,17 @@ export default function LeverageInput({
   };
 
   const onChangeLeverageTick = (val: number) => {
+    console.log(val);
     setLeverage(val);
 
-    if (tab === LeverageTab.LeverUp) {
+    if (tab === LeverageTab.LeverUp || tab === LeverageTab.Increase) {
       const step =
         ((val - increaseLeverageTicks[0]) /
           (increaseLeverageTicks[5] - increaseLeverageTicks[0])) *
         100;
       onSetSliderStep(step);
       onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
-    }
-    if (tab === LeverageTab.Increase) {
-      const step =
-        ((val - increaseLeverageTicks[0]) /
-          (increaseLeverageTicks[5] - increaseLeverageTicks[0])) *
-        100;
-      onSetSliderStep(step);
-      onSetTargetAmount(getAmountFromSliderStep(step).toFixed(4));
-    }
-    if (tab === LeverageTab.Decrease) {
+    } else if (tab === LeverageTab.Decrease) {
       const step =
         ((decreaseLeverageTicks[0] - val) /
           (decreaseLeverageTicks[0] - decreaseLeverageTicks[5])) *
