@@ -120,7 +120,6 @@ const getChartData = (data: ChartValue[]) => ({
       data: data.map((item) => item.y),
       borderColor: "#FFE3CA",
       backgroundColor: "#FFE3CA",
-      tension: 0.4,
     },
   ],
 });
