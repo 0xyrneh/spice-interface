@@ -273,7 +273,7 @@ export default function Portfolio() {
                     valueSize="base"
                   />
                   <Stats
-                    title="24 hr Avg Multiplier"
+                    title="Avg Multiplier"
                     value={`${formatNumber(
                       userInfo
                         ? userInfo[5]
@@ -285,7 +285,7 @@ export default function Portfolio() {
                     valueSize="base"
                   />
                   <Stats
-                    title="Points Earned"
+                    title="Lending Pts Earned"
                     value={`${formatNumber(
                       userInfo
                         ? userInfo[3] * userInfo[5]
@@ -353,7 +353,7 @@ export default function Portfolio() {
                 }
               />
               <Stats
-                title="24 hr Avg Multiplier"
+                title="Avg Multiplier"
                 value={`${formatNumber(vaultInfo ? vaultInfo[5] : undefined)}X`}
                 size="xs"
                 valueSize="base"
@@ -364,7 +364,7 @@ export default function Portfolio() {
                 }
               />
               <Stats
-                title="Points Earned"
+                title="Lending Pts Earned"
                 value={`${formatNumber(
                   vaultInfo ? vaultInfo[7] : undefined
                 )}/day`}
