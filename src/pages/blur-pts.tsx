@@ -441,7 +441,7 @@ export default function Portfolio() {
                 </span>{" "}
                 depositing ETH into the SP-BLUR Vault (
                 <span className="font-bold">
-                  {(vaultInfo[2] / userInfo[2]).toFixed(1)}x more efficient)
+                  {(100 * vaultInfo[2] / userInfo[2]).toFixed(0)}% more efficient)
                 </span>{" "}
                 than farming yourself. Will you continue to fade rational
                 decision making anon?{" "}
