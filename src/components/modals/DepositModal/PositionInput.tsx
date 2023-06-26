@@ -1,3 +1,5 @@
+import { BigNumber } from "ethers";
+
 import { Button, Card } from "../../common";
 import WethSVG from "@/assets/icons/weth.svg";
 import EthSVG from "@/assets/icons/eth.svg";
@@ -5,8 +7,18 @@ import TriangleSVG from "@/assets/icons/triangle.svg";
 import { TxStatus } from "@/types/common";
 import { getExpolorerUrl, shortenTxHash } from "@/utils/string";
 import { useAppSelector } from "@/state/hooks";
+import {
+  getVaultLiquidWeth,
+  getVaultNftShare,
+  getVaultWithdrawable,
+} from "@/state/vault/fetchGlobalVault";
+import { VaultInfo } from "@/types/vault";
+import { useEffect } from "react";
 
 type Props = {
+  vault: VaultInfo;
+  lend: any;
+  selectedNft: any;
   isDeposit: boolean;
   useWeth: boolean;
   value: string;
@@ -15,6 +27,8 @@ type Props = {
   balance: string;
   usdVal: string;
   vaultBalance: string;
+  setMaxWithdrawAmnt: (value: BigNumber) => void;
+  setLiquidWeth: (value: BigNumber | undefined) => void;
   setValue: (value: string) => void;
   onMax?: () => void;
   toggleEth: () => void;
@@ -23,10 +37,15 @@ type Props = {
 };
 
 export default function PositionInput({
+  vault,
+  lend,
+  selectedNft,
   isDeposit,
   useWeth,
   toggleEth,
   value,
+  setMaxWithdrawAmnt,
+  setLiquidWeth,
   setValue,
   onMax,
   txStatus,
@@ -40,6 +59,64 @@ export default function PositionInput({
   const processing = () => txStatus === TxStatus.Pending;
 
   const { pendingTxHash, actionError } = useAppSelector((state) => state.modal);
+
+  const isFungible = vault?.fungible;
+
+  const fetchMaxAmount = async () => {
+    if (!vault) return;
+
+    if (isFungible) {
+      const res = await getVaultWithdrawable(
+        vault,
+        vault?.userInfo?.userMaxRedeemable || BigNumber.from(0)
+      );
+      setMaxWithdrawAmnt(res);
+      return;
+    }
+
+    if (selectedNft) {
+      if (selectedNft.loan && selectedNft.loan.balance) {
+        const share = await getVaultNftShare(vault, selectedNft.tokenId);
+        const collateralAmnt = await getVaultWithdrawable(vault, share);
+
+        let lendMaxWithdrawable = collateralAmnt
+          .sub(selectedNft.loan.repayAmount)
+          .sub(
+            BigNumber.from(10000)
+              .mul(selectedNft.loan.repayAmount)
+              .div(BigNumber.from(10000 * (lend?.loanRatio || 0)))
+          );
+        lendMaxWithdrawable = BigNumber.from(99)
+          .mul(lendMaxWithdrawable)
+          .div(BigNumber.from(100));
+        setMaxWithdrawAmnt(lendMaxWithdrawable);
+      } else {
+        const res = await getVaultWithdrawable(
+          vault,
+          selectedNft?.tokenShare || BigNumber.from(0)
+        );
+        setMaxWithdrawAmnt(res);
+      }
+    }
+  };
+
+  const getLiquidWeth = async () => {
+    setLiquidWeth(undefined);
+
+    if (!vault) return;
+
+    const liquidWethBal = await getVaultLiquidWeth(vault);
+    setLiquidWeth(liquidWethBal);
+  };
+
+  useEffect(() => {
+    fetchMaxAmount();
+  }, [vault?.address, lend?.address, selectedNft?.tokenId]);
+
+  useEffect(() => {
+    getLiquidWeth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vault?.address]);
 
   return (
     <div className="flex flex-col px-2 pb-3 flex-1">
