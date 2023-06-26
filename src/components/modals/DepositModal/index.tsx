@@ -610,7 +610,8 @@ export default function DepositModal({
       ? useWeth
         ? userWethBalance
         : userEthBalance
-      : getPositionBalance();
+      : // : maxWithdrawAmnt;
+        getPositionBalance();
   };
 
   const onChangeAmount = (newAmount: string) => {
@@ -622,12 +623,12 @@ export default function DepositModal({
     let newAmountInWei = getBalanceInWei(Number(newAmount).toString() || "0");
     if (newAmountInWei.gt(getBalance())) {
       newAmountInWei = getBalance();
-      if (!isDeposit && !isFungible && liquidWeth) {
+      if (liquidWeth) {
         let max = liquidWeth.gt(newAmountInWei) ? newAmountInWei : liquidWeth;
         max = max.gte(BigNumber.from(0)) ? max : BigNumber.from(0);
         newAmountInWei = max;
       }
-      newAmount = utils.formatEther(newAmountInWei);
+      newAmount = getBalanceInEther(newAmountInWei).toString();
     }
 
     if (newAmountInWei.gt(0)) {
