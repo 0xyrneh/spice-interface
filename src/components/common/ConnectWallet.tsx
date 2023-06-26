@@ -1,8 +1,7 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 
-import { checkIfBlocked } from "@/utils";
 import { Button } from "@/components/common";
 import { useUI } from "@/hooks";
 import { useAppSelector } from "@/state/hooks";
@@ -15,17 +14,16 @@ type Props = {
 };
 
 const ConnectWallet = ({ isHeader }: Props) => {
-  const [blockedRegion, setBlockedRegion] = useState<string>();
   const [showToolTip, setShowToolTip] = useState<boolean>(false);
   const { showConnectModal, showDisconnectModal } = useUI();
 
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
-  const loans = accLoans(lendData);
+  const { geolocation, isBlocked } = useAppSelector(
+    (state) => state.geolocation
+  );
 
-  useEffect(() => {
-    checkIfBlocked().then(setBlockedRegion);
-  }, []);
+  const loans = accLoans(lendData);
 
   const accountImage = () => {
     if (loans.length === 0) {
@@ -39,21 +37,21 @@ const ConnectWallet = ({ isHeader }: Props) => {
   };
 
   const handleMouseEnter = () => {
-    if (!blockedRegion) return;
+    if (!isBlocked) return;
     if (!isHeader) return;
 
     setShowToolTip(true);
   };
 
   const handleMouseLeave = () => {
-    if (!blockedRegion) return;
+    if (!isBlocked) return;
     if (!isHeader) return;
 
     setShowToolTip(false);
   };
 
   const handleConnect = async () => {
-    if (!blockedRegion) {
+    if (isBlocked === false) {
       showConnectModal();
     }
   };
@@ -92,7 +90,7 @@ const ConnectWallet = ({ isHeader }: Props) => {
           <Button
             className="px-2 h-8"
             type="primary"
-            hideHoverStyle={!!blockedRegion}
+            hideHoverStyle={!!geolocation}
             onClick={handleConnect}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -101,7 +99,7 @@ const ConnectWallet = ({ isHeader }: Props) => {
           </Button>
           {showToolTip && (
             <div className="absolute bg-gray-700 bg-opacity-90 top-8 right-0 w-[300px] flex flex-col rounded-l rounded-b border-1 border-warm-gray-50 text-xs text-white p-2">
-              <span>{`You are accessing this website from ${blockedRegion}.`}</span>
+              <span>{`You are accessing this website from ${geolocation}.`}</span>
               <br />
               <span>{`The following countries are geo-blocked: United States, Canada, North Korea, Syria, Iran, Cuba, and Russia. `}</span>
             </div>
