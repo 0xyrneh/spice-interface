@@ -66,12 +66,18 @@ export default function PositionInput({
     if (!vault) return;
 
     if (isFungible) {
-      const res = await getVaultWithdrawable(
-        vault,
-        vault?.userInfo?.userMaxRedeemable || BigNumber.from(0)
-      );
-      setMaxWithdrawAmnt(res);
-      return;
+      if (vault?.isBlur) {
+        setMaxWithdrawAmnt(vault?.userInfo?.depositAmnt);
+        return;
+      } else {
+        const res = await getVaultWithdrawable(
+          vault,
+          vault?.userInfo?.userMaxRedeemable || BigNumber.from(0)
+        );
+
+        setMaxWithdrawAmnt(res);
+        return;
+      }
     }
 
     if (selectedNft) {

@@ -627,6 +627,7 @@ export const getVaultLiquidWeth = async (vault: VaultInfo) => {
   if (!vault?.address) return BigNumber.from(0);
 
   let liquidWeth = vault?.wethBalance || BigNumber.from(0);
+  if (vault?.isBlur) return liquidWeth;
 
   try {
     const underlyingVaults: any[] = await getUnderlyingVaults(vault);
