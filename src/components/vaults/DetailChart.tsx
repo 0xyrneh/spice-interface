@@ -309,6 +309,13 @@ export default function DetailChart({ vault }: Props) {
     );
   };
 
+  const getVaultEstimatedYield = () => {
+    const tvl = getTVL();
+    const apy = getVaultHistoricalApy();
+
+    return (tvl * apy) / 100.0;
+  };
+
   const fetchNoneBlurVaultPosition = async () => {
     const sharesRaw = await getVaultShares(vault.address);
     setNoneBlurVaultShares(
@@ -420,15 +427,21 @@ export default function DetailChart({ vault }: Props) {
             <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
               <div className="hidden 2xl:flex items-center gap-1">
                 <span>1W Est. Yield:</span>
-                <span className="text-white">Ξ25.60</span>
+                <span className="text-white">
+                  Ξ{(getVaultEstimatedYield() / 52).toFixed(2)}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <span>1M Est. Yield:</span>
-                <span className="text-white">Ξ25.60</span>
+                <span className="text-white">
+                  Ξ{(getVaultEstimatedYield() / 12).toFixed(2)}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <span>1Y Est. Yield:</span>
-                <span className="text-white">Ξ25.60</span>
+                <span className="text-white">
+                  Ξ{getVaultEstimatedYield().toFixed(2)}
+                </span>
               </div>
             </div>
           )}
