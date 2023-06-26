@@ -30,7 +30,34 @@ export default function VaultDetails({ vault }: Props) {
     );
   };
 
-  const getExpectedReturn = () => ((vault?.tvl || 0) * (vault?.apr || 0)) / 100;
+  const getAprHistories = () => {
+    const historialRecords = vault?.historicalRecords || [];
+    const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
+    const graphField =
+      activeChainId === 1 ? "assets_per_share" : "expected_return";
+
+    // apr histories
+    const aprHistories = historialRecords
+      .map((row) => ({
+        time: 1000 * Number(row.time) || 0,
+        apr:
+          (activeChainId === 1 ? 1 : 100) *
+          (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
+        assetPerShare:
+          (activeChainId === 1 ? 1 : 100) *
+          (row?.okrs && row?.okrs[graphField] ? row?.okrs[graphField] : 0),
+      }))
+      .reverse()
+      .filter((row) => row.assetPerShare);
+
+    return aprHistories;
+  };
+
+  const getTotalEarnings = () => {
+    const totalShares = (vault.totalShares || 0);
+    const aprHistories = getAprHistories();
+    return totalShares * (aprHistories[aprHistories.length - 1].assetPerShare - aprHistories[0].assetPerShare);
+  };
 
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
@@ -63,7 +90,7 @@ export default function VaultDetails({ vault }: Props) {
             />
             <Stats
               title="Total Earnings"
-              value={`Ξ${getExpectedReturn().toFixed(2)}`}
+              value={`Ξ${getTotalEarnings().toFixed(2)}`}
             />
             <Stats
               title="Historical APY"
