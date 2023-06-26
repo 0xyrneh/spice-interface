@@ -9,10 +9,7 @@ export const checkIfBlocked = async (): Promise<string | undefined> => {
   try {
     const res = await axios.get("https://geolocation-db.com/json/");
 
-    if (blockedLocations.includes(await res.data.country_code)) {
-      return res.data.country_name;
-    }
-    return undefined;
+    return res.data.country_name;
   } catch (err) {
     console.error(err);
   }
