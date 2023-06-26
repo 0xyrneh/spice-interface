@@ -13,13 +13,14 @@ import { BLUR_API_BASE } from "@/config/constants/backend";
 import axios from "axios";
 import {
   DAY_IN_SECONDS,
+  MIN_IN_SECONDS,
   MONTH_IN_SECONDS,
   WEEK_IN_SECONDS,
   YEAR_IN_SECONDS,
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
 import { activeChainId } from "@/utils/web3";
-import { getUserVaultPositions, getUserSpicePositions } from "@/api/subgraph";
+import { getUserVaultShares, getUserSpicePositions } from "@/api/subgraph";
 import { getBalanceInEther } from "@/utils/formatBalance";
 
 type Props = {
@@ -33,12 +34,51 @@ export default function VaultPositionGraph({
   totalPosition,
 }: Props) {
   const [showPosition, setShowPosition] = useState(true);
-  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
+  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Day);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const { account } = useWeb3React();
-  const [noneBlurVaultPositions, setNoneBlurVaultPositions] = useState<any>([]);
+  const [noneBlurVaultShares, setNoneBlurVaultShares] = useState<any>([]);
   const [spiceUserPositions, setSpiceUserPositions] = useState<any>([]);
+
+  const sampleDataByTimeTicks = (originData: any[]) => {
+    if (originData.length === 0) return [];
+    const tick =
+      selectedPeriod === PeriodFilter.Day
+        ? 24 * 60 * MIN_IN_SECONDS * 1000 // 24 hrs
+        : 24 * 60 * MIN_IN_SECONDS * 1000; // 24 hrs
+
+    let startTime = originData[0].x;
+    let endTime = moment().unix() * 1000;
+
+    startTime = Math.floor(startTime / tick) * tick;
+    endTime = Math.floor(endTime / tick) * tick;
+
+    let origin1: any = {};
+    originData.map((row, i) => {
+      origin1 = { ...origin1, [Math.floor(row.x / tick) * tick]: row.y };
+    });
+
+    let result: any[] = [];
+    let prevTick = startTime;
+    let nearTick = startTime;
+
+    while (prevTick < endTime) {
+      if (origin1[prevTick]) {
+        nearTick = prevTick;
+      }
+      result = [
+        ...result,
+        {
+          x: prevTick,
+          y: origin1[nearTick],
+        },
+      ];
+      prevTick += tick;
+    }
+
+    return result;
+  };
 
   const fetchBlurChart = async () => {
     setIsFetching(true);
@@ -77,12 +117,13 @@ export default function VaultPositionGraph({
         })
       );
     } else {
-      const positionsRaw = await getUserVaultPositions(account, vault.address);
-      setNoneBlurVaultPositions(
-        positionsRaw.map((row: any) => {
+      const sharesRaw = await getUserVaultShares(account, vault.address);
+
+      setNoneBlurVaultShares(
+        sharesRaw.map((row: any) => {
           return {
             time: Number(row.date) * 1000,
-            position: getBalanceInEther(row.position),
+            share: getBalanceInEther(row.share),
           };
         })
       );
@@ -100,49 +141,76 @@ export default function VaultPositionGraph({
   const getChartData = () => {
     let chartData: ChartValue[] = [];
 
+    let makeStepLike = false;
     if (vault) {
       if (vault.isBlur) {
         chartData = showPosition
           ? blurChartInfo?.tvlChart ?? []
           : blurChartInfo?.pointsChart ?? [];
       } else {
+        makeStepLike = true;
+        // asset share logic
+        const historialRecords = vault?.historicalRecords || [];
+        const aprField =
+          activeChainId === 1 ? "actual_returns" : "expected_return";
+        const graphField =
+          activeChainId === 1 ? "assets_per_share" : "expected_return";
+
+        // apr histories
+        const aprHistories = historialRecords
+          .map((row) => ({
+            time: 1000 * Number(row.time) || 0,
+            apr:
+              (activeChainId === 1 ? 1 : 100) *
+              (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
+            assetPerShare:
+              (activeChainId === 1 ? 1 : 100) *
+              (row?.okrs && row?.okrs[graphField] ? row?.okrs[graphField] : 0),
+          }))
+          .reverse()
+          .filter((row) => row.assetPerShare);
+
         if (showPosition) {
-          chartData = noneBlurVaultPositions.map((row: any) => {
-            return {
-              x: row.time,
-              y: row.position,
-            };
-          });
-        } else {
-          // asset share logic
-          const historialRecords = vault?.historicalRecords || [];
-          const aprField =
-            activeChainId === 1 ? "actual_returns" : "expected_return";
-          const graphField =
-            activeChainId === 1 ? "assets_per_share" : "expected_return";
-
-          // apr histories
-          const aprHistories = historialRecords
-            .map((row) => ({
-              time: 1000 * Number(row.time) || 0,
-              apr:
-                (activeChainId === 1 ? 1 : 100) *
-                (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
-              assetPerShare:
-                (activeChainId === 1 ? 1 : 100) *
-                (row?.okrs && row?.okrs[graphField]
-                  ? row?.okrs[graphField]
-                  : 0),
-            }))
-            .reverse()
-            .filter((row) => row.assetPerShare);
-
-          chartData = aprHistories.map((row) => {
+          const sharePriceChartData = aprHistories.map((row) => {
             return {
               x: row.time,
               y: row.assetPerShare,
             };
           });
+
+          const shareValueChartData = noneBlurVaultShares.map((row: any) => {
+            return {
+              x: row.time,
+              y: Number(row.share.toFixed(2)),
+            };
+          });
+
+          // historical asset per share price
+          let historicalAssetPreSharePrices: any = {};
+          sampleDataByTimeTicks(sharePriceChartData).map((row, i) => {
+            historicalAssetPreSharePrices = {
+              ...historicalAssetPreSharePrices,
+              [row.x]: row.y,
+            };
+          });
+
+          chartData = sampleDataByTimeTicks(shareValueChartData).map(
+            (row: any) => {
+              return {
+                x: row.x,
+                y: row.y * (historicalAssetPreSharePrices[row.x] || 0),
+              };
+            }
+          );
+        } else {
+          chartData = sampleDataByTimeTicks(
+            aprHistories.map((row) => {
+              return {
+                x: row.time,
+                y: row.assetPerShare,
+              };
+            })
+          );
         }
       }
     } else {
@@ -150,6 +218,7 @@ export default function VaultPositionGraph({
         if (!account) {
           chartData = [];
         } else {
+          makeStepLike = true;
           chartData = spiceUserPositions.map((row: any) => {
             return {
               x: row.time,
@@ -159,6 +228,20 @@ export default function VaultPositionGraph({
         }
       } else {
         chartData = [];
+      }
+    }
+
+    if (makeStepLike) {
+      let temp = chartData;
+      chartData = [];
+      for (let i = 0; i < temp.length; i++) {
+        if (i > 0 && temp[i - 1].y !== temp[i].y) {
+          chartData.push({
+            x: (temp[i].x as number) - 1,
+            y: temp[i - 1].y,
+          });
+        }
+        chartData.push(temp[i]);
       }
     }
 
@@ -221,7 +304,9 @@ export default function VaultPositionGraph({
         <PositionSVG />
         <h2 className="font-bold text-white font-sm">
           {!showPosition
-            ? "ASSETS PER VAULT SHARE"
+            ? vault && vault.isBlur
+              ? "POINTS"
+              : "ASSETS PER VAULT SHARE"
             : vault
             ? `YOUR ${(vault?.readable || "").toUpperCase()} ${
                 vault?.deprecated ? "[WITHDRAW ONLY]" : ""

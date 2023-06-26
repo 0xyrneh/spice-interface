@@ -4,8 +4,8 @@ import { prologueNftSubgraphClient, vaultSubgraphClient } from "./config";
 import {
   userPrologueNftQuery,
   prologueNftQuery,
-  userVaultPositionQuery,
-  vaultPositionQuery,
+  userVaultShareQuery,
+  vaultShareQuery,
   userSpicePositionQuery,
 } from "./queries";
 
@@ -40,12 +40,12 @@ export const getSpiceNfts = async () => {
   }
 };
 
-// vault position
-export const getVaultPositions = async (vaultAddress: string) => {
+// vault shares
+export const getVaultShares = async (vaultAddress: string) => {
   if (!vaultAddress) return [];
   try {
     const result = await vaultSubgraphClient.query({
-      query: gql(vaultPositionQuery),
+      query: gql(vaultShareQuery),
       variables: { cnt: 1000, vaultAddress: vaultAddress.toLowerCase() },
       fetchPolicy: "network-only",
     });
@@ -56,8 +56,8 @@ export const getVaultPositions = async (vaultAddress: string) => {
   }
 };
 
-// user vault position
-export const getUserVaultPositions = async (
+// user vault shares
+export const getUserVaultShares = async (
   userAddress: string,
   vaultAddress: string
 ) => {
@@ -65,7 +65,7 @@ export const getUserVaultPositions = async (
   if (!vaultAddress) return [];
   try {
     const result = await vaultSubgraphClient.query({
-      query: gql(userVaultPositionQuery),
+      query: gql(userVaultShareQuery),
       variables: {
         cnt: 1000,
         userAddress: userAddress.toLowerCase(),
@@ -74,8 +74,8 @@ export const getUserVaultPositions = async (
       fetchPolicy: "network-only",
     });
 
-    const { userHourPositions } = result.data;
-    return userHourPositions || [];
+    const { userVaultHourPositions } = result.data;
+    return userVaultHourPositions || [];
   } catch (err) {
     return [];
   }

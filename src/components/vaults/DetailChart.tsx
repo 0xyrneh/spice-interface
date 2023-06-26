@@ -15,6 +15,7 @@ import { BLUR_API_BASE } from "@/config/constants/backend";
 import axios from "axios";
 import moment from "moment";
 import {
+  MIN_IN_SECONDS,
   DAY_IN_SECONDS,
   MONTH_IN_SECONDS,
   WEEK_IN_SECONDS,
@@ -22,7 +23,7 @@ import {
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
 import { activeChainId } from "@/utils/web3";
-import { getVaultPositions } from "@/api/subgraph";
+import { getVaultShares } from "@/api/subgraph";
 import { getBalanceInEther } from "@/utils/formatBalance";
 
 type Props = {
@@ -31,10 +32,49 @@ type Props = {
 
 export default function DetailChart({ vault }: Props) {
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
-  const [showPerformance, setShowPerformance] = useState(false);
+  const [step, setStep] = useState(0);
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
-  const [noneBlurVaultPositions, setNoneBlurVaultPositions] = useState<any>();
+  const [noneBlurVaultShares, setNoneBlurVaultShares] = useState<any>();
+
+  const sampleDataByTimeTicks = (originData: any[]) => {
+    if (originData.length === 0) return [];
+    const tick =
+      selectedPeriod === PeriodFilter.Day
+        ? 24 * 60 * MIN_IN_SECONDS * 1000 // 24 hrs
+        : 24 * 60 * MIN_IN_SECONDS * 1000; // 24 hrs
+
+    let startTime = originData[0].x;
+    let endTime = moment().unix() * 1000;
+
+    startTime = Math.floor(startTime / tick) * tick;
+    endTime = Math.floor(endTime / tick) * tick;
+
+    let origin1: any = {};
+    originData.map((row, i) => {
+      origin1 = { ...origin1, [Math.floor(row.x / tick) * tick]: row.y };
+    });
+
+    let result: any[] = [];
+    let prevTick = startTime;
+    let nearTick = startTime;
+
+    while (prevTick < endTime) {
+      if (origin1[prevTick]) {
+        nearTick = prevTick;
+      }
+      result = [
+        ...result,
+        {
+          x: prevTick,
+          y: origin1[nearTick],
+        },
+      ];
+      prevTick += tick;
+    }
+
+    return result;
+  };
 
   const fetchBlurChart = async () => {
     setIsFetching(true);
@@ -57,142 +97,232 @@ export default function DetailChart({ vault }: Props) {
     setIsFetching(false);
   };
 
+  const getAprHistories = () => {
+    const historialRecords = vault?.historicalRecords || [];
+    const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
+    const graphField =
+      activeChainId === 1 ? "assets_per_share" : "expected_return";
+
+    // apr histories
+    const aprHistories = historialRecords
+      .map((row) => ({
+        time: 1000 * Number(row.time) || 0,
+        apr:
+          (activeChainId === 1 ? 1 : 100) *
+          (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
+        assetPerShare:
+          (activeChainId === 1 ? 1 : 100) *
+          (row?.okrs && row?.okrs[graphField] ? row?.okrs[graphField] : 0),
+      }))
+      .reverse()
+      .filter((row) => row.assetPerShare);
+
+    return aprHistories;
+  };
+
   const getChartData = () => {
     const currentTime = Math.floor(Date.now() / 1000);
 
-    if (showPerformance) {
-      // show asset per share graph
-      if (vault.isBlur) {
-        const blurTvlChart: ChartValue[] = blurChartInfo?.tvlChart ?? [];
+    // Blur points
+    if (vault.isBlur && step === 0) {
+      const blurPointsChart: ChartValue[] = blurChartInfo?.pointsChart ?? [];
+      if (selectedPeriod === PeriodFilter.Day) {
+        return blurPointsChart.filter((item) => {
+          return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+        });
+      } else if (selectedPeriod === PeriodFilter.Week) {
+        return blurPointsChart.filter((item) => {
+          return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+        });
+      } else if (selectedPeriod === PeriodFilter.Month) {
+        return blurPointsChart.filter((item) => {
+          return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+        });
+      } else if (selectedPeriod === PeriodFilter.Year) {
+        return blurPointsChart.filter((item) => {
+          return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+        });
+      }
+      return blurPointsChart;
+    }
 
-        if (selectedPeriod === PeriodFilter.Day) {
-          return blurTvlChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Week) {
-          return blurTvlChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Month) {
-          return blurTvlChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Year) {
-          return blurTvlChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
-          });
-        }
-        return blurTvlChart;
+    // Blur TVL
+    if (vault.isBlur && step === 1) {
+      const blurTvlChart: ChartValue[] = blurChartInfo?.tvlChart ?? [];
+
+      if (selectedPeriod === PeriodFilter.Day) {
+        return blurTvlChart.filter((item) => {
+          return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+        });
+      } else if (selectedPeriod === PeriodFilter.Week) {
+        return blurTvlChart.filter((item) => {
+          return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+        });
+      } else if (selectedPeriod === PeriodFilter.Month) {
+        return blurTvlChart.filter((item) => {
+          return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+        });
+      } else if (selectedPeriod === PeriodFilter.Year) {
+        return blurTvlChart.filter((item) => {
+          return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+        });
+      }
+      return blurTvlChart;
+    }
+
+    // apr histories
+    const aprHistories = getAprHistories();
+
+    // Assets per share
+    if ((!vault.isBlur && step === 1) || (vault.isBlur && step === 2)) {
+      const chartData = aprHistories.map((row) => {
+        return {
+          x: row.time,
+          y: row.assetPerShare,
+        };
+      });
+
+      if (selectedPeriod === PeriodFilter.All) {
+        return chartData;
+      } else if (selectedPeriod === PeriodFilter.Year) {
+        return chartData.filter((item) => {
+          return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+        });
+      } else if (selectedPeriod === PeriodFilter.Month) {
+        return chartData.filter((item) => {
+          return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+        });
+      } else if (selectedPeriod === PeriodFilter.Week) {
+        return chartData.filter((item) => {
+          return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+        });
       } else {
-        // asset share logic
-        const historialRecords = vault?.historicalRecords || [];
-        const aprField =
-          activeChainId === 1 ? "actual_returns" : "expected_return";
-        const graphField =
-          activeChainId === 1 ? "assets_per_share" : "expected_return";
+        return chartData.filter((item) => {
+          return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+        });
+      }
+    }
 
-        // apr histories
-        const aprHistories = historialRecords
-          .map((row) => ({
-            time: 1000 * Number(row.time) || 0,
-            apr:
-              (activeChainId === 1 ? 1 : 100) *
-              (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
-            assetPerShare:
-              (activeChainId === 1 ? 1 : 100) *
-              (row?.okrs && row?.okrs[graphField] ? row?.okrs[graphField] : 0),
-          }))
-          .reverse()
-          .filter((row) => row.assetPerShare);
+    // Non blur vault TVL
+    const sharePriceChartData = aprHistories.map((row) => {
+      return {
+        x: row.time,
+        y: row.assetPerShare,
+      };
+    });
 
-        const chartData = aprHistories.map((row) => {
+    const shareChartData = noneBlurVaultShares
+      ? noneBlurVaultShares.map((row: any) => {
           return {
             x: row.time,
-            y: row.assetPerShare,
+            y: row.share,
           };
-        });
+        })
+      : [];
 
-        if (selectedPeriod === PeriodFilter.All) {
-          return chartData;
-        } else if (selectedPeriod === PeriodFilter.Year) {
-          return chartData.filter((item) => {
-            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Month) {
-          return chartData.filter((item) => {
-            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Week) {
-          return chartData.filter((item) => {
-            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
-          });
-        } else {
-          return chartData.filter((item) => {
-            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
-          });
-        }
-      }
+    // historical asset per share price
+    let historicalAssetPreSharePrices: any = {};
+    sampleDataByTimeTicks(sharePriceChartData).map((row, i) => {
+      historicalAssetPreSharePrices = {
+        ...historicalAssetPreSharePrices,
+        [row.x]: row.y,
+      };
+    });
+
+    const chartData = sampleDataByTimeTicks(shareChartData).map((row: any) => {
+      return {
+        x: row.x,
+        y: row.y * (historicalAssetPreSharePrices[row.x] || 0),
+      };
+    });
+
+    if (selectedPeriod === PeriodFilter.All) {
+      return chartData;
+    } else if (selectedPeriod === PeriodFilter.Year) {
+      return chartData.filter((item: any) => {
+        return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+      });
+    } else if (selectedPeriod === PeriodFilter.Month) {
+      return chartData.filter((item: any) => {
+        return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+      });
+    } else if (selectedPeriod === PeriodFilter.Week) {
+      return chartData.filter((item: any) => {
+        return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+      });
     } else {
-      if (vault.isBlur) {
-        const blurPointsChart: ChartValue[] = blurChartInfo?.pointsChart ?? [];
-        if (selectedPeriod === PeriodFilter.Day) {
-          return blurPointsChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Week) {
-          return blurPointsChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Month) {
-          return blurPointsChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Year) {
-          return blurPointsChart.filter((item) => {
-            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
-          });
-        }
-        return blurPointsChart;
-      } else {
-        const chartData = noneBlurVaultPositions
-          ? noneBlurVaultPositions.map((row: any) => {
-              return {
-                x: row.time,
-                y: row.position,
-              };
-            })
-          : [];
-
-        if (selectedPeriod === PeriodFilter.All) {
-          return chartData;
-        } else if (selectedPeriod === PeriodFilter.Year) {
-          return chartData.filter((item: any) => {
-            return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Month) {
-          return chartData.filter((item: any) => {
-            return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
-          });
-        } else if (selectedPeriod === PeriodFilter.Week) {
-          return chartData.filter((item: any) => {
-            return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
-          });
-        } else {
-          return chartData.filter((item: any) => {
-            return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
-          });
-        }
-      }
+      return chartData.filter((item: any) => {
+        return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+      });
     }
   };
 
+  const getTVL = () => {
+    if (vault.isBlur) {
+      return blurChartInfo.tvl;
+    }
+
+    const aprHistories = getAprHistories();
+
+    const sharePriceChartData = aprHistories.map((row) => {
+      return {
+        x: row.time,
+        y: row.assetPerShare,
+      };
+    });
+
+    const shareChartData = noneBlurVaultShares
+      ? noneBlurVaultShares.map((row: any) => {
+          return {
+            x: row.time,
+            y: row.share,
+          };
+        })
+      : [];
+
+    // historical asset per share price
+    let historicalAssetPreSharePrices: any = {};
+    sampleDataByTimeTicks(sharePriceChartData).map((row, i) => {
+      historicalAssetPreSharePrices = {
+        ...historicalAssetPreSharePrices,
+        [row.x]: row.y,
+      };
+    });
+
+    const chartData = sampleDataByTimeTicks(shareChartData).map((row: any) => {
+      return {
+        x: row.x,
+        y: row.y * (historicalAssetPreSharePrices[row.x] || 0),
+      };
+    });
+
+    return chartData.length === 0
+      ? 0
+      : (chartData[chartData.length - 1].y as number);
+  };
+
+  const getVaultHistoricalApy = () => {
+    const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
+    return (
+      (activeChainId === 1 ? 1 : 100) *
+      (vault?.okrs ? vault?.okrs[aprField] : 0)
+    );
+  };
+
+  const getVaultEstimatedYield = () => {
+    const tvl = getTVL();
+    const apy = getVaultHistoricalApy();
+
+    return (tvl * apy) / 100.0;
+  };
+
   const fetchNoneBlurVaultPosition = async () => {
-    const positionsRaw = await getVaultPositions(vault.address);
-    setNoneBlurVaultPositions(
-      positionsRaw.map((row: any) => {
+    const sharesRaw = await getVaultShares(vault.address);
+    setNoneBlurVaultShares(
+      sharesRaw.map((row: any) => {
         return {
           time: Number(row.date) * 1000,
-          position: getBalanceInEther(row.position),
+          share: getBalanceInEther(row.share),
         };
       })
     );
@@ -212,33 +342,54 @@ export default function DetailChart({ vault }: Props) {
         <div className="flex items-center gap-2.5">
           <TvlSVG />
           <h2 className="font-bold text-white font-sm">
-            {showPerformance
-              ? vault.isBlur
+            {vault.isBlur
+              ? step === 0
+                ? "SP-BLUR ACCUMULATED"
+                : step === 1
                 ? "TOTAL VALUE LOCKED"
                 : "ASSETS PER VAULT SHARE"
-              : vault.isBlur
-              ? "SP-BLUR ACCUMULATED"
-              : "TOTAL VALUE LOCKED"}
+              : step === 0
+              ? "TOTAL VALUE LOCKED"
+              : "ASSETS PER VAULT SHARE"}
           </h2>
-          <button onClick={() => setShowPerformance(!showPerformance)}>
-            <SortUpSVG
-              className={`text-gray-100 hover:text-white ${
-                showPerformance ? "rotate-180" : ""
-              }`}
-            />
-          </button>
+          {vault.isBlur ? (
+            <div className="flex items-center gap-[4px]">
+              {[0, 1, 2].map((val) => (
+                <div
+                  className={`w-[24px] h-[8px] rounded-full cursor-pointer ${
+                    step === val
+                      ? "bg-orange-200 box-shadow-orange-200"
+                      : "bg-gray-200"
+                  }`}
+                  key={val}
+                  onClick={() => setStep(val)}
+                />
+              ))}
+            </div>
+          ) : (
+            <button onClick={() => setStep(1 - step)}>
+              <SortUpSVG
+                className={`text-gray-100 hover:text-white ${
+                  step === 1 ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+          )}
         </div>
         <div className="flex items-end justify-between text-gray-200 px-12">
           <div className="flex gap-4 items-center">
-            {!showPerformance && vault.isBlur ? (
+            {vault.isBlur && step === 0 ? (
               <Stats
                 title="SP-BLUR"
                 value={(blurChartInfo?.totalSpPoints ?? 0).toFixed(2)}
               />
             ) : (
               <>
-                <Stats title="Vault TVL" value="Ξ30.0" />
-                <Stats title="Vault APY" value="16.0%" />
+                <Stats title="Vault TVL" value={`Ξ${getTVL().toFixed(2)}`} />
+                <Stats
+                  title="Vault APY"
+                  value={`${getVaultHistoricalApy().toFixed(2)}%`}
+                />
               </>
             )}
           </div>
@@ -276,15 +427,21 @@ export default function DetailChart({ vault }: Props) {
             <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
               <div className="hidden 2xl:flex items-center gap-1">
                 <span>1W Est. Yield:</span>
-                <span className="text-white">Ξ25.60</span>
+                <span className="text-white">
+                  Ξ{(getVaultEstimatedYield() / 52).toFixed(2)}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <span>1M Est. Yield:</span>
-                <span className="text-white">Ξ25.60</span>
+                <span className="text-white">
+                  Ξ{(getVaultEstimatedYield() / 12).toFixed(2)}
+                </span>
               </div>
               <div className="flex items-center gap-1">
                 <span>1Y Est. Yield:</span>
-                <span className="text-white">Ξ25.60</span>
+                <span className="text-white">
+                  Ξ{getVaultEstimatedYield().toFixed(2)}
+                </span>
               </div>
             </div>
           )}
@@ -295,28 +452,11 @@ export default function DetailChart({ vault }: Props) {
               data={getChartData()}
               period={selectedPeriod}
               yPrefix={
-                showPerformance
-                  ? !vault.isBlur
-                    ? ""
-                    : "Ξ"
-                  : vault.isBlur
-                  ? ""
-                  : "Ξ"
+                (vault.isBlur && step === 1) || (!vault.isBlur && step === 0)
+                  ? "Ξ"
+                  : ""
               }
             />
-            {showPerformance ? (
-              <LineChart
-                data={getChartData()}
-                period={selectedPeriod}
-                yPrefix={vault.isBlur ? "Ξ" : ""}
-              />
-            ) : (
-              <LineChart
-                data={getChartData()}
-                period={selectedPeriod}
-                yPrefix={vault.isBlur ? "" : "Ξ"}
-              />
-            )}
           </div>
           <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
             {[
