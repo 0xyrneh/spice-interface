@@ -602,7 +602,9 @@ export default function DepositModal({
   };
 
   const getPositionBalance = () => {
-    return isFungible ? vault.userInfo.depositAmnt : maxWithdrawAmnt;
+    return isFungible
+      ? vault.userInfo.depositAmnt
+      : selectedNft?.amount || BigNumber.from("0");
   };
 
   const getBalance = () => {
@@ -610,8 +612,15 @@ export default function DepositModal({
       ? useWeth
         ? userWethBalance
         : userEthBalance
-      : // : maxWithdrawAmnt;
-        getPositionBalance();
+      : getPositionBalance();
+  };
+
+  const getMaxAmnt = () => {
+    return isDeposit
+      ? useWeth
+        ? userWethBalance
+        : userEthBalance
+      : maxWithdrawAmnt;
   };
 
   const onChangeAmount = (newAmount: string) => {
@@ -621,8 +630,8 @@ export default function DepositModal({
 
     if (!isValidNumber(newAmount)) return;
     let newAmountInWei = getBalanceInWei(Number(newAmount).toString() || "0");
-    if (newAmountInWei.gt(getBalance())) {
-      newAmountInWei = getBalance();
+    if (newAmountInWei.gt(getMaxAmnt())) {
+      newAmountInWei = getMaxAmnt();
       if (liquidWeth) {
         let max = liquidWeth.gt(newAmountInWei) ? newAmountInWei : liquidWeth;
         max = max.gte(BigNumber.from(0)) ? max : BigNumber.from(0);
