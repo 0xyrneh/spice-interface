@@ -10,6 +10,7 @@ import { VaultSearch, ConnectWallet } from "@/components/common";
 import { NAV_OPTIONS } from "@/constants";
 import { useUI } from "@/hooks";
 import {
+  fetchGeolocation,
   fetchVaultGlobalDataAsync,
   fetchLendGlobalDataAsync,
   fetchNftGlobalDataAsync,
@@ -36,6 +37,7 @@ const Header = () => {
 
   const { account, chainId } = useWeb3React();
   const { vaults, defaultVault } = useAppSelector((state) => state.vault);
+  const { isBlocked } = useAppSelector((state) => state.geolocation);
   const router = useRouter();
   const { blur, showTosModal } = useUI();
   const lendAddrs = getSpiceFiLendingAddresses();
@@ -50,11 +52,13 @@ const Header = () => {
   }, [chainId, activeChainId]);
 
   const persistConnect = () => {
-    const connectorId = window.localStorage.getItem(
-      connectorLocalStorageKey
-    ) as ConnectorNames;
-    if (connectorId) {
-      login(connectorId);
+    if (isBlocked === false) {
+      const connectorId = window.localStorage.getItem(
+        connectorLocalStorageKey
+      ) as ConnectorNames;
+      if (connectorId) {
+        login(connectorId);
+      }
     }
   };
 
@@ -66,6 +70,8 @@ const Header = () => {
   };
 
   useEffect(() => {
+    dispatch(fetchGeolocation());
+
     if (!window.localStorage.getItem("tos")) {
       showTosModal();
     }
@@ -80,7 +86,7 @@ const Header = () => {
   useEffect(() => {
     persistConnect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isBlocked]);
 
   useEffect(() => {
     if (vaults.length === 0) return;

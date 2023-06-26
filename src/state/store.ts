@@ -6,6 +6,7 @@ import lend from "./lend/lendSlice";
 import nft from "./nft/nftSlice";
 import modal from "./modal/modalSlice";
 import oracle from "./oracle/oracleSlice";
+import geolocation from "./geoLocation/geoLocationSlice";
 
 const customizedMiddleware = getDefaultMiddleware({
   serializableCheck: false,
@@ -18,6 +19,7 @@ export const store = configureStore({
     nft,
     modal,
     oracle,
+    geolocation,
   },
   middleware: customizedMiddleware,
   devTools: process.env.NODE_ENV !== "production",

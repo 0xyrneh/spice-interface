@@ -19,4 +19,6 @@ export {
   fetchCollectionsGlobalDataAsync,
 } from "./nft/nftSlice";
 
+export { fetchGeolocation } from "./geoLocation/geoLocationSlice";
+
 export {};
