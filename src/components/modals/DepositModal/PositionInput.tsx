@@ -4,13 +4,13 @@ import EthSVG from "@/assets/icons/eth.svg";
 import TriangleSVG from "@/assets/icons/triangle.svg";
 import { TxStatus } from "@/types/common";
 import { getExpolorerUrl, shortenTxHash } from "@/utils/string";
+import { useAppSelector } from "@/state/hooks";
 
 type Props = {
   isDeposit: boolean;
   useWeth: boolean;
   value: string;
   txStatus: TxStatus;
-  txHash?: string;
   showTooltip?: boolean;
   balance: string;
   usdVal: string;
@@ -29,7 +29,6 @@ export default function PositionInput({
   value,
   setValue,
   onMax,
-  txHash,
   txStatus,
   onFocus,
   onBlur,
@@ -39,6 +38,8 @@ export default function PositionInput({
   vaultBalance,
 }: Props) {
   const processing = () => txStatus === TxStatus.Pending;
+
+  const { pendingTxHash, actionError } = useAppSelector((state) => state.modal);
 
   return (
     <div className="flex flex-col px-2 pb-3 flex-1">
@@ -96,19 +97,36 @@ export default function PositionInput({
         </Card>
       </div>
       <div className="flex justify-between text-gray-200 text-xs">
-        <span className={`${txHash ? "opacity-100" : "opacity-0"}`}>
-          Tx Hash:{" "}
-          {txHash && (
+        <span className={`${pendingTxHash ? "opacity-100" : "opacity-0"}`}>
+          {` Tx Hash: `}
+          {pendingTxHash && (
             <a
               className="underline"
-              href={getExpolorerUrl(txHash)}
+              href={getExpolorerUrl(pendingTxHash)}
               target="__blank"
             >
-              {shortenTxHash(txHash, 8)}
+              {shortenTxHash(pendingTxHash, 8)}
             </a>
           )}
         </span>
-        {!isDeposit && <span>Vault Liquid Balance: Ξ{vaultBalance}</span>}
+        {isDeposit && (
+          <>
+            {actionError && (
+              <span className="text-red">{`ERROR: ${actionError}`}</span>
+            )}
+          </>
+        )}
+        {!isDeposit && (
+          <>
+            {actionError ? (
+              <span className="text-red">{`ERROR: ${actionError}`}</span>
+            ) : (
+              <span>
+                <span>Vault Liquid Balance: Ξ{vaultBalance}</span>
+              </span>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

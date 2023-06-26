@@ -31,6 +31,7 @@ import {
 } from "@/state/modal/modalSlice";
 import { calculateBorrowApr, getNetApy } from "@/utils/apy";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
+import { getTransactionByHash } from "@/utils/tenderly";
 
 interface Props extends ModalProps {
   vaultId: string;
@@ -493,11 +494,18 @@ export default function DepositModal({
         }
         dispatch(setPendingTxHash(""));
         dispatch(fetchVaultUserDataAsync(account, vault));
-      } catch (err) {
+      } catch (err: any) {
         setPositionStatus(TxStatus.None);
         setOldPosition("");
         setPositionChange("");
         setNewPosition("");
+
+        if (err.code) {
+          dispatch(setActionError(err.code));
+        } else {
+          const failedReason = await getTransactionByHash(pendingTxHash);
+          dispatch(setActionError(failedReason));
+        }
       }
     } else if (positionStatus === TxStatus.Finish) {
       reset();
@@ -928,7 +936,6 @@ export default function DepositModal({
                 setValue={onChangeAmount}
                 onMax={onClickMax}
                 txStatus={positionStatus}
-                txHash={pendingTxHash}
                 showTooltip={tooltipVisible}
                 onFocus={() => setFocused(true)}
                 balance={getBalanceInEther(getBalance()).toFixed(5)}
