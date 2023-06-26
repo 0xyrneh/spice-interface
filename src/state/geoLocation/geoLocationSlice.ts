@@ -1,8 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
 import { Geolocation } from "@/types/geolocation";
-import { checkIfBlocked } from "@/utils";
-import { GEOLOCATION_BLACKLIST } from "@/config/constants";
+import {
+  GEOLOCATION_API_KEY,
+  GEOLOCATION_API_URL,
+  GEOLOCATION_BLACKLIST,
+} from "@/config/constants";
 
 const initialState: Geolocation = {
   geolocation: "",
@@ -28,8 +32,13 @@ export const { setGeolocation } = geolocationSlice.actions;
 
 export const fetchGeolocation = () => async (dispatch: any) => {
   try {
-    const location = await checkIfBlocked();
-    dispatch(setGeolocation(location));
+    const res = await axios.get(
+      `${GEOLOCATION_API_URL}?api_key=${GEOLOCATION_API_KEY}`
+    );
+
+    if (res.status === 200) {
+      dispatch(setGeolocation(res.data.country));
+    }
   } catch (err: any) {
     console.log("Geolocation API call error:", err);
   }
