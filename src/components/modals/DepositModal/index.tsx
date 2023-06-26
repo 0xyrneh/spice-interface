@@ -31,6 +31,7 @@ import {
 } from "@/state/modal/modalSlice";
 import { calculateBorrowApr, getNetApy } from "@/utils/apy";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
+import { getTransactionByHash } from "@/utils/tenderly";
 
 interface Props extends ModalProps {
   vaultId: string;
@@ -65,6 +66,11 @@ export default function DepositModal({
   const [oldPosition, setOldPosition] = useState("");
   const [positionChange, setPositionChange] = useState("");
   const [newPosition, setNewPosition] = useState("");
+  const [maxWithdrawAmnt, setMaxWithdrawAmnt] = useState<BigNumber>(
+    BigNumber.from(0)
+  );
+  const [liquidWeth, setLiquidWeth] = useState<BigNumber | undefined>();
+
   // leverage handling
   const [leverageApproveRequired, setLeverageApproveRequired] = useState(false);
   const [loanLender, setLoanLender] = useState<string>("");
@@ -115,6 +121,9 @@ export default function DepositModal({
   } = useNftVault(vault.address);
 
   const isDeprecatedVault = vault?.deprecated;
+  const currentLend = lendData.find(
+    (row: any) => row.address === selectedNft?.lendAddr
+  );
 
   const getNftPortfolios = useCallback((): PrologueNftPortofolioInfo[] => {
     if (!account) {
@@ -247,9 +256,6 @@ export default function DepositModal({
     const { repayAmount, balance } = selectedNft?.loan;
 
     const collateralValue = getBalanceInEther(selectedNft.value);
-    const currentLend = lendData.find(
-      (row: any) => row.address === selectedNft?.lendAddr
-    );
     const loanValue = getBalanceInEther(balance || BigNumber.from(0));
     const repayValue = getBalanceInEther(repayAmount || BigNumber.from(0));
     const originMaxLtv = currentLend?.loanRatio || 0;
@@ -287,9 +293,6 @@ export default function DepositModal({
     const { repayAmount, balance } = selectedNft?.loan;
 
     const collateralValue = getBalanceInEther(selectedNft.value);
-    const currentLend = lendData.find(
-      (row: any) => row.address === selectedNft?.lendAddr
-    );
     const loanValue = getBalanceInEther(balance || BigNumber.from(0));
     const repayValue = getBalanceInEther(repayAmount || BigNumber.from(0));
     const originMaxLtv = currentLend?.loanRatio || 0;
@@ -493,11 +496,18 @@ export default function DepositModal({
         }
         dispatch(setPendingTxHash(""));
         dispatch(fetchVaultUserDataAsync(account, vault));
-      } catch (err) {
+      } catch (err: any) {
         setPositionStatus(TxStatus.None);
         setOldPosition("");
         setPositionChange("");
         setNewPosition("");
+
+        if (err.code) {
+          dispatch(setActionError(err.code));
+        } else {
+          const failedReason = await getTransactionByHash(pendingTxHash);
+          dispatch(setActionError(failedReason));
+        }
       }
     } else if (positionStatus === TxStatus.Finish) {
       reset();
@@ -605,16 +615,31 @@ export default function DepositModal({
       : getPositionBalance();
   };
 
+  const getMaxAmnt = () => {
+    return isDeposit
+      ? useWeth
+        ? userWethBalance
+        : userEthBalance
+      : maxWithdrawAmnt;
+  };
+
   const onChangeAmount = (newAmount: string) => {
     while (newAmount.split(".").length - 1 > 1 && newAmount.endsWith(".")) {
       newAmount = newAmount.split(".").slice(0, 2).join(".");
     }
+
     if (!isValidNumber(newAmount)) return;
     let newAmountInWei = getBalanceInWei(Number(newAmount).toString() || "0");
-    if (newAmountInWei.gt(getBalance())) {
-      newAmountInWei = getBalance();
-      newAmount = utils.formatEther(newAmountInWei);
+    if (newAmountInWei.gt(getMaxAmnt())) {
+      newAmountInWei = getMaxAmnt();
+      if (liquidWeth) {
+        let max = liquidWeth.gt(newAmountInWei) ? newAmountInWei : liquidWeth;
+        max = max.gte(BigNumber.from(0)) ? max : BigNumber.from(0);
+        newAmountInWei = max;
+      }
+      newAmount = getBalanceInEther(newAmountInWei).toString();
     }
+
     if (newAmountInWei.gt(0)) {
       const parts = newAmount.split(".");
       const decimalPart = parts[1];
@@ -624,6 +649,7 @@ export default function DepositModal({
         newAmount = parts.join(".") + "...";
       }
     }
+
     setPositionAmount(newAmount);
     setAmountInWei(newAmountInWei);
   };
@@ -648,9 +674,7 @@ export default function DepositModal({
       leverageTab === LeverageTab.LeverUp
         ? leverageVaults.find((row: any) => !row.deprecated)
         : leverageVaults.find((row: any) => row.address === loanLender);
-    const currentLend = lendData.find(
-      (row: any) => row.address === selectedNft?.lendAddr
-    );
+
     if (!loanLenderVault) return 0;
 
     const collateralValue = getBalanceInEther(selectedNft.value);
@@ -922,13 +946,17 @@ export default function DepositModal({
               </div>
               <PositionInput
                 isDeposit={isDeposit}
+                vault={vault}
+                lend={currentLend}
+                selectedNft={selectedNft}
                 useWeth={useWeth}
                 toggleEth={() => setUseWeth(!useWeth)}
                 value={positionAmount}
                 setValue={onChangeAmount}
+                setLiquidWeth={setLiquidWeth}
+                setMaxWithdrawAmnt={setMaxWithdrawAmnt}
                 onMax={onClickMax}
                 txStatus={positionStatus}
-                txHash={pendingTxHash}
                 showTooltip={tooltipVisible}
                 onFocus={() => setFocused(true)}
                 balance={getBalanceInEther(getBalance()).toFixed(5)}
@@ -936,7 +964,7 @@ export default function DepositModal({
                   2
                 )}
                 vaultBalance={getBalanceInEther(
-                  vault.wethBalance || BigNumber.from(0)
+                  liquidWeth || BigNumber.from(0)
                 ).toFixed(2)}
               />
             </>
