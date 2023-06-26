@@ -94,16 +94,26 @@ export default function Portfolio() {
   const fetchBlurBalance = async (addr: string) => {
     if (!DEFAULT_BLUR_VAULT[activeChainId]) return;
 
-    const [balance] = await multicall(VaultAbi, [
+    const [balance, totalAssets, totalSupply] = await multicall(VaultAbi, [
       {
         address: DEFAULT_BLUR_VAULT[activeChainId],
         name: "balanceOf",
         params: [addr],
       },
+      {
+        address: DEFAULT_BLUR_VAULT[activeChainId],
+        name: "totalAssets",
+        params: [],
+      },
+      {
+        address: DEFAULT_BLUR_VAULT[activeChainId],
+        name: "totalSupply",
+        params: [],
+      },
     ]);
 
     setIsInBlur(!balance[0].eq(0));
-    setBlurBalance(getBalanceInEther(balance[0]));
+    setBlurBalance(getBalanceInEther(balance[0]) * getBalanceInEther(totalAssets[0]) / getBalanceInEther(totalSupply[0]));
   };
 
   const formatNumber = (val: any, digits = 2) => {
