@@ -51,7 +51,7 @@ const ConnectWallet = ({ isHeader }: Props) => {
   };
 
   const handleConnect = async () => {
-    if (!isBlocked) {
+    if (isBlocked === false) {
       showConnectModal();
     }
   };
