@@ -5,7 +5,7 @@ import {
   userPrologueNftQuery,
   prologueNftQuery,
   userVaultShareQuery,
-  vaultPositionQuery,
+  vaultShareQuery,
   userSpicePositionQuery,
 } from "./queries";
 
@@ -40,12 +40,12 @@ export const getSpiceNfts = async () => {
   }
 };
 
-// vault position
-export const getVaultPositions = async (vaultAddress: string) => {
+// vault shares
+export const getVaultShares = async (vaultAddress: string) => {
   if (!vaultAddress) return [];
   try {
     const result = await vaultSubgraphClient.query({
-      query: gql(vaultPositionQuery),
+      query: gql(vaultShareQuery),
       variables: { cnt: 1000, vaultAddress: vaultAddress.toLowerCase() },
       fetchPolicy: "network-only",
     });

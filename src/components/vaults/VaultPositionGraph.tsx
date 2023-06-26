@@ -38,7 +38,6 @@ export default function VaultPositionGraph({
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const { account } = useWeb3React();
-  const [noneBlurVaultPositions, setNoneBlurVaultPositions] = useState<any>([]);
   const [noneBlurVaultShares, setNoneBlurVaultShares] = useState<any>([]);
   const [spiceUserPositions, setSpiceUserPositions] = useState<any>([]);
 
