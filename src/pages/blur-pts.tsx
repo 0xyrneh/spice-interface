@@ -204,7 +204,7 @@ export default function Portfolio() {
             <div className="flex items-center gap-2.5 text-white">
               <GameSVG />
               <h2 className="font-bold text-white font-sm">
-                HOW GOOD ARE YOU AT FARMING BLUR PTS?
+                HOW GOOD ARE YOU AT FARMING BLUR LENDING PTS?
               </h2>
             </div>
           </div>
@@ -273,7 +273,7 @@ export default function Portfolio() {
                     valueSize="base"
                   />
                   <Stats
-                    title="Multiplier"
+                    title="24 hr Avg Multiplier"
                     value={`${formatNumber(
                       userInfo
                         ? userInfo[5]
@@ -353,7 +353,7 @@ export default function Portfolio() {
                 }
               />
               <Stats
-                title="Multiplier"
+                title="24 hr Avg Multiplier"
                 value={`${formatNumber(vaultInfo ? vaultInfo[5] : undefined)}X`}
                 size="xs"
                 valueSize="base"
@@ -394,7 +394,7 @@ export default function Portfolio() {
             <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
               You&apos;re already in the SP-BLUR Vault! You could be earning{" "}
               <span className="font-bold">
-                {(balance * vaultInfo[2]).toFixed(3)} MORE BLUR POINTS PER DAY
+                {(balance * vaultInfo[2]).toFixed(3)} MORE BLUR LENDING POINTS PER DAY
               </span>{" "}
               depositing your current wallet balance. Will you continue to fade
               rational decision making anon?{" "}
@@ -412,9 +412,9 @@ export default function Portfolio() {
             vaultInfo &&
             (!userInfo || !userInfo[7]) && (
               <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
-                You currently has zero Blur Points. You can be earning{" "}
+                You currently have zero Blur Lending Points. You can be earning{" "}
                 <span className="font-bold">
-                  {(balance * vaultInfo[2]).toFixed(3)} BLUR POINTS PER DAY
+                  {(balance * vaultInfo[2]).toFixed(3)} BLUR LENDING POINTS PER DAY
                 </span>{" "}
                 by depositing the {balance.toFixed(3)} ETH in YOUR wallet into
                 the SP-BLUR Vault. Will you continue to fade rational decision
@@ -437,7 +437,7 @@ export default function Portfolio() {
               <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
                 You would have earned{" "}
                 <span className="font-bold">
-                  {earnedPoints.toFixed(2)} MORE BLUR POINTS PER DAY
+                  {earnedPoints.toFixed(2)} MORE BLUR LENDING POINTS PER DAY
                 </span>{" "}
                 depositing ETH into the SP-BLUR Vault (
                 <span className="font-bold">
@@ -462,7 +462,7 @@ export default function Portfolio() {
               <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
                 You are earning{" "}
                 <span className="font-bold">
-                  {Math.abs(earnedPoints).toFixed(2)} MORE BLUR POINTS PER DAY
+                  {Math.abs(earnedPoints).toFixed(2)} MORE BLUR LENDING POINTS PER DAY
                 </span>{" "}
                 farming yourself vs depositing ETH into the SP-BLUR Vault. Do
                 you want to continue spending the time farming yourself?{" "}
