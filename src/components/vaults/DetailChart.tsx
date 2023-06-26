@@ -204,6 +204,14 @@ export default function DetailChart({ vault }: Props) {
       return chartData.length === 0 ? 0 : chartData[chartData.length - 1].y as number;
   };
 
+  const getVaultHistoricalApy = () => {
+    const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
+    return (
+      (activeChainId === 1 ? 1 : 100) *
+      (vault?.okrs ? vault?.okrs[aprField] : 0)
+    );
+  };
+
   const fetchNoneBlurVaultPosition = async () => {
     const positionsRaw = await getVaultPositions(vault.address);
     setNoneBlurVaultPositions(
@@ -274,7 +282,7 @@ export default function DetailChart({ vault }: Props) {
             ) : (
               <>
                 <Stats title="Vault TVL" value={`Ξ${getTVL().toFixed(2)}`} />
-                <Stats title="Vault APY" value="16.0%" />
+                <Stats title="Vault APY" value={`${getVaultHistoricalApy().toFixed(2)}%`} />
               </>
             )}
           </div>
