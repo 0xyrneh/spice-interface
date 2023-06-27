@@ -58,7 +58,7 @@ export default function DetailChart({ vault }: Props) {
     let prevTick = startTime;
     let nearTick = startTime;
 
-    while (prevTick < endTime) {
+    while (prevTick <= endTime) {
       if (origin1[prevTick]) {
         nearTick = prevTick;
       }
