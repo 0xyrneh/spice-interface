@@ -23,9 +23,6 @@ import {
   VAULT_REQUIREMENTS,
   VAULT_RISK,
 } from "@/constants/vaults";
-import { getNFTMarketplaceDisplayName } from "@/utils/nft";
-import { COLLECTION_API_BASE } from "@/config/constants/backend";
-import { getNFTCollectionDisplayName } from "@/utils/nft";
 
 const apiEnv = activeChainId === 1 ? "prod" : "goerli";
 
@@ -113,106 +110,6 @@ export const fetchActiveVaults = async (vaults: any[]) => {
       })
     );
 
-    // marketplace exposures
-    const vaultMarketplaceExposures = await Promise.all(
-      vaultsWithDetails.map(async (vault: VaultInfo) => {
-        const protocolAllocationsOrigin =
-          vault?.okrs?.protocol_allocations || {};
-        const protocolAllocations0 = Object.keys(protocolAllocationsOrigin)
-          .map((key) => ({
-            name: key,
-            allocation: protocolAllocationsOrigin[key],
-          }))
-          .sort((a, b) => (a.allocation >= b.allocation ? -1 : 1));
-
-        // fetch bidder vault data
-        let protocolAllocations1: any[] = [];
-        await Promise.all(
-          protocolAllocations0.map(async (row: any) => {
-            if (row?.name && row?.name.toLowerCase().includes("spice-")) {
-              const res = await axios.get(`${VAULT_API}/result/${row.name}`);
-              if (res.status === 200) {
-                const bidderVaultProtocolAllocations =
-                  res.data?.data?.okrs?.protocol_allocations;
-                if (Object.keys(bidderVaultProtocolAllocations).length > 0) {
-                  Object.keys(bidderVaultProtocolAllocations).map((key) => {
-                    protocolAllocations1 = [
-                      ...protocolAllocations1,
-                      {
-                        name: key,
-                        allocation:
-                          bidderVaultProtocolAllocations[key] * row.allocation,
-                      },
-                    ];
-                    return key;
-                  });
-                }
-              } else {
-                protocolAllocations1 = [...protocolAllocations1, row];
-              }
-              return row;
-            }
-            protocolAllocations1 = [...protocolAllocations1, row];
-            return row;
-          })
-        );
-
-        if (protocolAllocations1.length === 0) {
-          protocolAllocations1 = [
-            ...protocolAllocations1,
-            { name: "SPICE", allocation: 1 },
-          ];
-        }
-
-        return protocolAllocations1.map((row) => {
-          return { ...row, name: getNFTMarketplaceDisplayName(row.name) };
-        });
-      })
-    );
-
-    // collection exposures
-    const vaultCollectionExposures = await Promise.all(
-      vaultsWithDetails.map(async (vault: VaultInfo) => {
-        const collectionAllocationsOrigin =
-          vault?.okrs?.collection_allocations || {};
-        let collectionAllocations0 = await Promise.all(
-          Object.keys(collectionAllocationsOrigin).map(async (key) => {
-            try {
-              const collectionRes = await axios.get(
-                `${COLLECTION_API_BASE}/${key}`
-              );
-
-              if (collectionRes.status === 200) {
-                return {
-                  slug: key,
-                  name:
-                    collectionRes.data.data.readable ||
-                    getNFTCollectionDisplayName(key),
-                  allocation: collectionAllocationsOrigin[key],
-                };
-              }
-            } catch (err) {
-              console.log("Collection API error:", err);
-            }
-            return {
-              slug: key,
-              name: getNFTCollectionDisplayName(key),
-              allocation: collectionAllocationsOrigin[key],
-            };
-          })
-        );
-
-        if (collectionAllocations0.length === 0) {
-          collectionAllocations0 = [
-            ...collectionAllocations0,
-            { name: "Prologue", slug: "Prologue", allocation: 1 },
-          ];
-        }
-
-        return collectionAllocations0;
-      })
-    );
-
     const vaultsWithTvl = vaultsWithDetails.map((row: VaultInfo, i: number) => {
       if (row.type === "aggregator") {
         return {
@@ -253,8 +150,6 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           },
           category: row.fungible ? VaultFilter.Public : VaultFilter.VIP,
           isBlur: false,
-          marketplaceExposures: vaultMarketplaceExposures[i],
-          collectionExposures: vaultCollectionExposures[i],
         };
       }
       return {
@@ -282,8 +177,6 @@ export const fetchActiveVaults = async (vaults: any[]) => {
         },
         category: VaultFilter.Public,
         isBlur: false,
-        marketplaceExposures: vaultMarketplaceExposures[i],
-        collectionExposures: vaultCollectionExposures[i],
       };
     });
 
@@ -388,50 +281,6 @@ export const fetchBlurVaults = async (vaults: any[]) => {
       })
     );
 
-    // collection exposures
-    const vaultCollectionExposures = await Promise.all(
-      vaultsWithDetails.map(async (vault: VaultInfo) => {
-        const collectionAllocationsOrigin =
-          vault?.metadata?.collection_allocations || {};
-
-        let collectionAllocations0 = await Promise.all(
-          Object.keys(collectionAllocationsOrigin).map(async (key) => {
-            try {
-              const collectionRes = await axios.get(
-                `${COLLECTION_API_BASE}/${key}`
-              );
-
-              if (collectionRes.status === 200) {
-                return {
-                  slug: key,
-                  name:
-                    collectionRes.data.data.readable ||
-                    getNFTCollectionDisplayName(key),
-                  allocation: collectionAllocationsOrigin[key],
-                };
-              }
-            } catch (err) {
-              console.log("Collection API error:", err);
-            }
-            return {
-              slug: key,
-              name: getNFTCollectionDisplayName(key),
-              allocation: collectionAllocationsOrigin[key],
-            };
-          })
-        );
-
-        if (collectionAllocations0.length === 0) {
-          collectionAllocations0 = [
-            ...collectionAllocations0,
-            { name: "Prologue", slug: "Prologue", allocation: 1 },
-          ];
-        }
-
-        return collectionAllocations0;
-      })
-    );
-
     const vaultsWithTvl = vaultsWithDetails.map((row: VaultInfo, i: number) => {
       return {
         ...row,
@@ -458,8 +307,6 @@ export const fetchBlurVaults = async (vaults: any[]) => {
         },
         category: VaultFilter.Public,
         isBlur: true,
-        marketplaceExposures: [{ name: "BLUR", allocation: 1 }],
-        collectionExposures: vaultCollectionExposures[i],
       };
     });
 
