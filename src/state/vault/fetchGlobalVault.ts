@@ -170,49 +170,6 @@ export const fetchActiveVaults = async (vaults: any[]) => {
       })
     );
 
-    // collection exposures
-    const vaultCollectionExposures = await Promise.all(
-      vaultsWithDetails.map(async (vault: VaultInfo) => {
-        const collectionAllocationsOrigin =
-          vault?.okrs?.collection_allocations || {};
-        let collectionAllocations0 = await Promise.all(
-          Object.keys(collectionAllocationsOrigin).map(async (key) => {
-            try {
-              const collectionRes = await axios.get(
-                `${COLLECTION_API_BASE}/${key}`
-              );
-
-              if (collectionRes.status === 200) {
-                return {
-                  slug: key,
-                  name:
-                    collectionRes.data.data.readable ||
-                    getNFTCollectionDisplayName(key),
-                  allocation: collectionAllocationsOrigin[key],
-                };
-              }
-            } catch (err) {
-              console.log("Collection API error:", err);
-            }
-            return {
-              slug: key,
-              name: getNFTCollectionDisplayName(key),
-              allocation: collectionAllocationsOrigin[key],
-            };
-          })
-        );
-
-        if (collectionAllocations0.length === 0) {
-          collectionAllocations0 = [
-            ...collectionAllocations0,
-            { name: "Prologue", slug: "Prologue", allocation: 1 },
-          ];
-        }
-
-        return collectionAllocations0;
-      })
-    );
-
     const vaultsWithTvl = vaultsWithDetails.map((row: VaultInfo, i: number) => {
       if (row.type === "aggregator") {
         return {
@@ -254,7 +211,6 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           category: row.fungible ? VaultFilter.Public : VaultFilter.VIP,
           isBlur: false,
           marketplaceExposures: vaultMarketplaceExposures[i],
-          collectionExposures: vaultCollectionExposures[i],
         };
       }
       return {
@@ -283,7 +239,6 @@ export const fetchActiveVaults = async (vaults: any[]) => {
         category: VaultFilter.Public,
         isBlur: false,
         marketplaceExposures: vaultMarketplaceExposures[i],
-        collectionExposures: vaultCollectionExposures[i],
       };
     });
 
