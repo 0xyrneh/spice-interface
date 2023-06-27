@@ -64,7 +64,7 @@ export default function VaultPositionGraph({
     let prevTick = startTime;
     let nearTick = startTime;
 
-    while (prevTick < endTime) {
+    while (prevTick <= endTime) {
       if (origin1[prevTick]) {
         nearTick = prevTick;
       }
@@ -199,6 +199,7 @@ export default function VaultPositionGraph({
         [row.x]: row.y,
       };
     });
+    console.log("===> shareValueChartData", shareValueChartData, sampleDataByTimeTicks(shareValueChartData));
 
     return sampleDataByTimeTicks(shareValueChartData).map((row: any) => {
       return {
