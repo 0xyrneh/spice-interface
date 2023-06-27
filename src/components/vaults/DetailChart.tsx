@@ -31,7 +31,7 @@ type Props = {
 };
 
 export default function DetailChart({ vault }: Props) {
-  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
+  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Month);
   const [step, setStep] = useState(0);
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
