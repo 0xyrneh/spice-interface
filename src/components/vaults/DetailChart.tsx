@@ -4,7 +4,6 @@ import { Card, Stats } from "@/components/common";
 import { LineChart } from "@/components/portfolio";
 import { PeriodFilter } from "@/types/common";
 import TvlSVG from "@/assets/icons/tvl.svg";
-import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import {
   MarketplaceExposure,
   CollectionExposure,
@@ -352,29 +351,19 @@ export default function DetailChart({ vault }: Props) {
               ? "TOTAL VALUE LOCKED"
               : "ASSETS PER VAULT SHARE"}
           </h2>
-          {vault.isBlur ? (
-            <div className="flex items-center gap-[4px]">
-              {[0, 1, 2].map((val) => (
-                <div
-                  className={`w-[24px] h-[8px] rounded-full cursor-pointer ${
-                    step === val
-                      ? "bg-orange-200 box-shadow-orange-200"
-                      : "bg-gray-200"
-                  }`}
-                  key={val}
-                  onClick={() => setStep(val)}
-                />
-              ))}
-            </div>
-          ) : (
-            <button onClick={() => setStep(1 - step)}>
-              <SortUpSVG
-                className={`text-gray-100 hover:text-white ${
-                  step === 1 ? "rotate-180" : ""
+          <div className="flex items-center gap-[4px]">
+            {(vault.isBlur ? [0, 1, 2] : [0, 1]).map((val) => (
+              <div
+                className={`w-[24px] h-[8px] rounded-full cursor-pointer ${
+                  step === val
+                    ? "bg-orange-200 box-shadow-orange-200"
+                    : "bg-gray-200"
                 }`}
+                key={val}
+                onClick={() => setStep(val)}
               />
-            </button>
-          )}
+            ))}
+          </div>
         </div>
         <div className="flex items-end justify-between text-gray-200 px-12">
           <div className="flex gap-4 items-center">
