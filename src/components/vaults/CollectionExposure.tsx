@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import axios from "axios";
 import { useWeb3React } from "@web3-react/core";
 
@@ -90,17 +89,17 @@ export default function CollectionExposure({
     let collectionAllocations: any[] = [];
 
     if (!vault) {
-      // vaults excepting blur vault
-      const vaults0 = vaults.filter((vault) => !vault.isBlur);
-
       let userTotalPosition = 0;
-      vaults0.map((vault: VaultInfo) => {
+      vaults.map((vault: VaultInfo) => {
         userTotalPosition += vault?.userPosition || 0;
       });
 
       let collectionAllocationsObj: any = {};
-      vaults0.map((row) => {
-        const vaultPortion = (row?.userPosition || 0) / userTotalPosition;
+      vaults.map((row) => {
+        const vaultPortion =
+          userTotalPosition > 0
+            ? (row?.userPosition || 0) / userTotalPosition
+            : 1;
         (row?.collectionExposures || []).map((row1) => {
           const { name, allocation } = row1;
           collectionAllocationsObj[name] =
