@@ -29,7 +29,7 @@ export const getExpolorerUrl = (txHash: string): string => {
 
   const baseExplorerUrl =
     activeChainId === 1
-      ? "https://etherscan.io/"
+      ? "https://etherscan.io"
       : "https://goerli.etherscan.io";
 
   return `${baseExplorerUrl}/tx/${txHash}`;
