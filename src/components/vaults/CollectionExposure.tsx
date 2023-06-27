@@ -3,7 +3,6 @@ import axios from "axios";
 import { useWeb3React } from "@web3-react/core";
 
 import UserSVG from "@/assets/icons/user.svg";
-import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { Card } from "@/components/common";
 import { PieChart } from "@/components/portfolio";
 import { VaultInfo } from "@/types/vault";
@@ -226,11 +225,19 @@ export default function CollectionExposure({
           {isBreakdown ? "COLLECTION BREAKDOWN" : "COLLECTION EXPOSURE"}
         </h2>
         {hasToggle && (
-          <button onClick={onSwitchTable}>
-            <SortUpSVG
-              className={`text-gray-100 hover:text-white rotate-180`}
-            />
-          </button>
+          <div className="flex items-center gap-[4px]">
+            {[0, 1].map((val) => (
+              <div
+                className={`w-[24px] h-[8px] rounded-full cursor-pointer ${
+                  val === 0
+                    ? "bg-orange-200 box-shadow-orange-200"
+                    : "bg-gray-200"
+                }`}
+                key={val}
+                onClick={() => val === 1 && onSwitchTable()}
+              />
+            ))}
+          </div>
         )}
       </div>
       <Table

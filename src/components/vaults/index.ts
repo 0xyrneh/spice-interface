@@ -3,7 +3,6 @@ export { default as News } from "./News";
 export { default as DetailChart } from "./DetailChart";
 export { default as VaultDetails } from "./VaultDetails";
 export { default as LoanBreakdown } from "./LoanBreakdown";
-export { default as Exposure } from "./Exposure";
 export { default as MarketplaceExposure } from "./MarketplaceExposure";
 export { default as CollectionExposure } from "./CollectionExposure";
 export { default as CombineExposure } from "./CombineExposure";

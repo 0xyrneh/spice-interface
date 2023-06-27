@@ -4,7 +4,6 @@ import axios from "axios";
 import { useWeb3React } from "@web3-react/core";
 
 import MarketExposureSVG from "@/assets/icons/market-exposure.svg";
-import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { Card } from "@/components/common";
 import { PieChart } from "@/components/portfolio";
 import { VaultInfo } from "@/types/vault";
@@ -241,9 +240,19 @@ export default function MarketplaceExposure({
           {isBreakdown ? "MARKETPLACE BREAKDOWN" : "MARKETPLACE EXPOSURE"}
         </h2>
         {hasToggle && (
-          <button onClick={onSwitchTable}>
-            <SortUpSVG className={`text-gray-100 hover:text-white`} />
-          </button>
+          <div className="flex items-center gap-[4px]">
+            {[0, 1].map((val) => (
+              <div
+                className={`w-[24px] h-[8px] rounded-full cursor-pointer ${
+                  val === 1
+                    ? "bg-orange-200 box-shadow-orange-200"
+                    : "bg-gray-200"
+                }`}
+                key={val}
+                onClick={() => val === 0 && onSwitchTable()}
+              />
+            ))}
+          </div>
         )}
       </div>
       <Table
