@@ -129,8 +129,30 @@ const VaultList = ({ onClickVault }: Props) => {
   });
 
   const getFilteredVaults = () => {
-    if (vaultFilter === VaultFilter.All) return vaults;
-    return vaults.filter((vault) => vault.category === vaultFilter);
+    let filtered = vaults;
+    if (vaultFilter !== VaultFilter.All) {
+      filtered = vaults.filter((vault) => vault.category === vaultFilter);
+    }
+
+    if (marketplaceFilters.length > 0) {
+      filtered = filtered.filter(
+        (vault) =>
+          (vault.marketplaceExposures || []).findIndex(
+            (exposure) => marketplaceFilters.indexOf(exposure.name) > -1
+          ) > -1
+      );
+    }
+
+    if (collectionFilters.length > 0) {
+      filtered = filtered.filter(
+        (vault) =>
+          (vault.collectionExposures || []).findIndex(
+            (exposure) => collectionFilters.indexOf(exposure.name) > -1
+          ) > -1
+      );
+    }
+
+    return filtered;
   };
 
   const getRowInfos = (): TableRowInfo[] => {
@@ -344,7 +366,9 @@ const VaultList = ({ onClickVault }: Props) => {
 
       {(marketplaceFilters.length !== 0 || collectionFilters.length !== 0) && (
         <div className="flex gap-4 flex-wrap items-center">
-          <span className="text-base font-medium">23 results</span>
+          <span className="text-base font-medium">
+            {marketplaceFilters.length + collectionFilters.length} results
+          </span>
           {marketplaceFilters.map((item) => (
             <div
               key={item}
