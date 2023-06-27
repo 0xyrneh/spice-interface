@@ -5,7 +5,6 @@ import moment from "moment";
 
 import { Card, Stats } from "@/components/common";
 import PositionSVG from "@/assets/icons/position.svg";
-import SortUpSVG from "@/assets/icons/sort-up2.svg";
 import { VaultInfo, ReceiptToken, ChartValue } from "@/types/vault";
 import { LineChart } from "@/components/portfolio";
 import { PeriodFilter } from "@/types/common";
@@ -33,7 +32,7 @@ export default function VaultPositionGraph({
   vaults,
   totalPosition,
 }: Props) {
-  const [showPosition, setShowPosition] = useState(true);
+  const [step, setStep] = useState(0);
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Day);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
@@ -144,7 +143,7 @@ export default function VaultPositionGraph({
     let makeStepLike = false;
     if (vault) {
       if (vault.isBlur) {
-        chartData = showPosition
+        chartData = step === 0
           ? blurChartInfo?.tvlChart ?? []
           : blurChartInfo?.pointsChart ?? [];
       } else {
@@ -170,7 +169,7 @@ export default function VaultPositionGraph({
           .reverse()
           .filter((row) => row.assetPerShare);
 
-        if (showPosition) {
+        if (step === 0) {
           const sharePriceChartData = aprHistories.map((row) => {
             return {
               x: row.time,
@@ -214,7 +213,7 @@ export default function VaultPositionGraph({
         }
       }
     } else {
-      if (showPosition) {
+      if (step === 0) {
         if (!account) {
           chartData = [];
         } else {
@@ -303,7 +302,7 @@ export default function VaultPositionGraph({
         )}
         <PositionSVG />
         <h2 className="font-bold text-white font-sm">
-          {!showPosition
+          {step === 1
             ? vault && vault.isBlur
               ? "POINTS"
               : "ASSETS PER VAULT SHARE"
@@ -314,13 +313,19 @@ export default function VaultPositionGraph({
             : "TOTAL SPICE POSITION"}
         </h2>
         {vault && (
-          <button onClick={() => setShowPosition(!showPosition)}>
-            <SortUpSVG
-              className={`text-gray-100 hover:text-white ${
-                showPosition ? "rotate-180" : ""
+          <div className="flex items-center gap-[4px]">
+          {[0, 1].map((val) => (
+            <div
+              className={`w-[24px] h-[8px] rounded-full cursor-pointer ${
+                step === val
+                  ? "bg-orange-200 box-shadow-orange-200"
+                  : "bg-gray-200"
               }`}
+              key={val}
+              onClick={() => setStep(val)}
             />
-          </button>
+          ))}
+        </div>
         )}
       </div>
 
@@ -333,19 +338,19 @@ export default function VaultPositionGraph({
               value={`Ξ${totalPosition.toFixed(2)}`}
             />
           )}
-          {vault && vault.isBlur && !showPosition && (
+          {vault && vault.isBlur && step === 1 && (
             <Stats
               title="SP-BLUR"
               value={(blurChartInfo?.totalSpPoints ?? 0).toFixed(2)}
             />
           )}
-          {vault && (!vault.isBlur || showPosition) && (
+          {vault && (!vault.isBlur || step === 0) && (
             <Stats
               title="Position"
               value={`Ξ${(vault?.userPosition || 0).toFixed(2)}`}
             />
           )}
-          {vault && (!vault.isBlur || showPosition) && (
+          {vault && (!vault.isBlur || step === 0) && (
             <Stats
               title={
                 vault?.receiptToken === ReceiptToken.NFT ? "Net APY" : "APY"
@@ -414,7 +419,7 @@ export default function VaultPositionGraph({
           <LineChart
             data={getChartData()}
             period={selectedPeriod}
-            yPrefix={!showPosition ? "" : "Ξ"}
+            yPrefix={step === 1 ? "" : "Ξ"}
           />
         </div>
         <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">

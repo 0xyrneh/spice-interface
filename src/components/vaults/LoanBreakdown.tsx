@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
 import moment from "moment-timezone";
+import { useWindowSize } from "@react-hookz/web";
 
 import { Card, Search, Table } from "@/components/common";
 import { TableRowInfo } from "@/components/common/Table";
@@ -40,6 +41,7 @@ export default function LoanBreakdown({
   walletConnectRequired,
   isBreakdown,
 }: Props) {
+  const size = useWindowSize();
   const { setBlur } = useUI();
 
   const [loanExpanded, setLoanExpanded] = useState(false);
@@ -151,7 +153,8 @@ export default function LoanBreakdown({
               ltv,
               nftId: row.nftid,
               tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
-              market: getNftMarketLogo(row.market),
+              market: row.market,
+              marketImg: getNftMarketLogo(row.market),
             };
           })
         );
@@ -306,19 +309,44 @@ export default function LoanBreakdown({
       },
       {
         title: "MARKET",
-        component: (item) => (
-          <>
-            {item.market && (
-              <Image
-                className="mr-1"
-                src={item.market}
-                width={16}
-                height={16}
-                alt=""
-              />
-            )}
-          </>
-        ),
+        component: (item) => {
+          let width;
+          let height;
+          if (size.width >= 1024) {
+            width = 16;
+            height = 16;
+            if (item.market === 'nftfi') {
+              width = 21;
+              height = 8;
+            } else if (item.market === 'benddao') {
+              width = 19;
+              height = 10;
+            }
+          } else {
+            width = 24;
+            height = 24;
+            if (item.market === 'nftfi') {
+              width = 42;
+              height = 16;
+            } else if (item.market === 'benddao') {
+              width = 38;
+              height = 20;
+            }
+          }
+          return (
+            <>
+              {item.marketImg && (
+                <Image
+                  className="mr-1"
+                  src={item.marketImg}
+                  width={width}
+                  height={height}
+                  alt=""
+                />
+              )}
+            </>
+          );
+        },
         rowClass: () => (loanExpanded ? "w-[10%]" : "hidden"),
       },
     ];
