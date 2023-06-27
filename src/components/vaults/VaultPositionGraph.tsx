@@ -38,7 +38,9 @@ export default function VaultPositionGraph({
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const { account } = useWeb3React();
   const [noneBlurVaultShares, setNoneBlurVaultShares] = useState<any>([]);
-  const [spiceUserPositions, setSpiceUserPositions] = useState<any>([]);
+  const [noneBlurVaultsShares, setNoneBlurVaultsShares] = useState<
+    { vault: VaultInfo; sharesRaw: any[] }[]
+  >([]);
 
   const sampleDataByTimeTicks = (originData: any[]) => {
     if (originData.length === 0) return [];
@@ -105,15 +107,19 @@ export default function VaultPositionGraph({
   const fetchNoneBlurVaultUserPosition = async () => {
     if (!account) return;
     if (!vault?.address) {
-      const positionsRaw = await getUserSpicePositions(account);
-
-      setSpiceUserPositions(
-        positionsRaw.map((row: any) => {
-          return {
-            time: Number(row.date) * 1000,
-            position: getBalanceInEther(row.position),
-          };
-        })
+      const sharesRaws = await Promise.all(
+        vaults.map((_vault) => getUserVaultShares(account, _vault.address))
+      );
+      setNoneBlurVaultsShares(
+        vaults.map((_vault, idx) => ({
+          vault: _vault,
+          sharesRaw: sharesRaws[idx].map((row: any) => {
+            return {
+              time: Number(row.date) * 1000,
+              share: getBalanceInEther(row.share),
+            };
+          }),
+        }))
       );
     } else {
       const sharesRaw = await getUserVaultShares(account, vault.address);
@@ -130,12 +136,77 @@ export default function VaultPositionGraph({
   };
 
   useEffect(() => {
-    if (vault && vault.isBlur) {
+    if (!vault) {
+      fetchBlurChart();
+      fetchNoneBlurVaultUserPosition();
+    } else if (vault.isBlur) {
       fetchBlurChart();
     } else {
       fetchNoneBlurVaultUserPosition();
     }
-  }, [vault, account]);
+  }, [vault, vaults, account]);
+
+  const getAprHistories = (_vault: VaultInfo) => {
+    const historialRecords = _vault.historicalRecords || [];
+    const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
+    const graphField =
+      activeChainId === 1 ? "assets_per_share" : "expected_return";
+
+    // apr histories
+    const aprHistories = historialRecords
+      .map((row) => ({
+        time: 1000 * Number(row.time) || 0,
+        apr:
+          (activeChainId === 1 ? 1 : 100) *
+          (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
+        assetPerShare:
+          (activeChainId === 1 ? 1 : 100) *
+          (row?.okrs && row?.okrs[graphField] ? row?.okrs[graphField] : 0),
+      }))
+      .reverse()
+      .filter((row) => row.assetPerShare);
+
+    return aprHistories;
+  };
+
+  const getUserVaultTVLData = (
+    aprHistories: {
+      time: number;
+      apr: number;
+      assetPerShare: number;
+    }[],
+    vaultShares: any[]
+  ) => {
+    const sharePriceChartData = aprHistories.map((row) => {
+      return {
+        x: row.time,
+        y: row.assetPerShare,
+      };
+    });
+
+    const shareValueChartData = vaultShares.map((row: any) => {
+      return {
+        x: row.time,
+        y: Number(row.share.toFixed(2)),
+      };
+    });
+
+    // historical asset per share price
+    let historicalAssetPreSharePrices: any = {};
+    sampleDataByTimeTicks(sharePriceChartData).map((row, i) => {
+      historicalAssetPreSharePrices = {
+        ...historicalAssetPreSharePrices,
+        [row.x]: row.y,
+      };
+    });
+
+    return sampleDataByTimeTicks(shareValueChartData).map((row: any) => {
+      return {
+        x: row.x,
+        y: row.y * (historicalAssetPreSharePrices[row.x] || 0),
+      };
+    });
+  };
 
   const getChartData = () => {
     let chartData: ChartValue[] = [];
@@ -143,64 +214,18 @@ export default function VaultPositionGraph({
     let makeStepLike = false;
     if (vault) {
       if (vault.isBlur) {
-        chartData = step === 0
-          ? blurChartInfo?.tvlChart ?? []
-          : blurChartInfo?.pointsChart ?? [];
+        chartData =
+          step === 0
+            ? blurChartInfo?.tvlChart ?? []
+            : blurChartInfo?.pointsChart ?? [];
       } else {
         makeStepLike = true;
-        // asset share logic
-        const historialRecords = vault?.historicalRecords || [];
-        const aprField =
-          activeChainId === 1 ? "actual_returns" : "expected_return";
-        const graphField =
-          activeChainId === 1 ? "assets_per_share" : "expected_return";
 
         // apr histories
-        const aprHistories = historialRecords
-          .map((row) => ({
-            time: 1000 * Number(row.time) || 0,
-            apr:
-              (activeChainId === 1 ? 1 : 100) *
-              (row?.okrs && row?.okrs[aprField] ? row?.okrs[aprField] : 0),
-            assetPerShare:
-              (activeChainId === 1 ? 1 : 100) *
-              (row?.okrs && row?.okrs[graphField] ? row?.okrs[graphField] : 0),
-          }))
-          .reverse()
-          .filter((row) => row.assetPerShare);
+        const aprHistories = getAprHistories(vault);
 
         if (step === 0) {
-          const sharePriceChartData = aprHistories.map((row) => {
-            return {
-              x: row.time,
-              y: row.assetPerShare,
-            };
-          });
-
-          const shareValueChartData = noneBlurVaultShares.map((row: any) => {
-            return {
-              x: row.time,
-              y: Number(row.share.toFixed(2)),
-            };
-          });
-
-          // historical asset per share price
-          let historicalAssetPreSharePrices: any = {};
-          sampleDataByTimeTicks(sharePriceChartData).map((row, i) => {
-            historicalAssetPreSharePrices = {
-              ...historicalAssetPreSharePrices,
-              [row.x]: row.y,
-            };
-          });
-
-          chartData = sampleDataByTimeTicks(shareValueChartData).map(
-            (row: any) => {
-              return {
-                x: row.x,
-                y: row.y * (historicalAssetPreSharePrices[row.x] || 0),
-              };
-            }
-          );
+          chartData = getUserVaultTVLData(aprHistories, noneBlurVaultShares);
         } else {
           chartData = sampleDataByTimeTicks(
             aprHistories.map((row) => {
@@ -218,11 +243,51 @@ export default function VaultPositionGraph({
           chartData = [];
         } else {
           makeStepLike = true;
-          chartData = spiceUserPositions.map((row: any) => {
+          chartData = [];
+          const data: any = {};
+          let userTvls = noneBlurVaultsShares.map(({ vault, sharesRaw }) => {
+            const aprHistories = getAprHistories(vault);
+            return [
+              { x: 0, y: 0 },
+              ...getUserVaultTVLData(aprHistories, sharesRaw),
+            ];
+          });
+
+          const blurTvl = (blurChartInfo?.tvlChart || []).map((row: any) => {
+            const x = new Date(row.x).getTime();
             return {
-              x: row.time,
-              y: row.position,
+              x,
+              y: row.y,
             };
+          });
+          userTvls.push([{ x: 0, y: 0 }, ...blurTvl]);
+          userTvls = userTvls.filter((userTvl) => userTvl.length > 0);
+          const times = userTvls
+            .map((vaultTvl) => vaultTvl.map((row: any) => row.x))
+            .reduce((cur, _times) => {
+              _times.map((time) => {
+                if (cur.indexOf(time) === -1) cur.push(time);
+              });
+              return cur;
+            }, [])
+            .sort((a, b) => a - b);
+          const length = userTvls.length;
+          const indexes = new Array(length).fill(0);
+          times.map((x) => {
+            if (x === 0) return;
+            let tvl = 0;
+            for (let i = 0; i < length; i++) {
+              while (
+                indexes[i] < userTvls[i].length &&
+                userTvls[i][indexes[i]].x <= x
+              )
+                indexes[i]++;
+              tvl += userTvls[i][indexes[i] - 1].y;
+            }
+            chartData.push({
+              x,
+              y: tvl,
+            });
           });
         }
       } else {
@@ -314,18 +379,18 @@ export default function VaultPositionGraph({
         </h2>
         {vault && (
           <div className="flex items-center gap-[4px]">
-          {[0, 1].map((val) => (
-            <div
-              className={`w-[24px] h-[8px] rounded-full cursor-pointer ${
-                step === val
-                  ? "bg-orange-200 box-shadow-orange-200"
-                  : "bg-gray-200"
-              }`}
-              key={val}
-              onClick={() => setStep(val)}
-            />
-          ))}
-        </div>
+            {[0, 1].map((val) => (
+              <div
+                className={`w-[24px] h-[8px] rounded-full cursor-pointer ${
+                  step === val
+                    ? "bg-orange-200 box-shadow-orange-200"
+                    : "bg-gray-200"
+                }`}
+                key={val}
+                onClick={() => setStep(val)}
+              />
+            ))}
+          </div>
         )}
       </div>
 
