@@ -72,6 +72,7 @@ export interface VaultInfo {
   marketplaceExposures?: any[];
   collectionExposures?: any[];
   startTime: number;
+  metadata?: any;
 }
 
 export interface LeverageVaultInfo {
@@ -97,5 +98,5 @@ export interface ChartValue {
 
 export enum VaultRisk {
   LOW = "LOW RISK",
-  MEDIUM = "MEDIUM RISK"
+  MEDIUM = "MEDIUM RISK",
 }
