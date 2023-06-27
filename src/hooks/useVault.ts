@@ -1,12 +1,16 @@
-import { useCallback } from 'react';
-import { useWeb3React } from '@web3-react/core';
-import { BigNumber, ethers } from 'ethers';
+import { useCallback } from "react";
+import { useWeb3React } from "@web3-react/core";
+import { BigNumber, ethers } from "ethers";
 
-import { useVaultContract, useWethContract } from '@/hooks/useContract';
-import { fetchVaultGlobalDataAsync, fetchVaultUserDepositDataAsync, fetchVaultUserTokenDataAsync } from '@/state/actions';
-import { useAppDispatch, useAppSelector } from '@/state/hooks';
-import { VaultInfo } from '@/types/vault';
-import { setPendingTxHash } from '@/state/modal/modalSlice';
+import { useVaultContract, useWethContract } from "@/hooks/useContract";
+import {
+  fetchVaultGlobalDataAsync,
+  fetchVaultUserDepositDataAsync,
+  fetchVaultUserTokenDataAsync,
+} from "@/state/actions";
+import { useAppDispatch, useAppSelector } from "@/state/hooks";
+import { VaultInfo } from "@/types/vault";
+import { setPendingTxHash } from "@/state/modal/modalSlice";
 
 export const useVault = (address: string) => {
   const dispatch = useAppDispatch();
@@ -17,11 +21,14 @@ export const useVault = (address: string) => {
   const currentVault = vaults.find((row: VaultInfo) => row.address === address);
 
   const handleApprove = useCallback(async (): Promise<string | undefined> => {
-    if (!account || !currentVault) return '';
-    if (!wethContract) return '';
-    if (!vaultContract) return '';
+    if (!account || !currentVault) return "";
+    if (!wethContract) return "";
+    if (!vaultContract) return "";
 
-    const tx = await wethContract.approve(vaultContract.address, ethers.constants.MaxUint256);
+    const tx = await wethContract.approve(
+      vaultContract.address,
+      ethers.constants.MaxUint256
+    );
     dispatch(setPendingTxHash(tx.hash));
     const receipt = await tx.wait();
 
@@ -36,8 +43,8 @@ export const useVault = (address: string) => {
 
   const handleDeposit = useCallback(
     async (amount: BigNumber): Promise<string | undefined> => {
-      if (!account || !currentVault) return '';
-      if (!vaultContract) return '';
+      if (!account || !currentVault) return "";
+      if (!vaultContract) return "";
 
       const tx = await vaultContract.deposit(amount, account);
       dispatch(setPendingTxHash(tx.hash));
@@ -59,8 +66,8 @@ export const useVault = (address: string) => {
 
   const handleDepositETH = useCallback(
     async (amount: BigNumber): Promise<string | undefined> => {
-      if (!account || !currentVault) return '';
-      if (!vaultContract) return '';
+      if (!account || !currentVault) return "";
+      if (!vaultContract) return "";
 
       const tx = await vaultContract.depositETH(account, { value: amount });
       dispatch(setPendingTxHash(tx.hash));
@@ -82,8 +89,8 @@ export const useVault = (address: string) => {
 
   const handleWithdraw = useCallback(
     async (assets: BigNumber): Promise<string | undefined> => {
-      if (!account || !currentVault) return '';
-      if (!vaultContract) return '';
+      if (!account || !currentVault) return "";
+      if (!vaultContract) return "";
 
       const tx = await vaultContract.withdraw(assets, account, account);
       dispatch(setPendingTxHash(tx.hash));
@@ -104,8 +111,8 @@ export const useVault = (address: string) => {
 
   const handleWithdrawETH = useCallback(
     async (assets: BigNumber): Promise<string | undefined> => {
-      if (!account || !currentVault) return '';
-      if (!vaultContract) return '';
+      if (!account || !currentVault) return "";
+      if (!vaultContract) return "";
 
       const tx = await vaultContract.withdrawETH(assets, account, account);
       dispatch(setPendingTxHash(tx.hash));
@@ -127,8 +134,8 @@ export const useVault = (address: string) => {
 
   const handleRedeem = useCallback(
     async (shares: BigNumber): Promise<string | undefined> => {
-      if (!account || !currentVault) return '';
-      if (!vaultContract) return '';
+      if (!account || !currentVault) return "";
+      if (!vaultContract) return "";
 
       const tx = await vaultContract.redeem(shares, account, account);
       dispatch(setPendingTxHash(tx.hash));
@@ -149,8 +156,8 @@ export const useVault = (address: string) => {
 
   const handleRedeemETH = useCallback(
     async (shares: BigNumber): Promise<string | undefined> => {
-      if (!account || !currentVault) return '';
-      if (!vaultContract) return '';
+      if (!account || !currentVault) return "";
+      if (!vaultContract) return "";
 
       const tx = await vaultContract.redeemETH(shares, account, account);
       dispatch(setPendingTxHash(tx.hash));
