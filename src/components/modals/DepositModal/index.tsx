@@ -430,6 +430,8 @@ export default function DepositModal({
   }, [actionStatus]);
 
   const onConfirmPosition = async () => {
+    if (amountInWei.eq(BigNumber.from(0))) return;
+
     if (positionStatus === TxStatus.None) {
       setPositionStatus(TxStatus.Pending);
       setOldPosition(getBalanceInEther(getPositionBalance()).toFixed(3));
@@ -632,7 +634,7 @@ export default function DepositModal({
     let newAmountInWei = getBalanceInWei(Number(newAmount).toString() || "0");
     if (newAmountInWei.gt(getMaxAmnt())) {
       newAmountInWei = getMaxAmnt();
-      if (liquidWeth) {
+      if (liquidWeth && !vault?.isBlur) {
         let max = liquidWeth.gt(newAmountInWei) ? newAmountInWei : liquidWeth;
         max = max.gte(BigNumber.from(0)) ? max : BigNumber.from(0);
         newAmountInWei = max;
@@ -1138,6 +1140,7 @@ export default function DepositModal({
           isDeposit={isDeposit}
           isApprove={isApprove()}
           positionStatus={positionStatus}
+          positionActionDisabled={amountInWei.eq(BigNumber.from(0))}
           leverageTab={leverageTab}
           onLeverageMaxClicked={() => {}}
           show={showRightModal()}

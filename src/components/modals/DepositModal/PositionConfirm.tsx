@@ -10,6 +10,7 @@ interface Props {
   isApprove: boolean;
   txStatus: TxStatus;
   hiding?: boolean;
+  disabled: boolean;
   onConfirm: () => void;
 }
 
@@ -17,7 +18,7 @@ export default function PositionConfirm(props: Props) {
   const [dots, setDots] = useState("");
   const [dotsTimer, setDotsTimer] = useState<NodeJS.Timer>();
   const [isDeposit, setIsDeposit] = useState(false);
-  const { txStatus, onConfirm } = props;
+  const { txStatus, disabled, onConfirm } = props;
 
   useEffect(() => {
     if (!props.hiding) {
@@ -88,7 +89,7 @@ export default function PositionConfirm(props: Props) {
       />
       <Button
         type={processing() ? "secondary" : "primary"}
-        disabled={processing()}
+        disabled={processing() || disabled}
         className="h-10 flex items-center justify-center"
         onClick={() => {
           if (!processing()) {

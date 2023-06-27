@@ -14,6 +14,7 @@ import {
 } from "@/state/vault/fetchGlobalVault";
 import { VaultInfo } from "@/types/vault";
 import { useEffect } from "react";
+import { getBalanceInEther } from "@/utils/formatBalance";
 
 type Props = {
   vault: VaultInfo;
@@ -66,18 +67,13 @@ export default function PositionInput({
     if (!vault) return;
 
     if (isFungible) {
-      if (vault?.isBlur) {
-        setMaxWithdrawAmnt(vault?.userInfo?.depositAmnt);
-        return;
-      } else {
-        const res = await getVaultWithdrawable(
-          vault,
-          vault?.userInfo?.userMaxRedeemable || BigNumber.from(0)
-        );
+      const res = await getVaultWithdrawable(
+        vault,
+        vault?.userInfo?.userMaxRedeemable || BigNumber.from(0)
+      );
 
-        setMaxWithdrawAmnt(res);
-        return;
-      }
+      setMaxWithdrawAmnt(res);
+      return;
     }
 
     if (selectedNft) {
