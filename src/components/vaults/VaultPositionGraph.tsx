@@ -199,7 +199,6 @@ export default function VaultPositionGraph({
         [row.x]: row.y,
       };
     });
-    console.log("===> shareValueChartData", shareValueChartData, sampleDataByTimeTicks(shareValueChartData));
 
     return sampleDataByTimeTicks(shareValueChartData).map((row: any) => {
       return {
