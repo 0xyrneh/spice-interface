@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
+import { useWindowSize } from "@react-hook/window-size/throttled";
 
 import { shortAddress } from "@/utils";
 import { Card, CopyClipboard } from "@/components/common";
@@ -25,13 +26,20 @@ import { accLoans } from "@/utils/lend";
 import { VaultPositionGraph } from "@/components/vaults";
 import { PROLOGUE_NFT_ADDRESS } from "@/config/constants";
 
+const MIN_HEIGHT = 820;
+
 export default function Portfolio() {
-  const { showDepositModal } = useUI();
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
+
+  const [expandedBoxId, setExpandedBoxId] = useState<number>(-1); // -1: none, 1: left center section, 2: left bottom section
+  const [isCardPopup, setIsCardPopup] = useState<boolean>(false); // flag to track one box is pop up
+
   const { account } = useWeb3React();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
+  const { showDepositModal } = useUI();
+  const [_, height] = useWindowSize({ fps: 60 });
 
   const accountImage = () => {
     if (loans.length === 0) {
@@ -90,12 +98,43 @@ export default function Portfolio() {
     return userTotalPosition;
   };
 
+  useEffect(() => {
+    if (!selectedVault) return;
+    if (
+      selectedVault.isBlur ||
+      selectedVault.receiptToken === ReceiptToken.NFT
+    ) {
+      if (height <= MIN_HEIGHT) {
+        if (expandedBoxId === -1) {
+          setExpandedBoxId(1);
+        }
+      } else {
+        if (expandedBoxId !== -1) {
+          setExpandedBoxId(-1);
+        }
+      }
+    }
+  }, [height, selectedVaultAddr]);
+
+  const onChangeActiveSectionId = (value: number) => {
+    if (!selectedVault) return;
+    if (
+      selectedVault.isBlur ||
+      selectedVault.receiptToken === ReceiptToken.NFT
+    ) {
+      if (value === expandedBoxId) return;
+      if (height > MIN_HEIGHT) return;
+
+      setExpandedBoxId(value);
+    }
+  };
+
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
       <div className="flex flex-col min-w-[35%] w-[41%] gap-5 pt-1">
         {/* account card */}
         {account && (
-          <Card className="py-3 !flex-row items-center justify-between gap-5">
+          <Card className="!py-3 !flex-row items-center justify-between gap-5">
             <div className="flex items-center gap-5 flex-1">
               {accountImage() ? (
                 <Image
@@ -136,23 +175,44 @@ export default function Portfolio() {
           vaults={vaults}
           selectedVault={selectedVault}
           onSelectVault={onSelectVault}
+          className="max-h-[40%]"
         />
 
-        <div className="h-[44%] overflow-y-hidden p-1 -m-1">
+        {/* blur leaderboard section */}
+        <div className="h-[44%] overflow-hidden p-1 -m-1 flex-1">
           {selectedVault &&
             (selectedVault.isBlur ? (
-              <div
-                className="flex flex-col h-full gap-5 overflow-hidden"
-                style={{ margin: -5, padding: 5 }}
-              >
-                <BlurLeaderboard vault={selectedVault} showIcon onlyPts />
+              <div className="flex flex-col h-full gap-5">
                 <BlurLeaderboard
                   vault={selectedVault}
                   showIcon
-                  nonExpandedClassName="flex-1"
+                  onlyPts
+                  className={`${
+                    expandedBoxId === 2
+                      ? `h-[58px] overflow-hidden gap-4.5 ${
+                          isCardPopup ? "flex-1" : ""
+                        }`
+                      : "flex-1 gap-3"
+                  }`}
+                  onActive={() => onChangeActiveSectionId(1)}
+                  onCardPopup={(value) => setIsCardPopup(value)}
+                />
+                <BlurLeaderboard
+                  vault={selectedVault}
+                  showIcon
+                  nonExpandedClassName={expandedBoxId === 2 ? "flex-1" : ""}
                   onDeposit={() => {
                     showDepositModal({ vault: selectedVault });
                   }}
+                  className={`${
+                    expandedBoxId === 1
+                      ? `h-[58px] overflow-hidden gap-4.5 ${
+                          isCardPopup ? "flex-1" : ""
+                        }`
+                      : "flex-1 gap-3"
+                  }`}
+                  onActive={() => onChangeActiveSectionId(2)}
+                  onCardPopup={(value) => setIsCardPopup(value)}
                 />
               </div>
             ) : selectedVault.receiptToken === ReceiptToken.ERC20 ? (

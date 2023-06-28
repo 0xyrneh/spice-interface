@@ -10,12 +10,14 @@ import ExposureSVG from "@/assets/icons/exposure.svg";
 import { useUI } from "@/hooks";
 
 type Props = {
+  className?: string;
   vaults: VaultInfo[];
   selectedVault?: VaultInfo | undefined;
   onSelectVault: (vault: VaultInfo | undefined) => void;
 };
 
 export default function VaultsTable({
+  className,
   vaults,
   selectedVault,
   onSelectVault,
@@ -134,7 +136,7 @@ export default function VaultsTable({
   };
 
   return (
-    <Card className="gap-3 overflow-hidden min-h-[300px] flex-1">
+    <Card className={`gap-3 overflow-hidden min-h-[280px] flex-1 ${className}`}>
       <div className="flex items-center gap-2.5">
         <ExposureSVG />
         <h2 className="font-bold text-white font-sm">SELECT YOUR VAULT</h2>
