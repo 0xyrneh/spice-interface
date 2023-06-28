@@ -28,6 +28,8 @@ type Props = {
   onlyPts?: boolean;
   showAccumulated?: boolean;
   onDeposit?: () => void;
+  onActive: () => void;
+  onCardPopup: (status: boolean) => void;
 };
 
 const BlurCards = [
@@ -63,6 +65,8 @@ export default function BlurPts({
   onlyPts,
   showAccumulated,
   onDeposit,
+  onActive,
+  onCardPopup,
 }: Props) {
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
   const [expanded, setExpanded] = useState(false);
@@ -87,6 +91,10 @@ export default function BlurPts({
       setCount(1);
     }
   }, [breakpoint]);
+
+  useEffect(() => {
+    onCardPopup(expanded);
+  }, [expanded]);
 
   useEffect(() => {
     if (account) {
@@ -220,12 +228,13 @@ export default function BlurPts({
 
   return (
     <Card
-      className={`gap-3 overflow-hidden ${className} ${
+      className={`overflow-hidden ${className} ${
         nonExpandedClassName && !expanded ? nonExpandedClassName : ""
       }`}
       animate
       expanded={expanded}
       onCollapse={() => setExpanded(false)}
+      onClick={onActive}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5 text-white">
@@ -372,7 +381,9 @@ export default function BlurPts({
             </Button>
           </div>
           <div className="flex h-[46px] py-2 items-center border-[1.5px] border-gray-100 rounded-lg text-gray-100 text-xs drop-shadow-sm">
-            <span className="tracking-normal text-center px-4">{total.toFixed(2)}</span>
+            <span className="tracking-normal text-center px-4">
+              {total.toFixed(2)}
+            </span>
             <span className="border-l-[1.5px] px-4 tracking-normal w-[95px]">
               Total SPB emitted
             </span>
@@ -383,7 +394,9 @@ export default function BlurPts({
         <>
           {showAccumulated && (
             <div className="flex justify-center py-2 items-center text-gray-100 text-sm drop-shadow-sm">
-              <span className="tracking-normal text-center px-4">{total.toFixed(2)}</span>
+              <span className="tracking-normal text-center px-4">
+                {total.toFixed(2)}
+              </span>
               <span className="border-l-[1.5px] px-4 tracking-normal">
                 Total SPB accumulated
               </span>
