@@ -1,1 +1,1 @@
-export const MIN_SCREEN_HEIGHT = 820;
+export const MIN_SCREEN_HEIGHT = 1000;
