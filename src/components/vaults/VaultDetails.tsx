@@ -32,7 +32,12 @@ export default function VaultDetails({ vault }: Props) {
     if (vault.isBlur || vault.receiptToken === ReceiptToken.NFT) {
       if (height <= MIN_SCREEN_HEIGHT) {
         if (expandedBoxId === -1) {
-          setExpandedBoxId(2);
+          if (vault.isBlur) {
+            setExpandedBoxId(2);
+          }
+          if (vault.receiptToken === ReceiptToken.NFT) {
+            setExpandedBoxId(1);
+          }
         }
       } else {
         if (expandedBoxId !== -1) {
