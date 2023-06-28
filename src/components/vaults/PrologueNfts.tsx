@@ -24,12 +24,16 @@ type Props = {
   vault?: VaultInfo;
   className?: string;
   walletConnectRequired?: boolean;
+  onActive: () => void;
+  onCardPopup: (status: boolean) => void;
 };
 
 export default function PrologueNfts({
   vault,
   className,
   walletConnectRequired,
+  onActive,
+  onCardPopup,
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [vaultNftsSortFilter, setVaultNftsSortFilter] = useState(
@@ -51,6 +55,7 @@ export default function PrologueNfts({
 
   useEffect(() => {
     setSelectedIdx(undefined);
+    onCardPopup(expanded);
   }, [expanded]);
 
   useEffect(() => {
@@ -207,12 +212,11 @@ export default function PrologueNfts({
 
   return (
     <Card
-      className={`gap-3 ${className} ${
-        expanded ? "h-[90%] my-auto" : "relative"
-      }`}
+      className={`${className} ${expanded ? "h-[90%] my-auto" : "relative"}`}
       expanded={expanded}
       onCollapse={() => setExpanded(false)}
       animate
+      onClick={onActive}
     >
       {selectedIdx !== undefined && (
         <div

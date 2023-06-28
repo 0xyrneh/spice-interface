@@ -49,7 +49,7 @@ const Card = ({
       <motion.div
         ref={comp as any}
         layout
-        transition={{ duration: animate ? 0.4 : 0 }}
+        transition={{ duration: animate ? (expanded ? 0.4 : 0.5) : 0 }}
         onLayoutAnimationComplete={onLayoutAnimationComplete}
         className={`flex flex-col bg-gray-700 rounded shadow-card px-4 py-5 ${className} ${
           expanded

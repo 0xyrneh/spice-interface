@@ -30,6 +30,8 @@ type Props = {
   className?: string;
   walletConnectRequired?: boolean;
   isBreakdown?: boolean;
+  onActive: () => void;
+  onCardPopup: (status: boolean) => void;
 };
 
 export default function LoanBreakdown({
@@ -40,6 +42,8 @@ export default function LoanBreakdown({
   nonExpandedClassName,
   walletConnectRequired,
   isBreakdown,
+  onActive,
+  onCardPopup,
 }: Props) {
   const size = useWindowSize();
   const { setBlur } = useUI();
@@ -186,6 +190,7 @@ export default function LoanBreakdown({
 
   useEffect(() => {
     setBlur(loanExpanded);
+    onCardPopup(loanExpanded);
   }, [loanExpanded, setBlur]);
 
   const filteredLoans =
@@ -315,20 +320,20 @@ export default function LoanBreakdown({
           if (size.width >= 1024) {
             width = 16;
             height = 16;
-            if (item.market === 'nftfi') {
+            if (item.market === "nftfi") {
               width = 21;
               height = 8;
-            } else if (item.market === 'benddao') {
+            } else if (item.market === "benddao") {
               width = 19;
               height = 10;
             }
           } else {
             width = 24;
             height = 24;
-            if (item.market === 'nftfi') {
+            if (item.market === "nftfi") {
               width = 42;
               height = 16;
-            } else if (item.market === 'benddao') {
+            } else if (item.market === "benddao") {
               width = 38;
               height = 20;
             }
@@ -354,11 +359,12 @@ export default function LoanBreakdown({
 
   return (
     <Card
-      className={`gap-3 overflow-hidden ${className} ${
+      className={`overflow-hidden ${className} ${
         nonExpandedClassName && !loanExpanded ? nonExpandedClassName : ""
       } ${loanExpanded ? "h-[90%] my-auto" : ""}`}
       expanded={loanExpanded}
       onCollapse={() => setLoanExpanded(false)}
+      onClick={onActive}
       animate
     >
       <div className="flex items-center justify-between">
