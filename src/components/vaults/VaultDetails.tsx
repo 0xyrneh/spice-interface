@@ -158,6 +158,7 @@ export default function VaultDetails({ vault }: Props) {
           />
         )}
 
+        {/* blur leaderboard section */}
         {vault.isBlur ? (
           <div
             className="flex flex-col h-full gap-5 overflow-hidden"
