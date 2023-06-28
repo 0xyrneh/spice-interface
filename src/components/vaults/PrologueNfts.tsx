@@ -224,7 +224,7 @@ export default function PrologueNfts({
           onClick={() => setSelectedIdx(undefined)}
         />
       )}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between cursor-pointer">
         <div className="flex items-center gap-2.5 text-white">
           <UserSVG />
           <h2 className="font-bold text-white font-sm">PROLOGUE NFTS</h2>
