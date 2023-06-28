@@ -24,9 +24,7 @@ import { getNftPortfolios, getTokenImageFromReservoir } from "@/utils/nft";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { accLoans } from "@/utils/lend";
 import { VaultPositionGraph } from "@/components/vaults";
-import { PROLOGUE_NFT_ADDRESS } from "@/config/constants";
-
-const MIN_HEIGHT = 820;
+import { PROLOGUE_NFT_ADDRESS, MIN_SCREEN_HEIGHT } from "@/config/constants";
 
 export default function Portfolio() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
@@ -104,7 +102,7 @@ export default function Portfolio() {
       selectedVault.isBlur ||
       selectedVault.receiptToken === ReceiptToken.NFT
     ) {
-      if (height <= MIN_HEIGHT) {
+      if (height <= MIN_SCREEN_HEIGHT) {
         if (expandedBoxId === -1) {
           setExpandedBoxId(1);
         }
@@ -123,7 +121,7 @@ export default function Portfolio() {
       selectedVault.receiptToken === ReceiptToken.NFT
     ) {
       if (value === expandedBoxId) return;
-      if (height > MIN_HEIGHT) return;
+      if (height > MIN_SCREEN_HEIGHT) return;
 
       setExpandedBoxId(value);
     }

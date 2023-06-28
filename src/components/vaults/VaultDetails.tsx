@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useWindowSize } from "@react-hook/window-size/throttled";
 
 import { Card, Stats } from "@/components/common";
@@ -12,14 +13,12 @@ import { ReceiptToken, VaultInfo } from "@/types/vault";
 import { activeChainId } from "@/utils/web3";
 import { getVaultUpTime } from "@/utils/vault";
 import { useUI } from "@/hooks";
-import { useEffect, useState } from "react";
 import VaultDesc from "./VaultDesc";
+import { MIN_SCREEN_HEIGHT } from "@/config/constants";
 
 type Props = {
   vault: VaultInfo;
 };
-
-const MIN_HEIGHT = 820;
 
 export default function VaultDetails({ vault }: Props) {
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -31,7 +30,7 @@ export default function VaultDetails({ vault }: Props) {
 
   useEffect(() => {
     if (vault.isBlur || vault.receiptToken === ReceiptToken.NFT) {
-      if (height <= MIN_HEIGHT) {
+      if (height <= MIN_SCREEN_HEIGHT) {
         if (expandedBoxId === -1) {
           setExpandedBoxId(1);
         }
@@ -46,7 +45,7 @@ export default function VaultDetails({ vault }: Props) {
   const onChangeActiveSectionId = (value: number) => {
     if (vault.isBlur || vault.receiptToken === ReceiptToken.NFT) {
       if (value === expandedBoxId) return;
-      if (height > MIN_HEIGHT) return;
+      if (height > MIN_SCREEN_HEIGHT) return;
 
       setExpandedBoxId(value);
     }
