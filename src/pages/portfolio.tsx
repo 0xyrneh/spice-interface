@@ -104,7 +104,7 @@ export default function Portfolio() {
     ) {
       if (height <= MIN_SCREEN_HEIGHT) {
         if (expandedBoxId === -1) {
-          setExpandedBoxId(1);
+          setExpandedBoxId(2);
         }
       } else {
         if (expandedBoxId !== -1) {
