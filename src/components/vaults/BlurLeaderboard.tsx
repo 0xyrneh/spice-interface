@@ -236,7 +236,7 @@ export default function BlurPts({
       onCollapse={() => setExpanded(false)}
       onClick={onActive}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between cursor-pointer">
         <div className="flex items-center gap-2.5 text-white">
           {showIcon && (
             <Image
@@ -265,7 +265,11 @@ export default function BlurPts({
         </button>
       </div>
       {onlyPts && (
-        <div className="flex items-center justify-center flex-1">
+        <div
+          className={`flex items-center justify-center ${
+            expanded ? "" : "flex-1"
+          }`}
+        >
           <div>
             {(onlyPts || expanded) && (
               <div
