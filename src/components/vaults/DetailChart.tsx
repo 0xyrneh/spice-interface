@@ -36,7 +36,8 @@ export default function DetailChart({ vault }: Props) {
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [noneBlurVaultShares, setNoneBlurVaultShares] = useState<any>();
-  const [sliderValue, setSliderValue] = useState(50);
+  const [sliderValue, setSliderValue] = useState(3);
+  const [ptValue, setPtValue] = useState("3.00");
 
   const sampleDataByTimeTicks = (originData: any[]) => {
     if (originData.length === 0) return [];
@@ -337,6 +338,26 @@ export default function DetailChart({ vault }: Props) {
     }
   }, [vault]);
 
+  const onPtValueChange = (e: any) => {
+    const newValue = Number(e.target.value);
+    if (newValue >= 0) {
+      const targetMax = 25;
+
+      if (newValue > targetMax) {
+        setPtValue(targetMax.toFixed(3));
+        setSliderValue(targetMax);
+      } else {
+        setPtValue(e.target.value);
+        setSliderValue(newValue);
+      }
+    }
+  };
+
+  const onSliderValueChange = (val: number) => {
+    setSliderValue(val);
+    setPtValue(val.toString());
+  };
+
   return (
     <div className="flex flex-col flex-1 gap-5 pt-1">
       <Card className="gap-3 flex-1 overflow-hidden min-h-[323px] h-[50%]">
@@ -394,37 +415,30 @@ export default function DetailChart({ vault }: Props) {
                     <input
                       className="text-xs text-gray-200 w-full"
                       placeholder="0.00"
+                      value={ptValue}
+                      onChange={onPtValueChange}
                     />
                   </div>
                 </div>
                 <div className="flex flex-col tracking-normal justify-end w-full max-w-[300px]">
                   <div className="flex flex-row items-center justify-between items-center">
-                    <span className="text-xs font-medium text-gray-200">
-                      $0
-                    </span>
-                    <span className="text-xs font-medium text-gray-200">
-                      $5
-                    </span>
-                    <span className="text-xs font-medium text-gray-200">
-                      $10
-                    </span>
-                    <span className="text-xs font-medium text-gray-200">
-                      $15
-                    </span>
-                    <span className="text-xs font-medium text-gray-200">
-                      $20
-                    </span>
-                    <span className="text-xs font-medium text-gray-200">
-                      $25
-                    </span>
+                    {[0, 5, 10, 15, 20, 25].map((val, idx) => (
+                      <span
+                        className={`text-xs font-medium pointer-cursor ${sliderValue !== val ? "text-gray-200" : "text-orange-200 text-shadow-orange-200"}`}
+                        onClick={() => onSliderValueChange(val)}
+                        key={idx}
+                      >
+                        ${val}
+                      </span>
+                    ))}
                   </div>
                   <div className="flex flex-col">
                     <Slider
-                      max={100}
+                      max={25}
                       min={0}
-                      step={10}
+                      step={0.1}
                       value={sliderValue}
-                      onChange={setSliderValue}
+                      onChange={onSliderValueChange}
                       size="small"
                     />
                   </div>
@@ -435,7 +449,7 @@ export default function DetailChart({ vault }: Props) {
           {vault.isBlur && step !== 1 ? (
             <div className="flex items-start tracking-normal text-xs gap-[1px] flex-col">
               <div className="hidden 2xl:flex items-center gap-1">
-                <span>1W Est. Points:</span>
+                <span className="whitespace-nowrap whitespace-nowrap">1W Est. Points:</span>
                 <span className="text-white">
                   {(blurChartInfo?.weekPoints
                     ? blurChartInfo?.weekPoints.toFixed(2)
@@ -444,7 +458,7 @@ export default function DetailChart({ vault }: Props) {
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span>1M Est. Points:</span>
+                <span className="whitespace-nowrap whitespace-nowrap">1M Est. Points:</span>
                 <span className="text-white">
                   {(blurChartInfo?.weekPoints
                     ? ((blurChartInfo?.weekPoints * 30) / 7).toFixed(2)
@@ -453,8 +467,8 @@ export default function DetailChart({ vault }: Props) {
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span>1Y Est. Points:</span>
-                <span className="text-white">
+                <span className="whitespace-nowrap">1Y Est. Points:</span>
+                <span className="text-white whitespace-nowrap">
                   {(blurChartInfo?.weekPoints
                     ? (blurChartInfo?.weekPoints * 52).toFixed(2)
                     : undefined) ?? "-"}{" "}
