@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import useBreakpoint from "use-breakpoint";
 import moment from "moment";
+import { useWeb3React } from "@web3-react/core";
 
 import { CopyClipboard, Card, Table } from "@/components/common";
 import { TableRowInfo } from "@/components/common/Table";
 import { BREAKPOINTS } from "@/constants";
+import { getExpolorerUrl } from "@/utils/string";
 
-import { useWeb3React } from "@web3-react/core";
 import { shortAddress } from "@/utils";
 
 type Props = {
@@ -131,10 +132,21 @@ export default function AccountInfo({
         itemClass: () => "!justify-start pr-3",
         rowClass: () => "w-[60px] lg:w-[21%] 2xl:w-[21%]",
         format: (item) => {
+          let txHash = shortAddress(item.txHash, 8, -6);
           if (breakpoint === "md" || breakpoint === "sm")
-            return shortAddress(item.txHash, 5, -3);
-          if (breakpoint === "lg") return shortAddress(item.txHash, 5, -3);
-          return shortAddress(item.txHash, 8, -6);
+            txHash = shortAddress(item.txHash, 5, -3);
+          if (breakpoint === "lg") txHash = shortAddress(item.txHash, 5, -3);
+
+          return (
+            <a
+              className="underline"
+              href={getExpolorerUrl(item.txHash)}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {txHash}
+            </a>
+          );
         },
       },
       {
