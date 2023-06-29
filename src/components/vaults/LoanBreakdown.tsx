@@ -28,6 +28,7 @@ type Props = {
   showIcon?: boolean;
   nonExpandedClassName?: string;
   className?: string;
+  headerClassName?: string;
   walletConnectRequired?: boolean;
   isBreakdown?: boolean;
   onActive: () => void;
@@ -39,6 +40,7 @@ export default function LoanBreakdown({
   small,
   showIcon,
   className,
+  headerClassName,
   nonExpandedClassName,
   walletConnectRequired,
   isBreakdown,
@@ -367,7 +369,7 @@ export default function LoanBreakdown({
       onClick={onActive}
       animate
     >
-      <div className="flex items-center justify-between cursor-pointer">
+      <div className={`flex items-center justify-between ${headerClassName}`}>
         <div className="flex items-center gap-2.5 text-white">
           {showIcon && (
             <Image

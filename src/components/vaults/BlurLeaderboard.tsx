@@ -25,6 +25,7 @@ type Props = {
   showIcon?: boolean;
   nonExpandedClassName?: string;
   className?: string;
+  headerClassName?: string;
   onlyPts?: boolean;
   showAccumulated?: boolean;
   onDeposit?: () => void;
@@ -61,6 +62,7 @@ export default function BlurPts({
   vault,
   showIcon,
   className,
+  headerClassName,
   nonExpandedClassName,
   onlyPts,
   showAccumulated,
@@ -236,7 +238,7 @@ export default function BlurPts({
       onCollapse={() => setExpanded(false)}
       onClick={onActive}
     >
-      <div className="flex items-center justify-between cursor-pointer">
+      <div className={`flex items-center justify-between ${headerClassName}`}>
         <div className="flex items-center gap-2.5 text-white">
           {showIcon && (
             <Image
