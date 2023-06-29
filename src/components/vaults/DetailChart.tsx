@@ -440,7 +440,7 @@ export default function DetailChart({ vault }: Props) {
                   <span className="text-sm font-medium text-gray-200">
                     Point Value
                   </span>
-                  <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 text-gray-200 hover:text-gray-300 rounded gap-[8px] px-[8px] py-[5px] w-[100px]">
+                  <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 text-gray-200 hover:text-gray-300 rounded gap-[8px] px-[8px] py-[5px] w-[120px]">
                     <span className="text-xs">$/PT</span>
                     <input
                       className="text-xs text-gray-200 w-full"
@@ -454,7 +454,7 @@ export default function DetailChart({ vault }: Props) {
                   <div className="flex flex-row items-center justify-between items-center">
                     {[0, 5, 10, 15, 20, 25].map((val, idx) => (
                       <span
-                        className={`text-xs font-medium cursor-pointer ${
+                        className={`text-xs font-medium cursor-pointer w-[25px] text-center ${
                           sliderValue !== val
                             ? "text-gray-200"
                             : "text-orange-200 text-shadow-orange-200"
