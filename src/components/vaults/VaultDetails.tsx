@@ -194,12 +194,14 @@ export default function VaultDetails({ vault }: Props) {
               }}
               className={`${
                 expandedBoxId === 1
-                  ? `h-[100px] overflow-hidden gap-4.5 ${
+                  ? `h-[100px] overflow-hidden gap-3 ${
                       isCardPopup ? "flex-1" : ""
                     }`
                   : "flex-1 gap-3"
               }`}
-              headerClassName={expandedBoxId === 1 ? "cursor-pointer" : ""}
+              headerClassName={`${
+                expandedBoxId === 1 ? "cursor-pointer" : ""
+              } h-[18px]`}
               onActive={() => onChangeActiveSectionId(2)}
               onCardPopup={(value) => setIsCardPopup(value)}
             />
