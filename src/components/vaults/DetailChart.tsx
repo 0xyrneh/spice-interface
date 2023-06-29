@@ -11,6 +11,7 @@ import {
 } from "@/components/vaults";
 import { ChartValue, VaultInfo } from "@/types/vault";
 import { BLUR_API_BASE } from "@/config/constants/backend";
+import { Slider } from "../common";
 import axios from "axios";
 import moment from "moment";
 import {
@@ -35,6 +36,7 @@ export default function DetailChart({ vault }: Props) {
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [noneBlurVaultShares, setNoneBlurVaultShares] = useState<any>();
+  const [sliderValue, setSliderValue] = useState(50);
 
   const sampleDataByTimeTicks = (originData: any[]) => {
     if (originData.length === 0) return [];
@@ -258,7 +260,7 @@ export default function DetailChart({ vault }: Props) {
 
   const getTVL = () => {
     if (vault.isBlur) {
-      return blurChartInfo.tvl;
+      return blurChartInfo.tvl || 0;
     }
 
     const aprHistories = getAprHistories();
@@ -365,8 +367,8 @@ export default function DetailChart({ vault }: Props) {
             ))}
           </div>
         </div>
-        <div className="flex items-end justify-between text-gray-200 px-12">
-          <div className="flex gap-4 items-center">
+        <div className="flex items-center justify-between text-gray-200 px-12 gap-[12px]">
+          <div className="flex gap-4 items-center w-full">
             {vault.isBlur && step === 0 ? (
               <Stats
                 title="SP-BLUR"
@@ -381,9 +383,57 @@ export default function DetailChart({ vault }: Props) {
                 />
               </>
             )}
+            {vault.isBlur && step === 1 && (
+              <div className="flex flex-row gap-1 w-full">
+                <div className="flex flex-col tracking-normal">
+                  <span className="text-sm font-medium text-gray-200">
+                    Point Value
+                  </span>
+                  <div className="flex items-center border-1 border-gray-200 hover:border-gray-300 text-gray-200 hover:text-gray-300 rounded gap-[8px] px-[8px] py-[5px] w-[100px]">
+                    <span className="text-xs">$/PT</span>
+                    <input
+                      className="text-xs text-gray-200 w-full"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col tracking-normal justify-end w-full max-w-[300px]">
+                  <div className="flex flex-row items-center justify-between items-center">
+                    <span className="text-xs font-medium text-gray-200">
+                      $0
+                    </span>
+                    <span className="text-xs font-medium text-gray-200">
+                      $5
+                    </span>
+                    <span className="text-xs font-medium text-gray-200">
+                      $10
+                    </span>
+                    <span className="text-xs font-medium text-gray-200">
+                      $15
+                    </span>
+                    <span className="text-xs font-medium text-gray-200">
+                      $20
+                    </span>
+                    <span className="text-xs font-medium text-gray-200">
+                      $25
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <Slider
+                      max={100}
+                      min={0}
+                      step={10}
+                      value={sliderValue}
+                      onChange={setSliderValue}
+                      size="small"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          {vault.isBlur ? (
-            <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
+          {vault.isBlur && step !== 1 ? (
+            <div className="flex items-start tracking-normal text-xs gap-[1px] flex-col">
               <div className="hidden 2xl:flex items-center gap-1">
                 <span>1W Est. Points:</span>
                 <span className="text-white">
@@ -413,21 +463,21 @@ export default function DetailChart({ vault }: Props) {
               </div>
             </div>
           ) : (
-            <div className="flex items-center tracking-normal text-xs gap-1 xl:gap-4 flex-col xl:flex-row">
-              <div className="hidden 2xl:flex items-center gap-1">
-                <span>1W Est. Yield:</span>
+            <div className="flex items-start tracking-normal text-xs gap-[1px] flex-col">
+              <div className="flex items-center gap-1">
+                <span className="whitespace-nowrap">1W Est. Yield:</span>
                 <span className="text-white">
                   Ξ{(getVaultEstimatedYield() / 52).toFixed(2)}
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span>1M Est. Yield:</span>
+                <span className="whitespace-nowrap">1M Est. Yield:</span>
                 <span className="text-white">
                   Ξ{(getVaultEstimatedYield() / 12).toFixed(2)}
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span>1Y Est. Yield:</span>
+                <span className="whitespace-nowrap">1Y Est. Yield:</span>
                 <span className="text-white">
                   Ξ{getVaultEstimatedYield().toFixed(2)}
                 </span>
