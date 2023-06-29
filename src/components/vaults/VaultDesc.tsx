@@ -74,9 +74,8 @@ export default function VaultDesc({
 
   return (
     <Card
-      className={`gap-3 !py-3 ${
-        showFullDesc ? "absolute top-0 !z-50 bg-opacity-95" : ""
-      }`}
+      className={`gap-3 !py-3 
+      ${showFullDesc ? "absolute top-0 !z-50 bg-opacity-95" : ""}`}
       onMouseLeave={onHideFullDesc}
     >
       <div className="flex items-center justify-between gap-5">

@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 import { useWindowSize } from "@react-hook/window-size/throttled";
 
-import { shortAddress } from "@/utils";
-import { Card, CopyClipboard } from "@/components/common";
 import {
   LoanAndBidExposure,
   MarketplaceExposure,
@@ -25,12 +22,14 @@ import { getBalanceInEther } from "@/utils/formatBalance";
 import { accLoans } from "@/utils/lend";
 import { VaultPositionGraph } from "@/components/vaults";
 import { PROLOGUE_NFT_ADDRESS, MIN_SCREEN_HEIGHT } from "@/config/constants";
+import AccountInfo from "@/components/portfolio/AccountInfo";
 
 export default function Portfolio() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
 
   const [expandedBoxId, setExpandedBoxId] = useState<number>(-1); // -1: none, 1: left center section, 2: left bottom section
   const [isCardPopup, setIsCardPopup] = useState<boolean>(false); // flag to track one box is pop up
+  const [showAccountDetails, setShowAccountDetails] = useState(false); // flag to show tx history
 
   const { account } = useWeb3React();
   const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
@@ -132,40 +131,19 @@ export default function Portfolio() {
       <div className="flex flex-col min-w-[35%] w-[41%] gap-5 pt-1">
         {/* account card */}
         {account && (
-          <Card className="!py-3 !flex-row items-center justify-between gap-5">
-            <div className="flex items-center gap-5 flex-1">
-              {accountImage() ? (
-                <Image
-                  className="border-1 border-orange-200 rounded-full drop-shadow-orange-200"
-                  src={accountImage()!}
-                  width={40}
-                  height={40}
-                  alt=""
-                />
-              ) : (
-                <Image
-                  className=""
-                  src="/assets/images/profile.svg"
-                  width={52}
-                  height={52}
-                  alt=""
-                />
-              )}
-              <span className="hidden 3xl:flex font-bold text-base text-orange-200 text-shadow-orange-200 max-w-[60%]">
-                {shortAddress(account, 18, -16)}
-              </span>
-              <span className="hidden lg:flex 3xl:hidden font-bold text-base text-orange-200 text-shadow-orange-200 max-w-[60%]">
-                {shortAddress(account, 10, -10)}
-              </span>
-              <span className="lg:hidden font-bold text-base text-orange-200 text-shadow-orange-200 max-w-[60%]">
-                {shortAddress(account, 10, account.length)}
-              </span>
-            </div>
-            <CopyClipboard
-              text={account}
-              className="min-w-[24px] min-w-[24px]"
+          <div className="relative">
+            <AccountInfo
+              accountImage={accountImage()}
+              onShowDetails={() => setShowAccountDetails(true)}
             />
-          </Card>
+            {showAccountDetails && (
+              <AccountInfo
+                accountImage={accountImage()}
+                showDetails
+                onHideDetails={() => setShowAccountDetails(false)}
+              />
+            )}
+          </div>
         )}
 
         {/* vault list table */}
