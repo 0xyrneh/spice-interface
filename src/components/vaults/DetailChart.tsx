@@ -470,7 +470,7 @@ export default function DetailChart({ vault }: Props) {
                     <Slider
                       max={25}
                       min={0}
-                      step={0.1}
+                      step={2.5}
                       value={sliderValue}
                       onChange={onSliderValueChange}
                       size="small"
