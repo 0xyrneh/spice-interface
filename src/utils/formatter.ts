@@ -93,6 +93,7 @@ export const formatBlurRanking = async (
       day: (point as any) - beforeOneDayPoint,
       week: (point as any) - beforeOneWeekPoint,
       total: point as number,
+      depositedAmnt: lastestItem.okrs.holders_eth[addr] || 0,
     });
   }
 
