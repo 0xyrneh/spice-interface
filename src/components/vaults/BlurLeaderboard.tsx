@@ -393,10 +393,11 @@ export default function BlurPts({
           </div>
         </div>
       )}
+      {/* sp-blur rankings module */}
       {(!onlyPts || expanded) && (
         <>
           {showAccumulated && (
-            <div className="flex justify-center py-2 items-center text-gray-100 text-sm drop-shadow-sm">
+            <div className="flex justify-center items-center text-gray-100 text-sm drop-shadow-sm my-[5px]">
               <span className="tracking-normal text-center px-4">
                 {total.toFixed(2)}
               </span>
