@@ -100,15 +100,19 @@ export default function VaultDetails({ vault }: Props) {
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
       <div className="flex flex-col min-w-[35%] w-[41%] gap-5 pt-1">
+        {/* vault description module */}
         <div className="relative">
           <VaultDesc
             vault={vault}
+            showFullDesc={false}
+            expanded={showFullDescription}
             onShowFullDesc={() => setShowFullDescription(true)}
           />
           {showFullDescription && (
             <VaultDesc
               vault={vault}
               showFullDesc
+              expanded
               onHideFullDesc={() => setShowFullDescription(false)}
             />
           )}
