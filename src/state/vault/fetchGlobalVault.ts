@@ -285,6 +285,7 @@ export const fetchBlurVaults = async (vaults: any[]) => {
       return {
         ...row,
         tvl: getBalanceInEther(onChainInfo[i][0][0]),
+        totalShares: getBalanceInEther(onChainInfo[i][1][0]),
         wethBalance: vaultWethInfo[i][0][0],
         totalSupply: 0,
         apr: 100 * (row?.okrs?.expected_return || 0),

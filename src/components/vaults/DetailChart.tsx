@@ -25,12 +25,16 @@ import { formatBlurChart } from "@/utils/formatter";
 import { activeChainId } from "@/utils/web3";
 import { getVaultShares } from "@/api/subgraph";
 import { getBalanceInEther } from "@/utils/formatBalance";
+import { useAppDispatch, useAppSelector } from "@/state/hooks";
+import { fetchETHPriceAsync } from "@/state/oracle/oracleSlice";
 
 type Props = {
   vault: VaultInfo;
 };
 
 export default function DetailChart({ vault }: Props) {
+  const dispatch = useAppDispatch();
+
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Month);
   const [step, setStep] = useState(0);
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
@@ -38,6 +42,7 @@ export default function DetailChart({ vault }: Props) {
   const [noneBlurVaultShares, setNoneBlurVaultShares] = useState<any>();
   const [sliderValue, setSliderValue] = useState(3);
   const [ptValue, setPtValue] = useState("3.00");
+  const { ethPrice } = useAppSelector((state) => state.oracle);
 
   const sampleDataByTimeTicks = (originData: any[]) => {
     if (originData.length === 0) return [];
@@ -261,7 +266,7 @@ export default function DetailChart({ vault }: Props) {
 
   const getTVL = () => {
     if (vault.isBlur) {
-      return blurChartInfo.tvl || 0;
+      return blurChartInfo?.tvl || 0;
     }
 
     const aprHistories = getAprHistories();
@@ -311,6 +316,20 @@ export default function DetailChart({ vault }: Props) {
     );
   };
 
+  const getBlurApy = () => {
+    const totalPoints: number = blurChartInfo?.totalSpPoints ?? 0;
+    const ethVal = (totalPoints * sliderValue) / ethPrice;
+    const totalAssets = vault?.tvl || 0;
+    const totalShares = vault?.totalShares || 0;
+    if (totalShares === 0) return 0;
+    return (
+      Math.pow(
+        (totalAssets + ethVal) / totalShares / 285.126857633,
+        31536000 / (Math.floor(new Date().getTime() / 1000) - 1687219691)
+      ) - 1
+    ) * 100;
+  };
+
   const getVaultEstimatedYield = () => {
     const tvl = getTVL();
     const apy = getVaultHistoricalApy();
@@ -332,6 +351,7 @@ export default function DetailChart({ vault }: Props) {
 
   useEffect(() => {
     if (vault.isBlur) {
+      dispatch(fetchETHPriceAsync());
       fetchBlurChart();
     } else {
       fetchNoneBlurVaultPosition();
@@ -357,6 +377,12 @@ export default function DetailChart({ vault }: Props) {
     setSliderValue(val);
     setPtValue(val.toString());
   };
+
+  useEffect(() => {
+    if (vault.isBlur && step === 1) {
+      onSliderValueChange(3);
+    }
+  }, [vault, step]);
 
   return (
     <div className="flex flex-col flex-1 gap-5 pt-1">
@@ -400,7 +426,11 @@ export default function DetailChart({ vault }: Props) {
                 <Stats title="Vault TVL" value={`Ξ${getTVL().toFixed(2)}`} />
                 <Stats
                   title="Vault APY"
-                  value={`${getVaultHistoricalApy().toFixed(2)}%`}
+                  value={`${(vault.isBlur && step === 1
+                    ? getBlurApy()
+                    : getVaultHistoricalApy()
+                  ).toFixed(2)}%`}
+                  valueClass="min-w-[80px]"
                 />
               </>
             )}
@@ -424,7 +454,11 @@ export default function DetailChart({ vault }: Props) {
                   <div className="flex flex-row items-center justify-between items-center">
                     {[0, 5, 10, 15, 20, 25].map((val, idx) => (
                       <span
-                        className={`text-xs font-medium pointer-cursor ${sliderValue !== val ? "text-gray-200" : "text-orange-200 text-shadow-orange-200"}`}
+                        className={`text-xs font-medium cursor-pointer ${
+                          sliderValue !== val
+                            ? "text-gray-200"
+                            : "text-orange-200 text-shadow-orange-200"
+                        }`}
                         onClick={() => onSliderValueChange(val)}
                         key={idx}
                       >
@@ -449,7 +483,9 @@ export default function DetailChart({ vault }: Props) {
           {vault.isBlur && step !== 1 ? (
             <div className="flex items-start tracking-normal text-xs gap-[1px] flex-col">
               <div className="hidden 2xl:flex items-center gap-1">
-                <span className="whitespace-nowrap whitespace-nowrap">1W Est. Points:</span>
+                <span className="whitespace-nowrap whitespace-nowrap">
+                  1W Est. Points:
+                </span>
                 <span className="text-white">
                   {(blurChartInfo?.weekPoints
                     ? blurChartInfo?.weekPoints.toFixed(2)
@@ -458,7 +494,9 @@ export default function DetailChart({ vault }: Props) {
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <span className="whitespace-nowrap whitespace-nowrap">1M Est. Points:</span>
+                <span className="whitespace-nowrap whitespace-nowrap">
+                  1M Est. Points:
+                </span>
                 <span className="text-white">
                   {(blurChartInfo?.weekPoints
                     ? ((blurChartInfo?.weekPoints * 30) / 7).toFixed(2)
