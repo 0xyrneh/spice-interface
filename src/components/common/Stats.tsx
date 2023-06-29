@@ -43,7 +43,7 @@ export default function Stats({
         <span
           className={`${
             size ? "text-" + size : "text-sm"
-          } font-medium text-gray-200`}
+          } font-medium text-gray-200 whitespace-nowrap`}
         >
           {title}
         </span>

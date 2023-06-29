@@ -3,63 +3,66 @@ import Slider, { SliderThumb } from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import MenuSVG from "@/assets/icons/menu.svg";
 
-const AirbnbSlider = styled(Slider)((component) => ({
-  "& .MuiSlider-thumb": {
-    height: 40,
-    width: 40,
-    borderRadius: "4px",
-    backgroundColor: component.disabled
-      ? "rgba(161, 161, 161, 0.8)"
-      : "rgba(253, 167, 57, 0.8)",
-    border: component.disabled ? "2px solid #A1A1A1" : "2px solid #FDA739",
-  },
-  "& .MuiSlider-thumb.Mui-focusVisible, & .MuiSlider-thumb.Mui-active, & .MuiSlider-thumb:hover":
-    {
-      boxShadow: "none !important",
+const AirbnbSlider = styled(Slider)((component) => {
+  const size = component.size === "small" ? 28 : 40;
+  return {
+    "& .MuiSlider-thumb": {
+      height: size,
+      width: size,
+      borderRadius: "4px",
+      backgroundColor: component.disabled
+        ? "rgba(161, 161, 161, 0.8)"
+        : "rgba(253, 167, 57, 0.8)",
+      border: component.disabled ? "2px solid #A1A1A1" : "2px solid #FDA739",
     },
-  "& .MuiSlider-track": {
-    height: 40,
-    background: "transparent",
-    border: 0,
-    borderRadius: 0,
-    "&:after": {
-      content: '""',
-      position: "absolute",
-      display: "block",
-      width: "calc(100% + 40px)",
-      height: 40,
-      borderRadius: 4,
-      background: component.disabled
-        ? "rgba(161, 161, 161, 0.2)"
-        : "rgba(255, 227, 202, 0.2)",
-      border: "1px solid #A1A1A1",
-      transform: "translateX(-20px)",
-      zIndex: -10000,
-    },
-  },
-  "& .MuiSlider-rail": {
-    color: "transparent",
-    height: 40,
-    "&:after": {
-      content: '""',
-      position: "absolute",
-      display: "block",
-      width: "calc(100% + 40px)",
-      height: 40,
-      borderRadius: 4,
+    "& .MuiSlider-thumb.Mui-focusVisible, & .MuiSlider-thumb.Mui-active, & .MuiSlider-thumb:hover":
+      {
+        boxShadow: "none !important",
+      },
+    "& .MuiSlider-track": {
+      height: size,
       background: "transparent",
-      border: "1px solid #A1A1A1",
-      transform: "translateX(-20px)",
-      zIndex: -10000,
+      border: 0,
+      borderRadius: 0,
+      "&:after": {
+        content: '""',
+        position: "absolute",
+        display: "block",
+        width: `calc(100% + ${size}px)`,
+        height: size,
+        borderRadius: 4,
+        background: component.disabled
+          ? "rgba(161, 161, 161, 0.2)"
+          : "rgba(255, 227, 202, 0.2)",
+        border: "1px solid #A1A1A1",
+        transform: `translateX(-${size / 2}px)`,
+        zIndex: -10000,
+      },
     },
-  },
-  "& .MuiSlider-markLabel": {
-    color: "#A1A1A1",
-  },
-  "& .MuiSlider-markLabelActive": {
-    color: "#FDA739",
-  },
-}));
+    "& .MuiSlider-rail": {
+      color: "transparent",
+      height: size,
+      "&:after": {
+        content: '""',
+        position: "absolute",
+        display: "block",
+        width: `calc(100% + ${size}px)`,
+        height: size,
+        borderRadius: 4,
+        background: "transparent",
+        border: "1px solid #A1A1A1",
+        transform: `translateX(-${size / 2}px)`,
+        zIndex: -10000,
+      },
+    },
+    "& .MuiSlider-markLabel": {
+      color: "#A1A1A1",
+    },
+    "& .MuiSlider-markLabelActive": {
+      color: "#FDA739",
+    },
+  };
+});
 
 interface AirbnbThumbComponentProps extends React.HTMLAttributes<unknown> {}
 
@@ -76,6 +79,7 @@ function AirbnbThumbComponent(props: AirbnbThumbComponentProps) {
 type Props = {
   value: number;
   disabled?: boolean;
+  size?: "small" | "medium";
   min?: number;
   max?: number;
   step?: number;
@@ -86,14 +90,16 @@ type Props = {
 export default function CustomizedSlider({
   value,
   disabled,
+  size,
   min,
   max,
   step,
   onChange,
   marks,
 }: Props) {
+  const _size = size === "small" ? 28 : 40;
   return (
-    <div className="relative flex flex-col px-5">
+    <div className="relative flex flex-col px-5" style={{padding: `0 ${_size / 2}px`}}>
       <AirbnbSlider
         slots={{ thumb: AirbnbThumbComponent }}
         value={value}
@@ -101,6 +107,7 @@ export default function CustomizedSlider({
         max={max}
         step={step}
         marks={marks}
+        size={size}
         disabled={disabled}
         onChange={(_, val) => {
           if (onChange) {
