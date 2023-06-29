@@ -266,111 +266,104 @@ export default function BlurPts({
           />
         </button>
       </div>
-      {onlyPts && (
-        <div
-          className={`flex items-center justify-center ${
-            expanded ? "" : "flex-1"
-          }`}
-        >
-          <div>
-            {(onlyPts || expanded) && (
-              <div
-                className={`flex flex-col gap-5 ${
-                  expanded ? "border-y border-gray-200 py-4" : ""
-                }`}
-              >
-                {expanded && (
-                  <div className="flex justify-between">
-                    <Stats
-                      title="RANK"
-                      value={myRank?.rank ?? "-"}
-                      valueSize="sm"
-                      className="w-[60px]"
-                    />
-                    <div className="flex flex-col tracking-normal flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-200">
-                          WALLET
-                        </span>
-                      </div>
-                      <div
-                        className={
-                          "flex items-center font-bold text-sm text-orange-200 drop-shadow-orange-200"
-                        }
-                      >
-                        <CopyClipboard
-                          text={account!}
-                          width={16}
-                          height={16}
-                          className="hidden lg:flex items-center min-w-4 w-4 h-4 mr-1"
-                        />
-                        YOU
-                      </div>
-                    </div>
-                    <Stats
-                      title="1D"
-                      value={myRank?.day ? myRank?.day.toFixed(2) : "0"}
-                      valueSize="sm"
-                      className="w-[16%] items-end"
-                    />
-                    <Stats
-                      title="1W"
-                      value={myRank?.week ? myRank?.week.toFixed(2) : "0"}
-                      valueSize="sm"
-                      className="w-[16%] items-end"
-                    />
-                    <Stats
-                      title="TOTAL SPB"
-                      value={myRank?.total ? myRank?.total.toFixed(2) : "0"}
-                      valueSize="sm"
-                      className="w-[16%] items-end"
-                    />
+      {/* sp-blur points module */}
+      <>
+        {(onlyPts || expanded) && (
+          <div
+            className={`flex flex-col gap-5 ${
+              expanded ? "border-y border-gray-200 py-4" : ""
+            }`}
+          >
+            {expanded && (
+              <div className="flex justify-between">
+                <Stats
+                  title="RANK"
+                  value={myRank?.rank ?? "-"}
+                  valueSize="sm"
+                  className="w-[60px]"
+                />
+                <div className="flex flex-col tracking-normal flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-200">
+                      WALLET
+                    </span>
                   </div>
-                )}
-                <div
-                  className={`flex items-center justify-center ${
-                    expanded
-                      ? "gap-[calc(20%-122px)] lg:gap-[calc(14%-112px)]"
-                      : "lg:gap-2 xl:gap-0 3xl:gap-2 mb-2"
-                  }`}
-                >
-                  {(expanded
-                    ? BlurCards
-                    : BlurCards.slice(count * page, count * (page + 1))
-                  ).map((card, idx) => (
-                    <BlurStats
-                      key={`${card.title}-${idx}`}
-                      title={BlurCards[count * page + idx].title}
-                      value={BlurCards[count * page + idx].value}
-                      type={BlurCards[count * page + idx].type as any}
-                      tooltip={BlurCards[count * page + idx].tooltip}
-                      disabled={count * page + idx !== 0}
-                      className={`${expanded ? "w-[153px] lg:w-[196px]" : ""} ${
-                        count * page + idx === 0 ? "" : "blur-[2px]"
-                      }`}
+                  <div
+                    className={
+                      "flex items-center font-bold text-sm text-orange-200 drop-shadow-orange-200"
+                    }
+                  >
+                    <CopyClipboard
+                      text={account!}
+                      width={16}
+                      height={16}
+                      className="hidden lg:flex items-center min-w-4 w-4 h-4 mr-1"
                     />
-                  ))}
+                    YOU
+                  </div>
                 </div>
+                <Stats
+                  title="1D"
+                  value={myRank?.day ? myRank?.day.toFixed(2) : "0"}
+                  valueSize="sm"
+                  className="w-[16%] items-end"
+                />
+                <Stats
+                  title="1W"
+                  value={myRank?.week ? myRank?.week.toFixed(2) : "0"}
+                  valueSize="sm"
+                  className="w-[16%] items-end"
+                />
+                <Stats
+                  title="TOTAL SPB"
+                  value={myRank?.total ? myRank?.total.toFixed(2) : "0"}
+                  valueSize="sm"
+                  className="w-[16%] items-end"
+                />
               </div>
             )}
-            {onlyPts && !expanded && (
-              <div className="flex items-center justify-center gap-2">
-                {Array(Math.ceil(BlurCards.length / count))
-                  .fill("0")
-                  .map((_, idx) => (
-                    <button
-                      key={`Pagination-${idx}`}
-                      className={`${
-                        idx === page ? "bg-orange-200" : "bg-gray-200"
-                      } w-6 lg:w-8 h-1 rounded-lg`}
-                      onClick={() => setPage(idx)}
-                    />
-                  ))}
-              </div>
-            )}
+            <div
+              className={`flex items-center justify-center ${
+                expanded
+                  ? "gap-[calc(20%-122px)] lg:gap-[calc(14%-112px)]"
+                  : "lg:gap-2 xl:gap-0 3xl:gap-2 mb-2"
+              }`}
+            >
+              {(expanded
+                ? BlurCards
+                : BlurCards.slice(count * page, count * (page + 1))
+              ).map((card, idx) => (
+                <BlurStats
+                  key={`${card.title}-${idx}`}
+                  title={BlurCards[count * page + idx].title}
+                  value={BlurCards[count * page + idx].value}
+                  type={BlurCards[count * page + idx].type as any}
+                  tooltip={BlurCards[count * page + idx].tooltip}
+                  disabled={count * page + idx !== 0}
+                  className={`${expanded ? "w-[153px] lg:w-[196px]" : ""} ${
+                    count * page + idx === 0 ? "" : "blur-[2px]"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+        {onlyPts && !expanded && (
+          <div className="flex items-center justify-center gap-2">
+            {Array(Math.ceil(BlurCards.length / count))
+              .fill("0")
+              .map((_, idx) => (
+                <button
+                  key={`Pagination-${idx}`}
+                  className={`${
+                    idx === page ? "bg-orange-200" : "bg-gray-200"
+                  } w-6 lg:w-8 h-1 rounded-lg`}
+                  onClick={() => setPage(idx)}
+                />
+              ))}
+          </div>
+        )}
+      </>
 
       {expanded && (
         <div className="flex items-end justify-between mt-3">

@@ -191,7 +191,7 @@ export default function Portfolio() {
                           isCardPopup ? "flex-1" : ""
                         }`
                       : "flex-1 gap-3"
-                  }`}
+                  } justify-between`}
                   headerClassName={expandedBoxId === 2 ? "cursor-pointer" : ""}
                   onActive={() => onChangeActiveSectionId(1)}
                   onCardPopup={(value) => setIsCardPopup(value)}
