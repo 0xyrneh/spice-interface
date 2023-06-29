@@ -141,6 +141,7 @@ export default function BlurPts({
         const ranksInfo = await formatBlurRanking(
           res.data.data.historicalRecords
         );
+
         setRank(ranksInfo);
       }
     } catch (err) {
@@ -179,7 +180,7 @@ export default function BlurPts({
       },
       {
         title: "WALLET",
-        key: "wallet",
+        key: "depositedAmnt",
         headerClass: "!justify-start",
         itemClass: () => "!justify-start",
         itemPrefix: (item) => {
@@ -190,6 +191,13 @@ export default function BlurPts({
               height={16}
               className="hidden lg:flex items-center min-w-4 w-4 h-4 mr-1"
             />
+          );
+        },
+        itemSuffix: (item) => {
+          return (
+            <span className="ml-[4px]">
+              {` [Ξ${item.depositedAmnt.toFixed(2)}]`}
+            </span>
           );
         },
         format: (item) => {
