@@ -158,7 +158,7 @@ export default function BlurPointsPage() {
         });
       });
       chartData.push(vaultData);
-      if (userData.findIndex((val) => (val.y as number) > 0) > -1) {
+      if (checkedAddress && userData.findIndex((val) => (val.y as number) > 0) > -1) {
         chartData.push(userData);
       }
     } else {
