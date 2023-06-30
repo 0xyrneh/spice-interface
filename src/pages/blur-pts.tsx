@@ -36,6 +36,7 @@ export default function BlurPointsPage() {
   const [vaultChartInfo, setVaultChartInfo] = useState<any>();
   const [userChartInfo, setUserChartInfo] = useState<any>();
   const [historicalData, setHistoricalData] = useState<any>();
+  const [efficiencyData, setEfficiencyData] = useState<any>();
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [balance, setBalance] = useState(0);
   const [isInblur, setIsInBlur] = useState(false);
@@ -85,6 +86,21 @@ export default function BlurPointsPage() {
     }
   };
 
+  const fetchBlurEfficiencyData = async () => {
+    try {
+      let url = `${BLUR_API_BASE}/historical-efficiency/`;
+      if (checkedAddress) url += checkedAddress;
+      else url += "0x0";
+      const res = await axios.get(url);
+
+      if (res.status === 200) {
+        setEfficiencyData(res.data.data);
+      }
+    } catch (err) {
+      console.error("efficiency fetching error");
+    }
+  };
+
   const fetchBalance = async (addr: string) => {
     const web3 = getWeb3();
     const res = await web3.eth.getBalance(addr);
@@ -127,25 +143,54 @@ export default function BlurPointsPage() {
   const getChartData = () => {
     const currentTime = Math.floor(Date.now() / 1000);
 
-    const blurPointsChart: ChartValue[] = vaultChartInfo?.pointsChart ?? [];
-    if (selectedPeriod === PeriodFilter.Day) {
-      return blurPointsChart.filter((item) => {
-        return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+    const chartData: ChartValue[][] = [];
+    if (efficiencyData) {
+      const vaultData: ChartValue[] = [];
+      const userData: ChartValue[] = [];
+      efficiencyData.times.map((time: string, i: number) => {
+        vaultData.push({
+          x: parseInt(time) * 1000,
+          y: efficiencyData.SPICE[i],
+        });
+        userData.push({
+          x: parseInt(time) * 1000,
+          y: efficiencyData.user[i],
+        });
       });
-    } else if (selectedPeriod === PeriodFilter.Week) {
-      return blurPointsChart.filter((item) => {
-        return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
-      });
-    } else if (selectedPeriod === PeriodFilter.Month) {
-      return blurPointsChart.filter((item) => {
-        return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
-      });
-    } else if (selectedPeriod === PeriodFilter.Year) {
-      return blurPointsChart.filter((item) => {
-        return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
-      });
+      chartData.push(vaultData);
+      if (userData.findIndex((val) => (val.y as number) > 0) > -1) {
+        chartData.push(userData);
+      }
+    } else {
+      chartData.push([]);
     }
-    return blurPointsChart;
+
+    if (selectedPeriod === PeriodFilter.Day) {
+      return chartData.map((data: ChartValue[]) =>
+        data.filter((item) => {
+          return moment(item.x).unix() > currentTime - DAY_IN_SECONDS;
+        })
+      );
+    } else if (selectedPeriod === PeriodFilter.Week) {
+      return chartData.map((data: ChartValue[]) =>
+        data.filter((item) => {
+          return moment(item.x).unix() > currentTime - WEEK_IN_SECONDS;
+        })
+      );
+    } else if (selectedPeriod === PeriodFilter.Month) {
+      return chartData.map((data: ChartValue[]) =>
+        data.filter((item) => {
+          return moment(item.x).unix() > currentTime - MONTH_IN_SECONDS;
+        })
+      );
+    } else if (selectedPeriod === PeriodFilter.Year) {
+      return chartData.map((data: ChartValue[]) =>
+        data.filter((item) => {
+          return moment(item.x).unix() > currentTime - YEAR_IN_SECONDS;
+        })
+      );
+    }
+    return chartData;
   };
 
   useEffect(() => {
@@ -158,6 +203,10 @@ export default function BlurPointsPage() {
     fetchBlurChart();
     fetchEfficiency();
   }, []);
+
+  useEffect(() => {
+    fetchBlurEfficiencyData();
+  }, [vaultInfo, checkedAddress]);
 
   useEffect(() => {
     if (checkedAddress && vaultInfo) {
@@ -482,7 +531,37 @@ export default function BlurPointsPage() {
               </span>
             )}
 
-          {/* <LineChart data={getChartData()} period={selectedPeriod} /> */}
+          <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)] basis-[350px]">
+            <div className="flex-1 relative max-h-[calc(100%-18px)] lg:max-h-[100%]">
+              <LineChart
+                data={getChartData()}
+                colors={["#FFE3CA", "#FDA739"]}
+                period={selectedPeriod}
+              />
+            </div>
+            <div className="flex px-12 lg:px-0 lg:w-[34px] lg:flex-col gap-5.5 justify-center justify-between lg:justify-center">
+              {[
+                PeriodFilter.Day,
+                PeriodFilter.Week,
+                PeriodFilter.Month,
+                PeriodFilter.Year,
+                PeriodFilter.All,
+              ].map((period) => (
+                <button
+                  key={period}
+                  className={`w-[34px] lg:w-full border-1 rounded text-xs bg-opacity-10 ${
+                    period === selectedPeriod
+                      ? "text-orange-200 border-orange-200 shadow-orange-200 bg-orange-200"
+                      : "text-gray-200 border-gray-200 bg-gray-200 hover:text-gray-300 hover:bg-gray-300 hover:bg-opacity-10 hover:border-gray-300"
+                  }`}
+                  disabled={period === selectedPeriod}
+                  onClick={() => setPeriod(period)}
+                >
+                  {period}
+                </button>
+              ))}
+            </div>
+          </div>
         </Card>
       </div>
     </div>
