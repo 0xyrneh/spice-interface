@@ -35,7 +35,7 @@ type Props = {
 export default function DetailChart({ vault }: Props) {
   const dispatch = useAppDispatch();
 
-  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Month);
+  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Year);
   const [step, setStep] = useState(0);
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
@@ -323,11 +323,13 @@ export default function DetailChart({ vault }: Props) {
     const totalShares = vault?.totalShares || 0;
     if (totalShares === 0) return 0;
     return (
-      Math.pow(
+      (Math.pow(
         (totalAssets + ethVal) / totalShares / 285.126857633,
         31536000 / (Math.floor(new Date().getTime() / 1000) - 1687219691)
-      ) - 1
-    ) * 100;
+      ) -
+        1) *
+      100
+    );
   };
 
   const getVaultEstimatedYield = () => {

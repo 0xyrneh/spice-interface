@@ -33,7 +33,7 @@ export default function VaultPositionGraph({
   totalPosition,
 }: Props) {
   const [step, setStep] = useState(0);
-  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Day);
+  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Year);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const { account } = useWeb3React();
