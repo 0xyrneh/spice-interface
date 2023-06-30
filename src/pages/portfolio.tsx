@@ -26,7 +26,7 @@ import { accLoans } from "@/utils/lend";
 import { VaultPositionGraph } from "@/components/vaults";
 import { PROLOGUE_NFT_ADDRESS, MIN_SCREEN_HEIGHT } from "@/config/constants";
 
-export default function Portfolio() {
+export default function PortfolioPage() {
   const [selectedVaultAddr, setSelectedVaultAddr] = useState<string>();
 
   const [expandedBoxId, setExpandedBoxId] = useState<number>(-1); // -1: none, 1: left center section, 2: left bottom section

@@ -27,7 +27,7 @@ import { LineChart } from "@/components/portfolio";
 import { DEFAULT_BLUR_VAULT } from "@/config/constants";
 import multicall from "@/utils/multicall";
 
-export default function Portfolio() {
+export default function BlurPointsPage() {
   const [address, setAddress] = useState<string>();
   const [error, setError] = useState<string>();
   const [checkedAddress, setCheckedAddress] = useState<string>();
