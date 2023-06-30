@@ -33,6 +33,8 @@ export default function AccountInfo({
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
 
   const fetchTxHistories = async () => {
+    if (!showDetails) return [];
+
     setIsFetching(true);
     if (!account) return;
     const txHistoryRes = await getUserTxHistories(account);
