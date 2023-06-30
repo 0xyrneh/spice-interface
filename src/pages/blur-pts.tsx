@@ -40,7 +40,7 @@ export default function Portfolio() {
   const [balance, setBalance] = useState(0);
   const [isInblur, setIsInBlur] = useState(false);
   const [blurBalance, setBlurBalance] = useState(0);
-  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Week);
+  const [selectedPeriod, setPeriod] = useState(PeriodFilter.Year);
 
   const router = useRouter();
   const { vaults } = useAppSelector((state) => state.vault);
@@ -113,7 +113,10 @@ export default function Portfolio() {
     ]);
 
     setIsInBlur(!balance[0].eq(0));
-    setBlurBalance(getBalanceInEther(balance[0]) * getBalanceInEther(totalAssets[0]) / getBalanceInEther(totalSupply[0]));
+    setBlurBalance(
+      (getBalanceInEther(balance[0]) * getBalanceInEther(totalAssets[0])) /
+        getBalanceInEther(totalSupply[0])
+    );
   };
 
   const formatNumber = (val: any, digits = 2) => {
@@ -394,7 +397,8 @@ export default function Portfolio() {
             <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
               You&apos;re already in the SP-BLUR Vault! You could be earning{" "}
               <span className="font-bold">
-                {(balance * vaultInfo[2]).toFixed(3)} MORE BLUR LENDING POINTS PER DAY
+                {(balance * vaultInfo[2]).toFixed(3)} MORE BLUR LENDING POINTS
+                PER DAY
               </span>{" "}
               depositing your current wallet balance. Will you continue to fade
               rational decision making anon?{" "}
@@ -414,7 +418,8 @@ export default function Portfolio() {
               <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
                 You currently have zero Blur Lending Points. You can be earning{" "}
                 <span className="font-bold">
-                  {(balance * vaultInfo[2]).toFixed(3)} BLUR LENDING POINTS PER DAY
+                  {(balance * vaultInfo[2]).toFixed(3)} BLUR LENDING POINTS PER
+                  DAY
                 </span>{" "}
                 by depositing the {balance.toFixed(3)} ETH in YOUR wallet into
                 the SP-BLUR Vault. Will you continue to fade rational decision
@@ -441,7 +446,8 @@ export default function Portfolio() {
                 </span>{" "}
                 depositing ETH into the SP-BLUR Vault (
                 <span className="font-bold">
-                  {(100 * vaultInfo[2] / userInfo[2]).toFixed(0)}% more efficient)
+                  {((100 * vaultInfo[2]) / userInfo[2]).toFixed(0)}% more
+                  efficient)
                 </span>{" "}
                 than farming yourself. Will you continue to fade rational
                 decision making anon?{" "}
@@ -462,7 +468,8 @@ export default function Portfolio() {
               <span className="text-orange-900 text-xs border-1 border-orange-900 rounded text-xs py-2 px-1 text-center tracking-normal">
                 You are earning{" "}
                 <span className="font-bold">
-                  {Math.abs(earnedPoints).toFixed(2)} MORE BLUR LENDING POINTS PER DAY
+                  {Math.abs(earnedPoints).toFixed(2)} MORE BLUR LENDING POINTS
+                  PER DAY
                 </span>{" "}
                 farming yourself vs depositing ETH into the SP-BLUR Vault. Do
                 you want to continue spending the time farming yourself?{" "}
