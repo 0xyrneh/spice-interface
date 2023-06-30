@@ -8,8 +8,10 @@ import { CopyClipboard, Card, Table } from "@/components/common";
 import { TableRowInfo } from "@/components/common/Table";
 import { BREAKPOINTS } from "@/constants";
 import { getExpolorerUrl } from "@/utils/string";
-
 import { shortAddress } from "@/utils";
+import { getUserTxHistories } from "@/api/subgraph";
+import { getBalanceInEther } from "@/utils/formatBalance";
+import { getVaultNameFromAddress } from "@/utils/vault";
 
 type Props = {
   accountImage?: string;
@@ -18,91 +20,41 @@ type Props = {
   onHideDetails?: () => void;
 };
 
-const txHistories = [
-  {
-    time: 1688042053,
-    txHash:
-      "0x0189828f767e84c5e789a19233d756efca14590c66627b341dcb7c52d46bec45",
-    txType: "Withdraw",
-    vaultType: "Prologue",
-    amount: 2.13,
-  },
-  {
-    time: 1688031053,
-    txHash:
-      "0x0189828f767e84c5e789a19233d756efca14590c66627b341dcb7c52d46bec45",
-    txType: "Deposit",
-    vaultType: "Flagship",
-    amount: 1.59,
-  },
-  {
-    time: 1688037053,
-    txHash:
-      "0x0189828f767e84c5e789a19233d756efca14590c66627b341dcb7c52d46bec45",
-    txType: "Increase Leverage",
-    vaultType: "SP-BLUR",
-    amount: 2.93,
-  },
-  {
-    time: 1688042053,
-    txHash:
-      "0x0189828f767e84c5e789a19233d756efca14590c66627b341dcb7c52d46bec45",
-    txType: "Withdraw",
-    vaultType: "Prologue",
-    amount: 2.13,
-  },
-  {
-    time: 1688031053,
-    txHash:
-      "0x0189828f767e84c5e789a19233d756efca14590c66627b341dcb7c52d46bec45",
-    txType: "Deposit",
-    vaultType: "Flagship",
-    amount: 1.59,
-  },
-  {
-    time: 1688037053,
-    txHash:
-      "0x0189828f767e84c5e789a19233d756efca14590c66627b341dcb7c52d46bec45",
-    txType: "Increase Leverage",
-    vaultType: "SP-BLUR",
-    amount: 2.93,
-  },
-  {
-    time: 1688042053,
-    txHash:
-      "0x0189828f767e84c5e789a19233d756efca14590c66627b341dcb7c52d46bec45",
-    txType: "Withdraw",
-    vaultType: "Prologue",
-    amount: 2.13,
-  },
-  {
-    time: 1688031053,
-    txHash:
-      "0x0189828f767e84c5e789a19233d756efca14590c66627b341dcb7c52d46bec45",
-    txType: "Deposit",
-    vaultType: "Flagship",
-    amount: 1.59,
-  },
-  {
-    time: 1688037053,
-    txHash:
-      "0x0189828f767e84c5e789a19233d756efca14590c66627b341dcb7c52d46bec45",
-    txType: "Increase Leverage",
-    vaultType: "SP-BLUR",
-    amount: 2.93,
-  },
-];
-
 export default function AccountInfo({
   accountImage,
   showDetails,
   onShowDetails,
   onHideDetails,
 }: Props) {
-  const [isFetching, setIsFetching] = useState<boolean | undefined>(false);
+  const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
+  const [txHistories, setTxHistories] = useState<any[]>([]);
 
   const { account } = useWeb3React();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
+
+  const fetchTxHistories = async () => {
+    setIsFetching(true);
+    if (!account) return;
+    const txHistoryRes = await getUserTxHistories(account);
+
+    const userTxHistories = txHistoryRes.map((row: any) => {
+      return {
+        time: row.timestamp,
+        amount: getBalanceInEther(row.amount),
+        txType: row.type,
+        txHash: row.txHash,
+        vaultType: getVaultNameFromAddress(row.vault.address),
+      };
+    });
+
+    setTxHistories(userTxHistories);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    fetchTxHistories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account]);
 
   const getRowInfos = (): TableRowInfo[] => {
     return [
