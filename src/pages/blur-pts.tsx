@@ -531,7 +531,7 @@ export default function BlurPointsPage() {
               </span>
             )}
 
-          <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100%-96px)] basis-[350px]">
+          <div className="flex flex-1 flex-col-reverse lg:flex-row lg:gap-3 max-h-[calc(100vh-570px)] basis-[350px]">
             <div className="flex-1 relative max-h-[calc(100%-18px)] lg:max-h-[100%]">
               <LineChart
                 data={getChartData()}
