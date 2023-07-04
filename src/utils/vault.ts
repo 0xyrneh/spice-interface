@@ -71,3 +71,21 @@ export const getVaultUpTime = (creationTimeStamp: number): number => {
   }
   return 0;
 };
+
+// get vault name
+export const getVaultNameFromAddress = (address: string): string => {
+  const prologueAddress = "0x6110d61DD1133b0f845f1025d6678Cd22A11a2fe";
+  const flagshipAddress = "0xAe11ae7CaD244dD1d321Ff2989543bCd8a6Db6DF";
+  const leverageAddress = "0xd68871bd7D28572860b2E0Ee5c713b64445104F9";
+  const blurAddress = "0xfC287513E2DD58fbf952eB0ED05D511591a6215B";
+
+  if (address.toLowerCase() === prologueAddress.toLowerCase())
+    return "Prologue";
+  if (address.toLowerCase() === flagshipAddress.toLowerCase())
+    return "Flagship";
+  if (address.toLowerCase() === leverageAddress.toLowerCase())
+    return "Leverage";
+  if (address.toLowerCase() === blurAddress.toLowerCase()) return "SP-BLUR";
+
+  return "Prologue";
+};

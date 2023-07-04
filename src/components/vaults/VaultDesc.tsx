@@ -17,6 +17,7 @@ import { useUI } from "@/hooks";
 type Props = {
   vault: VaultInfo;
   showFullDesc?: boolean;
+  expanded?: boolean;
   onShowFullDesc?: () => void;
   onHideFullDesc?: () => void;
 };
@@ -24,6 +25,7 @@ type Props = {
 export default function VaultDesc({
   vault,
   showFullDesc,
+  expanded,
   onShowFullDesc,
   onHideFullDesc,
 }: Props) {
@@ -72,9 +74,8 @@ export default function VaultDesc({
 
   return (
     <Card
-      className={`gap-3 !py-3 ${
-        showFullDesc ? "absolute top-0 !z-50 bg-opacity-95" : ""
-      }`}
+      className={`gap-3 !py-3 
+      ${showFullDesc ? "absolute top-0 !z-50 bg-opacity-95" : ""}`}
       onMouseLeave={onHideFullDesc}
     >
       <div className="flex items-center justify-between gap-5">
@@ -172,7 +173,8 @@ export default function VaultDesc({
         </div>
       ) : (
         <div
-          className="tracking-normal text-white text-xs font-medium leading-4 h-auto relative overflow-hidden xl:h-8 whitespace-nowrap xl:whitespace-normal"
+          className={`tracking-normal text-white text-xs font-medium leading-4 h-auto relative overflow-hidden xl:h-8 whitespace-nowrap xl:whitespace-normal 
+          ${expanded ? "invisible" : "visible"}`}
           onMouseEnter={onShowFullDesc}
         >
           {vault.description}
