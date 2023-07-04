@@ -63,7 +63,7 @@ const Table = ({
   const visibleItems = items.slice(0, pageNum * ROW_PER_PAGE);
   const hasMore =
     pageNum * ROW_PER_PAGE < items.length &&
-    visibleItems.length >= ROW_PER_PAGE;
+    visibleItems.length >= pageNum * ROW_PER_PAGE;
 
   const getSortedItems = () => {
     if (sortKey) {
