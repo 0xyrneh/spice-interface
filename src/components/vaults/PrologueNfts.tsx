@@ -24,6 +24,7 @@ type Props = {
   vault?: VaultInfo;
   className?: string;
   headerClassName?: string;
+  walletConnectRequired?: boolean;
   onActive: () => void;
   onCardPopup: (status: boolean) => void;
 };
@@ -32,6 +33,7 @@ export default function PrologueNfts({
   vault,
   className,
   headerClassName,
+  walletConnectRequired,
   onActive,
   onCardPopup,
 }: Props) {
