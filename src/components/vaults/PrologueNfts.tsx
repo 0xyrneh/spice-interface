@@ -63,7 +63,7 @@ export default function PrologueNfts({
       : nftsOrigin;
   };
 
-  const ROW_PER_PAGE = expanded ? 30 : 20;
+  const ROW_PER_PAGE = expanded ? 40 : 20;
   const filteredNfts = getFilteredNfts();
   const visibleNfts = filteredNfts.slice(0, pageNum * ROW_PER_PAGE);
   const hasMore =
