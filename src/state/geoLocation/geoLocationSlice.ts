@@ -2,11 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 import { Geolocation } from "@/types/geolocation";
-import {
-  GEOLOCATION_API_KEY,
-  GEOLOCATION_API_URL,
-  GEOLOCATION_BLACKLIST,
-} from "@/config/constants";
+import { GEOLOCATION_API_URL, GEOLOCATION_BLACKLIST } from "@/config/constants";
 
 const initialState: Geolocation = {
   geolocation: "",
@@ -32,9 +28,7 @@ export const { setGeolocation } = geolocationSlice.actions;
 
 export const fetchGeolocation = () => async (dispatch: any) => {
   try {
-    const res = await axios.get(
-      `${GEOLOCATION_API_URL}?api_key=${GEOLOCATION_API_KEY}`
-    );
+    const res = await axios.get(GEOLOCATION_API_URL);
 
     if (res.status === 200) {
       dispatch(setGeolocation(res.data.country));
