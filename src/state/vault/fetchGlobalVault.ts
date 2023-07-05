@@ -519,7 +519,16 @@ export const getVaultLiquidWeth = async (vault: VaultInfo) => {
   if (!vault?.address) return BigNumber.from(0);
 
   let liquidWeth = vault?.wethBalance || BigNumber.from(0);
-  if (vault?.isBlur) return liquidWeth;
+  if (vault?.isBlur) {
+    const [wethBalance] = await multicall(WethAbi, [
+      {
+        address: getWethAddress(),
+        name: "balanceOf",
+        params: ["0xB23a734F49Ed11dc3B0dD3Ff322b5Df95220574e"],
+      },
+    ]);
+    return wethBalance;
+  }
 
   try {
     const underlyingVaults: any[] = await getUnderlyingVaults(vault);
