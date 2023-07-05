@@ -13,6 +13,7 @@ import { VaultInfo, ReceiptToken } from "@/types/vault";
 import VaultAbi from "@/config/abi/SpiceFiVault.json";
 import SpiceFiNFT4626Abi from "@/config/abi/SpiceFiNFT4626.json";
 import WethAbi from "@/config/abi/WETH.json";
+import Blur4626Abi from "@/config/abi/Blur4626.json";
 import { getWethAddress } from "@/utils/addressHelpers";
 import { activeChainId } from "@/utils/web3";
 import {
@@ -655,14 +656,21 @@ export const getVaultLiquidWeth = async (vault: VaultInfo) => {
 
   let liquidWeth = vault?.wethBalance || BigNumber.from(0);
   if (vault?.isBlur) {
+    const [bidder] = await multicall(Blur4626Abi, [
+      {
+        address: vault.address,
+        name: "bidder",
+        params: [],
+      },
+    ]);
     const [wethBalance] = await multicall(WethAbi, [
       {
         address: getWethAddress(),
         name: "balanceOf",
-        params: ["0xB23a734F49Ed11dc3B0dD3Ff322b5Df95220574e"],
+        params: [bidder[0]],
       },
     ]);
-    return wethBalance;
+    return wethBalance[0];
   }
 
   try {
