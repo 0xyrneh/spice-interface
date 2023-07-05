@@ -24,7 +24,6 @@ type Props = {
   vault?: VaultInfo;
   className?: string;
   headerClassName?: string;
-  walletConnectRequired?: boolean;
   onActive: () => void;
   onCardPopup: (status: boolean) => void;
 };
@@ -33,7 +32,6 @@ export default function PrologueNfts({
   vault,
   className,
   headerClassName,
-  walletConnectRequired,
   onActive,
   onCardPopup,
 }: Props) {
@@ -57,10 +55,17 @@ export default function PrologueNfts({
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
 
+  const getFilteredNfts = (): PrologueNftInfo[] => {
+    return searchQuery.length > 0
+      ? nftsOrigin.filter((row) => String(row.tokenId).includes(searchQuery))
+      : nftsOrigin;
+  };
+
   const ROW_PER_PAGE = expanded ? 30 : 20;
-  const visibleNfts = nftsOrigin.slice(0, pageNum * ROW_PER_PAGE);
+  const filteredNfts = getFilteredNfts();
+  const visibleNfts = filteredNfts.slice(0, pageNum * ROW_PER_PAGE);
   const hasMore =
-    pageNum * ROW_PER_PAGE < nftsOrigin.length &&
+    pageNum * ROW_PER_PAGE < filteredNfts.length &&
     visibleNfts.length >= pageNum * ROW_PER_PAGE;
 
   const getNftPortolios = () => {
@@ -180,6 +185,42 @@ export default function PrologueNfts({
     fetchMoreOnBottomReached(infiniteScrollBodyRef.current);
   }, [fetchMoreOnBottomReached]);
 
+  // get sorted nfts
+  const getSortedNfts = (): PrologueNftInfo[] => {
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueHighToLow) {
+      return visibleNfts.sort((a, b) => (a.amount.gte(b.amount) ? -1 : 1));
+    }
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
+      return visibleNfts.sort((a, b) => (a.amount.gt(b.amount) ? 1 : -1));
+    }
+    // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
+      return visibleNfts
+        .sort((a, b) => (a.apy <= b.apy ? 1 : -1))
+        .sort((a, b) => {
+          if (a.isEscrowed || b.isEscrowed) return 0;
+          return BigNumber.from(a.amount).gte(b.amount) ? 1 : -1;
+        });
+    }
+    // show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyLowToHigh) {
+      return visibleNfts
+        .sort((a, b) => {
+          return a.apy > b.apy ? 1 : -1;
+        })
+        .sort((a, b) => {
+          if (a.isEscrowed) return 1;
+          return -1;
+        })
+        .sort((a, b) => {
+          if (a.isEscrowed && b.isEscrowed) return a.apy > b.apy ? 1 : -1;
+          return a.amount.gte(b.amount) ? 1 : -1;
+        });
+    }
+
+    return visibleNfts;
+  };
+
   const cardInRow = () => {
     if (expanded) {
       if (breakpoint === "3xl" || breakpoint === "2xl" || breakpoint === "xl")
@@ -201,7 +242,10 @@ export default function PrologueNfts({
     else if ((idx + 1) % _cardInRow === 0) sides.push("right");
     if (expanded) {
       if (idx < _cardInRow) sides.push("top");
-      else if (nfts.length - idx <= nfts.length % _cardInRow)
+      else if (
+        getSortedNfts().length - idx <=
+        getSortedNfts().length % _cardInRow
+      )
         sides.push("bottom");
     } else {
       sides.push("bottom");
@@ -209,50 +253,6 @@ export default function PrologueNfts({
 
     return sides as any;
   };
-
-  // get sorted nfts
-  const getSortedNfts = (): PrologueNftInfo[] => {
-    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueHighToLow) {
-      return nftsOrigin.sort((a, b) => (a.amount.gte(b.amount) ? -1 : 1));
-    }
-    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
-      return nftsOrigin.sort((a, b) => (a.amount.gt(b.amount) ? 1 : -1));
-    }
-    // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
-    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
-      return nftsOrigin
-        .sort((a, b) => (a.apy <= b.apy ? 1 : -1))
-        .sort((a, b) => {
-          if (a.isEscrowed || b.isEscrowed) return 0;
-          return BigNumber.from(a.amount).gte(b.amount) ? 1 : -1;
-        });
-    }
-    // show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)
-    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyLowToHigh) {
-      return nftsOrigin
-        .sort((a, b) => {
-          return a.apy > b.apy ? 1 : -1;
-        })
-        .sort((a, b) => {
-          if (a.isEscrowed) return 1;
-          return -1;
-        })
-        .sort((a, b) => {
-          if (a.isEscrowed && b.isEscrowed) return a.apy > b.apy ? 1 : -1;
-          return a.amount.gte(b.amount) ? 1 : -1;
-        });
-    }
-
-    return nftsOrigin;
-  };
-
-  // get queried nfts
-  const nfts =
-    searchQuery.length > 0
-      ? getSortedNfts().filter((row) =>
-          String(row.tokenId).includes(searchQuery)
-        )
-      : getSortedNfts();
 
   return (
     <Card
@@ -283,7 +283,7 @@ export default function PrologueNfts({
       </div>
       <div className="flex items-center justify-between gap-5">
         <Search
-          placeholder={`Search NFTID [${nfts.length}]`}
+          placeholder={`Search NFTID [${nftsOrigin.length}]`}
           className={`${expanded ? "flex-none" : "flex-1 xl:flex-none"}`}
           onChange={(val) => setSearchQuery(val)}
         />
@@ -319,7 +319,7 @@ export default function PrologueNfts({
           } overflow-y-auto flex-wrap`}
           onScroll={(e) => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
         >
-          {visibleNfts.map((nft, idx) => (
+          {getSortedNfts().map((nft, idx) => (
             <PrologueNftCard
               key={`prologue-nft-${idx}`}
               nfts={[nft]}
