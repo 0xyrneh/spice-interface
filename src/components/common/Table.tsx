@@ -97,7 +97,7 @@ const Table = ({
     setTimeout(() => {
       setInfiniteLoading(false);
       setPageNum(pageNum + 1);
-    }, 3000);
+    }, 100);
   }, [hasMore, pageNum]);
 
   const fetchMoreOnBottomReached = useCallback(
