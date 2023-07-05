@@ -67,7 +67,7 @@ const VaultFooter = () => {
         </Link>
         <Link
           target="__blank"
-          href="https://github.com"
+          href="https://github.com/teamspice"
           className="text-gray-200 hover:text-gray-300"
         >
           <GithubSVG />
