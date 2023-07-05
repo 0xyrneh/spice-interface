@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect, useRef, useCallback } from "react";
 import { useWeb3React } from "@web3-react/core";
 
 import SortDownSVG from "@/assets/icons/sort-down.svg";
@@ -30,6 +30,7 @@ type Props = {
   bodyClass?: string;
   isLoading?: boolean;
   walletConnectRequired?: boolean;
+  rowPerPage?: number;
   onClickItem?: (item: any) => void;
   isActive?: (item: any) => boolean;
 };
@@ -47,16 +48,26 @@ const Table = ({
   isActive,
   isLoading,
   walletConnectRequired,
+  rowPerPage,
 }: Props) => {
   const [sortKey, setSortKey] = useState<string | undefined>(defaultSortKey);
   const [sortAsc, setSortAsc] = useState(false);
   const [hoverBody, setHoverBody] = useState(false);
+  const [pageNum, setPageNum] = useState<number>(0);
+  const [infiniteLoading, setInfiniteLoading] = useState(false);
+  const infiniteScrollBodyRef = useRef<HTMLTableSectionElement>(null);
 
   const { account } = useWeb3React();
 
+  const ROW_PER_PAGE = rowPerPage || 15;
+  const visibleItems = items.slice(0, pageNum * ROW_PER_PAGE);
+  const hasMore =
+    pageNum * ROW_PER_PAGE < items.length &&
+    visibleItems.length >= pageNum * ROW_PER_PAGE;
+
   const getSortedItems = () => {
     if (sortKey) {
-      return items.sort((a, b) => {
+      return visibleItems.sort((a, b) => {
         if (typeof a[sortKey] === "number") {
           if (a[sortKey] === undefined || b[sortKey] === undefined) return 0;
           if (sortAsc) {
@@ -74,9 +85,41 @@ const Table = ({
         }
       });
     } else {
-      return items;
+      return visibleItems;
     }
   };
+
+  const fetchMoreData = useCallback(() => {
+    if (!hasMore) return;
+
+    setInfiniteLoading(true);
+
+    setTimeout(() => {
+      setInfiniteLoading(false);
+      setPageNum(pageNum + 1);
+    }, 100);
+  }, [hasMore, pageNum]);
+
+  const fetchMoreOnBottomReached = useCallback(
+    (infiniteScrollElement?: HTMLDivElement | null) => {
+      if (infiniteScrollElement) {
+        const { scrollHeight, scrollTop, clientHeight } = infiniteScrollElement;
+
+        if (scrollTop + clientHeight >= scrollHeight - 10) {
+          fetchMoreData();
+        }
+      }
+    },
+    [fetchMoreData]
+  );
+
+  useEffect(() => {
+    setPageNum(1);
+  }, []);
+
+  useEffect(() => {
+    fetchMoreOnBottomReached(infiniteScrollBodyRef.current);
+  }, [fetchMoreOnBottomReached]);
 
   return (
     <div className={`overflow-hidden pr-5 -mr-5 ${containerClassName}`}>
@@ -124,6 +167,8 @@ const Table = ({
           }`}
           onMouseEnter={() => setHoverBody(true)}
           onMouseLeave={() => setHoverBody(false)}
+          onScroll={(e) => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
+          ref={infiniteScrollBodyRef}
         >
           {!account && walletConnectRequired && (
             <tr className="h-full">
@@ -179,6 +224,15 @@ const Table = ({
                 ))}
               </tr>
             ))}
+          {infiniteLoading && (
+            <tr className="mb-[4px]">
+              <td>
+                <span className="flex justify-center align-center my-2">
+                  <LoadingSpinner size={16} />
+                </span>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

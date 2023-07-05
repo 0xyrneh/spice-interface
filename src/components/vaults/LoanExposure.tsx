@@ -380,6 +380,7 @@ export default function LoanExposure({
         bodyClass="h-[calc(100%-40px)]"
         isLoading={isFetching}
         walletConnectRequired={true}
+        rowPerPage={loanExpanded ? 30 : 20}
       />
     </Card>
   );

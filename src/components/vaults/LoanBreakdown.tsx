@@ -421,6 +421,7 @@ export default function LoanBreakdown({
         bodyClass="h-[calc(100%-40px)]"
         isLoading={isFetching}
         walletConnectRequired={walletConnectRequired}
+        rowPerPage={loanExpanded ? 30 : 20}
       />
     </Card>
   );
