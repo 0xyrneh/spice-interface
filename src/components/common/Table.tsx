@@ -105,7 +105,7 @@ const Table = ({
       if (infiniteScrollElement) {
         const { scrollHeight, scrollTop, clientHeight } = infiniteScrollElement;
 
-        if (scrollTop + clientHeight >= scrollHeight) {
+        if (scrollTop + clientHeight >= scrollHeight - 10) {
           fetchMoreData();
         }
       }
