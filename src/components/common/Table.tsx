@@ -55,7 +55,7 @@ const Table = ({
   const [hoverBody, setHoverBody] = useState(false);
   const [pageNum, setPageNum] = useState<number>(0);
   const [infiniteLoading, setInfiniteLoading] = useState(false);
-  const tableBodyRef = useRef<HTMLTableSectionElement>(null);
+  const infiniteScrollBodyRef = useRef<HTMLTableSectionElement>(null);
 
   const { account } = useWeb3React();
 
@@ -118,7 +118,7 @@ const Table = ({
   }, []);
 
   useEffect(() => {
-    fetchMoreOnBottomReached(tableBodyRef.current);
+    fetchMoreOnBottomReached(infiniteScrollBodyRef.current);
   }, [fetchMoreOnBottomReached]);
 
   return (
@@ -168,7 +168,7 @@ const Table = ({
           onMouseEnter={() => setHoverBody(true)}
           onMouseLeave={() => setHoverBody(false)}
           onScroll={(e) => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
-          ref={tableBodyRef}
+          ref={infiniteScrollBodyRef}
         >
           {!account && walletConnectRequired && (
             <tr className="h-full">
