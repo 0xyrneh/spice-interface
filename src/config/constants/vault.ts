@@ -34,11 +34,11 @@ export const VAULT_COLLECTION_COLORS = [
 ];
 
 export const VAULT_BACKGROUND_IMAGES = {
-  flagship: "/assets/images/bg-flagship-vault.jpg",
-  prologue: "/assets/images/bg-prologue-vault.jpg",
-  leverage: "/assets/images/bg-leverage-vault.jpg",
-  leverageWithrawOnly: "/assets/images/bg-leverage-vault-withdraw-only.png",
-  blur: "/assets/images/bg-blur-vault.png",
+  flagship: "/assets/images/bg-flagship-vault.webp",
+  prologue: "/assets/images/bg-prologue-vault.webp",
+  leverage: "/assets/images/bg-leverage-vault.webp",
+  leverageWithrawOnly: "/assets/images/bg-leverage-vault-withdraw-only.webp",
+  blur: "/assets/images/bg-blur-vault.webp",
 };
 
 export const VAULT_LOGOS = {
