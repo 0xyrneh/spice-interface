@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import useBreakpoint from "use-breakpoint";
 import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
@@ -44,10 +44,12 @@ export default function PrologueNfts({
   const [selectedIdx, setSelectedIdx] = useState<number>();
   const [searchQuery, setSearchQuery] = useState("");
   const [hoverList, setHoverList] = useState(false);
+  const [pageNum, setPageNum] = useState<number>(0);
+  const [nftsOrigin, setNftsOrigin] = useState<any[]>([]);
 
   const { setBlur } = useUI();
   const { breakpoint } = useBreakpoint(BREAKPOINTS);
-  const container = useRef();
+  const infiniteScrollBodyRef = useRef<HTMLDivElement>(null);
   const { account } = useWeb3React();
   const { data: lendData } = useAppSelector((state) => state.lend);
   const { allNfts } = useAppSelector((state) => state.nft);
@@ -55,14 +57,11 @@ export default function PrologueNfts({
   const loans = accLoans(lendData);
   const userNfts = vault?.userInfo?.nftsRaw || [];
 
-  useEffect(() => {
-    setSelectedIdx(undefined);
-    onCardPopup(expanded);
-  }, [expanded]);
-
-  useEffect(() => {
-    setBlur(expanded);
-  }, [expanded, setBlur]);
+  const ROW_PER_PAGE = expanded ? 30 : 20;
+  const visibleNfts = nftsOrigin.slice(0, pageNum * ROW_PER_PAGE);
+  const hasMore =
+    pageNum * ROW_PER_PAGE < nftsOrigin.length &&
+    visibleNfts.length >= pageNum * ROW_PER_PAGE;
 
   const getNftPortolios = () => {
     if (!vault) return [];
@@ -82,6 +81,7 @@ export default function PrologueNfts({
         apy: 0,
       };
     });
+
     if (!account) {
       return allNfts1;
     }
@@ -136,51 +136,49 @@ export default function PrologueNfts({
     return [...allNfts1, ...myNfts];
   };
 
-  const sortNfts = (): PrologueNftInfo[] => {
-    const nftPortfolios = getNftPortolios();
+  // fetch more nfts
+  const fetchMoreData = useCallback(() => {
+    if (!hasMore) return;
 
-    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueHighToLow) {
-      return nftPortfolios.sort((a, b) => (a.amount.gte(b.amount) ? -1 : 1));
-    }
-    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
-      return nftPortfolios.sort((a, b) => (a.amount.gt(b.amount) ? 1 : -1));
-    }
-    // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
-    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
-      return nftPortfolios
-        .sort((a, b) => (a.apy <= b.apy ? 1 : -1))
-        .sort((a, b) => {
-          if (a.isEscrowed || b.isEscrowed) return 0;
-          return BigNumber.from(a.amount).gte(b.amount) ? 1 : -1;
-        });
-    }
-    // show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)
-    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyLowToHigh) {
-      return nftPortfolios
-        .sort((a, b) => {
-          return a.apy > b.apy ? 1 : -1;
-        })
-        .sort((a, b) => {
-          if (a.isEscrowed) return 1;
-          return -1;
-        })
-        .sort((a, b) => {
-          if (a.isEscrowed && b.isEscrowed) return a.apy > b.apy ? 1 : -1;
-          return a.amount.gte(b.amount) ? 1 : -1;
-        });
-    }
+    setTimeout(() => {
+      setPageNum(pageNum + 1);
+    }, 100);
+  }, [hasMore, pageNum]);
 
-    return nftPortfolios;
-  };
+  // event trigger when scroll is at bottom
+  const fetchMoreOnBottomReached = useCallback(
+    (infiniteScrollElement?: HTMLDivElement | null) => {
+      if (infiniteScrollElement) {
+        const { scrollHeight, scrollTop, clientHeight } = infiniteScrollElement;
 
-  // get sorted nfts
-  const sortedNfts = sortNfts();
+        if (scrollTop + clientHeight >= scrollHeight - 10) {
+          fetchMoreData();
+        }
+      }
+    },
+    [fetchMoreData]
+  );
 
-  // get queried nfts
-  const nfts =
-    searchQuery.length > 0
-      ? sortedNfts.filter((row) => String(row.tokenId).includes(searchQuery))
-      : sortedNfts;
+  useEffect(() => {
+    setSelectedIdx(undefined);
+    onCardPopup(expanded);
+  }, [expanded]);
+
+  useEffect(() => {
+    setBlur(expanded);
+  }, [expanded, setBlur]);
+
+  useEffect(() => {
+    setNftsOrigin(getNftPortolios());
+  }, [vault?.address, allNfts.length, loans.length]);
+
+  useEffect(() => {
+    setPageNum(1);
+  }, []);
+
+  useEffect(() => {
+    fetchMoreOnBottomReached(infiniteScrollBodyRef.current);
+  }, [fetchMoreOnBottomReached]);
 
   const cardInRow = () => {
     if (expanded) {
@@ -211,6 +209,50 @@ export default function PrologueNfts({
 
     return sides as any;
   };
+
+  // get sorted nfts
+  const getSortedNfts = (): PrologueNftInfo[] => {
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueHighToLow) {
+      return nftsOrigin.sort((a, b) => (a.amount.gte(b.amount) ? -1 : 1));
+    }
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ValueLowToHigh) {
+      return nftsOrigin.sort((a, b) => (a.amount.gt(b.amount) ? 1 : -1));
+    }
+    // show escrowed nfts first sorted by apy (high to low), then non escrowed nfts sorted by position size (high to low) - this should be default sorting
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyHighToLow) {
+      return nftsOrigin
+        .sort((a, b) => (a.apy <= b.apy ? 1 : -1))
+        .sort((a, b) => {
+          if (a.isEscrowed || b.isEscrowed) return 0;
+          return BigNumber.from(a.amount).gte(b.amount) ? 1 : -1;
+        });
+    }
+    // show escrowed nfts first reverse sorted by apy (low to high), then non escrowed nfts sorted by position size (high to low)
+    if (vaultNftsSortFilter === VaultNftsSortFilter.ApyLowToHigh) {
+      return nftsOrigin
+        .sort((a, b) => {
+          return a.apy > b.apy ? 1 : -1;
+        })
+        .sort((a, b) => {
+          if (a.isEscrowed) return 1;
+          return -1;
+        })
+        .sort((a, b) => {
+          if (a.isEscrowed && b.isEscrowed) return a.apy > b.apy ? 1 : -1;
+          return a.amount.gte(b.amount) ? 1 : -1;
+        });
+    }
+
+    return nftsOrigin;
+  };
+
+  // get queried nfts
+  const nfts =
+    searchQuery.length > 0
+      ? getSortedNfts().filter((row) =>
+          String(row.tokenId).includes(searchQuery)
+        )
+      : getSortedNfts();
 
   return (
     <Card
@@ -271,12 +313,13 @@ export default function PrologueNfts({
         onMouseLeave={() => setHoverList(false)}
       >
         <div
-          ref={container as any}
+          ref={infiniteScrollBodyRef as any}
           className={`h-full block flex gap-y-3 gap-px -mr-2.5 pr-2 ${
             hoverList ? "custom-scroll" : "custom-scroll-transparent"
           } overflow-y-auto flex-wrap`}
+          onScroll={(e) => fetchMoreOnBottomReached(e.target as HTMLDivElement)}
         >
-          {nfts.map((nft, idx) => (
+          {visibleNfts.map((nft, idx) => (
             <PrologueNftCard
               key={`prologue-nft-${idx}`}
               nfts={[nft]}
@@ -287,13 +330,12 @@ export default function PrologueNfts({
               containerClassName={
                 expanded
                   ? "min-w-[calc((100%-5px)/6)] lg:min-w-[calc((100%-6px)/7)] xl:min-w-[calc((100%-7px)/8)] max-w-[calc((100%-5px)/6)] lg:max-w-[calc((100%-6px)/7)] xl:max-w-[calc((100%-7px)/8)]"
-                  : // : "min-w-[calc((100%-2px)/3)] lg:min-w-[calc((100%-3px)/4)] xl:min-w-[calc((100%-4px)/5)] 3xl:min-w-[calc((100%-5px)/6)]"
-                    "w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
+                  : "w-[calc(99%/3)] lg:w-[calc(98.5%/4)] xl:w-[calc(98%/5)] 3xl:w-[calc(97.5%/6)]"
               }
               className={`${
                 selectedIdx === undefined ? "hover:cursor-pointer" : ""
               }`}
-              parent={container}
+              parent={infiniteScrollBodyRef}
               onClick={() => setSelectedIdx(idx)}
             />
           ))}
