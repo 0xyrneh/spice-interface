@@ -110,6 +110,7 @@ export default function VaultPositionGraph({
       const sharesRaws = await Promise.all(
         vaults.map((_vault) => getUserVaultShares(account, _vault.address))
       );
+
       setNoneBlurVaultsShares(
         vaults.map((_vault, idx) => ({
           vault: _vault,
@@ -214,10 +215,21 @@ export default function VaultPositionGraph({
     let makeStepLike = false;
     if (vault) {
       if (vault.isBlur) {
-        chartData =
-          step === 0
-            ? blurChartInfo?.tvlChart ?? []
-            : blurChartInfo?.pointsChart ?? [];
+        if (step === 0) {
+          chartData = blurChartInfo?.tvlChart ?? [];
+        } else if (step === 1) {
+          chartData = blurChartInfo?.pointsChart ?? [];
+        } else {
+          const aprHistories = getAprHistories(vault);
+          chartData = sampleDataByTimeTicks(
+            aprHistories.map((row) => {
+              return {
+                x: row.time,
+                y: row.assetPerShare,
+              };
+            })
+          );
+        }
       } else {
         makeStepLike = true;
 
@@ -367,19 +379,21 @@ export default function VaultPositionGraph({
         )}
         <PositionSVG />
         <h2 className="font-bold text-white font-sm">
-          {step === 1
-            ? vault && vault.isBlur
+          {step === 0
+            ? vault
+              ? `YOUR ${(vault?.readable || "").toUpperCase()} ${
+                  vault?.deprecated ? "[WITHDRAW ONLY]" : ""
+                } POSITION`
+              : "TOTAL SPICE POSITION"
+            : vault && vault.isBlur
+            ? step === 1
               ? "POINTS"
               : "ASSETS PER VAULT SHARE"
-            : vault
-            ? `YOUR ${(vault?.readable || "").toUpperCase()} ${
-                vault?.deprecated ? "[WITHDRAW ONLY]" : ""
-              } POSITION`
-            : "TOTAL SPICE POSITION"}
+            : "ASSETS PER VAULT SHARE"}
         </h2>
         {vault && (
           <div className="flex items-center gap-[4px]">
-            {[0, 1].map((val) => (
+            {(vault.isBlur ? [0, 1, 2] : [0, 1]).map((val) => (
               <div
                 className={`w-[24px] h-[8px] rounded-full cursor-pointer ${
                   step === val
