@@ -147,6 +147,7 @@ export default function LoanExposure({
               nftId: row.nftid,
               tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
               market: getNftMarketLogo(row.market),
+              initiated: row.start,
             };
           })
         );
@@ -283,7 +284,9 @@ export default function LoanExposure({
         rowClass: () =>
           loanExpanded ? "hidden lg:table-cell w-[10%]" : "hidden",
         format: (item) => {
-          return (item?.initiated || 0).toFixed(2);
+          return item.initiated
+            ? moment.unix(item.initiated).format("MM/DD/YYYY")
+            : "-";
         },
       },
       {
