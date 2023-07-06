@@ -10,13 +10,17 @@ import {
 import multicall from "@/utils/multicall";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { VaultInfo, ReceiptToken } from "@/types/vault";
-import { getVaultDisplayName } from "@/utils/string";
 import VaultAbi from "@/config/abi/SpiceFiVault.json";
 import SpiceFiNFT4626Abi from "@/config/abi/SpiceFiNFT4626.json";
 import WethAbi from "@/config/abi/WETH.json";
 import { getWethAddress } from "@/utils/addressHelpers";
 import { activeChainId } from "@/utils/web3";
-import { getVaultBackgroundImage, getVaultLogo } from "@/utils/vault";
+import {
+  getVaultBackgroundImage,
+  getVaultLogo,
+  getVaultReadableName,
+  getVaultDisplayName,
+} from "@/utils/vault";
 import { VaultFilter } from "@/types/common";
 import {
   VAULT_DESCRIPTIONS,
@@ -318,7 +322,7 @@ export const fetchBlurVaults = async (vaults: any[]) => {
   }
 };
 
-// fetch global data of vaults
+// fetch global initial data of vaults
 export const fetchGlobalInitialData = async () => {
   const res = await axios.get(`${VAULT_API}?env=${apiEnv}`);
   if (res.status === 200) {
@@ -339,89 +343,62 @@ export const fetchGlobalInitialData = async () => {
       (row: VaultInfo) => row.depositable && row.address === blurVaultAddr
     );
 
-    // TODO: all active vaults data
-    const activeVaultsData = activeVaults.map((row: VaultInfo) => {
-      return {
-        ...row,
-        name: getVaultDisplayName(row?.name),
-        logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated, row.name),
-        backgroundImage: getVaultBackgroundImage(
-          row?.fungible,
-          row?.type,
-          row?.deprecated,
-          row.name
-        ),
-        receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
-        userInfo: {
-          allowance: BigNumber.from(0),
-          tokenBalance: BigNumber.from(0),
-          nfts: [],
-          amount: BigNumber.from(0),
-        },
-        category: row.fungible ? VaultFilter.Public : VaultFilter.VIP,
-        isBlur: false,
-      };
-    });
-
-    // TODO: leverage vault data
-    const leverageVaultsData = leverageVaults.map((row: VaultInfo) => {
-      return {
-        ...row,
-        name: getVaultDisplayName(row?.name),
-        logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated, row.name),
-        backgroundImage: getVaultBackgroundImage(
-          row?.fungible,
-          row?.type,
-          row?.deprecated,
-          row.name
-        ),
-        receiptToken: ReceiptToken.ERC20,
-        userInfo: {
-          allowance: BigNumber.from(0),
-          tokenBalance: BigNumber.from(0),
-          nfts: [],
-          amount: BigNumber.from(0),
-        },
-        category: VaultFilter.Public,
-        isBlur: true,
-      };
-    });
-
-    // TODO: blur vault data
-    const blurVaultsData = blurVaults.map((row: VaultInfo) => {
-      return {
-        ...row,
-        category: VaultFilter.Public,
-        isBlur: true,
-      };
-    });
-
     return {
-      vaults: [...activeVaultsData, ...blurVaultsData].map((vault) => {
-        if (vault.readable) {
-          let prefix = vault.readable.split(" ")[0];
+      vaults: [...activeVaults, ...blurVaults].map((row) => {
+        const readablename =
+          row?.readable ||
+          getVaultReadableName(row?.fungible, row?.type, row.name);
+        const vaultDetail = {
+          ...row,
+          name: getVaultDisplayName(row?.name),
+          readable: getVaultReadableName(row?.fungible, row?.type, row.name),
+          logo: getVaultLogo(
+            row?.fungible,
+            row?.type,
+            row?.deprecated,
+            row.name
+          ),
+          backgroundImage: getVaultBackgroundImage(
+            row?.fungible,
+            row?.type,
+            row?.deprecated,
+            row.name
+          ),
+          receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
+          userInfo: {
+            allowance: BigNumber.from(0),
+            tokenBalance: BigNumber.from(0),
+            nfts: [],
+            amount: BigNumber.from(0),
+          },
+          category: row.fungible ? VaultFilter.Public : VaultFilter.VIP,
+          isBlur: false,
+        };
 
-          if (vault.deprecated) {
+        if (readablename) {
+          let prefix = readablename.split(" ")[0];
+
+          if (row.deprecated) {
             prefix = prefix + "-Deprecated";
           }
 
           return {
-            ...vault,
+            ...vaultDetail,
             description: VAULT_DESCRIPTIONS[prefix],
             requirement: VAULT_REQUIREMENTS[prefix],
             risk: VAULT_RISK[prefix],
           };
         }
-        return vault;
+        return vaultDetail;
       }),
       defaultVault:
-        activeVaultsData.find(
+        activeVaults.find(
           (row: VaultInfo) =>
             DEFAULT_AGGREGATOR_VAULT[activeChainId].toLowerCase() ===
             row.address.toLowerCase()
-        ) || activeVaultsData[0],
-      leverageVaults: leverageVaultsData,
-      blurVaults: blurVaultsData,
+        ) || activeVaults[0],
+      leverageVaults: leverageVaults,
+      blurVaults: blurVaults,
     };
   }
   return {
