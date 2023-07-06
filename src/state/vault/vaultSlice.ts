@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { BigNumber } from "ethers";
 
 import { LeverageVaultInfo, VaultInfo } from "@/types/vault";
-import { fetchGlobalData } from "./fetchGlobalVault";
+import { fetchGlobalData, fetchGlobalInitialData } from "./fetchGlobalVault";
 import { fetchUserTokenData, fetchUserVaultData } from "./fetchUserVault";
 
 interface WalletConnectState {
@@ -157,6 +157,20 @@ export const {
   setVaultUserDepositData,
   updateActiveVault,
 } = vaultSlice.actions;
+
+export const fetchVaultGlobalInitialDataAsync = () => async (dispatch: any) => {
+  const { defaultVault, leverageVaults, blurVaults, vaults } =
+    await fetchGlobalInitialData();
+
+  dispatch(
+    setVaultGlobalData({
+      defaultVault,
+      leverageVaults,
+      blurVaults,
+      vaults,
+    })
+  );
+};
 
 export const fetchVaultGlobalDataAsync = () => async (dispatch: any) => {
   const { defaultVault, leverageVaults, blurVaults, vaults } =

@@ -12,6 +12,7 @@ import { useUI } from "@/hooks";
 import {
   fetchGeolocation,
   fetchVaultGlobalDataAsync,
+  fetchVaultGlobalInitialDataAsync,
   fetchLendGlobalDataAsync,
   fetchNftGlobalDataAsync,
   fetchVaultUserDataAsync,
@@ -75,6 +76,8 @@ const Header = () => {
     if (!window.localStorage.getItem("tos")) {
       showTosModal();
     }
+
+    dispatch(fetchVaultGlobalInitialDataAsync());
 
     fetchData();
     setInterval(() => {

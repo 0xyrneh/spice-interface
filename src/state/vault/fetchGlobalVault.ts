@@ -319,6 +319,120 @@ export const fetchBlurVaults = async (vaults: any[]) => {
 };
 
 // fetch global data of vaults
+export const fetchGlobalInitialData = async () => {
+  const res = await axios.get(`${VAULT_API}?env=${apiEnv}`);
+  if (res.status === 200) {
+    const vaults = res.data.data.filter(
+      (row: VaultInfo) =>
+        !VAULT_BLACKLISTED[activeChainId].includes(row.address)
+    );
+
+    const activeVaults = vaults.filter(
+      (row: VaultInfo) =>
+        row.depositable && (row.type === "aggregator" || row.type === "bidder")
+    );
+    const leverageVaults = vaults.filter((row: VaultInfo) => row.leverage);
+
+    // blur vault
+    const blurVaultAddr = DEFAULT_BLUR_VAULT[activeChainId];
+    const blurVaults = vaults.filter(
+      (row: VaultInfo) => row.depositable && row.address === blurVaultAddr
+    );
+
+    // TODO: all active vaults data
+    const activeVaultsData = activeVaults.map((row: VaultInfo) => {
+      return {
+        ...row,
+        name: getVaultDisplayName(row?.name),
+        logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated, row.name),
+        backgroundImage: getVaultBackgroundImage(
+          row?.fungible,
+          row?.type,
+          row?.deprecated,
+          row.name
+        ),
+        receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
+        userInfo: {
+          allowance: BigNumber.from(0),
+          tokenBalance: BigNumber.from(0),
+          nfts: [],
+          amount: BigNumber.from(0),
+        },
+        category: row.fungible ? VaultFilter.Public : VaultFilter.VIP,
+        isBlur: false,
+      };
+    });
+
+    // TODO: leverage vault data
+    const leverageVaultsData = leverageVaults.map((row: VaultInfo) => {
+      return {
+        ...row,
+        name: getVaultDisplayName(row?.name),
+        logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated, row.name),
+        backgroundImage: getVaultBackgroundImage(
+          row?.fungible,
+          row?.type,
+          row?.deprecated,
+          row.name
+        ),
+        receiptToken: ReceiptToken.ERC20,
+        userInfo: {
+          allowance: BigNumber.from(0),
+          tokenBalance: BigNumber.from(0),
+          nfts: [],
+          amount: BigNumber.from(0),
+        },
+        category: VaultFilter.Public,
+        isBlur: true,
+      };
+    });
+
+    // TODO: blur vault data
+    const blurVaultsData = blurVaults.map((row: VaultInfo) => {
+      return {
+        ...row,
+        category: VaultFilter.Public,
+        isBlur: true,
+      };
+    });
+
+    return {
+      vaults: [...activeVaultsData, ...blurVaultsData].map((vault) => {
+        if (vault.readable) {
+          let prefix = vault.readable.split(" ")[0];
+
+          if (vault.deprecated) {
+            prefix = prefix + "-Deprecated";
+          }
+
+          return {
+            ...vault,
+            description: VAULT_DESCRIPTIONS[prefix],
+            requirement: VAULT_REQUIREMENTS[prefix],
+            risk: VAULT_RISK[prefix],
+          };
+        }
+        return vault;
+      }),
+      defaultVault:
+        activeVaultsData.find(
+          (row: VaultInfo) =>
+            DEFAULT_AGGREGATOR_VAULT[activeChainId].toLowerCase() ===
+            row.address.toLowerCase()
+        ) || activeVaultsData[0],
+      leverageVaults: leverageVaultsData,
+      blurVaults: blurVaultsData,
+    };
+  }
+  return {
+    vaults: [],
+    defaultVault: {},
+    leverageVaults: [],
+    blurVaults: [],
+  };
+};
+
+// fetch global data of vaults
 export const fetchGlobalData = async () => {
   const res = await axios.get(`${VAULT_API}?env=${apiEnv}`);
   if (res.status === 200) {
