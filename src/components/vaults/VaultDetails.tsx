@@ -90,6 +90,7 @@ export default function VaultDetails({ vault }: Props) {
   const getTotalEarnings = () => {
     const totalShares = vault.totalShares || 0;
     const aprHistories = getAprHistories();
+    if (aprHistories.length === 0) return 0;
     return (
       totalShares *
       (aprHistories[aprHistories.length - 1].assetPerShare -

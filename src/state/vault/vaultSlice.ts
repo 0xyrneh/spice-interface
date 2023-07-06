@@ -11,6 +11,7 @@ interface WalletConnectState {
   leverageVaults: LeverageVaultInfo[];
   blurVaults: VaultInfo[];
   vaults: VaultInfo[];
+  isFullDataFetched: Boolean;
 }
 
 const initialState: WalletConnectState = {
@@ -19,6 +20,7 @@ const initialState: WalletConnectState = {
   leverageVaults: [],
   blurVaults: [],
   vaults: [],
+  isFullDataFetched: false,
 };
 
 export const vaultSlice = createSlice({
@@ -42,6 +44,7 @@ export const vaultSlice = createSlice({
         ...row,
         userInfo: state.vaults[i]?.userInfo || {},
       }));
+      state.isFullDataFetched = action.payload.isFullDataFetched;
     },
     updateActiveVault: (state, action) => {
       state.activeVault = action.payload;
@@ -168,6 +171,7 @@ export const fetchVaultGlobalInitialDataAsync = () => async (dispatch: any) => {
       leverageVaults,
       blurVaults,
       vaults,
+      isFullDataFetched: false,
     })
   );
 };
@@ -182,6 +186,7 @@ export const fetchVaultGlobalDataAsync = () => async (dispatch: any) => {
       leverageVaults,
       blurVaults,
       vaults,
+      isFullDataFetched: true,
     })
   );
 };
