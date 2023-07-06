@@ -178,13 +178,14 @@ export default function VaultDetails({ vault }: Props) {
               vault={vault}
               showIcon
               onlyPts
-              className={`${
+              className={`justify-between  
+              ${
                 expandedBoxId === 2
-                  ? `h-[58px] overflow-hidden gap-4.5 ${
-                      isCardPopup ? "flex-1" : ""
-                    }`
+                  ? `h-[58px] overflow-hidden gap-4.5 
+                  ${isCardPopup ? "flex-1" : ""}`
                   : "flex-1 gap-3"
-              } justify-between`}
+              } 
+              ${height > MIN_SCREEN_HEIGHT ? "max-h-[200px]" : ""}`}
               headerClassName={expandedBoxId === 2 ? "cursor-pointer" : ""}
               onActive={() => onChangeActiveSectionId(1)}
               onCardPopup={(value) => setIsCardPopup(value)}

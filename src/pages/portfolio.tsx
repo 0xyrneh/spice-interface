@@ -151,7 +151,9 @@ export default function PortfolioPage() {
           vaults={vaults}
           selectedVault={selectedVault}
           onSelectVault={onSelectVault}
-          className="max-h-[40%]"
+          className={
+            height > MIN_SCREEN_HEIGHT ? "max-h-[350px]" : "max-h-[40%]"
+          }
         />
 
         {/* blur leaderboard section */}
@@ -163,13 +165,13 @@ export default function PortfolioPage() {
                   vault={selectedVault}
                   showIcon
                   onlyPts
-                  className={`${
+                  className={`justify-between 
+                  ${
                     expandedBoxId === 2
-                      ? `h-[58px] overflow-hidden gap-4.5 ${
-                          isCardPopup ? "flex-1" : ""
-                        }`
+                      ? `h-[58px] overflow-hidden gap-4.5 
+                      ${isCardPopup ? "flex-1" : ""}`
                       : "flex-1 gap-3"
-                  } justify-between`}
+                  } ${height > MIN_SCREEN_HEIGHT ? "max-h-[200px]" : ""}`}
                   headerClassName={expandedBoxId === 2 ? "cursor-pointer" : ""}
                   onActive={() => onChangeActiveSectionId(1)}
                   onCardPopup={(value) => setIsCardPopup(value)}
