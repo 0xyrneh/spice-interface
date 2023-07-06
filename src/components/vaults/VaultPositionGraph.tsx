@@ -387,7 +387,7 @@ export default function VaultPositionGraph({
               : "TOTAL SPICE POSITION"
             : vault && vault.isBlur
             ? step === 1
-              ? "POINTS"
+              ? "YOUR SP-BLUR POINTS"
               : "ASSETS PER VAULT SHARE"
             : "ASSETS PER VAULT SHARE"}
         </h2>
