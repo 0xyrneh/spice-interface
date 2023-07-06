@@ -198,7 +198,12 @@ export default function CollectionExposure({
     setAllocations([]);
     updateAllocations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address, vaults.length, isVaultFullDataFetched, account]);
+  }, [
+    vault?.marketplaceExposures,
+    vaults.length,
+    isVaultFullDataFetched,
+    account,
+  ]);
 
   const onSwitchTable = () => {
     if (!hasToggle) return;

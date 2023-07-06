@@ -184,8 +184,6 @@ const Header = () => {
     return NAV_OPTIONS[1];
   };
 
-  console.log("111--->render");
-
   return (
     <div
       className={`z-10 hidden ${
