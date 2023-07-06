@@ -261,7 +261,6 @@ export default function PrologueNfts({
       className={`${className} ${expanded ? "h-[90%] my-auto" : "relative"}`}
       expanded={expanded}
       onCollapse={() => setExpanded(false)}
-      animate
       onClick={onActive}
     >
       {selectedIdx !== undefined && (

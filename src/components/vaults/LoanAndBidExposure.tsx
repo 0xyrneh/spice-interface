@@ -155,7 +155,6 @@ export default function LoanAndBidExposure({
         nonExpandedClassName && !expanded ? nonExpandedClassName : ""
       }`}
       expanded={expanded}
-      animate
       onCollapse={() => setExpanded(false)}
     >
       <div className="flex items-center justify-between">

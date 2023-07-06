@@ -367,7 +367,6 @@ export default function LoanBreakdown({
       expanded={loanExpanded}
       onCollapse={() => setLoanExpanded(false)}
       onClick={onActive}
-      animate
     >
       <div className={`flex items-center justify-between ${headerClassName}`}>
         <div className="flex items-center gap-2.5 text-white">
