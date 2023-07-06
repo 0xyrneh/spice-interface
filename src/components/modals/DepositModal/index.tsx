@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { BigNumber, utils, constants } from "ethers";
+import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 import moment from "moment-timezone";
 import { useRouter } from "next/router";
-import axios from "axios";
 
 import LeverageInput, { LeverageTab } from "./LeverageInput";
 import Modal, { ModalProps } from "../Modal";
@@ -33,8 +32,6 @@ import {
 import { calculateBorrowApr, getNetApy } from "@/utils/apy";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { getTransactionByHash } from "@/utils/tenderly";
-import { BLUR_API_BASE } from "@/config/constants/backend";
-import { formatBlurChart } from "@/utils/formatter";
 
 interface Props extends ModalProps {
   vaultId: string;
@@ -89,37 +86,6 @@ export default function DepositModal({
   const [vaultToShow, setVaultToShow] = useState<VaultInfo>();
   const [myNfts, setMyNfts] = useState<PrologueNftPortofolioInfo[]>([]);
   const [selectedNft, setSelectedNft] = useState<PrologueNftPortofolioInfo>();
-
-  // for blur apy calculation
-  const [blurChartInfo, setBlurChartInfo] = useState<any>();
-
-  const fetchBlurChart = async () => {
-    // setIsFetching(true);
-
-    const apiEnv =
-      Number(process.env.REACT_APP_CHAIN_ID) === 1 ? "prod" : "goerli";
-
-    try {
-      const res = await axios.get(
-        `${BLUR_API_BASE}/historical-points?env=${apiEnv}`
-      );
-
-      if (res.status === 200) {
-        setBlurChartInfo(formatBlurChart(res.data.data.historicalRecords));
-      }
-    } catch (err) {
-      console.log("ranks fetching error");
-    }
-
-    // setIsFetching(false);
-  };
-
-  useEffect(() => {
-    if (vault.isBlur) {
-      // dispatch(fetchETHPriceAsync());
-      fetchBlurChart();
-    }
-  }, [vault]);
 
   useEffect(() => {
     setVault(vaults.find((item) => item.address === vaultId)!);
@@ -802,26 +768,6 @@ export default function DepositModal({
     );
   };
 
-  const getBlurApy = () => {
-    const pointValue = 2.5;
-    const totalPoints: number = blurChartInfo?.totalSpPoints ?? 0;
-
-    if (totalPoints === 0) return 0;
-
-    const ethVal = (totalPoints * pointValue) / ethPrice;
-    const totalAssets = vault?.tvl || 0;
-    const totalShares = vault?.totalShares || 0;
-    if (totalShares === 0) return 0;
-    return (
-      (Math.pow(
-        (totalAssets + ethVal) / totalShares / 285.126857633,
-        31536000 / (Math.floor(new Date().getTime() / 1000) - 1687219691)
-      ) -
-        1) *
-      100
-    );
-  };
-
   return (
     <Modal open={open} onClose={onCloseModal}>
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
@@ -848,9 +794,7 @@ export default function DepositModal({
               </div>
               <div className="flex gap-1 items-center">
                 <span className="drop-shadow-orange-200 leading-5">
-                  {`${(
-                    (vaultToShow?.isBlur ? getBlurApy() : vaultToShow?.apy) || 0
-                  ).toFixed(2)}%`}
+                  {`${(vaultToShow?.apy || 0).toFixed(2)}%`}
                 </span>
                 <span className="text-xs text-gray-200">APY</span>
               </div>

@@ -56,14 +56,6 @@ export default function VaultDetails({ vault }: Props) {
     }
   };
 
-  const getVaultHistoricalApy = () => {
-    const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
-    return (
-      (activeChainId === 1 ? 1 : 100) *
-      (vault?.okrs ? vault?.okrs[aprField] : 0)
-    );
-  };
-
   const getAprHistories = () => {
     const historialRecords = vault?.historicalRecords || [];
     const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
@@ -138,7 +130,7 @@ export default function VaultDetails({ vault }: Props) {
             />
             <Stats
               title="Historical APY"
-              value={`${getVaultHistoricalApy().toFixed(2)}%`}
+              value={`${(vault?.historicalApy || 0).toFixed(2)}%`}
             />
             {getVaultUpTime(vault.startTime) > 0 && (
               <Stats

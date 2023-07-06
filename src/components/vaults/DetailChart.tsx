@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
+import moment from "moment";
 
 import { Card, Stats } from "@/components/common";
 import { LineChart } from "@/components/portfolio";
@@ -12,8 +14,6 @@ import {
 import { ChartValue, VaultInfo } from "@/types/vault";
 import { BLUR_API_BASE } from "@/config/constants/backend";
 import { Slider } from "../common";
-import axios from "axios";
-import moment from "moment";
 import {
   MIN_IN_SECONDS,
   DAY_IN_SECONDS,
@@ -27,6 +27,7 @@ import { getVaultShares } from "@/api/subgraph";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { useAppDispatch, useAppSelector } from "@/state/hooks";
 import { fetchETHPriceAsync } from "@/state/oracle/oracleSlice";
+import { calculateBlurVaultHistApy } from "@/utils/apy";
 
 type Props = {
   vault: VaultInfo;
@@ -317,19 +318,13 @@ export default function DetailChart({ vault }: Props) {
   };
 
   const getBlurApy = () => {
-    const totalPoints: number = blurChartInfo?.totalSpPoints ?? 0;
-    const ethVal = (totalPoints * sliderValue) / ethPrice;
-    const totalAssets = vault?.tvl || 0;
-    const totalShares = vault?.totalShares || 0;
-    if (totalShares === 0) return 0;
-    return (
-      (Math.pow(
-        (totalAssets + ethVal) / totalShares / 285.126857633,
-        31536000 / (Math.floor(new Date().getTime() / 1000) - 1687219691)
-      ) -
-        1) *
-      100
-    );
+    return calculateBlurVaultHistApy({
+      pointValue: sliderValue,
+      totalPoints: blurChartInfo?.totalSpPoints ?? 0,
+      ethPrice,
+      totalAssets: vault?.tvl || 0,
+      totalShares: vault?.totalShares || 0,
+    });
   };
 
   const getVaultEstimatedYield = () => {

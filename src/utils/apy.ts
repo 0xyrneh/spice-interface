@@ -139,3 +139,52 @@ export const calculateBorrowApr = (
 
   return Math.floor(apr * 10000) / 10000;
 };
+
+export const calculateBlurVaultHistApy = ({
+  pointValue,
+  totalPoints,
+  ethPrice,
+  totalAssets,
+  totalShares,
+}: {
+  pointValue: number;
+  totalPoints: number;
+  ethPrice: number;
+  totalAssets: number;
+  totalShares: number;
+}) => {
+  if (totalPoints === 0) return 0;
+
+  const ethVal = (totalPoints * pointValue) / ethPrice;
+  if (totalShares === 0) return 0;
+  return (
+    (Math.pow(
+      (totalAssets + ethVal) / totalShares / 285.126857633,
+      31536000 / (Math.floor(new Date().getTime() / 1000) - 1687219691)
+    ) -
+      1) *
+    100
+  );
+};
+
+export const calculateBlurVaultEstApy = ({
+  originEstApy,
+  pointValue,
+  totalPoints,
+  ethPrice,
+  totalAssets,
+  dayPoints,
+}: {
+  originEstApy: number;
+  pointValue: number;
+  totalPoints: number;
+  ethPrice: number;
+  totalAssets: number;
+  dayPoints: number;
+}) => {
+  if (totalPoints === 0) return 0;
+
+  const ethVal = (totalPoints * pointValue) / ethPrice;
+
+  return originEstApy + (365 * dayPoints * ethVal) / totalAssets;
+};
