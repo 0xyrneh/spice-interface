@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { BigNumber, utils, constants } from "ethers";
+import { BigNumber } from "ethers";
 import { useWeb3React } from "@web3-react/core";
 import moment from "moment-timezone";
 import { useRouter } from "next/router";
@@ -80,12 +80,10 @@ export default function DepositModal({
     (state) => state.vault
   );
   const [processing, setProcessing] = useState(false);
-
   const [vault, setVault] = useState(
     vaults.find((item) => item.address === vaultId)!
   );
   const [vaultToShow, setVaultToShow] = useState<VaultInfo>();
-
   const [myNfts, setMyNfts] = useState<PrologueNftPortofolioInfo[]>([]);
   const [selectedNft, setSelectedNft] = useState<PrologueNftPortofolioInfo>();
 
@@ -770,6 +768,11 @@ export default function DepositModal({
     );
   };
 
+  const vaultShowApy = Math.max(
+    vaultToShow?.apy || 0,
+    vaultToShow?.historicalApy || 0
+  );
+
   return (
     <Modal open={open} onClose={onCloseModal}>
       <div className="mx-8 flex items-center gap-3 font-medium h-[364px] max-w-[864px] z-50">
@@ -796,7 +799,7 @@ export default function DepositModal({
               </div>
               <div className="flex gap-1 items-center">
                 <span className="drop-shadow-orange-200 leading-5">
-                  {`${(vaultToShow?.apy || 0).toFixed(2)}%`}
+                  {`${vaultShowApy.toFixed(vaultShowApy >= 100 ? 1 : 2)}%`}
                 </span>
                 <span className="text-xs text-gray-200">APY</span>
               </div>

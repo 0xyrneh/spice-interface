@@ -1,4 +1,5 @@
 export {
+  fetchVaultGlobalInitialDataAsync,
   fetchVaultGlobalDataAsync,
   fetchVaultUserTokenDataAsync,
   fetchVaultUserDepositDataAsync,

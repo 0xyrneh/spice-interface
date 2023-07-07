@@ -17,7 +17,8 @@ export default function VaultDetailsPage() {
   const router = useRouter();
   const { id }: { id?: string[] } = router.query;
 
-  const { vaults: vaultsOrigin } = useAppSelector((state) => state.vault);
+  const { vaults: vaultsOrigin, isFullDataFetched: isVaultFullDataFetched } =
+    useAppSelector((state) => state.vault);
   const { data: lendData } = useAppSelector((state) => state.lend);
   const loans = accLoans(lendData);
 
@@ -63,7 +64,7 @@ export default function VaultDetailsPage() {
     if (!selectedVault && vaults.length > 0) {
       router.push(`/`);
     }
-  }, [id, router, vaults.length]);
+  }, [id, router, vaults.length, isVaultFullDataFetched]);
 
   if (vault) {
     return <VaultDetails vault={vault} />;

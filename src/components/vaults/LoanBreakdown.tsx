@@ -161,6 +161,7 @@ export default function LoanBreakdown({
               tokenImg: getTokenImageFromReservoir(collectionAddr, row.nftid),
               market: row.market,
               marketImg: getNftMarketLogo(row.market),
+              initiated: row.start,
             };
           })
         );
@@ -298,7 +299,9 @@ export default function LoanBreakdown({
         rowClass: () =>
           loanExpanded ? "hidden lg:table-cell w-[10%]" : "hidden",
         format: (item) => {
-          return (item?.initiated || 0).toFixed(2);
+          return item.initiated
+            ? moment.unix(item.initiated).format("MM/DD/YYYY")
+            : "-";
         },
       },
       {
@@ -367,7 +370,6 @@ export default function LoanBreakdown({
       expanded={loanExpanded}
       onCollapse={() => setLoanExpanded(false)}
       onClick={onActive}
-      animate
     >
       <div className={`flex items-center justify-between ${headerClassName}`}>
         <div className="flex items-center gap-2.5 text-white">

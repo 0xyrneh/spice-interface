@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { BigNumber } from "ethers";
 
 import { LeverageVaultInfo, VaultInfo } from "@/types/vault";
-import { fetchGlobalData } from "./fetchGlobalVault";
+import { fetchGlobalData, fetchGlobalInitialData } from "./fetchGlobalVault";
 import { fetchUserTokenData, fetchUserVaultData } from "./fetchUserVault";
 
 interface WalletConnectState {
@@ -11,6 +11,7 @@ interface WalletConnectState {
   leverageVaults: LeverageVaultInfo[];
   blurVaults: VaultInfo[];
   vaults: VaultInfo[];
+  isFullDataFetched: Boolean;
 }
 
 const initialState: WalletConnectState = {
@@ -19,6 +20,7 @@ const initialState: WalletConnectState = {
   leverageVaults: [],
   blurVaults: [],
   vaults: [],
+  isFullDataFetched: false,
 };
 
 export const vaultSlice = createSlice({
@@ -42,6 +44,7 @@ export const vaultSlice = createSlice({
         ...row,
         userInfo: state.vaults[i]?.userInfo || {},
       }));
+      state.isFullDataFetched = action.payload.isFullDataFetched;
     },
     updateActiveVault: (state, action) => {
       state.activeVault = action.payload;
@@ -158,6 +161,21 @@ export const {
   updateActiveVault,
 } = vaultSlice.actions;
 
+export const fetchVaultGlobalInitialDataAsync = () => async (dispatch: any) => {
+  const { defaultVault, leverageVaults, blurVaults, vaults } =
+    await fetchGlobalInitialData();
+
+  dispatch(
+    setVaultGlobalData({
+      defaultVault,
+      leverageVaults,
+      blurVaults,
+      vaults,
+      isFullDataFetched: false,
+    })
+  );
+};
+
 export const fetchVaultGlobalDataAsync = () => async (dispatch: any) => {
   const { defaultVault, leverageVaults, blurVaults, vaults } =
     await fetchGlobalData();
@@ -168,6 +186,7 @@ export const fetchVaultGlobalDataAsync = () => async (dispatch: any) => {
       leverageVaults,
       blurVaults,
       vaults,
+      isFullDataFetched: true,
     })
   );
 };

@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
 import axios from "axios";
 
-import { VAULT_API } from "@/config/constants/backend";
+import { VAULT_API, BLUR_API_BASE } from "@/config/constants/backend";
 import {
   DEFAULT_AGGREGATOR_VAULT,
   DEFAULT_BLUR_VAULT,
@@ -10,19 +10,29 @@ import {
 import multicall from "@/utils/multicall";
 import { getBalanceInEther } from "@/utils/formatBalance";
 import { VaultInfo, ReceiptToken } from "@/types/vault";
-import { getVaultDisplayName } from "@/utils/string";
 import VaultAbi from "@/config/abi/SpiceFiVault.json";
 import SpiceFiNFT4626Abi from "@/config/abi/SpiceFiNFT4626.json";
 import WethAbi from "@/config/abi/WETH.json";
 import { getWethAddress } from "@/utils/addressHelpers";
 import { activeChainId } from "@/utils/web3";
-import { getVaultBackgroundImage, getVaultLogo } from "@/utils/vault";
+import {
+  getVaultBackgroundImage,
+  getVaultLogo,
+  getVaultReadableName,
+  getVaultDisplayName,
+} from "@/utils/vault";
 import { VaultFilter } from "@/types/common";
 import {
   VAULT_DESCRIPTIONS,
   VAULT_REQUIREMENTS,
   VAULT_RISK,
 } from "@/constants/vaults";
+import { formatBlurChart } from "@/utils/formatter";
+import { fetchETHPrice } from "@/state/oracle/fetchPrice";
+import {
+  calculateBlurVaultHistApy,
+  calculateBlurVaultEstApy,
+} from "@/utils/apy";
 
 const apiEnv = activeChainId === 1 ? "prod" : "goerli";
 
@@ -281,41 +291,166 @@ export const fetchBlurVaults = async (vaults: any[]) => {
       })
     );
 
-    const vaultsWithTvl = vaultsWithDetails.map((row: VaultInfo, i: number) => {
-      return {
-        ...row,
-        tvl: getBalanceInEther(onChainInfo[i][0][0]),
-        totalShares: getBalanceInEther(onChainInfo[i][1][0]),
-        wethBalance: vaultWethInfo[i][0][0],
-        totalSupply: 0,
-        apr: 100 * (row?.okrs?.expected_return || 0),
-        apy: 100 * (row?.okrs?.expected_return || 0),
-        historicalApy: getVaultHistoricalApy(row),
-        name: getVaultDisplayName(row?.name),
-        logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated, row.name),
-        backgroundImage: getVaultBackgroundImage(
-          row?.fungible,
-          row?.type,
-          row?.deprecated,
-          row.name
-        ),
-        receiptToken: ReceiptToken.ERC20,
-        userInfo: {
-          allowance: BigNumber.from(0),
-          tokenBalance: BigNumber.from(0),
-          nfts: [],
-          amount: BigNumber.from(0),
-        },
-        category: VaultFilter.Public,
-        isBlur: true,
-      };
-    });
+    const vaultsWithTvl = await Promise.all(
+      vaultsWithDetails.map(async (row: VaultInfo, i: number) => {
+        const tvl = getBalanceInEther(onChainInfo[i][0][0]);
+        const totalShares = getBalanceInEther(onChainInfo[i][1][0]);
+        const res = await axios.get(
+          `${BLUR_API_BASE}/historical-points?env=${apiEnv}`
+        );
+
+        let blurEstApy = 0;
+        let blurHistApy = 0;
+        if (res.status === 200) {
+          const historicalPoints = formatBlurChart(
+            res.data.data.historicalRecords
+          );
+          const ethPrice = await fetchETHPrice();
+          blurEstApy = calculateBlurVaultEstApy({
+            originEstApy: row?.okrs?.expected_return || 0,
+            pointValue: 2.5,
+            totalPoints: historicalPoints?.totalSpPoints ?? 0,
+            ethPrice,
+            totalAssets: tvl,
+            dayPoints: (historicalPoints?.weekPoints || 0) / 7,
+          });
+          blurHistApy = calculateBlurVaultHistApy({
+            pointValue: 2.5,
+            totalPoints: historicalPoints?.totalSpPoints ?? 0,
+            ethPrice,
+            totalAssets: tvl,
+            totalShares,
+          });
+        }
+
+        return {
+          ...row,
+          tvl,
+          totalShares,
+          wethBalance: vaultWethInfo[i][0][0],
+          totalSupply: 0,
+          apr: 100 * (row?.okrs?.expected_return || 0),
+          // apy: 100 * (row?.okrs?.expected_return || 0),
+          apy: blurEstApy,
+          historicalApy: blurHistApy,
+          name: getVaultDisplayName(row?.name),
+          logo: getVaultLogo(
+            row?.fungible,
+            row?.type,
+            row?.deprecated,
+            row.name
+          ),
+          backgroundImage: getVaultBackgroundImage(
+            row?.fungible,
+            row?.type,
+            row?.deprecated,
+            row.name
+          ),
+          receiptToken: ReceiptToken.ERC20,
+          userInfo: {
+            allowance: BigNumber.from(0),
+            tokenBalance: BigNumber.from(0),
+            nfts: [],
+            amount: BigNumber.from(0),
+          },
+          category: VaultFilter.Public,
+          isBlur: true,
+        };
+      })
+    );
 
     return vaultsWithTvl;
   } catch (err) {
     console.log("err", err);
     return [];
   }
+};
+
+// fetch global initial data of vaults
+export const fetchGlobalInitialData = async () => {
+  const res = await axios.get(`${VAULT_API}?env=${apiEnv}`);
+  if (res.status === 200) {
+    const vaults = res.data.data.filter(
+      (row: VaultInfo) =>
+        !VAULT_BLACKLISTED[activeChainId].includes(row.address)
+    );
+
+    const activeVaults = vaults.filter(
+      (row: VaultInfo) =>
+        row.depositable && (row.type === "aggregator" || row.type === "bidder")
+    );
+    const leverageVaults = vaults.filter((row: VaultInfo) => row.leverage);
+
+    // blur vault
+    const blurVaultAddr = DEFAULT_BLUR_VAULT[activeChainId];
+    const blurVaults = vaults.filter(
+      (row: VaultInfo) => row.depositable && row.address === blurVaultAddr
+    );
+
+    return {
+      vaults: [...activeVaults, ...blurVaults].map((row) => {
+        const readablename =
+          row?.readable ||
+          getVaultReadableName(row?.fungible, row?.type, row.name);
+        const vaultDetail = {
+          ...row,
+          name: getVaultDisplayName(row?.name),
+          readable: getVaultReadableName(row?.fungible, row?.type, row.name),
+          logo: getVaultLogo(
+            row?.fungible,
+            row?.type,
+            row?.deprecated,
+            row.name
+          ),
+          backgroundImage: getVaultBackgroundImage(
+            row?.fungible,
+            row?.type,
+            row?.deprecated,
+            row.name
+          ),
+          receiptToken: row.fungible ? ReceiptToken.ERC20 : ReceiptToken.NFT,
+          userInfo: {
+            allowance: BigNumber.from(0),
+            tokenBalance: BigNumber.from(0),
+            nfts: [],
+            amount: BigNumber.from(0),
+          },
+          category: row.fungible ? VaultFilter.Public : VaultFilter.VIP,
+          isBlur: false,
+        };
+
+        if (readablename) {
+          let prefix = readablename.split(" ")[0];
+
+          if (row.deprecated) {
+            prefix = prefix + "-Deprecated";
+          }
+
+          return {
+            ...vaultDetail,
+            description: VAULT_DESCRIPTIONS[prefix],
+            requirement: VAULT_REQUIREMENTS[prefix],
+            risk: VAULT_RISK[prefix],
+          };
+        }
+        return vaultDetail;
+      }),
+      defaultVault:
+        activeVaults.find(
+          (row: VaultInfo) =>
+            DEFAULT_AGGREGATOR_VAULT[activeChainId].toLowerCase() ===
+            row.address.toLowerCase()
+        ) || activeVaults[0],
+      leverageVaults: leverageVaults,
+      blurVaults: blurVaults,
+    };
+  }
+  return {
+    vaults: [],
+    defaultVault: {},
+    leverageVaults: [],
+    blurVaults: [],
+  };
 };
 
 // fetch global data of vaults

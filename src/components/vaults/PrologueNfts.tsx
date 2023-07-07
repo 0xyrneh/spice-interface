@@ -72,16 +72,22 @@ export default function PrologueNfts({
 
   const getNftPortolios = () => {
     if (!vault) return [];
+
     const allNfts1 = allNfts.map((row) => {
       return {
         owner: row.owner.address,
-        amount: BigNumber.from(row.shares)
-          .mul(BigNumber.from(getBalanceInWei((vault?.tvl || 0).toString())))
-          .div(
-            BigNumber.from(
-              getBalanceInWei((vault?.totalShares || 0).toString())
-            )
-          ),
+        amount:
+          (vault?.totalShares || 0) === 0
+            ? BigNumber.from(0)
+            : BigNumber.from(row.shares || 0)
+                .mul(
+                  BigNumber.from(getBalanceInWei((vault?.tvl || 0).toString()))
+                )
+                .div(
+                  BigNumber.from(
+                    getBalanceInWei((vault?.totalShares || 0).toString())
+                  )
+                ),
         tokenId: row.tokenId,
         tokenImg: row.tokenImg,
         isEscrowed: false,
@@ -177,7 +183,7 @@ export default function PrologueNfts({
 
   useEffect(() => {
     setNftsOrigin(getNftPortolios());
-  }, [vault?.address, allNfts.length, loans.length]);
+  }, [vault?.totalShares, allNfts.length, loans.length]);
 
   useEffect(() => {
     setPageNum(1);
@@ -261,7 +267,6 @@ export default function PrologueNfts({
       className={`${className} ${expanded ? "h-[90%] my-auto" : "relative"}`}
       expanded={expanded}
       onCollapse={() => setExpanded(false)}
-      animate
       onClick={onActive}
     >
       {selectedIdx !== undefined && (

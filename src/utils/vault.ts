@@ -89,3 +89,32 @@ export const getVaultNameFromAddress = (address: string): string => {
 
   return "Prologue";
 };
+
+export const getVaultReadableName = (
+  isFungible?: boolean,
+  type?: string,
+  name?: string
+): string => {
+  if (name === "blur") {
+    return "SP-BLUR Vault";
+  }
+  if (isFungible) {
+    if (type === "aggregator") {
+      return "Flagship Vault";
+    }
+    return "Leverage Vault";
+  }
+  return "Prologue Vault";
+};
+
+export const getVaultDisplayName = (name: string): string => {
+  switch (name) {
+    case "spice-nft-vault-goerli":
+      return "Prologue Test Vault";
+    case "spice-vault-3":
+      return "Prologue Vault";
+
+    default:
+      return "Spice Vault";
+  }
+};

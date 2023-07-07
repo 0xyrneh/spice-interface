@@ -12,6 +12,7 @@ import { useUI } from "@/hooks";
 import {
   fetchGeolocation,
   fetchVaultGlobalDataAsync,
+  fetchVaultGlobalInitialDataAsync,
   fetchLendGlobalDataAsync,
   fetchNftGlobalDataAsync,
   fetchVaultUserDataAsync,
@@ -36,7 +37,11 @@ const Header = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
 
   const { account, chainId } = useWeb3React();
-  const { vaults, defaultVault } = useAppSelector((state) => state.vault);
+  const {
+    vaults,
+    defaultVault,
+    isFullDataFetched: isVaultFullDataFetched,
+  } = useAppSelector((state) => state.vault);
   const { isBlocked } = useAppSelector((state) => state.geolocation);
   const router = useRouter();
   const { blur, showTosModal } = useUI();
@@ -76,6 +81,8 @@ const Header = () => {
       showTosModal();
     }
 
+    dispatch(fetchVaultGlobalInitialDataAsync());
+
     fetchData();
     setInterval(() => {
       fetchData();
@@ -96,7 +103,7 @@ const Header = () => {
       return row;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, vaults.length]);
+  }, [account, vaults.length, isVaultFullDataFetched]);
 
   useEffect(() => {
     dispatch(resetLendUserLoanData());

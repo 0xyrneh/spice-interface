@@ -9,6 +9,7 @@ import { VaultInfo } from "@/types/vault";
 import { getNFTCollectionDisplayName } from "@/utils/nft";
 import { COLLECTION_API_BASE } from "@/config/constants/backend";
 import { VAULT_COLLECTION_COLORS } from "@/config/constants/vault";
+import { useAppSelector } from "@/state/hooks";
 import Table, { TableRowInfo } from "../common/Table";
 
 type Props = {
@@ -33,6 +34,9 @@ export default function CollectionExposure({
   const [allocations, setAllocations] = useState<any[]>([]);
 
   const { account } = useWeb3React();
+  const { isFullDataFetched: isVaultFullDataFetched } = useAppSelector(
+    (state) => state.vault
+  );
 
   const updateAllocationsOld = async () => {
     if (!account && walletConnectRequired) return;
@@ -194,7 +198,12 @@ export default function CollectionExposure({
     setAllocations([]);
     updateAllocations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vault?.address, vaults.length, account]);
+  }, [
+    vault?.marketplaceExposures,
+    vaults.length,
+    isVaultFullDataFetched,
+    account,
+  ]);
 
   const onSwitchTable = () => {
     if (!hasToggle) return;
