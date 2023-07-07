@@ -184,7 +184,6 @@ export const calculateBlurVaultEstApy = ({
 }) => {
   if (totalPoints === 0) return 0;
 
-  const ethVal = (totalPoints * pointValue) / ethPrice;
-
-  return originEstApy + (365 * dayPoints * ethVal) / totalAssets;
+  const ethVal = pointValue / ethPrice;
+  return 100 * (originEstApy + (365 * dayPoints * ethVal) / totalAssets);
 };

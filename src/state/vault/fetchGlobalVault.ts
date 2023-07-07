@@ -307,7 +307,7 @@ export const fetchBlurVaults = async (vaults: any[]) => {
           );
           const ethPrice = await fetchETHPrice();
           blurEstApy = calculateBlurVaultEstApy({
-            originEstApy: 100 * (row?.okrs?.expected_return || 0),
+            originEstApy: row?.okrs?.expected_return || 0,
             pointValue: 2.5,
             totalPoints: historicalPoints?.totalSpPoints ?? 0,
             ethPrice,
