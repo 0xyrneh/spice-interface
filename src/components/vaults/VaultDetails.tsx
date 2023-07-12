@@ -129,8 +129,8 @@ export default function VaultDetails({ vault }: Props) {
               value={`Ξ${getTotalEarnings().toFixed(2)}`}
             />
             <Stats
-              title="Historical APY"
-              value={`${(vault?.historicalApy || 0).toFixed(2)}%`}
+              title="Estimated APY"
+              value={`${(vault?.estimatedApy || 0).toFixed(2)}%`}
             />
             {getVaultUpTime(vault.startTime) > 0 && (
               <Stats
