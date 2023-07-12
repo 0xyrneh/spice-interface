@@ -422,7 +422,7 @@ export default function DetailChart({ vault }: Props) {
               <>
                 <Stats title="Vault TVL" value={`Ξ${getTVL().toFixed(2)}`} />
                 <Stats
-                  title="Vault APY"
+                  title="Historical APY"
                   value={`${(vault.isBlur && step === 1
                     ? getBlurApy()
                     : getVaultHistoricalApy()
