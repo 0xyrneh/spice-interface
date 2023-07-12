@@ -187,6 +187,7 @@ export default function DepositModal({
       }
 
       return {
+        ...userNft,
         lendAddr: row.lendAddr,
         value,
         isApproved: !!row.isApproved || !!row.loan.terms,
@@ -456,7 +457,7 @@ export default function DepositModal({
             } else {
               if (isFungible) await onVaultDeposit(amountInWei);
               else if (selectedNft) {
-                if (selectedNft.lendAddr) {
+                if (selectedNft.loan && selectedNft.loan.balance) {
                   await onLendingDeposit(selectedNft.loan.loanId, amountInWei);
                 } else
                   await onNftVaultDeposit(selectedNft.tokenId, amountInWei);
@@ -466,7 +467,7 @@ export default function DepositModal({
           } else {
             if (isFungible) await onVaultDepositETH(amountInWei);
             else if (selectedNft) {
-              if (selectedNft.lendAddr)
+              if (selectedNft.loan && selectedNft.loan.balance)
                 await onLendingDepositETH(selectedNft.loan.loanId, amountInWei);
               else await onNftVaultDepositETH(selectedNft.tokenId, amountInWei);
             }
@@ -476,7 +477,7 @@ export default function DepositModal({
           if (isFungible) {
             await (useWeth ? onVaultWithdraw : onVaultWithdrawETH)(amountInWei);
           } else if (selectedNft) {
-            if (selectedNft.lendAddr) {
+            if (selectedNft.loan && selectedNft.loan.balance) {
               await (useWeth ? onLendingWithdraw : onLendingWithdrawETH)(
                 selectedNft.loan.loanId,
                 amountInWei
