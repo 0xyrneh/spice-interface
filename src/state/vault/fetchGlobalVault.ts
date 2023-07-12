@@ -313,14 +313,14 @@ export const fetchBlurVaults = async (vaults: any[]) => {
           const ethPrice = await fetchETHPrice();
           blurEstApy = calculateBlurVaultEstApy({
             originEstApy: row?.okrs?.expected_return || 0,
-            pointValue: 2.5,
+            pointValue: 2,
             totalPoints: historicalPoints?.totalSpPoints ?? 0,
             ethPrice,
             totalAssets: tvl,
             dayPoints: (historicalPoints?.weekPoints || 0) / 7,
           });
           blurHistApy = calculateBlurVaultHistApy({
-            pointValue: 2.5,
+            pointValue: 2,
             totalPoints: historicalPoints?.totalSpPoints ?? 0,
             ethPrice,
             totalAssets: tvl,
@@ -338,7 +338,6 @@ export const fetchBlurVaults = async (vaults: any[]) => {
           // apy: 100 * (row?.okrs?.expected_return || 0),
           apy: blurEstApy,
           historicalApy: blurHistApy,
-          estimatedApy: blurHistApy,
           name: getVaultDisplayName(row?.name),
           logo: getVaultLogo(
             row?.fungible,

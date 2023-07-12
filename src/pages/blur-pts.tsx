@@ -535,7 +535,7 @@ export default function BlurPointsPage() {
             <div className="flex-1 relative max-h-[calc(100%-18px)] lg:max-h-[100%]">
               <LineChart
                 data={getChartData()}
-                colors={["#FFE3CA", "#FDA739"]}
+                colors={["#FDA739", "#FFE3CA"]}
                 period={selectedPeriod}
               />
             </div>
