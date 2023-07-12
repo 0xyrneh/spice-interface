@@ -154,7 +154,7 @@ export default function CollectionExposure({
       return {
         name: row.name,
         value: 100 * row.allocation,
-        color: VAULT_COLLECTION_COLORS[id % 4],
+        color: row.color,
       };
     });
   };
