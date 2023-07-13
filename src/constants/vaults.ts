@@ -18,5 +18,5 @@ export const VAULT_REQUIREMENTS: Record<string, string> = {
 };
 
 export const VAULT_RISK: Record<string, VaultRisk> = {
-  Prologue: VaultRisk.MEDIUM
-}
+  Flagship: VaultRisk.MEDIUM,
+};

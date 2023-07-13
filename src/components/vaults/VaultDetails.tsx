@@ -24,6 +24,7 @@ export default function VaultDetails({ vault }: Props) {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [expandedBoxId, setExpandedBoxId] = useState<number>(-1); // -1: none, 1: left center section, 2: left bottom section
   const [isCardPopup, setIsCardPopup] = useState<boolean>(false); // flag to track one box is pop up
+  const [pointValue, setPointValue] = useState(2);
 
   const { showDepositModal } = useUI();
   const [_, height] = useWindowSize({ fps: 60 });
@@ -90,6 +91,15 @@ export default function VaultDetails({ vault }: Props) {
     );
   };
 
+  const blurEstApy = () => {
+    if (!vault || !vault.isBlur) return 0;
+    // return vault.apy || 0;
+    return (
+      (((vault.apy || 0) - (vault.apr || 0)) / 100 / 2) * pointValue * 100 +
+      (vault.apr || 0)
+    );
+  };
+
   return (
     <div className="relative hidden md:flex tracking-wide w-full h-[calc(100vh-112px)] mt-[80px] px-8 pb-5 gap-5 overflow-hidden">
       <div className="flex flex-col min-w-[35%] w-[41%] gap-5 pt-1">
@@ -129,8 +139,11 @@ export default function VaultDetails({ vault }: Props) {
               value={`Ξ${getTotalEarnings().toFixed(2)}`}
             />
             <Stats
-              title="Historical APY"
-              value={`${(vault?.historicalApy || 0).toFixed(2)}%`}
+              title="Estimated APY"
+              value={`${(vault?.isBlur
+                ? blurEstApy()
+                : vault?.estimatedApy || 0
+              ).toFixed(2)}%`}
             />
             {getVaultUpTime(vault.startTime) > 0 && (
               <Stats
@@ -223,7 +236,7 @@ export default function VaultDetails({ vault }: Props) {
         )}
       </div>
 
-      <DetailChart vault={vault} />
+      <DetailChart vault={vault} setPointValue={setPointValue} />
     </div>
   );
 }

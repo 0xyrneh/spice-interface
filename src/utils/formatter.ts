@@ -144,7 +144,7 @@ export const formatBlurChart = (
         : weekBeforeInfo.okrs.total_points;
     }
     if (monthBeforeInfo) {
-      weekPoints -= account
+      monthPoints -= account
         ? monthBeforeInfo.okrs.holders_points[account] ?? 0
         : monthBeforeInfo.okrs.total_points;
     }

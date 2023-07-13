@@ -31,9 +31,10 @@ import { calculateBlurVaultHistApy } from "@/utils/apy";
 
 type Props = {
   vault: VaultInfo;
+  setPointValue: (val: number) => void;
 };
 
-export default function DetailChart({ vault }: Props) {
+export default function DetailChart({ vault, setPointValue }: Props) {
   const dispatch = useAppDispatch();
 
   const [selectedPeriod, setPeriod] = useState(PeriodFilter.Year);
@@ -41,8 +42,8 @@ export default function DetailChart({ vault }: Props) {
   const [isFetching, setIsFetching] = useState<boolean | undefined>(true);
   const [blurChartInfo, setBlurChartInfo] = useState<any>();
   const [noneBlurVaultShares, setNoneBlurVaultShares] = useState<any>();
-  const [sliderValue, setSliderValue] = useState(3);
-  const [ptValue, setPtValue] = useState("3.00");
+  const [sliderValue, setSliderValue] = useState(2);
+  const [ptValue, setPtValue] = useState("2.00");
   const { ethPrice } = useAppSelector((state) => state.oracle);
 
   const sampleDataByTimeTicks = (originData: any[]) => {
@@ -363,22 +364,23 @@ export default function DetailChart({ vault }: Props) {
       if (newValue > targetMax) {
         setPtValue(targetMax.toFixed(3));
         setSliderValue(targetMax);
+        setPointValue(targetMax);
       } else {
         setPtValue(e.target.value);
         setSliderValue(newValue);
+        setPointValue(newValue);
       }
     }
   };
 
   const onSliderValueChange = (val: number) => {
     setSliderValue(val);
+    setPointValue(val);
     setPtValue(val.toString());
   };
 
   useEffect(() => {
-    if (vault.isBlur && step === 1) {
-      onSliderValueChange(3);
-    }
+    onSliderValueChange(2);
   }, [vault, step]);
 
   return (
@@ -422,7 +424,11 @@ export default function DetailChart({ vault }: Props) {
               <>
                 <Stats title="Vault TVL" value={`Ξ${getTVL().toFixed(2)}`} />
                 <Stats
-                  title="Vault APY"
+                  title={
+                    vault.isBlur && step === 2
+                      ? "Historical APY (ETH only)"
+                      : "Historical APY"
+                  }
                   value={`${(vault.isBlur && step === 1
                     ? getBlurApy()
                     : getVaultHistoricalApy()

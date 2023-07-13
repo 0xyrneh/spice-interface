@@ -39,6 +39,7 @@ export interface VaultInfo {
   apr?: number;
   apy?: number;
   historicalApy?: number;
+  estimatedApy?: number;
   totalSupply?: number;
   maxSupply?: number;
   tvlChange?: number;

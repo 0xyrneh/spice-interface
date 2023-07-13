@@ -38,11 +38,13 @@ import {
 const apiEnv = activeChainId === 1 ? "prod" : "goerli";
 
 const getVaultHistoricalApy = (vaultInfo: VaultInfo) => {
-  const aprField = activeChainId === 1 ? "actual_returns" : "expected_return";
-  return (
-    (activeChainId === 1 ? 1 : 100) *
-    (vaultInfo?.okrs ? vaultInfo?.okrs[aprField] : 0)
-  );
+  const aprField = "actual_returns";
+  return vaultInfo?.okrs ? vaultInfo?.okrs[aprField] : 0;
+};
+
+const getVaultEstimatedApy = (vaultInfo: VaultInfo) => {
+  const aprField = "expected_return";
+  return 100 * (vaultInfo?.okrs ? vaultInfo?.okrs[aprField] : 0);
 };
 
 // fetch onchain/offchain data of active vaults
@@ -139,6 +141,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
           apr: 100 * (row?.okrs?.expected_return || 0),
           apy: 100 * (row?.okrs?.expected_return || 0),
           historicalApy: getVaultHistoricalApy(row),
+          estimatedApy: getVaultEstimatedApy(row),
           name: getVaultDisplayName(row?.name),
           logo: getVaultLogo(
             row?.fungible,
@@ -171,6 +174,7 @@ export const fetchActiveVaults = async (vaults: any[]) => {
         apr: 100 * (row?.okrs?.expected_return || 0),
         apy: 100 * (row?.okrs?.expected_return || 0),
         historicalApy: getVaultHistoricalApy(row),
+        estimatedApy: getVaultEstimatedApy(row),
         name: getVaultDisplayName(row?.name),
         logo: getVaultLogo(row?.fungible, row?.type, row?.deprecated, row.name),
         backgroundImage: getVaultBackgroundImage(
@@ -309,14 +313,14 @@ export const fetchBlurVaults = async (vaults: any[]) => {
           const ethPrice = await fetchETHPrice();
           blurEstApy = calculateBlurVaultEstApy({
             originEstApy: row?.okrs?.expected_return || 0,
-            pointValue: 2.5,
+            pointValue: 2,
             totalPoints: historicalPoints?.totalSpPoints ?? 0,
             ethPrice,
             totalAssets: tvl,
             dayPoints: (historicalPoints?.weekPoints || 0) / 7,
           });
           blurHistApy = calculateBlurVaultHistApy({
-            pointValue: 2.5,
+            pointValue: 2,
             totalPoints: historicalPoints?.totalSpPoints ?? 0,
             ethPrice,
             totalAssets: tvl,
