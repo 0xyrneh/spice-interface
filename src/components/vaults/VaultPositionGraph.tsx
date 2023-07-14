@@ -188,7 +188,7 @@ export default function VaultPositionGraph({
     const shareValueChartData = vaultShares.map((row: any) => {
       return {
         x: row.time,
-        y: Number(row.share.toFixed(2)),
+        y: row.share,
       };
     });
 
