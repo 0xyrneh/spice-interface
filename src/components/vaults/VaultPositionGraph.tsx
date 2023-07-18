@@ -19,7 +19,7 @@ import {
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
 import { activeChainId } from "@/utils/web3";
-import { getUserVaultShares, getUserSpicePositions } from "@/api/subgraph";
+import { getUserVaultShares } from "@/api/subgraph";
 import { getBalanceInEther } from "@/utils/formatBalance";
 
 type Props = {

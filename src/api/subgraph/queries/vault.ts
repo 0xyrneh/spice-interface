@@ -33,21 +33,4 @@ const vaultShareQuery = `
   }
 `;
 
-const userSpicePositionQuery = `
-  query getUserSpicePositions($userAddress: String!) {
-    userSpiceHourPositions(
-      first:$cnt
-      where: {
-        address: $userAddress
-      }
-      orderBy: date
-      orderDirection: asc
-    )
-      {
-        date
-        position
-      }
-  }
-`;
-
-export { userVaultShareQuery, vaultShareQuery, userSpicePositionQuery };
+export { userVaultShareQuery, vaultShareQuery };

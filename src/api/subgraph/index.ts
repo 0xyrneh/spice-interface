@@ -6,7 +6,6 @@ import {
   prologueNftQuery,
   userVaultShareQuery,
   vaultShareQuery,
-  userSpicePositionQuery,
   // tx history query
   userTxHistoryQuery,
 } from "./queries";
@@ -78,26 +77,6 @@ export const getUserVaultShares = async (
 
     const { userVaultHourPositions } = result.data;
     return userVaultHourPositions || [];
-  } catch (err) {
-    return [];
-  }
-};
-
-// user spice position
-export const getUserSpicePositions = async (userAddress: string) => {
-  if (!userAddress) return [];
-  try {
-    const result = await vaultSubgraphClient.query({
-      query: gql(userSpicePositionQuery),
-      variables: {
-        cnt: 1000,
-        userAddress: userAddress.toLowerCase(),
-      },
-      fetchPolicy: "network-only",
-    });
-
-    const { userSpiceHourPositions } = result.data;
-    return userSpiceHourPositions || [];
   } catch (err) {
     return [];
   }
