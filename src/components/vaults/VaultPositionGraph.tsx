@@ -19,7 +19,7 @@ import {
 } from "@/config/constants/time";
 import { formatBlurChart } from "@/utils/formatter";
 import { activeChainId } from "@/utils/web3";
-import { getUserVaultShares, getUserSpicePositions } from "@/api/subgraph";
+import { getUserVaultShares } from "@/api/subgraph";
 import { getBalanceInEther } from "@/utils/formatBalance";
 
 type Props = {
@@ -65,7 +65,7 @@ export default function VaultPositionGraph({
     let nearTick = startTime;
 
     while (prevTick <= endTime) {
-      if (origin1[prevTick]) {
+      if (origin1[prevTick] != undefined) {
         nearTick = prevTick;
       }
       result = [
@@ -256,7 +256,6 @@ export default function VaultPositionGraph({
         } else {
           makeStepLike = true;
           chartData = [];
-          const data: any = {};
           let userTvls = noneBlurVaultsShares.map(({ vault, sharesRaw }) => {
             const aprHistories = getAprHistories(vault);
             return [

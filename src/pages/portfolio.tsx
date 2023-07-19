@@ -64,7 +64,6 @@ export default function PortfolioPage() {
 
         userNftPortfolios.map((row1: any) => {
           userPositionRaw = userPositionRaw.add(row1.value);
-          return row1;
         });
       }
 
@@ -76,7 +75,6 @@ export default function PortfolioPage() {
         userNftPortfolios,
       };
     })
-    .filter((row1: VaultInfo) => row1.userPosition && row1.userPosition > 0);
 
   const onSelectVault = (item?: VaultInfo) => {
     if (!item) setSelectedVaultAddr(undefined);

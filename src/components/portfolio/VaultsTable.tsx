@@ -159,7 +159,7 @@ export default function VaultsTable({
         containerClassName="flex-1"
         className="block h-full"
         rowInfos={getRowInfos()}
-        items={vaults}
+        items={vaults.filter((row1: VaultInfo) => row1.userPosition && row1.userPosition > 0)}
         trStyle="h-10"
         rowStyle="h-8"
         defaultSortKey="apy"
