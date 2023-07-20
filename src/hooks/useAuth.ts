@@ -62,7 +62,13 @@ const useAuth = () => {
     }
   };
 
-  return { login, logout };
+  const useProvider = () => {
+    const connectorId = window.localStorage.getItem(connectorLocalStorageKey);
+    if (!connectorId) return;
+    return connectorsByName[connectorId as ConnectorNames].hooks.useProvider();
+  };
+
+  return { login, logout, useProvider };
 };
 
 export default useAuth;
