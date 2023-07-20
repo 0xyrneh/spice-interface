@@ -9,6 +9,7 @@ import { LeverageTab } from "./LeverageInput";
 import { PrologueNftPortofolioInfo } from "@/types/nft";
 import { useSpiceLending } from "@/hooks/useSpiceLending";
 import { useAppSelector } from "@/state/hooks";
+import useAuth from "@/hooks/useAuth";
 import {
   DEFAULT_AGGREGATOR_VAULT,
   DEFAULT_LEND,
@@ -60,7 +61,9 @@ export default function LeverageConfirm(props: Props) {
   } = props;
 
   const dispatch = useDispatch();
-  const { account, library } = useWeb3React();
+  const { account } = useWeb3React();
+  const { useProvider } = useAuth();
+  const provider = useProvider();
   const { vaults, defaultVault } = useAppSelector((state) => state.vault);
   const { pendingTxHash, actionStatus, actionError } = useAppSelector(
     (state) => state.modal
@@ -140,6 +143,8 @@ export default function LeverageConfirm(props: Props) {
   // get leverage params from off-chain
   // call backend spice pricing api
   const getObtainLeverageParams = async () => {
+    if (!provider) return;
+
     dispatch(setActionError(undefined));
     dispatch(setActionStatus(ActionStatus.Pending));
 
@@ -201,7 +206,6 @@ export default function LeverageConfirm(props: Props) {
         LoanTerms: LoanTermsRequestType,
       };
 
-      const provider = new providers.Web3Provider(library);
       const signer = provider.getSigner();
       // eslint-disable-next-line no-underscore-dangle
       const signature = await signer._signTypedData(domain, types, terms);
@@ -237,6 +241,8 @@ export default function LeverageConfirm(props: Props) {
   // get leverage params from off-chain
   // call backend spice pricing api
   const getIncreaseLeverageParams = async (additionalAmount: string) => {
+    if (!provider) return;
+
     dispatch(setActionError(undefined));
     dispatch(setActionStatus(ActionStatus.Pending));
 
@@ -298,7 +304,6 @@ export default function LeverageConfirm(props: Props) {
         LoanTerms: LoanTermsRequestType,
       };
 
-      const provider = new providers.Web3Provider(library);
       const signer = provider.getSigner();
       // eslint-disable-next-line no-underscore-dangle
       const signature = await signer._signTypedData(domain, types, terms);

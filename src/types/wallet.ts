@@ -4,8 +4,6 @@ export enum ConnectorNames {
   Coinbase = "coinbase",
 }
 
-export type Login = (connectorId: ConnectorNames) => void;
-
 export interface Config {
   title: string;
   icon: string;

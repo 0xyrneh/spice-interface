@@ -7,7 +7,7 @@ import { Header, Footer, NotSupported } from "@/components";
 import NotificationProvider from "@/contexts/NotificationContext";
 import UIProvider from "@/contexts/UIContext";
 import { store } from "@/state/store";
-import { getLibrary } from "@/utils/web3React";
+import { connectors } from "@/utils/web3React";
 
 import "@/styles/globals.scss";
 
@@ -17,7 +17,7 @@ declare global {
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <Web3ReactProvider getLibrary={getLibrary}>
+    <Web3ReactProvider connectors={connectors}>
       <Provider store={store}>
         <UIProvider>
           <NotificationProvider>

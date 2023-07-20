@@ -1,14 +1,11 @@
-import { InjectedConnector } from "@web3-react/injected-connector";
-import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
-import { WalletLinkConnector } from "@web3-react/walletlink-connector";
-import Web3 from "web3";
-
 import { ConnectorNames } from "@/types/wallet";
-import getNodeUrl from "@/utils/getRpcUrl";
+import { CoinbaseWallet } from "@web3-react/coinbase-wallet";
+import { MetaMask } from "@web3-react/metamask";
+import { initializeConnector, Web3ReactHooks } from "@web3-react/core";
+import { WalletConnect as WalletConnectV2 } from "@web3-react/walletconnect-v2";
+
 import { spiceTestnetNodes, spiceMainnetNodes } from "./getRpcUrl";
 import { activeChainId } from "@/utils/web3";
-
-const rpcUrl = getNodeUrl();
 
 const mainnetParams = {
   chainId: 1,
@@ -36,24 +33,52 @@ const testnetParams = {
 
 const params = activeChainId === 1 ? mainnetParams : testnetParams;
 
-const injected = new InjectedConnector({ supportedChainIds: [1, 5] });
+const [metaMask, metaMaskHooks] = initializeConnector<MetaMask>(
+  (actions) => new MetaMask({ actions })
+);
 
-const walletconnect = new WalletConnectConnector({
-  rpc: { [activeChainId]: rpcUrl },
-  bridge: "https://bridge.walletconnect.org",
-  qrcode: true,
-});
+const [walletConnectV2, walletConnectV2Hooks] =
+  initializeConnector<WalletConnectV2>(
+    (actions) =>
+      new WalletConnectV2({
+        actions,
+        options: {
+          projectId: process.env.walletConnectProjectId || "",
+          chains: [activeChainId],
+          showQrModal: true,
+        },
+      })
+  );
 
-const walletlink = new WalletLinkConnector({
-  url: params.rpcUrls[0],
-  appName: "Spice",
-  supportedChainIds: [1, 5],
-});
+const [coinbaseWallet, coinbaseWalletHooks] =
+  initializeConnector<CoinbaseWallet>(
+    (actions) =>
+      new CoinbaseWallet({
+        actions,
+        options: {
+          url: params.rpcUrls[0],
+          appName: "Spice",
+        },
+      })
+  );
 
-export const connectorsByName: { [connectorName in ConnectorNames]: any } = {
-  [ConnectorNames.Injected]: injected,
-  [ConnectorNames.WalletConnect]: walletconnect,
-  [ConnectorNames.Coinbase]: walletlink,
+export const connectors: [
+  MetaMask | WalletConnectV2 | CoinbaseWallet,
+  Web3ReactHooks
+][] = [
+  [metaMask, metaMaskHooks],
+  [walletConnectV2, walletConnectV2Hooks],
+  [coinbaseWallet, coinbaseWalletHooks],
+];
+
+export const connectorsByName = {
+  [ConnectorNames.Injected]: { connector: metaMask, hooks: metaMaskHooks },
+  [ConnectorNames.WalletConnect]: {
+    connector: walletConnectV2,
+    hooks: walletConnectV2Hooks,
+  },
+  [ConnectorNames.Coinbase]: {
+    connector: coinbaseWallet,
+    hooks: coinbaseWalletHooks,
+  },
 };
-
-export const getLibrary = (provider: any): Web3 => provider;
