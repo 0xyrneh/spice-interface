@@ -1,18 +1,12 @@
 import { useCallback } from "react";
-import { UnsupportedChainIdError, useWeb3React } from "@web3-react/core";
-import {
-  NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected,
-} from "@web3-react/injected-connector";
 
 import { ConnectorNames } from "@/types/wallet";
 import { connectorLocalStorageKey } from "@/config/constants/wallet";
 import { connectorsByName } from "@/utils/web3React";
-import { setupNetwork } from "@/utils/wallet";
+// import { setupNetwork } from "@/utils/wallet";
+import { activeChainId } from "@/utils/web3";
 
 const useAuth = () => {
-  const { activate, deactivate } = useWeb3React();
-
   const activateInjectedProvider = (connectorID?: string) => {
     if (!connectorID) return;
     const { ethereum } = window;
@@ -41,29 +35,11 @@ const useAuth = () => {
   const login = useCallback(
     (connectorID: ConnectorNames) => {
       activateInjectedProvider(connectorID);
-      const connector = connectorsByName[connectorID];
+      const { connector } = connectorsByName[connectorID];
 
       if (connector) {
-        activate(connector, async (error: Error) => {
-          if (error instanceof UnsupportedChainIdError) {
-            const hasSetup = await setupNetwork();
-
-            if (hasSetup) {
-              activate(connector);
-            }
-          } else {
-            window.localStorage.removeItem(connectorLocalStorageKey);
-            if (error instanceof NoEthereumProviderError) {
-              console.log("Provider Error", "No provider was found");
-            } else if (error instanceof UserRejectedRequestErrorInjected) {
-              console.log(
-                "Authorization Error",
-                "Please authorize to access your account"
-              );
-            } else {
-              console.log(error.name, error.message);
-            }
-          }
+        connector.activate(activeChainId).catch((err: Error) => {
+          console.log(err.name, err.message);
         });
         window.localStorage.setItem(connectorLocalStorageKey, connectorID);
       } else {
@@ -74,10 +50,17 @@ const useAuth = () => {
     []
   );
 
-  const logout = useCallback(() => {
+  const logout = async () => {
+    const connectorId = window.localStorage.getItem(connectorLocalStorageKey);
     window.localStorage.removeItem(connectorLocalStorageKey);
-    deactivate();
-  }, [deactivate]);
+    if (!connectorId) return;
+    const { connector } = connectorsByName[connectorId as ConnectorNames];
+    if (connector.deactivate) {
+      await connector.deactivate();
+    } else {
+      await connector.resetState();
+    }
+  };
 
   return { login, logout };
 };
