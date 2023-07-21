@@ -3,7 +3,6 @@ import { useCallback } from "react";
 import { ConnectorNames } from "@/types/wallet";
 import { connectorLocalStorageKey } from "@/config/constants/wallet";
 import { connectorsByName } from "@/utils/web3React";
-// import { setupNetwork } from "@/utils/wallet";
 import { activeChainId } from "@/utils/web3";
 
 const useAuth = () => {
