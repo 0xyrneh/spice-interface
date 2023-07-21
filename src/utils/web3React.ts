@@ -43,7 +43,7 @@ const [walletConnectV2, walletConnectV2Hooks] =
       new WalletConnectV2({
         actions,
         options: {
-          projectId: process.env.walletConnectProjectId || "",
+          projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",
           chains: [activeChainId],
           showQrModal: true,
         },
