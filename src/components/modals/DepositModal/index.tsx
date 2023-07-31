@@ -625,6 +625,9 @@ export default function DepositModal({
   };
 
   const onChangeAmount = (newAmount: string) => {
+    if (newAmount.startsWith(".")) {
+      newAmount = "0" + newAmount;
+    }
     while (newAmount.split(".").length - 1 > 1 && newAmount.endsWith(".")) {
       newAmount = newAmount.split(".").slice(0, 2).join(".");
     }
